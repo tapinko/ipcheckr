@@ -1,0 +1,78 @@
+using IPCheckr.Api;
+using IPCheckr.Api.Config;
+using IPCheckr.Api.Models;
+using IPCheckr.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+
+namespace IPCheckr.Api
+{
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+
+            // service registrations
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddDatabase(builder.Configuration);
+            builder.Services.AddJwtAuthentication();
+            builder.Services.AddSwaggerDocumentation();
+            builder.Services.AddControllers();
+            builder.Services.AddCustomAuthorization();
+
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.Services.AddCustomCors();
+            }
+
+            var app = builder.Build();
+
+            // middlewares
+            app.UseStaticFiles();
+            app.UseRouting();
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseCors("AllowVite");
+            }
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseOpenApi();
+            app.UseSwaggerUi();
+
+            app.MapControllers();
+            app.MapFallbackToFile("index.html");
+
+            // creating admin user, setting the language and institution name empty string
+            await app.SeedDatabaseAsync();
+
+            // suply the client with the default language from the server settings
+            app.MapGet("/lang.js", async (HttpContext context) =>
+            {
+                using var scope = app.Services.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+
+                var rawLang = await db.AppSettings
+                    .Where(s => s.Name == "DefaultLanguage" || s.Name == "Language")
+                    .Select(s => s.Value)
+                    .FirstOrDefaultAsync();
+
+                var normalized = (rawLang ?? string.Empty).Trim().ToUpperInvariant();
+                var clientLang = normalized == Common.Constants.Languages.Sk
+                    ? Common.Constants.Languages.Sk
+                    : Common.Constants.Languages.En;
+
+                var js = $"window.__IPCHECKR_DEFAULT_LANGUAGE__ = '{clientLang}';";
+
+                context.Response.ContentType = "application/javascript; charset=utf-8";
+                context.Response.Headers["Cache-Control"] = "no-store, must-revalidate";
+                await context.Response.WriteAsync(js);
+            });
+
+            app.Run();
+        }
+    }
+}

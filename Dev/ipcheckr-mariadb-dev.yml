@@ -1,0 +1,17 @@
+services:
+  ipcheckr-mariadb-dev:
+    image: mariadb:latest
+    container_name: ipcheckr-mariadb-dev
+    environment:
+      - MYSQL_ROOT_PASSWORD=cisco
+      - MYSQL_DATABASE=ipcheckr
+      - MYSQL_USER=ipcheckr
+      - MYSQL_PASSWORD=cisco
+    ports:
+      - "3306:3306"
+    volumes:
+      - ipcheckr_data_dev:/var/lib/mysql
+    restart: always
+
+volumes:
+  ipcheckr_data_dev:

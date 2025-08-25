@@ -1,0 +1,83 @@
+export enum RouteParams {
+  ASSIGNMENT_GROUP_ID = "ASSIGNMENT_GROUP_ID",
+  ATTEMPT = "ATTEMPT",
+  ASSIGNMENT_ID = "ASSIGNMENT_ID",
+}
+
+export enum RouteKeys {
+  LOGIN,
+
+  ADMIN,
+  ADMIN_DASHBOARD,
+  ADMIN_USERS,
+  ADMIN_CLASSES,
+  ADMIN_SETTINGS,
+
+  TEACHER,
+  TEACHER_DASHBOARD,
+  TEACHER_MY_CLASSES,
+  TEACHER_ASSIGNMENT_GROUPS,
+  TEACHER_ASSIGNMENT_GROUPS_DETAILS,
+  TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
+
+  STUDENT,
+  STUDENT_DASHBOARD,
+  STUDENT_ASSIGNMENTS,
+  STUDENT_ASSIGNMENT_SUBMISSION,
+  STUDENT_ASSIGNMENT_DETAILS,
+}
+
+const LOGIN = "/login"
+
+const ADMIN = "/admin"
+const ADMIN_DASHBOARD = `${ADMIN}/dashboard`
+const ADMIN_USERS = `${ADMIN}/users`
+const ADMIN_CLASSES = `${ADMIN}/classes`
+const ADMIN_SETTINGS = `${ADMIN}/settings`
+
+const TEACHER = "/teacher"
+const TEACHER_DASHBOARD = `${TEACHER}/dashboard`
+const TEACHER_MY_CLASSES = `${TEACHER}/my-classes`
+const TEACHER_ASSIGNMENT_GROUPS = `${TEACHER}/assignment-groups`
+const TEACHER_ASSIGNMENT_GROUPS_DETAILS = `${TEACHER_ASSIGNMENT_GROUPS}/details/:${RouteParams.ASSIGNMENT_GROUP_ID}`
+const TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT = `${TEACHER_ASSIGNMENT_GROUPS_DETAILS}/:${RouteParams.ASSIGNMENT_ID}/:${RouteParams.ATTEMPT}`
+
+const STUDENT = "/student"
+const STUDENT_DASHBOARD = `${STUDENT}/dashboard`
+const STUDENT_ASSIGNMENS = `${STUDENT}/assignments`
+const STUDENT_ASSIGNMENT_SUBMISSION = `${STUDENT_ASSIGNMENS}/submit/:${RouteParams.ASSIGNMENT_ID}`
+const STUDENT_ASSIGNMENT_DETAILS = `${STUDENT_ASSIGNMENS}/details/:${RouteParams.ASSIGNMENT_ID}/:${RouteParams.ATTEMPT}`
+
+/**
+ * Generates a URL with parameters replaced with a provided values.
+ */
+export const getParametrizedUrl = (route: RouteKeys, params: { [key in RouteParams]?: string }) => {
+  let _route = Routes[route]
+  for (const [key, value] of Object.entries(params)) {
+    _route = _route.replace(`:${key}`, value)
+  }
+  return _route
+}
+
+export const Routes: Record<RouteKeys, string> = {
+  [RouteKeys.LOGIN]: LOGIN,
+
+  [RouteKeys.ADMIN]: ADMIN,
+  [RouteKeys.ADMIN_DASHBOARD]: ADMIN_DASHBOARD,
+  [RouteKeys.ADMIN_USERS]: ADMIN_USERS,
+  [RouteKeys.ADMIN_CLASSES]: ADMIN_CLASSES,
+  [RouteKeys.ADMIN_SETTINGS]: ADMIN_SETTINGS,
+
+  [RouteKeys.TEACHER]: TEACHER,
+  [RouteKeys.TEACHER_DASHBOARD]: TEACHER_DASHBOARD,
+  [RouteKeys.TEACHER_MY_CLASSES]: TEACHER_MY_CLASSES,
+  [RouteKeys.TEACHER_ASSIGNMENT_GROUPS]: TEACHER_ASSIGNMENT_GROUPS,
+  [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS]: TEACHER_ASSIGNMENT_GROUPS_DETAILS,
+  [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
+
+  [RouteKeys.STUDENT]: STUDENT,
+  [RouteKeys.STUDENT_DASHBOARD]: STUDENT_DASHBOARD,
+  [RouteKeys.STUDENT_ASSIGNMENTS]: STUDENT_ASSIGNMENS,
+  [RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION]: STUDENT_ASSIGNMENT_SUBMISSION,
+  [RouteKeys.STUDENT_ASSIGNMENT_DETAILS]: STUDENT_ASSIGNMENT_DETAILS,
+}

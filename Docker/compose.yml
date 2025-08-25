@@ -1,0 +1,30 @@
+services:
+  ipcheckr:
+    image: tapinko/ipcheckr:latest
+    container_name: ipcheckr
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=ipcheckr
+      - DB_USER=ipcheckr
+      - DB_PASSWORD=mystrongpassword # CHANGE
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  db:
+    image: mariadb:latest
+    container_name: ipcheckr-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=mystrongpassword # CHANGE
+      - MYSQL_DATABASE=ipcheckr
+      - MYSQL_USER=ipcheckr
+      - MYSQL_PASSWORD=mystrongpassword # CHANGE
+    volumes:
+      - ipcheckr_data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  ipcheckr_data:
