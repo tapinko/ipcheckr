@@ -4,6 +4,7 @@ import AdminClasses from "../pages/admin/AdminClasses"
 import AdminSettings from "../pages/admin/AdminSettings"
 
 import TeacherLayout from "../layouts/TeacherLayout"
+import TeacherDashboard from "../pages/teacher/TeacherDashboard"
 import TeacherMyClasses from "../pages/teacher/TeacherMyClasses"
 import TeacherAssignmentGroups from "../pages/teacher/TeacherAssignmentGroups"
 import TeacherAssignmentGroupDetails from "../pages/teacher/TeacherAssignmentGroupDetails"
@@ -36,7 +37,7 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.ADMIN_SETTINGS]: <AdminSettings />,
 
   [RouteKeys.TEACHER]: <Navigate to={Routes[RouteKeys.TEACHER_DASHBOARD]} />,
-  [RouteKeys.TEACHER_DASHBOARD]: <div>Teacher Dashboard</div>,
+  [RouteKeys.TEACHER_DASHBOARD]: <TeacherDashboard />,
   [RouteKeys.TEACHER_MY_CLASSES]: <TeacherMyClasses />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS]: <TeacherAssignmentGroups />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS]: <TeacherAssignmentGroupDetails />,
