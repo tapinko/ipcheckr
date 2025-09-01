@@ -1,6 +1,6 @@
 # IPCheckr
 
-![ipcheckr logo](Assets/bg_w_cr_text-h150.png)
+![ipcheckr logo](Assets/github-images/bg_w_cr_text-h150.png)
 
 A minimal self-hosted application for teaching and testing subnetting and IP networking concepts.  
 Provides role-based management for administrators, teachers and students with a web client and .NET API.
