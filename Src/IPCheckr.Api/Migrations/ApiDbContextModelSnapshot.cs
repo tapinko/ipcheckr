@@ -235,6 +235,12 @@ namespace IPCheckr.Api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime>("SubmittedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTime>("SubmittedAt"));
+
                     b.HasKey("Id");
 
                     b.HasIndex("AssignmentId");

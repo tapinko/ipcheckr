@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IPCheckr.Api.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20250824204719_InitialCreate")]
+    [Migration("20250901204118_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -237,6 +237,12 @@ namespace IPCheckr.Api.Migrations
                     b.Property<string>("Networks")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTime>("SubmittedAt"));
 
                     b.HasKey("Id");
 

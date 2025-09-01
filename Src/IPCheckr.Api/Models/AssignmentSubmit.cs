@@ -20,5 +20,8 @@ namespace IPCheckr.Api.Models
         public required string[] LastUsables { get; set; }
 
         public required string[] Broadcasts { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime SubmittedAt { get; set; }
     }
 }
