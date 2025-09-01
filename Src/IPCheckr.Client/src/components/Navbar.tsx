@@ -2,6 +2,7 @@ import {
   AppBar,
   Box,
   Button,
+  Divider,
   IconButton,
   Toolbar,
   Typography
@@ -15,6 +16,7 @@ import { ThemeContext } from "../contexts/ThemeContext"
 import { useAuth } from "../contexts/AuthContext"
 import { RouteKeys, Routes } from "../router/routes"
 import UserRole from "../types/UserRole"
+import bg_w_cr_text from "../assets/bg_w_cr_text.svg"
 
 interface NavItem {
   labelKey: TranslationKey
@@ -26,7 +28,7 @@ interface RoleConfig {
   items: NavItem[]
 }
 
-const navbarTitle = "IPCheckr"
+const navbarTitle = bg_w_cr_text
 
 const roleConfig: Record<UserRole, RoleConfig> = {
   [UserRole.ADMIN]: {
@@ -100,9 +102,19 @@ const Navbar = ({ role }: NavbarProps) => {
       <AppBar position="static">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-            <Typography variant="h6" component="div">
-              {cfg.titleKey}
-            </Typography>
+            <Box
+              component="img"
+              src={cfg.titleKey}
+              alt="IPCheckr"
+              sx={{
+                height: 32,
+                display: "block",
+                filter: "drop-shadow(0px 6px 6px rgba(0, 0, 0, 0.3))",
+                cursor: "pointer"
+              }}
+              onClick={() => navigate(Routes[RouteKeys.LOGIN], { replace: true })}
+            />
+            <Divider orientation="vertical" sx={{ height: 32, borderColor: "rgba(255, 255, 255, 0.5)" }} />
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {navButtons}
             </Box>
