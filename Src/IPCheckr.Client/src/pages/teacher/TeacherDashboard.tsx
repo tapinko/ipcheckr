@@ -1,6 +1,5 @@
-import { useEffect, useState, type ReactElement, type ReactNode } from "react"
+import { useEffect, useState } from "react"
 import {
-  Avatar,
   Box,
   Card,
   CardContent,
@@ -25,32 +24,8 @@ import CardsSkeleton from "../../components/CardsSkeleton"
 import { TranslationKey } from "../../utils/i18n"
 import { AccessTime, Class, EmojiEvents, Groups, School } from "@mui/icons-material"
 import { BarChart } from "@mui/x-charts"
-
-interface IStatsCardProps {
-  title: string
-  value: ReactNode
-  icon: ReactElement
-}
-
-const StatsCard = ({
-  title,
-  value,
-  icon
-}: IStatsCardProps) => (
-  <Card variant="outlined">
-    <CardContent>
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Avatar sx={{ bgcolor: "primary.main" }}>{icon}</Avatar>
-        <Box>
-          <Typography variant="overline" color="text.secondary">
-            {title}
-          </Typography>
-          <Typography variant="h6">{value}</Typography>
-        </Box>
-      </Stack>
-    </CardContent>
-  </Card>
-)
+import StatsCard from "../../components/StatsCard"
+import TableSkeleton from "../../components/TableSkeleton"
 
 const TeacherDashboard = () => {
   const { t } = useTranslation()
@@ -95,7 +70,10 @@ const TeacherDashboard = () => {
       <Divider sx={{ my: 2 }} />
 
       {dashboardQuery.isLoading ? (
-        <CardsSkeleton />
+        <>
+          <TableSkeleton />
+          <CardsSkeleton />
+        </>
       ) : dashboardQuery.isError ? (
         <ErrorLoading
           onRetry={() =>
