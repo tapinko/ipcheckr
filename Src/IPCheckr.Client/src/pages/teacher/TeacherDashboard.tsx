@@ -104,7 +104,7 @@ const TeacherDashboard = () => {
         />
       ) : (<Stack spacing={2}>
         <Grid container spacing={2}>
-          <Grid>
+          <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
                 title={t(TranslationKey.TEACHER_DASHBOARD_LAST_SUBMIT)}
@@ -146,7 +146,7 @@ const TeacherDashboard = () => {
             </Stack>
           </Grid>
 
-          <Grid>
+          <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
                 title={t(TranslationKey.TEACHER_DASHBOARD_INSTITUTION_NAME)}
