@@ -134,7 +134,7 @@ namespace IPCheckr.Api.Controllers
                     }
 
                     var latestSubmit = assignmentSubmits.OrderByDescending(s => s.Attempt).First();
-                    lastSubmit = assignment.IsCompleted ? assignment.CompletedAt : null;
+                    lastSubmit = assignmentSubmits.First().SubmittedAt;
                 }
 
                 sumFirstAttemptPercentages += firstAttemptSuccessRate;
