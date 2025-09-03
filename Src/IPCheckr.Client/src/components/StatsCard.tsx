@@ -13,13 +13,15 @@ interface IStatsCardProps {
   value: ReactNode
   icon: ReactElement
   color?: "primary" | "secondary" | "error" | "warning" | "info" | "success" | "default"
+  actions?: ReactNode
 }
   
 const StatsCard = ({
   title,
   value,
   icon,
-  color = "primary"
+  color = "primary",
+  actions
 }: IStatsCardProps) => {
   const getMuiPalette = (color: string) => {
     switch (color) {
@@ -51,6 +53,8 @@ const StatsCard = ({
             </Typography>
             <Typography variant="h6">{value}</Typography>
           </Box>
+          <Box flexGrow={1} />
+          <Box>{actions}</Box>
         </Stack>
       </CardContent>
     </Card>
