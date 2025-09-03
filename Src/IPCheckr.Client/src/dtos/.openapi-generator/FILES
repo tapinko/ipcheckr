@@ -37,6 +37,7 @@ docs/EditUserReq.md
 docs/LoginReq.md
 docs/LoginRes.md
 docs/ProblemDetails.md
+docs/QueryAdminDashboardRes.md
 docs/QueryAppSettingRes.md
 docs/QueryAssignmentDataForSubmitRes.md
 docs/QueryAssignmentGroupDetailsRes.md

@@ -824,6 +824,73 @@ export interface ProblemDetails {
 /**
  * 
  * @export
+ * @interface QueryAdminDashboardRes
+ */
+export interface QueryAdminDashboardRes {
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAdminDashboardRes
+     */
+    'institutionName'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalClasses': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalStudents': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAdminDashboardRes
+     */
+    'lastSubmitUsername'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAdminDashboardRes
+     */
+    'lastSubmitAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalSubmits': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalAssignmentGroups': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalUpcoming': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalInProgress': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalEnded': number;
+}
+/**
+ * 
+ * @export
  * @interface QueryAppSettingRes
  */
 export interface QueryAppSettingRes {
@@ -1143,13 +1210,13 @@ export interface QueryTeacherDashboardRes {
      * @type {number}
      * @memberof QueryTeacherDashboardRes
      */
-    'totalClasses'?: number;
+    'totalClasses': number;
     /**
      * 
      * @type {number}
      * @memberof QueryTeacherDashboardRes
      */
-    'totalStudents'?: number;
+    'totalStudents': number;
     /**
      * 
      * @type {Array<TeacherBarChartDataDto>}
@@ -2852,6 +2919,38 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
     return {
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardQueryAdminDashboard: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/dashboard/get-admin-dashboard`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {number} [barChartLength] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2887,6 +2986,53 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {string | null} [minLevel] 
+         * @param {string | null} [categoryStartsWith] 
+         * @param {string | null} [contains] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardStreamLogs: async (minLevel?: string | null, categoryStartsWith?: string | null, contains?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/dashboard/stream-logs`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (minLevel !== undefined) {
+                localVarQueryParameter['MinLevel'] = minLevel;
+            }
+
+            if (categoryStartsWith !== undefined) {
+                localVarQueryParameter['CategoryStartsWith'] = categoryStartsWith;
+            }
+
+            if (contains !== undefined) {
+                localVarQueryParameter['Contains'] = contains;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -2899,6 +3045,17 @@ export const DashboardApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardQueryAdminDashboard(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryAdminDashboardRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardQueryAdminDashboard(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DashboardApi.dashboardQueryAdminDashboard']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {number} [barChartLength] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2907,6 +3064,20 @@ export const DashboardApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardQueryTeacherDashboard(barChartLength, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DashboardApi.dashboardQueryTeacherDashboard']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string | null} [minLevel] 
+         * @param {string | null} [categoryStartsWith] 
+         * @param {string | null} [contains] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardStreamLogs(minLevel?: string | null, categoryStartsWith?: string | null, contains?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardStreamLogs(minLevel, categoryStartsWith, contains, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DashboardApi.dashboardStreamLogs']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -2921,12 +3092,31 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
     return {
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardQueryAdminDashboard(options?: RawAxiosRequestConfig): AxiosPromise<QueryAdminDashboardRes> {
+            return localVarFp.dashboardQueryAdminDashboard(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {number} [barChartLength] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         dashboardQueryTeacherDashboard(barChartLength?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryTeacherDashboardRes> {
             return localVarFp.dashboardQueryTeacherDashboard(barChartLength, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string | null} [minLevel] 
+         * @param {string | null} [categoryStartsWith] 
+         * @param {string | null} [contains] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardStreamLogs(minLevel?: string | null, categoryStartsWith?: string | null, contains?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.dashboardStreamLogs(minLevel, categoryStartsWith, contains, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2940,6 +3130,16 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
 export class DashboardApi extends BaseAPI {
     /**
      * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardQueryAdminDashboard(options?: RawAxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardQueryAdminDashboard(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {number} [barChartLength] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -2947,6 +3147,19 @@ export class DashboardApi extends BaseAPI {
      */
     public dashboardQueryTeacherDashboard(barChartLength?: number, options?: RawAxiosRequestConfig) {
         return DashboardApiFp(this.configuration).dashboardQueryTeacherDashboard(barChartLength, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string | null} [minLevel] 
+     * @param {string | null} [categoryStartsWith] 
+     * @param {string | null} [contains] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardStreamLogs(minLevel?: string | null, categoryStartsWith?: string | null, contains?: string | null, options?: RawAxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardStreamLogs(minLevel, categoryStartsWith, contains, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

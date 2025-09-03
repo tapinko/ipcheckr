@@ -5,6 +5,7 @@ using IPCheckr.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using IPCheckr.Api.Services.Logging;
 
 namespace IPCheckr.Api
 {
@@ -21,6 +22,28 @@ namespace IPCheckr.Api
             builder.Services.AddSwaggerDocumentation();
             builder.Services.AddControllers();
             builder.Services.AddCustomAuthorization();
+
+            builder.Services.AddSingleton<ILogStreamBroker, LogStreamBroker>();
+            builder.Logging.Services.AddSingleton<ILoggerProvider, BroadcastLoggerProvider>();
+
+            builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.Events ??= new JwtBearerEvents();
+                var prev = options.Events.OnMessageReceived;
+                options.Events.OnMessageReceived = async context =>
+                {
+                    var path = context.HttpContext.Request.Path;
+                    if (path.StartsWithSegments("/api/dashboard/stream-logs"))
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        if (!string.IsNullOrEmpty(accessToken))
+                        {
+                            context.Token = accessToken!;
+                        }
+                    }
+                    if (prev != null) await prev(context);
+                };
+            });
 
             if (builder.Environment.IsDevelopment())
             {

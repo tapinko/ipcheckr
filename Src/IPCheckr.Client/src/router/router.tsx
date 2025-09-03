@@ -1,4 +1,5 @@
 import AdminLayout from "../layouts/AdminLayout"
+import AdminDashboard from "../pages/admin/AdminDashboard"
 import AdminUsers from "../pages/admin/AdminUsers"
 import AdminClasses from "../pages/admin/AdminClasses"
 import AdminSettings from "../pages/admin/AdminSettings"
@@ -31,7 +32,7 @@ const childPath = (full: string, parent: string) =>
 
 const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.ADMIN]: <Navigate to={Routes[RouteKeys.ADMIN_DASHBOARD]} />,
-  [RouteKeys.ADMIN_DASHBOARD]: <div>Admin Dashboard</div>,
+  [RouteKeys.ADMIN_DASHBOARD]: <AdminDashboard />,
   [RouteKeys.ADMIN_USERS]: <AdminUsers />,
   [RouteKeys.ADMIN_CLASSES]: <AdminClasses />,
   [RouteKeys.ADMIN_SETTINGS]: <AdminSettings />,
