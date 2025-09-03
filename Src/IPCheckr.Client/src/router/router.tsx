@@ -12,6 +12,7 @@ import TeacherAssignmentGroupDetails from "../pages/teacher/TeacherAssignmentGro
 import TeacherAssignmentGroupDetailsSubmit from "../pages/teacher/TeacherAssignmentGroupDetailsSubmit"
 
 import StudentLayout from "../layouts/StudentLayout"
+import StudentDashboard from "../pages/student/StudentDashboard"
 import StudentAssignments from "../pages/student/StudentAssignments"
 import StudentAssignmentSubmission from "../pages/student/StudentAssignmentSubmission"
 import StudentAssignmentDetails from "../pages/student/StudentAssignmentDetails"
@@ -45,7 +46,7 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <TeacherAssignmentGroupDetailsSubmit />,
 
   [RouteKeys.STUDENT]: <Navigate to={Routes[RouteKeys.STUDENT_DASHBOARD]} />,
-  [RouteKeys.STUDENT_DASHBOARD]: <div>Student Dashboard</div>,
+  [RouteKeys.STUDENT_DASHBOARD]: <StudentDashboard />,
   [RouteKeys.STUDENT_ASSIGNMENTS]: <StudentAssignments />,
   [RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION]: <StudentAssignmentSubmission />,
   [RouteKeys.STUDENT_ASSIGNMENT_DETAILS]: <StudentAssignmentDetails />,

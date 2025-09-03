@@ -1196,6 +1196,79 @@ export interface QueryClassesRes {
 /**
  * 
  * @export
+ * @interface QueryStudentDashboardRes
+ */
+export interface QueryStudentDashboardRes {
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryStudentDashboardRes
+     */
+    'institutionName'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDashboardRes
+     */
+    'totalAssignmentGroups': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDashboardRes
+     */
+    'totalUpcoming': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDashboardRes
+     */
+    'totalInProgress': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDashboardRes
+     */
+    'totalEnded': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryStudentDashboardRes
+     */
+    'classes': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryStudentDashboardRes
+     */
+    'teachers': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryStudentDashboardRes
+     */
+    'lastSubmitAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDashboardRes
+     */
+    'totalSubmits': number;
+    /**
+     * 
+     * @type {Array<StudentLinesChartDataDto>}
+     * @memberof QueryStudentDashboardRes
+     */
+    'successRate': Array<StudentLinesChartDataDto>;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDashboardRes
+     */
+    'lastSubmitId'?: number | null;
+}
+/**
+ * 
+ * @export
  * @interface QueryTeacherDashboardRes
  */
 export interface QueryTeacherDashboardRes {
@@ -1267,6 +1340,12 @@ export interface QueryTeacherDashboardRes {
     'totalStudents': number;
     /**
      * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'totalSubmits': number;
+    /**
+     * 
      * @type {Array<TeacherBarChartDataDto>}
      * @memberof QueryTeacherDashboardRes
      */
@@ -1277,12 +1356,6 @@ export interface QueryTeacherDashboardRes {
      * @memberof QueryTeacherDashboardRes
      */
     'averagePercentageInClasses'?: Array<TeacherBarChartDataDto> | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryTeacherDashboardRes
-     */
-    'totalSubmits': number;
 }
 /**
  * 
@@ -1302,6 +1375,25 @@ export interface QueryUsersRes {
      * @memberof QueryUsersRes
      */
     'totalCount': number;
+}
+/**
+ * 
+ * @export
+ * @interface StudentLinesChartDataDto
+ */
+export interface StudentLinesChartDataDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentLinesChartDataDto
+     */
+    'date': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof StudentLinesChartDataDto
+     */
+    'percentage': number;
 }
 /**
  * 
@@ -3005,6 +3097,38 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardQueryStudentDashboard: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/dashboard/get-student-dashboard`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {number} [barChartLength] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3110,6 +3234,17 @@ export const DashboardApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardQueryStudentDashboard(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryStudentDashboardRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardQueryStudentDashboard(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DashboardApi.dashboardQueryStudentDashboard']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {number} [barChartLength] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3154,6 +3289,14 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardQueryStudentDashboard(options?: RawAxiosRequestConfig): AxiosPromise<QueryStudentDashboardRes> {
+            return localVarFp.dashboardQueryStudentDashboard(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {number} [barChartLength] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3190,6 +3333,16 @@ export class DashboardApi extends BaseAPI {
      */
     public dashboardQueryAdminDashboard(options?: RawAxiosRequestConfig) {
         return DashboardApiFp(this.configuration).dashboardQueryAdminDashboard(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardQueryStudentDashboard(options?: RawAxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardQueryStudentDashboard(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

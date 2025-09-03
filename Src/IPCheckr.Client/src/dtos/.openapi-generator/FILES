@@ -47,8 +47,10 @@ docs/QueryAssignmentSubmitDetailsFullRecordField.md
 docs/QueryAssignmentSubmitDetailsFullRes.md
 docs/QueryAssignmentsRes.md
 docs/QueryClassesRes.md
+docs/QueryStudentDashboardRes.md
 docs/QueryTeacherDashboardRes.md
 docs/QueryUsersRes.md
+docs/StudentLinesChartDataDto.md
 docs/SubmitAssignmentField.md
 docs/SubmitAssignmentReq.md
 docs/SubmitAssignmentRes.md
