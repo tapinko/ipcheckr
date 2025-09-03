@@ -22,7 +22,7 @@ import type { QueryTeacherDashboardRes } from "../../dtos"
 import ErrorLoading from "../../components/ErrorLoading"
 import CardsSkeleton from "../../components/CardsSkeleton"
 import { TranslationKey } from "../../utils/i18n"
-import { AccessTime, Class, EmojiEvents, Groups, School } from "@mui/icons-material"
+import { AccessTime, Class, EmojiEvents, Groups, Quiz, School, TaskAlt } from "@mui/icons-material"
 import { BarChart } from "@mui/x-charts"
 import StatsCard from "../../components/StatsCard"
 import TableSkeleton from "../../components/TableSkeleton"
@@ -85,6 +85,18 @@ const TeacherDashboard = () => {
           <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
+                title={t(TranslationKey.ADMIN_DASHBOARD_INSTITUTION_NAME)}
+                value={dashboardQuery.data?.institutionName ?? "-"}
+                icon={<School />}
+              />
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2}>
+          <Grid flex={1}>
+            <Stack spacing={2}>
+              <StatsCard
                 title={t(TranslationKey.TEACHER_DASHBOARD_LAST_SUBMIT)}
                 value={
                   dashboardQuery.data?.lastSubmitUsername ? (
@@ -121,25 +133,48 @@ const TeacherDashboard = () => {
                   />
                 </Box>
               </Tooltip>
+              <StatsCard
+                title={t(TranslationKey.TEACHER_DASHBOARD_CLASSES)}
+                value={dashboardQuery.data?.totalClasses}
+                icon={<Class />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_DASHBOARD_STUDENTS)}
+                value={dashboardQuery.data?.totalStudents}
+                icon={<Groups />}
+              />
             </Stack>
           </Grid>
 
           <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_INSTITUTION_NAME)}
-                value={dashboardQuery.data?.institutionName ?? "-"}
-                icon={<School />}
+                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_SUBMITS)}
+                value={dashboardQuery.data?.totalSubmits}
+                icon={<TaskAlt />}
               />
               <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_CLASSES)}
-                value={dashboardQuery.data?.totalClasses ?? 0}
-                icon={<Class />}
+                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
+                value={dashboardQuery.data?.totalAssignmentGroups}
+                icon={<Quiz />}
               />
               <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_STUDENTS)}
-                value={dashboardQuery.data?.totalStudents ?? 0}
-                icon={<Groups />}
+                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_UPCOMING)}
+                value={dashboardQuery.data?.totalUpcoming}
+                icon={<AccessTime />}
+                color="default"
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_IN_PROGRESS)}
+                value={dashboardQuery.data?.totalInProgress}
+                icon={<AccessTime />}
+                color="warning"
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_ENDED)}
+                value={dashboardQuery.data?.totalEnded}
+                icon={<AccessTime />}
+                color="success"
               />
             </Stack>
           </Grid>

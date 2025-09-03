@@ -574,6 +574,30 @@ export interface DashboardResBase {
      * @memberof DashboardResBase
      */
     'institutionName'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof DashboardResBase
+     */
+    'totalAssignmentGroups': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DashboardResBase
+     */
+    'totalUpcoming': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DashboardResBase
+     */
+    'totalInProgress': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DashboardResBase
+     */
+    'totalEnded': number;
 }
 /**
  * 
@@ -838,6 +862,30 @@ export interface QueryAdminDashboardRes {
      * @type {number}
      * @memberof QueryAdminDashboardRes
      */
+    'totalAssignmentGroups': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalUpcoming': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalInProgress': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'totalEnded': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
     'totalClasses': number;
     /**
      * 
@@ -863,30 +911,6 @@ export interface QueryAdminDashboardRes {
      * @memberof QueryAdminDashboardRes
      */
     'totalSubmits': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAdminDashboardRes
-     */
-    'totalAssignmentGroups': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAdminDashboardRes
-     */
-    'totalUpcoming': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAdminDashboardRes
-     */
-    'totalInProgress': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAdminDashboardRes
-     */
-    'totalEnded': number;
 }
 /**
  * 
@@ -1183,6 +1207,30 @@ export interface QueryTeacherDashboardRes {
     'institutionName'?: string | null;
     /**
      * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'totalAssignmentGroups': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'totalUpcoming': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'totalInProgress': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'totalEnded': number;
+    /**
+     * 
      * @type {string}
      * @memberof QueryTeacherDashboardRes
      */
@@ -1229,6 +1277,12 @@ export interface QueryTeacherDashboardRes {
      * @memberof QueryTeacherDashboardRes
      */
     'averagePercentageInClasses'?: Array<TeacherBarChartDataDto> | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'totalSubmits': number;
 }
 /**
  * 

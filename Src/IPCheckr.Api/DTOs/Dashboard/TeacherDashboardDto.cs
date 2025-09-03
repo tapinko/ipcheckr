@@ -25,6 +25,9 @@ namespace IPCheckr.Api.DTOs.Dashboard
         [Required]
         public int TotalStudents { get; set; }
 
+        [Required]
+        public int TotalSubmits { get; set; }
+
         public TeacherBarChartDataDto[]? AveragePercentageInStudents { get; set; }
 
         public TeacherBarChartDataDto[]? AveragePercentageInClasses { get; set; }

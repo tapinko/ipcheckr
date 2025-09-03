@@ -16,17 +16,5 @@ namespace IPCheckr.Api.DTOs.Dashboard
 
         [Required]
         public int TotalSubmits { get; set; }
-
-        [Required]
-        public int TotalAssignmentGroups { get; set; }
-
-        [Required]
-        public int TotalUpcoming { get; set; }
-
-        [Required]
-        public int TotalInProgress { get; set; }
-        
-        [Required]
-        public int TotalEnded { get; set; }
     }
 }

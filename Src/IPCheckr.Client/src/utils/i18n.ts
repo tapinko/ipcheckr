@@ -205,6 +205,11 @@ export enum TranslationKey {
   TEACHER_DASHBOARD_PERCENTAGE = "TEACHER_DASHBOARD_PERCENTAGE",
   TEACHER_DASHBOARD_LAST_SUBMIT = "TEACHER_DASHBOARD_LAST_SUBMIT",
   TEACHER_DASHBOARD_NO_DATA = "TEACHER_DASHBOARD_NO_DATA",
+  TEACHER_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS = "TEACHER_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS",
+  TEACHER_DASHBOARD_TOTAL_UPCOMING = "TEACHER_DASHBOARD_TOTAL_UPCOMING",
+  TEACHER_DASHBOARD_TOTAL_IN_PROGRESS = "TEACHER_DASHBOARD_TOTAL_IN_PROGRESS",
+  TEACHER_DASHBOARD_TOTAL_ENDED = "TEACHER_DASHBOARD_TOTAL_ENDED",
+  TEACHER_DASHBOARD_TOTAL_SUBMITS = "TEACHER_DASHBOARD_SUBMITS",
 
   // Teacher My Classes
   TEACHER_MY_CLASSES_TITLE = "TEACHER_MY_CLASSES_TITLE",
@@ -553,6 +558,11 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_DASHBOARD_PERCENTAGE]: "Percentage",
   [TranslationKey.TEACHER_DASHBOARD_LAST_SUBMIT]: "Last submit",
   [TranslationKey.TEACHER_DASHBOARD_NO_DATA]: "No data available",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS]: "Total assignments",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_UPCOMING]: "Total upcoming",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_IN_PROGRESS]: "Total in progress",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_ENDED]: "Total ended",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_SUBMITS]: "Total submits",
 
   // Teacher My Classes
   [TranslationKey.TEACHER_MY_CLASSES_TITLE]: "My classes",
@@ -898,6 +908,11 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_DASHBOARD_PERCENTAGE]: "Percentá",
   [TranslationKey.TEACHER_DASHBOARD_LAST_SUBMIT]: "Posledné odovzdanie",
   [TranslationKey.TEACHER_DASHBOARD_NO_DATA]: "Žiadne dostupné údaje",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS]: "Celkové zadania",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_UPCOMING]: "Celkové nadchádzajúce",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_IN_PROGRESS]: "Celkové prebiehajúce",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_ENDED]: "Celkové ukončené",
+  [TranslationKey.TEACHER_DASHBOARD_TOTAL_SUBMITS]: "Celkové odovzdania",
 
   // Teacher My Classes
   [TranslationKey.TEACHER_MY_CLASSES_TITLE]: "Moje triedy",

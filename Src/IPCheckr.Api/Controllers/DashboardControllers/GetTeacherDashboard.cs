@@ -122,6 +122,26 @@ namespace IPCheckr.Api.Controllers
             var institution = await _db.AppSettings.FirstOrDefaultAsync(a => a.Name == "InstitutionName");
             var institutionName = institution?.Value;
 
+            var now = DateTime.UtcNow;
+
+            var totalAssignmentGroups = await _db.AssignmentGroups
+                .Where(ag => classIds.Contains(ag.Class.Id))
+                .CountAsync();
+
+            var totalUpcoming = await _db.AssignmentGroups
+                .Where(ag => classIds.Contains(ag.Class.Id) && ag.StartDate > now)
+                .CountAsync();
+
+            var totalInProgress = await _db.AssignmentGroups
+                .Where(ag => classIds.Contains(ag.Class.Id) && ag.StartDate <= now && ag.Deadline >= now)
+                .CountAsync();
+
+            var totalEnded = await _db.AssignmentGroups
+                .Where(ag => classIds.Contains(ag.Class.Id) && ag.Deadline <= now)
+                .CountAsync();
+
+            var totalSubmits = submits.Count;
+
             var totalClasses = classes.Count;
             var totalStudents = classes
                 .SelectMany(c => c.Students ?? Enumerable.Empty<Models.User>())
@@ -139,12 +159,17 @@ namespace IPCheckr.Api.Controllers
             var res = new QueryTeacherDashboardRes
             {
                 InstitutionName = institutionName,
+                TotalAssignmentGroups = totalAssignmentGroups,
+                TotalUpcoming = totalUpcoming,
+                TotalInProgress = totalInProgress,
+                TotalEnded = totalEnded,
                 LastSubmitUsername = lastSubmitUsername,
                 LastSubmitAt = lastSubmitAt,
                 MostSuccessfulClass = mostSuccessfulClass,
                 MostSuccessfulStudent = mostSuccessfulStudent,
                 TotalClasses = totalClasses,
                 TotalStudents = totalStudents,
+                TotalSubmits = totalSubmits,
                 AveragePercentageInStudents = studentBars,
                 AveragePercentageInClasses = classBars
             };
