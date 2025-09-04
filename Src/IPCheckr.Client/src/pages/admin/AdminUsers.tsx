@@ -311,7 +311,7 @@ const AdminUsers = () => {
         }}
         onDetails={() => {}}
         onDelete={() => setDeleteDialogvis(true)}
-        disableEdit={selectedRows.userId.length !== 1 || hasAdminSelected}
+        disableEdit={selectedRows.userId.length !== 1}
         disableDetails={selectedRows.userId.length !== 1 || hasAdminSelected}
         disableDelete={selectedRows.userId.length === 0 || hasAdminSelected}
         addLabel={t(TranslationKey.ADMIN_USERS_ADD_USER)}
@@ -531,6 +531,7 @@ const AdminUsers = () => {
               }}
               render={({ field }) => (
                 <TextField
+                  disabled={hasAdminSelected}
                   margin="dense"
                   label={t(TranslationKey.ADMIN_USERS_USERNAME)}
                   fullWidth
@@ -575,6 +576,7 @@ const AdminUsers = () => {
                 <FormControl fullWidth margin="dense">
                   <InputLabel>{t(TranslationKey.ADMIN_USERS_CLASS)}</InputLabel>
                   <Select
+                    disabled={hasAdminSelected}
                     multiple
                     value={field.value}
                     onChange={e =>
