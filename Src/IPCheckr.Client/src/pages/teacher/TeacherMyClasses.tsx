@@ -236,7 +236,7 @@ const TeacherMyClasses = () => {
         classIds: data.classIds
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] })
+      queryClient.invalidateQueries({ queryKey: ["classStudents"] })
       setAlert({
         severity: "success",
         message: t(TranslationKey.ADMIN_USER_ADD_SUCCESS, { value: addStudentWatchValues.username })
