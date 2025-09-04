@@ -15,17 +15,16 @@ namespace IPCheckr.Api.Controllers
         public async Task<ActionResult<LoginRes>> Login([FromBody] LoginReq req)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == req.Username);
+
             if (user == null || !BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
-            {
-                return Unauthorized(new ApiProblemDetails
+                return StatusCode(StatusCodes.Status401Unauthorized, new ApiProblemDetails
                 {
                     Title = "Unauthorized",
                     Detail = "Invalid username or password.",
                     Status = StatusCodes.Status401Unauthorized,
                     MessageEn = "Invalid username or password.",
-                    MessageSk = "Neplatné používateľské meno alebo heslo."
+                    MessageSk = "Neplatné používateľské meno alebo heslo.",
                 });
-            }
 
             var claims = new[]
             {
