@@ -10,6 +10,7 @@ services:
       - DB_NAME=ipcheckr
       - DB_USER=ipcheckr
       - DB_PASSWORD=mystrongpassword # CHANGE
+      - TZ=Europe/Bratislava
     ports:
       - "8080:8080"
     restart: unless-stopped
