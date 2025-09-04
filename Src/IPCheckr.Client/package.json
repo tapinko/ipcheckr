@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dtos": "openapi-generator-cli generate -i http://localhost:5236/swagger/v1/swagger.json -g typescript-axios -o src/dtos/"
+    "dtos": "openapi-generator-cli generate -i http://localhost:5236/swagger/v1/swagger.json -g typescript-axios -o src/dtos/ --global-property=apiDocs=false,apiTests=false,modelDocs=false,modelTests=false,supportingFiles=none"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
