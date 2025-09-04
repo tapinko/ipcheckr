@@ -774,21 +774,21 @@ const TeacherAssignmentGroups = () => {
                     />
                   )}
                 />
-                <Tooltip
-                  title={t(
-                    TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS_TOOLTIP
-                  )}
-                >
-                  <Controller
-                    name="numberOfRecords"
-                    control={createAGControl}
-                    rules={{
-                      ...FormRules.required(),
-                      validate: v =>
-                        v > 0 ||
-                        t(TranslationKey.FORM_RULES_REQUIRED).toString()
-                    }}
-                    render={({ field }) => (
+                <Controller
+                  name="numberOfRecords"
+                  control={createAGControl}
+                  rules={{
+                    ...FormRules.required(),
+                    validate: v =>
+                      v > 0 ||
+                      t(TranslationKey.FORM_RULES_REQUIRED).toString()
+                  }}
+                  render={({ field }) => (
+                    <Tooltip
+                      title={t(
+                        TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS_TOOLTIP
+                      )}
+                    >
                       <TextField
                         margin="dense"
                         label={t(
@@ -807,9 +807,9 @@ const TeacherAssignmentGroups = () => {
                             : ""
                         }
                       />
-                    )}
-                  />
-                </Tooltip>
+                    </Tooltip>
+                  )}
+                />
                 <Controller
                   name="possibleAttempts"
                   control={createAGControl}
@@ -844,53 +844,59 @@ const TeacherAssignmentGroups = () => {
                   name="studentsIds"
                   control={createAGControl}
                   render={({ field }) => (
-                    <FormControl fullWidth margin="dense">
-                      <InputLabel>
-                        {t(
-                          TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS
-                        )}
-                      </InputLabel>
-                      <Select
-                        multiple
-                        value={field.value}
-                        onChange={e =>
-                          field.onChange(
-                            Array.isArray(e.target.value)
-                              ? e.target.value.map(Number)
-                              : []
-                          )
-                        }
-                        input={
-                          <OutlinedInput
-                            label={t(
-                              TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS
-                            )}
-                          />
-                        }
-                        renderValue={selected =>
-                          (studentsQuery.data ?? [])
-                            .filter(c =>
-                              (selected as (number | string)[]).includes(
-                                c.id
-                              )
+                    <Tooltip
+                      title={t(
+                        TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED_TOOLTIP
+                      )}
+                    >
+                      <FormControl fullWidth margin="dense">
+                        <InputLabel>
+                          {t(
+                            TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS
+                          )}
+                        </InputLabel>
+                        <Select
+                          multiple
+                          value={field.value}
+                          onChange={e =>
+                            field.onChange(
+                              Array.isArray(e.target.value)
+                                ? e.target.value.map(Number)
+                                : []
                             )
-                            .map(c => c.username)
-                            .join(", ")
-                        }
-                      >
-                        {(studentsQuery.data ?? []).map(_student => (
-                          <MenuItem key={_student.id} value={_student.id}>
-                            <Checkbox
-                              checked={
-                                (field.value ?? []).indexOf(_student.id) >
-                                -1
-                              }
+                          }
+                          input={
+                            <OutlinedInput
+                              label={t(
+                                TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS
+                              )}
                             />
-                            <ListItemText primary={_student.username} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                          }
+                          renderValue={selected =>
+                            (studentsQuery.data ?? [])
+                              .filter(c =>
+                                (selected as (number | string)[]).includes(
+                                  c.id
+                                )
+                              )
+                              .map(c => c.username)
+                              .join(", ")
+                          }
+                        >
+                          {(studentsQuery.data ?? []).map(_student => (
+                            <MenuItem key={_student.id} value={_student.id}>
+                              <Checkbox
+                                checked={
+                                  (field.value ?? []).indexOf(_student.id) >
+                                  -1
+                                }
+                              />
+                              <ListItemText primary={_student.username} />
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Tooltip>
                   )}
                 />
                 <LocalizationProvider dateAdapter={AdapterDateFns}>

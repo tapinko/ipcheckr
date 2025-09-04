@@ -288,6 +288,7 @@ export enum TranslationKey {
   TEACHER_ASSIGNMENT_GROUPS_DELETE_ERROR = "TEACHER_ASSIGNMENT_GROUPS_DELETE_ERROR",
   TEACHER_ASSIGNMENT_GROUPS_SAVE = "TEACHER_ASSIGNMENT_GROUPS_SAVE",
   TEACHER_ASSIGNMENT_GROUPS_LOADING = "TEACHER_ASSIGNMENT_GROUPS_LOADING",
+  TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED_TOOLTIP = "TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED",
 
   // TeacherAssignmentGroupDetails
   TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE = "TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE",
@@ -640,7 +641,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NAME]: "Name",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DESCRIPTION]: "Description",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS]: "Number of networks",
-  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS_TOOLTIP]: "Indicates the number of networks for which the student will calculate parameters (network address, gateway, mask, First usable address, broadcast)",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS_TOOLTIP]: "Indicates the number of networks for which the student will calculate parameters (network address, gateway, mask, First usable address, broadcast).",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_ATTEMPTS]: "Possible attempts",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS]: "Assigned students",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE]: "Start date",
@@ -657,6 +658,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_ERROR]: "Error deleting assignments",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_SAVE]: "Save",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_LOADING]: "Loading assignments...",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED_TOOLTIP]: "When no students are selected, the assignment will be assigned to all student.",
 
   // TeacherAssignmentGroupDetails
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE]: "Success rate",
@@ -1007,7 +1009,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NAME]: "Názov",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DESCRIPTION]: "Popis",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS]: "Počet sietí",
-  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS_TOOLTIP]: "Vyjadruje počet sietí, pre ktoré bude študent rátať parametre (adresa siete, brána, maska, Prvá použiteľná adresa, broadcast)",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS_TOOLTIP]: "Vyjadruje počet sietí, pre ktoré bude študent rátať parametre (adresa siete, brána, maska, Prvá použiteľná adresa, broadcast).",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_ATTEMPTS]: "Možné pokusy",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS]: "Priradení študenti",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE]: "Dátum začiatku",
@@ -1024,6 +1026,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_ERROR]: "Chyba pri odstraňovaní zadaní",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_SAVE]: "Uložiť",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_LOADING]: "Načítavanie zadaní...",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED_TOOLTIP]: "Keď nie sú vybraní žiadni študenti, zadanie bude priradené všetkým študentom.",
 
   // TeacherAssignmentGroupDetails
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE]: "Úspešnosť",
