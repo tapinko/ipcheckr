@@ -14,6 +14,8 @@ namespace IPCheckr.Api.DTOs.Dashboard
 
         public int? LastSubmitId { get; set; }
 
+        public int? LastSubmitGroupId { get; set; }
+
         [Required]
         public int TotalSubmits { get; set; }
 

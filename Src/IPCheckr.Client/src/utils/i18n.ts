@@ -327,7 +327,7 @@ export enum TranslationKey {
   STUDENT_DASHBOARD_TITLE = "STUDENT_DASHBOARD_TITLE",
   STUDENT_DASHBOARD_INSTITUTION_NAME = "STUDENT_DASHBOARD_INSTITUTION_NAME",
   STUDENT_DASHBOARD_CLASSES = "STUDENT_DASHBOARD_CLASSES",
-  STUDENT_DASHBOARD_STUDENTS = "STUDENT_DASHBOARD_STUDENTS",
+  STUDENT_DASHBOARD_TEACHERS = "STUDENT_DASHBOARD_STUDENTS",
   STUDENT_DASHBOARD_TOTAL_SUBMITS = "STUDENT_DASHBOARD_TOTAL_SUBMITS",
   STUDENT_DASHBOARD_LAST_SUBMIT = "STUDENT_DASHBOARD_LAST_SUBMIT",
   STUDENT_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS = "STUDENT_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS",
@@ -696,7 +696,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.STUDENT_DASHBOARD_TITLE]: "Dashboard",
   [TranslationKey.STUDENT_DASHBOARD_INSTITUTION_NAME]: "Institution name",
   [TranslationKey.STUDENT_DASHBOARD_CLASSES]: "Classes",
-  [TranslationKey.STUDENT_DASHBOARD_STUDENTS]: "Students",
+  [TranslationKey.STUDENT_DASHBOARD_TEACHERS]: "Teachers",
   [TranslationKey.STUDENT_DASHBOARD_TOTAL_SUBMITS]: "Total submits",
   [TranslationKey.STUDENT_DASHBOARD_LAST_SUBMIT]: "Last submit",
   [TranslationKey.STUDENT_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS]: "Total assignments",
@@ -828,7 +828,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_NAVBAR_CLASSES]: "Triedy",
   [TranslationKey.ADMIN_NAVBAR_SETTINGS]: "Nastavenia",
 
-  // Admin Dashboard
+  // AdminDashboard
   [TranslationKey.ADMIN_DASHBOARD_TITLE]: "Hlavný panel",
   [TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT]: "Posledné odovzdanie",
   [TranslationKey.ADMIN_DASHBOARD_INSTITUTION_NAME]: "Názov inštitúcie",
@@ -884,7 +884,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_USER_DELETE_ERROR]: "Chyba pri odstraňovaní používateľov",
   [TranslationKey.ADMIN_USERS_SAVE]: "Uložiť",
 
-  // Admin Classes
+  // AdminClasses
   [TranslationKey.ADMIN_CLASSES_TITLE]: "Triedy",
   [TranslationKey.ADMIN_CLASSES_CREATE_CLASS]: "Vytvoriť triedu",
   [TranslationKey.ADMIN_CLASSES_EDIT_CLASS]: "Upraviť triedu",
@@ -948,7 +948,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_DASHBOARD_TOTAL_ENDED]: "Celkové ukončené",
   [TranslationKey.TEACHER_DASHBOARD_TOTAL_SUBMITS]: "Celkové odovzdania",
 
-  // Teacher My Classes
+  // TeacherMyClasses
   [TranslationKey.TEACHER_MY_CLASSES_TITLE]: "Moje triedy",
   [TranslationKey.TEACHER_MY_CLASSES_STUDENTS_IN_THIS_CLASS]: "Študenti v tejto triede",
   [TranslationKey.TEACHER_MY_CLASSES_USERNAME]: "Používateľské meno",
@@ -1059,11 +1059,11 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.STUDENT_NAVBAR_DASHBOARD]: "Hlavný panel",
   [TranslationKey.STUDENT_NAVBAR_ASSIGNMENTS]: "Zadania",
 
-  // Student Dashboard
+  // StudentDashboard
   [TranslationKey.STUDENT_DASHBOARD_TITLE]: "Hlavný panel",
   [TranslationKey.STUDENT_DASHBOARD_INSTITUTION_NAME]: "Názov inštitúcie",
   [TranslationKey.STUDENT_DASHBOARD_CLASSES]: "Triedy",
-  [TranslationKey.STUDENT_DASHBOARD_STUDENTS]: "Študenti",
+  [TranslationKey.STUDENT_DASHBOARD_TEACHERS]: "Učitelia",
   [TranslationKey.STUDENT_DASHBOARD_TOTAL_SUBMITS]: "Celkové odovzdania",
   [TranslationKey.STUDENT_DASHBOARD_LAST_SUBMIT]: "Posledné odovzdanie",
   [TranslationKey.STUDENT_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS]: "Celkové zadania",

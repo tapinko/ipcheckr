@@ -119,6 +119,9 @@ namespace IPCheckr.Api.Controllers
             var lastSubmitUsername = lastSubmit?.Assignment.Student.Username;
             DateTime? lastSubmitAt = lastSubmit?.SubmittedAt;
 
+            int? lastSubmitId = lastSubmit?.Assignment.Id;
+            int? lastSubmitGroupId = lastSubmit?.Assignment.AssignmentGroup.Id;
+
             var institution = await _db.AppSettings.FirstOrDefaultAsync(a => a.Name == "InstitutionName");
             var institutionName = institution?.Value;
 
@@ -165,6 +168,8 @@ namespace IPCheckr.Api.Controllers
                 TotalEnded = totalEnded,
                 LastSubmitUsername = lastSubmitUsername,
                 LastSubmitAt = lastSubmitAt,
+                LastSubmitGroupId = lastSubmitGroupId,
+                LastSubmitId = lastSubmitId,
                 MostSuccessfulClass = mostSuccessfulClass,
                 MostSuccessfulStudent = mostSuccessfulStudent,
                 TotalClasses = totalClasses,

@@ -77,7 +77,7 @@ const StudentDashboard = () => {
                 icon={<Class />}
               />
               <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_STUDENTS)}
+                title={t(TranslationKey.STUDENT_DASHBOARD_TEACHERS)}
                 value={dashboardQuery.data?.teachers}
                 icon={<Groups />}
               />

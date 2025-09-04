@@ -118,7 +118,8 @@ namespace IPCheckr.Api.Controllers
                 .FirstOrDefault();
 
             var lastSubmitAt = lastSubmit?.SubmittedAt;
-            var lastSubmitId = lastSubmit?.Id;
+            var lastSubmitId = lastSubmit?.Assignment.Id;
+            var lastSubmitGroupId = lastSubmit?.Assignment.AssignmentGroup.Id;
 
             var classesStr = string.Join(", ", classes.Select(c => c.Name).OrderBy(n => n));
             var teachersStr = string.Join(", ",
@@ -139,6 +140,7 @@ namespace IPCheckr.Api.Controllers
                 Teachers = teachersStr,
                 LastSubmitAt = lastSubmitAt,
                 LastSubmitId = lastSubmitId,
+                LastSubmitGroupId = lastSubmitGroupId,
                 TotalSubmits = studentSubmits.Count,
                 SuccessRate = successRate.ToArray()
             };

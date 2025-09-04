@@ -1252,6 +1252,18 @@ export interface QueryStudentDashboardRes {
      * @type {number}
      * @memberof QueryStudentDashboardRes
      */
+    'lastSubmitId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDashboardRes
+     */
+    'lastSubmitGroupId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDashboardRes
+     */
     'totalSubmits': number;
     /**
      * 
@@ -1259,12 +1271,6 @@ export interface QueryStudentDashboardRes {
      * @memberof QueryStudentDashboardRes
      */
     'successRate': Array<StudentLinesChartDataDto>;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDashboardRes
-     */
-    'lastSubmitId'?: number | null;
 }
 /**
  * 
@@ -1314,6 +1320,18 @@ export interface QueryTeacherDashboardRes {
      * @memberof QueryTeacherDashboardRes
      */
     'lastSubmitAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'lastSubmitGroupId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'lastSubmitId'?: number | null;
     /**
      * 
      * @type {string}

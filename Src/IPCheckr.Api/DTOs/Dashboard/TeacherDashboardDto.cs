@@ -15,6 +15,10 @@ namespace IPCheckr.Api.DTOs.Dashboard
 
         public DateTime? LastSubmitAt { get; set; }
 
+        public int? LastSubmitGroupId { get; set; }
+
+        public int? LastSubmitId { get; set; }
+
         public string? MostSuccessfulClass { get; set; }
 
         public string? MostSuccessfulStudent { get; set; }

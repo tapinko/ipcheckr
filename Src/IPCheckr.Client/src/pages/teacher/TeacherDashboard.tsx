@@ -12,7 +12,8 @@ import {
   Stack,
   Tooltip,
   Typography,
-  Grid
+  Grid,
+  Button
 } from "@mui/material"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
@@ -26,9 +27,12 @@ import { AccessTime, Class, EmojiEvents, Groups, Quiz, School, TaskAlt } from "@
 import { BarChart } from "@mui/x-charts"
 import StatsCard from "../../components/StatsCard"
 import TableSkeleton from "../../components/TableSkeleton"
+import { useNavigate } from "react-router-dom"
+import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 
 const TeacherDashboard = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { userId } = useAuth()
   const queryClient = useQueryClient()
 
@@ -114,6 +118,21 @@ const TeacherDashboard = () => {
                   ) : ("-")
                 }
                 icon={<AccessTime />}
+                actions={
+                  <Button variant="outlined" onClick={() => 
+                    navigate(
+                      getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT, {
+                        [RouteParams.ASSIGNMENT_GROUP_ID]:
+                          dashboardQuery.data?.lastSubmitGroupId!.toString(),
+                        [RouteParams.ASSIGNMENT_ID]:
+                          dashboardQuery.data?.lastSubmitId!.toString(),
+                        [RouteParams.ATTEMPT]: "1"
+                      })
+                    )}
+                  >
+                    {t(TranslationKey.STUDENT_DASHBOARD_SHOW_DETAILS)}
+                  </Button>
+                }
               />
               <Tooltip title={t(TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_CLASS_TOOLTIP)}>
                 <Box component="span" sx={{ display: "block" }}>
