@@ -216,8 +216,8 @@ const StudentAssignments = () => {
                 }
                 state={assignment.state}
                 status={assignment.status}
-                startDate={new Date(assignment.startDate).toLocaleDateString()}
-                deadline={new Date(assignment.deadline).toLocaleDateString()}
+                startDate={new Date(assignment.startDate).toLocaleString()}
+                deadline={new Date(assignment.deadline).toLocaleString()}
                 maxSuccessRate={assignment.maxSuccessRate?.toString()}
                 className={assignment.className}
                 description={

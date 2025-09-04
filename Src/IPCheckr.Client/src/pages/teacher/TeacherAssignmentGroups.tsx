@@ -680,8 +680,8 @@ const TeacherAssignmentGroups = () => {
                   className={
                     selectedClass?.classId === 0 ? ag.className : undefined
                   }
-                  startDate={new Date(ag.startDate).toLocaleDateString()}
-                  deadline={new Date(ag.deadline).toLocaleDateString()}
+                  startDate={new Date(ag.startDate).toLocaleString()}
+                  deadline={new Date(ag.deadline).toLocaleString()}
                   selected={selectedAssignmentGroups.some(
                     g => g.assignmentGroupId === ag.assignmentGroupId
                   )}
