@@ -13,7 +13,9 @@ import {
   CardHeader,
   Chip,
   Divider,
-  Typography
+  Typography,
+  Stack,
+  Grid
 } from "@mui/material"
 import { useNavigate, useParams } from "react-router-dom"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
@@ -22,6 +24,17 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import ErrorLoading from "../../components/ErrorLoading"
 import CardsSkeleton from "../../components/CardsSkeleton"
 import TableSkeleton from "../../components/TableSkeleton"
+import StatsCard from "../../components/StatsCard"
+import {
+  AccessTime,
+  Class,
+  Description,
+  Dns,
+  Percent,
+  PlaylistAddCheck,
+  Quiz,
+  TaskAlt
+} from "@mui/icons-material"
 
 interface IAssignmentGroupSubmitDetailsCard {
   assignmentId: number
@@ -183,81 +196,98 @@ const TeacherAssignmentGroupDetails = () => {
 
   return (
     <>
-      <Typography variant="h6" color="textPrimary" gutterBottom>
-        <strong>
-          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_NAME)}:
-        </strong>{" "}
-        {data?.assignmentGroupName}
-      </Typography>
-      <Typography variant="h6" color="textPrimary" gutterBottom>
-        <strong>
-          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DESCRIPTION)}:
-        </strong>{" "}
-        {data?.assignmentGroupDescription}
-      </Typography>
-      <Typography variant="h6" color="textPrimary" gutterBottom>
-        <strong>
-          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CLASS)}:
-        </strong>{" "}
-        {data?.className}
-      </Typography>
-      <Typography variant="h6" color="textPrimary" gutterBottom>
-        <strong>
-          {t(
-            TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_NUMBER_OF_RECORDS
-          )}
-          :
-        </strong>{" "}
-        {data?.numberOfRecords}
-      </Typography>
-      <Typography variant="h6" color="textPrimary" gutterBottom>
-        <strong>
-          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_POSSIBLE_ATTEMPTS)}:
-        </strong>{" "}
-        {data?.possibleAttempts}
-      </Typography>
-      <Typography variant="h6" color="textPrimary" gutterBottom>
-        <strong>
-          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMITTED)}:
-        </strong>{" "}
-        {data?.submitted}/{data?.total}
-      </Typography>
-      <Typography variant="h6" color="textPrimary" gutterBottom>
-        <strong>
-          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE)}:
-        </strong>{" "}
-        {data?.successRate}%
-      </Typography>
-      <Typography variant="h6" color="textPrimary" gutterBottom>
-        <strong>
-          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_START_DATE)}:
-        </strong>{" "}
-        {data?.startDate
-          ? new Date(data.startDate).toLocaleString()
-          : undefined}
-      </Typography>
-      <Typography variant="h6" color="textPrimary">
-        <strong>
-          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DEADLINE)}:
-        </strong>{" "}
-        {data?.deadline ? new Date(data.deadline).toLocaleString() : undefined}
-      </Typography>
+      <Stack spacing={2}>
+        <Grid container spacing={2}>
+          <Grid flex={1}>
+            <Stack spacing={2}>
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_NAME)}
+                value={data?.assignmentGroupName ?? "-"}
+                icon={<Quiz />}
+              />
+            </Stack>
+          </Grid>
+        </Grid>
 
-      <Divider sx={{ my: 2 }} />
+        <Grid container spacing={2}>
+          <Grid flex={1}>
+            <Stack spacing={2}>
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DESCRIPTION)}
+                value={data?.assignmentGroupDescription === ""
+                  ? "-" : data?.assignmentGroupDescription}
+                icon={<Description />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CLASS)}
+                value={data?.className ?? "-"}
+                icon={<Class />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_NUMBER_OF_RECORDS)}
+                value={data?.numberOfRecords ?? "-"}
+                icon={<Dns />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_POSSIBLE_ATTEMPTS)}
+                value={data?.possibleAttempts ?? "-"}
+                icon={<PlaylistAddCheck />}
+              />
+            </Stack>
+          </Grid>
 
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-        {data?.assignments.map(a => (
-          <AssignmentGroupSubmitDetailsCard
-            key={a.assignmentId}
-            assignmentId={a.assignmentId}
-            studentUsername={a.studentUsername}
-            successRate={a.successRate}
-            attemptCount={a.attemptCount}
-            lastSubmit={a.lastSubmit ? new Date(a.lastSubmit) : undefined}
-            status={a.status}
-          />
-        ))}
-      </Box>
+          <Grid flex={1}>
+            <Stack spacing={2}>
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMITTED)}
+                value={data ? `${data.submitted}/${data.total}` : "-"}
+                icon={<TaskAlt />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE)}
+                value={
+                  data?.successRate != null ? `${data.successRate}%` : "-"
+                }
+                icon={<Percent />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_START_DATE)}
+                value={
+                  data?.startDate
+                    ? new Date(data.startDate).toLocaleString()
+                    : "-"
+                }
+                icon={<AccessTime />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DEADLINE)}
+                value={
+                  data?.deadline
+                    ? new Date(data.deadline).toLocaleString()
+                    : "-"
+                }
+                icon={<AccessTime />}
+              />
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+          {data?.assignments.map(a => (
+            <AssignmentGroupSubmitDetailsCard
+              key={a.assignmentId}
+              assignmentId={a.assignmentId}
+              studentUsername={a.studentUsername}
+              successRate={a.successRate}
+              attemptCount={a.attemptCount}
+              lastSubmit={a.lastSubmit ? new Date(a.lastSubmit) : undefined}
+              status={a.status}
+            />
+          ))}
+        </Box>
+      </Stack>
     </>
   )
 }
