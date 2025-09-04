@@ -9,6 +9,7 @@ Provides role-based management for administrators, teachers and students with a 
 
 ### Teacher's view
 
+![teacher dashboard zoomed out](Assets/github-images/teacher_dashboard.png)
 ![teacher submit details](Assets/github-images/teacher_submit_details.png)
 
 ### Student's view
@@ -44,7 +45,6 @@ Provides role-based management for administrators, teachers and students with a 
 
 Because this is in very early development, not all features are working. Here are some features planned/in-scope:
 
-- Proper dashboards (priority)
 - Refactoring the API code to make it more readable (this whole project is for me to learn .NET)
 - More advanced admin settings page
 - Personalized settings pages (long-term)
