@@ -129,6 +129,12 @@ const TeacherDashboard = () => {
                         [RouteParams.ATTEMPT]: "1"
                       })
                     )}
+                    disabled={
+                      !dashboardQuery.data?.lastSubmitGroupId ||
+                      !dashboardQuery.data?.lastSubmitId ||
+                      !dashboardQuery.data?.lastSubmitAt ||
+                      !dashboardQuery.data?.lastSubmitUsername
+                    }
                   >
                     {t(TranslationKey.STUDENT_DASHBOARD_SHOW_DETAILS)}
                   </Button>
