@@ -19,6 +19,18 @@ const LinkRouter = (props: LinkRouterProps) => {
 
 const routes: BreadcrumbsRoute[] = [
   {
+    path: Routes[RouteKeys.TEACHER_MY_CLASSES],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS],
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES_STUDENT_DETAILS)} {match.params.STUDENT_ID}
+      </Typography>
+  },
+  {
     path: Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS],
     breadcrumb: () => <Typography variant="body2" component="span">
         {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUPS)}

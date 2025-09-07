@@ -1275,6 +1275,91 @@ export interface QueryStudentDashboardRes {
 /**
  * 
  * @export
+ * @interface QueryStudentDetailsRes
+ */
+export interface QueryStudentDetailsRes {
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryStudentDetailsRes
+     */
+    'username': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'totalSubmits': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'lastSubmitGroupId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'lastSubmitAssignmentId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'lastSubmitAttempt'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryStudentDetailsRes
+     */
+    'lastSubmitAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryStudentDetailsRes
+     */
+    'classes'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'averageNetwork'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'averageFirst'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'averageLast'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'averageBroadcast'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'averageTotal': number;
+    /**
+     * 
+     * @type {Array<StudentLinesChartDataDto>}
+     * @memberof QueryStudentDetailsRes
+     */
+    'successRate': Array<StudentLinesChartDataDto>;
+}
+/**
+ * 
+ * @export
  * @interface QueryTeacherDashboardRes
  */
 export interface QueryTeacherDashboardRes {
@@ -3512,6 +3597,43 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
+         * @param {number | null} [studentId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userQueryStudentDetails: async (studentId?: number | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/users/get-student-details`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (studentId !== undefined) {
+                localVarQueryParameter['StudentId'] = studentId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {number | null} [userId] 
          * @param {string | null} [username] 
          * @param {string | null} [role] 
@@ -3620,6 +3742,18 @@ export const UserApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {number | null} [studentId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userQueryStudentDetails(studentId?: number | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryStudentDetailsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userQueryStudentDetails(studentId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.userQueryStudentDetails']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {number | null} [userId] 
          * @param {string | null} [username] 
          * @param {string | null} [role] 
@@ -3671,6 +3805,15 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
          */
         userEditUser(editUserReq: EditUserReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.userEditUser(editUserReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number | null} [studentId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userQueryStudentDetails(studentId?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<QueryStudentDetailsRes> {
+            return localVarFp.userQueryStudentDetails(studentId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3727,6 +3870,17 @@ export class UserApi extends BaseAPI {
      */
     public userEditUser(editUserReq: EditUserReq, options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).userEditUser(editUserReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number | null} [studentId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public userQueryStudentDetails(studentId?: number | null, options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userQueryStudentDetails(studentId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -42,6 +42,8 @@ import TableSkeleton from "../../components/TableSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { AxiosError, type AxiosResponse } from "axios"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
+import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import { useNavigate } from "react-router-dom"
 
 type AddStudentFormValues = {
   username: string
@@ -70,6 +72,7 @@ type StudentRow = UserDto & { classNamesDisplay: string }
 
 const TeacherMyClasses = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { username, userId } = useAuth()
   const queryClient = useQueryClient()
 
@@ -625,7 +628,14 @@ const TeacherMyClasses = () => {
                   }
                 }
               }}
-              onDetails={() => {}}
+              onDetails={() => {
+                navigate(
+                  getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS, {
+                    [RouteParams.STUDENT_ID]:
+                      studentsSelectedRows.userId.toString() || ""
+                  })
+                )
+              }}
               onDelete={() => setDeleteStudentsDialogvis(true)}
               disableEdit={studentsSelectedRows.userId.length !== 1}
               disableDetails={studentsSelectedRows.userId.length !== 1}
@@ -1205,7 +1215,7 @@ const TeacherMyClasses = () => {
         question={t(TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_MESSAGE)}
         title={t(TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_TITLE)}
         color="warning"
-        confirmLabel={TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_CONFIRM}
+        confirmLabel={t(TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_CONFIRM)}
       />
 
       {alert && (

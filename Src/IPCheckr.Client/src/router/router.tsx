@@ -7,6 +7,7 @@ import AdminSettings from "../pages/admin/AdminSettings"
 import TeacherLayout from "../layouts/TeacherLayout"
 import TeacherDashboard from "../pages/teacher/TeacherDashboard"
 import TeacherMyClasses from "../pages/teacher/TeacherMyClasses"
+import TeacherStudentDetails from "../pages/teacher/TeacherStudentDetails"
 import TeacherAssignmentGroups from "../pages/teacher/TeacherAssignmentGroups"
 import TeacherAssignmentGroupDetails from "../pages/teacher/TeacherAssignmentGroupDetails"
 import TeacherAssignmentGroupDetailsSubmit from "../pages/teacher/TeacherAssignmentGroupDetailsSubmit"
@@ -41,6 +42,7 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.TEACHER]: <Navigate to={Routes[RouteKeys.TEACHER_DASHBOARD]} />,
   [RouteKeys.TEACHER_DASHBOARD]: <TeacherDashboard />,
   [RouteKeys.TEACHER_MY_CLASSES]: <TeacherMyClasses />,
+  [RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS]: <TeacherStudentDetails />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS]: <TeacherAssignmentGroups />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS]: <TeacherAssignmentGroupDetails />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <TeacherAssignmentGroupDetailsSubmit />,
@@ -105,6 +107,7 @@ const useAuthRouter = () => {
         ...[
           RouteKeys.TEACHER_DASHBOARD,
           RouteKeys.TEACHER_MY_CLASSES,
+          RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
