@@ -69,7 +69,7 @@ namespace IPCheckr.Api.Controllers
                     AverageLast = null,
                     AverageBroadcast = null,
                     AverageTotal = 0.0,
-                    SuccessRate = Array.Empty<StudentLinesChartDataDto>()
+                    SuccessRate = Array.Empty<StudentDetailsSuccessRateDto>()
                 };
 
                 return Ok(resNoSubmits);
@@ -145,7 +145,7 @@ namespace IPCheckr.Api.Controllers
             double? avgBroadcast = broadcastPercents.Count > 0 ? broadcastPercents.Average() : (double?)null;
             double avgTotal = totalPercents.Count > 0 ? totalPercents.Average() : 0.0;
 
-            var successRate = new List<StudentLinesChartDataDto>();
+            var successRate = new List<StudentDetailsSuccessRateDto>();
             foreach (var submit in submits.OrderBy(s => s.SubmittedAt).ThenBy(s => s.Id))
             {
                 if (!answerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key))
@@ -178,7 +178,7 @@ namespace IPCheckr.Api.Controllers
                 }
                 double percentage = total == 0 ? 0.0 : (double)correct / total * 100.0;
 
-                successRate.Add(new StudentLinesChartDataDto
+                successRate.Add(new StudentDetailsSuccessRateDto
                 {
                     Date = submit.SubmittedAt.ToString("yyyy-MM-dd"),
                     Percentage = percentage

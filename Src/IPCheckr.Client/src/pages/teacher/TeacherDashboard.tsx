@@ -261,7 +261,7 @@ const TeacherDashboard = () => {
                       {
                         scaleType: "band",
                         data:
-                          dashboardQuery.data!.averagePercentageInClasses!.map(d => d.username),
+                          dashboardQuery.data!.averagePercentageInClasses!.map(d => d.className),
                       },
                     ]}
                     series={[

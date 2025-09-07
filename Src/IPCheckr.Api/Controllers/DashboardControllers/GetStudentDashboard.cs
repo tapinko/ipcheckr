@@ -98,14 +98,14 @@ namespace IPCheckr.Api.Controllers
                 return (double)correct / total * 100.0;
             }
 
-            var successRate = new List<StudentLinesChartDataDto>();
+            var successRate = new List<StudentDashboardSuccessRateDto>();
             foreach (var submit in studentSubmits)
             {
                 if (!answerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key))
                     continue;
 
                 var percentage = ComputeSubmitPercent(key, submit);
-                successRate.Add(new StudentLinesChartDataDto
+                successRate.Add(new StudentDashboardSuccessRateDto
                 {
                     Date = submit.SubmittedAt.ToString("yyyy-MM-dd"),
                     Percentage = percentage

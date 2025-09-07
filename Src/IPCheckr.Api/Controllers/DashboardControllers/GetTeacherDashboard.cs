@@ -49,7 +49,7 @@ namespace IPCheckr.Api.Controllers
 
             var answerKeyByAssignment = answerKeys.ToDictionary(k => k.Assignment.Id, k => k);
 
-            static double ComputeSubmitPercent(Models.AssignmentAnswerKey answerKey, IPCheckr.Api.Models.AssignmentSubmit submit)
+            static double ComputeSubmitPercent(Models.AssignmentAnswerKey answerKey, Models.AssignmentSubmit submit)
             {
                 string[][] ans = {
                     answerKey.Networks ?? Array.Empty<string>(),
@@ -88,7 +88,7 @@ namespace IPCheckr.Api.Controllers
                 .Select(g =>
                 {
                     var avg = g.Average(s => ComputeSubmitPercent(answerKeyByAssignment[s.Assignment.Id], s));
-                    return new TeacherBarChartDataDto
+                    return new AveragePercentageInStudentsDto
                     {
                         Username = g.Key.Username,
                         Percentage = avg
@@ -103,9 +103,9 @@ namespace IPCheckr.Api.Controllers
                 .Select(g =>
                 {
                     var avg = g.Average(s => ComputeSubmitPercent(answerKeyByAssignment[s.Assignment.Id], s));
-                    return new TeacherBarChartDataDto
+                    return new AveragePercentageInClassesDto
                     {
-                        Username = g.Key.ClassName,
+                        ClassName = g.Key.ClassName,
                         Percentage = avg
                     };
                 })
@@ -153,7 +153,7 @@ namespace IPCheckr.Api.Controllers
                 .Count();
 
             var mostSuccessfulStudent = studentAverages.FirstOrDefault()?.Username;
-            var mostSuccessfulClass = classAverages.FirstOrDefault()?.Username;
+            var mostSuccessfulClass = classAverages.FirstOrDefault()?.ClassName;
 
             int take = req.BarChartLength > 0 ? req.BarChartLength : int.MaxValue;
             var studentBars = studentAverages.Take(take).ToArray();

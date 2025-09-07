@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using IPCheckr.Api.Interfaces;
 
 namespace IPCheckr.Api.DTOs.Dashboard
 {
@@ -32,16 +33,50 @@ namespace IPCheckr.Api.DTOs.Dashboard
         [Required]
         public int TotalSubmits { get; set; }
 
-        public TeacherBarChartDataDto[]? AveragePercentageInStudents { get; set; }
+        public AveragePercentageInStudentsDto[]? AveragePercentageInStudents { get; set; }
 
-        public TeacherBarChartDataDto[]? AveragePercentageInClasses { get; set; }
+        public AveragePercentageInClassesDto[]? AveragePercentageInClasses { get; set; }
     }
 
-    public class TeacherBarChartDataDto
+    public class AveragePercentageInStudentsDto : IBarChartData
     {
         [Required]
         public required string Username { get; set; }
+
         [Required]
         public double Percentage { get; set; }
+
+        string IChartDataBase.Label
+        {
+            get => Username;
+            set => Username = value;
+        }
+
+        double IChartDataBase.Value
+        {
+            get => Percentage;
+            set => Percentage = value;
+        }
+    }
+
+    public class AveragePercentageInClassesDto : IBarChartData
+    {
+        [Required]
+        public required string ClassName { get; set; }
+
+        [Required]
+        public double Percentage { get; set; }
+
+        string IChartDataBase.Label
+        {
+            get => ClassName;
+            set => ClassName = value;
+        }
+
+        double IChartDataBase.Value
+        {
+            get => Percentage;
+            set => Percentage = value;
+        }
     }
 }

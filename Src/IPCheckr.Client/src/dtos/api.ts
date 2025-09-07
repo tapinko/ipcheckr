@@ -434,6 +434,101 @@ export interface AssignmentGroupSubmitDetailsDto {
 /**
  * 
  * @export
+ * @interface AveragePercentageInClassesDto
+ */
+export interface AveragePercentageInClassesDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AveragePercentageInClassesDto
+     */
+    'className': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AveragePercentageInClassesDto
+     */
+    'percentage': number;
+}
+/**
+ * 
+ * @export
+ * @interface AveragePercentageInStudentsDto
+ */
+export interface AveragePercentageInStudentsDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AveragePercentageInStudentsDto
+     */
+    'username': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AveragePercentageInStudentsDto
+     */
+    'percentage': number;
+}
+/**
+ * 
+ * @export
+ * @interface AverageSuccessRateInAssignmentGroupsDto
+ */
+export interface AverageSuccessRateInAssignmentGroupsDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AverageSuccessRateInAssignmentGroupsDto
+     */
+    'assignmentGroupName': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AverageSuccessRateInAssignmentGroupsDto
+     */
+    'percentage': number;
+}
+/**
+ * 
+ * @export
+ * @interface AverageSuccessRateInStudentsDto
+ */
+export interface AverageSuccessRateInStudentsDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AverageSuccessRateInStudentsDto
+     */
+    'username': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AverageSuccessRateInStudentsDto
+     */
+    'percentage': number;
+}
+/**
+ * 
+ * @export
+ * @interface ClassDetailsStudentsDto
+ */
+export interface ClassDetailsStudentsDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof ClassDetailsStudentsDto
+     */
+    'studentId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClassDetailsStudentsDto
+     */
+    'username': string;
+}
+/**
+ * 
+ * @export
  * @interface ClassDto
  */
 export interface ClassDto {
@@ -1177,6 +1272,79 @@ export interface QueryAssignmentsRes {
 /**
  * 
  * @export
+ * @interface QueryClassDetailsRes
+ */
+export interface QueryClassDetailsRes {
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryClassDetailsRes
+     */
+    'className': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryClassDetailsRes
+     */
+    'totalSubmits': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryClassDetailsRes
+     */
+    'averageSuccessRate': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryClassDetailsRes
+     */
+    'totalAssignmentGroups': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryClassDetailsRes
+     */
+    'totalUpcoming': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryClassDetailsRes
+     */
+    'totalInProgress': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryClassDetailsRes
+     */
+    'totalEnded': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryClassDetailsRes
+     */
+    'teachers'?: string | null;
+    /**
+     * 
+     * @type {Array<ClassDetailsStudentsDto>}
+     * @memberof QueryClassDetailsRes
+     */
+    'students'?: Array<ClassDetailsStudentsDto> | null;
+    /**
+     * 
+     * @type {Array<AverageSuccessRateInStudentsDto>}
+     * @memberof QueryClassDetailsRes
+     */
+    'averageSuccessRateInStudents'?: Array<AverageSuccessRateInStudentsDto> | null;
+    /**
+     * 
+     * @type {Array<AverageSuccessRateInAssignmentGroupsDto>}
+     * @memberof QueryClassDetailsRes
+     */
+    'averageSuccessRateInAssignmentGroups'?: Array<AverageSuccessRateInAssignmentGroupsDto> | null;
+}
+/**
+ * 
+ * @export
  * @interface QueryClassesRes
  */
 export interface QueryClassesRes {
@@ -1267,10 +1435,10 @@ export interface QueryStudentDashboardRes {
     'totalSubmits': number;
     /**
      * 
-     * @type {Array<StudentLinesChartDataDto>}
+     * @type {Array<StudentDashboardSuccessRateDto>}
      * @memberof QueryStudentDashboardRes
      */
-    'successRate': Array<StudentLinesChartDataDto>;
+    'successRate': Array<StudentDashboardSuccessRateDto>;
 }
 /**
  * 
@@ -1352,10 +1520,10 @@ export interface QueryStudentDetailsRes {
     'averageTotal': number;
     /**
      * 
-     * @type {Array<StudentLinesChartDataDto>}
+     * @type {Array<StudentDetailsSuccessRateDto>}
      * @memberof QueryStudentDetailsRes
      */
-    'successRate': Array<StudentLinesChartDataDto>;
+    'successRate': Array<StudentDetailsSuccessRateDto>;
 }
 /**
  * 
@@ -1449,16 +1617,16 @@ export interface QueryTeacherDashboardRes {
     'totalSubmits': number;
     /**
      * 
-     * @type {Array<TeacherBarChartDataDto>}
+     * @type {Array<AveragePercentageInStudentsDto>}
      * @memberof QueryTeacherDashboardRes
      */
-    'averagePercentageInStudents'?: Array<TeacherBarChartDataDto> | null;
+    'averagePercentageInStudents'?: Array<AveragePercentageInStudentsDto> | null;
     /**
      * 
-     * @type {Array<TeacherBarChartDataDto>}
+     * @type {Array<AveragePercentageInClassesDto>}
      * @memberof QueryTeacherDashboardRes
      */
-    'averagePercentageInClasses'?: Array<TeacherBarChartDataDto> | null;
+    'averagePercentageInClasses'?: Array<AveragePercentageInClassesDto> | null;
 }
 /**
  * 
@@ -1482,19 +1650,38 @@ export interface QueryUsersRes {
 /**
  * 
  * @export
- * @interface StudentLinesChartDataDto
+ * @interface StudentDashboardSuccessRateDto
  */
-export interface StudentLinesChartDataDto {
+export interface StudentDashboardSuccessRateDto {
     /**
      * 
      * @type {string}
-     * @memberof StudentLinesChartDataDto
+     * @memberof StudentDashboardSuccessRateDto
      */
     'date': string;
     /**
      * 
      * @type {number}
-     * @memberof StudentLinesChartDataDto
+     * @memberof StudentDashboardSuccessRateDto
+     */
+    'percentage': number;
+}
+/**
+ * 
+ * @export
+ * @interface StudentDetailsSuccessRateDto
+ */
+export interface StudentDetailsSuccessRateDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentDetailsSuccessRateDto
+     */
+    'date': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof StudentDetailsSuccessRateDto
      */
     'percentage': number;
 }
@@ -1566,25 +1753,6 @@ export interface SubmitAssignmentRes {
      * @memberof SubmitAssignmentRes
      */
     'attempt': number;
-}
-/**
- * 
- * @export
- * @interface TeacherBarChartDataDto
- */
-export interface TeacherBarChartDataDto {
-    /**
-     * 
-     * @type {string}
-     * @memberof TeacherBarChartDataDto
-     */
-    'username': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof TeacherBarChartDataDto
-     */
-    'percentage': number;
 }
 /**
  * 
@@ -2932,6 +3100,43 @@ export const ClassApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * 
+         * @param {number} [id] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        classQueryClassDetails: async (id?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/classes/get-class-details`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (id !== undefined) {
+                localVarQueryParameter['Id'] = id;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {number | null} [classId] 
          * @param {string | null} [className] 
          * @param {number | null} [teacherId] 
@@ -3035,6 +3240,18 @@ export const ClassApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {number} [id] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async classQueryClassDetails(id?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryClassDetailsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.classQueryClassDetails(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ClassApi.classQueryClassDetails']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {number | null} [classId] 
          * @param {string | null} [className] 
          * @param {number | null} [teacherId] 
@@ -3085,6 +3302,15 @@ export const ClassApiFactory = function (configuration?: Configuration, basePath
          */
         classEditClass(editClassReq: EditClassReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.classEditClass(editClassReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} [id] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        classQueryClassDetails(id?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryClassDetailsRes> {
+            return localVarFp.classQueryClassDetails(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3140,6 +3366,17 @@ export class ClassApi extends BaseAPI {
      */
     public classEditClass(editClassReq: EditClassReq, options?: RawAxiosRequestConfig) {
         return ClassApiFp(this.configuration).classEditClass(editClassReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} [id] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ClassApi
+     */
+    public classQueryClassDetails(id?: number, options?: RawAxiosRequestConfig) {
+        return ClassApiFp(this.configuration).classQueryClassDetails(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

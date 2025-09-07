@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using IPCheckr.Api.DTOs.Dashboard;
+using IPCheckr.Api.Interfaces;
 
 namespace IPCheckr.Api.DTOs.User
 {
@@ -40,6 +41,27 @@ namespace IPCheckr.Api.DTOs.User
         public double AverageTotal { get; set; }
 
         [Required]
-        public StudentLinesChartDataDto[]? SuccessRate { get; set; }
+        public StudentDetailsSuccessRateDto[]? SuccessRate { get; set; }
+    }
+
+    public class StudentDetailsSuccessRateDto : ILinesChartData
+    {
+        [Required]
+        public required string Date { get; set; }
+
+        [Required]
+        public double Percentage { get; set; }
+
+        string IChartDataBase.Label
+        {
+            get => Date;
+            set => Date = value;
+        }
+
+        double IChartDataBase.Value
+        {
+            get => Percentage;
+            set => Percentage = value;
+        }
     }
 }
