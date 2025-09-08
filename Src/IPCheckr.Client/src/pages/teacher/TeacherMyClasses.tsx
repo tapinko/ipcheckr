@@ -575,7 +575,14 @@ const TeacherMyClasses = () => {
                 setEditClassDialogVis(true)
               }
             }}
-            onDetails={() => {}}
+            onDetails={() => {
+              navigate(
+                getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_CLASS_DETAILS, {
+                  [RouteParams.CLASS_ID]:
+                    selectedClass.classId.toString() || ""
+                })
+              )
+            }}
             onDelete={() => setDeleteClassDialogvis(true)}
             disableEdit={!selectedClass}
             disableDetails={!selectedClass}

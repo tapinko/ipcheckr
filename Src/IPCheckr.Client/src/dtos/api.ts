@@ -1325,10 +1325,46 @@ export interface QueryClassDetailsRes {
     'teachers'?: string | null;
     /**
      * 
+     * @type {string}
+     * @memberof QueryClassDetailsRes
+     */
+    'createdAt'?: string;
+    /**
+     * 
      * @type {Array<ClassDetailsStudentsDto>}
      * @memberof QueryClassDetailsRes
      */
-    'students'?: Array<ClassDetailsStudentsDto> | null;
+    'students': Array<ClassDetailsStudentsDto>;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryClassDetailsRes
+     */
+    'lastSubmitAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryClassDetailsRes
+     */
+    'lastSubmitUsername'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryClassDetailsRes
+     */
+    'lastSubmitGroupId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryClassDetailsRes
+     */
+    'lastSubmitAttempt'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryClassDetailsRes
+     */
+    'lastSubmitId'?: number | null;
     /**
      * 
      * @type {Array<AverageSuccessRateInStudentsDto>}
