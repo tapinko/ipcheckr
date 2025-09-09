@@ -27,7 +27,7 @@ namespace IPCheckr.Api.DTOs.User
 
         public DateTime? LastSubmitAt { get; set; }
 
-        public string? Classes { get; set; }
+        public StudentDetailsClassesDto[]? Classes { get; set; }
 
         public double? AverageNetwork { get; set; }
 
@@ -42,6 +42,15 @@ namespace IPCheckr.Api.DTOs.User
 
         [Required]
         public StudentDetailsSuccessRateDto[]? SuccessRate { get; set; }
+    }
+
+    public class StudentDetailsClassesDto
+    {
+        [Required]
+        public required int Id { get; set; }
+
+        [Required]
+        public required string Name { get; set; }
     }
 
     public class StudentDetailsSuccessRateDto : ILinesChartData

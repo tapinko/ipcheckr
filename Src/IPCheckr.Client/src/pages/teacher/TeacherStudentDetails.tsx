@@ -139,7 +139,7 @@ const TeacherStudentDetails = () => {
                 title={t(TranslationKey.TEACHER_STUDENT_DETAILS_CLASSES)}
                 value={detailsQuery.data?.classes
                   && detailsQuery.data.classes.length
-                  > 0 ? detailsQuery.data.classes : "-"}
+                  > 0 ? detailsQuery.data.classes.map(c => c.name).join(", ") : "-"}
                 icon={<Class />}
               />
             </Stack>

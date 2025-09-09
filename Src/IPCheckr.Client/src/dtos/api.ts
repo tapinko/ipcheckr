@@ -1520,10 +1520,10 @@ export interface QueryStudentDetailsRes {
     'lastSubmitAt'?: string | null;
     /**
      * 
-     * @type {string}
+     * @type {Array<StudentDetailsClassesDto>}
      * @memberof QueryStudentDetailsRes
      */
-    'classes'?: string | null;
+    'classes'?: Array<StudentDetailsClassesDto> | null;
     /**
      * 
      * @type {number}
@@ -1701,6 +1701,25 @@ export interface StudentDashboardSuccessRateDto {
      * @memberof StudentDashboardSuccessRateDto
      */
     'percentage': number;
+}
+/**
+ * 
+ * @export
+ * @interface StudentDetailsClassesDto
+ */
+export interface StudentDetailsClassesDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof StudentDetailsClassesDto
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentDetailsClassesDto
+     */
+    'name': string;
 }
 /**
  * 

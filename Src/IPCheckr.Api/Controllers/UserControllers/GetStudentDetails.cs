@@ -31,7 +31,16 @@ namespace IPCheckr.Api.Controllers
                 .OrderBy(n => n)
                 .ToListAsync();
 
-            var classesStr = string.Join(", ", classNames);
+            var classesStr = Array.Empty<StudentDetailsClassesDto>();
+
+            for (int i = 0; i < classNames.Count; i++)
+            {
+                classesStr = classesStr.Append(new StudentDetailsClassesDto
+                {
+                    Id = i + 1,
+                    Name = classNames[i]
+                }).ToArray();
+            }
 
             var submits = await _db.AssignmentSubmits
                 .Include(s => s.Assignment)
