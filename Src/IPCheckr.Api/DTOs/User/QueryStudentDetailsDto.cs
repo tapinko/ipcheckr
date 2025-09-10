@@ -42,6 +42,18 @@ namespace IPCheckr.Api.DTOs.User
 
         [Required]
         public StudentDetailsSuccessRateDto[]? SuccessRate { get; set; }
+
+        [Required]
+        public int TotalAssignmentGroups { get; set; }
+
+        [Required]
+        public int TotalUpcoming { get; set; }
+
+        [Required]
+        public int TotalInProgress { get; set; }
+
+        [Required]
+        public int TotalEnded { get; set; }
     }
 
     public class StudentDetailsClassesDto

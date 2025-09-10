@@ -2,7 +2,6 @@ using IPCheckr.Api.DTOs.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IPCheckr.Api.DTOs;
-using IPCheckr.Api.DTOs.Dashboard;
 
 namespace IPCheckr.Api.Controllers
 {
@@ -41,6 +40,25 @@ namespace IPCheckr.Api.Controllers
                     Name = classNames[i]
                 }).ToArray();
             }
+
+            var classIds = classesStr.Select(c => c.Id).ToHashSet();
+            var now = DateTime.UtcNow;
+
+            var totalAssignmentGroups = await _db.AssignmentGroups
+                .Where(ag => classIds.Contains(ag.Class.Id))
+                .CountAsync();
+
+            var totalUpcoming = await _db.AssignmentGroups
+                .Where(ag => classIds.Contains(ag.Class.Id) && ag.StartDate > now)
+                .CountAsync();
+
+            var totalInProgress = await _db.AssignmentGroups
+                .Where(ag => classIds.Contains(ag.Class.Id) && ag.StartDate <= now && ag.Deadline >= now)
+                .CountAsync();
+
+            var totalEnded = await _db.AssignmentGroups
+                .Where(ag => classIds.Contains(ag.Class.Id) && ag.Deadline <= now)
+                .CountAsync();
 
             var submits = await _db.AssignmentSubmits
                 .Include(s => s.Assignment)
@@ -208,7 +226,11 @@ namespace IPCheckr.Api.Controllers
                 AverageLast = avgLast,
                 AverageBroadcast = avgBroadcast,
                 AverageTotal = avgTotal,
-                SuccessRate = successRate.ToArray()
+                SuccessRate = successRate.ToArray(),
+                TotalAssignmentGroups = totalAssignmentGroups,
+                TotalUpcoming = totalUpcoming,
+                TotalInProgress = totalInProgress,
+                TotalEnded = totalEnded
             };
 
             return Ok(res);
