@@ -12,7 +12,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { LineChart, RadarChart } from "@mui/x-charts"
-import { AccessTime, Class, Percent, Person, TaskAlt } from "@mui/icons-material"
+import { AccessTime, Class, Percent, Person, Quiz, TaskAlt } from "@mui/icons-material"
 import TableSkeleton from "../../components/TableSkeleton"
 import CardsSkeleton from "../../components/CardsSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
@@ -122,11 +122,6 @@ const TeacherStudentDetails = () => {
                   </Button>
                 }
               />
-            </Stack>
-          </Grid>
-
-          <Grid flex={1}>
-            <Stack spacing={2}>
               <Tooltip title={t(TranslationKey.TEACHER_STUDENT_DETAILS_SUCCESS_RATE_TOOLTIP)}>
                 <StatsCard
                   title={t(TranslationKey.TEACHER_STUDENT_DETAILS_SUCCESS_RATE)}
@@ -134,13 +129,40 @@ const TeacherStudentDetails = () => {
                   icon={<Percent />}
                 />
               </Tooltip>
-              
               <StatsCard
                 title={t(TranslationKey.TEACHER_STUDENT_DETAILS_CLASSES)}
                 value={detailsQuery.data?.classes
                   && detailsQuery.data.classes.length
                   > 0 ? detailsQuery.data.classes.map(c => c.name).join(", ") : "-"}
                 icon={<Class />}
+              />
+            </Stack>
+          </Grid>
+
+          <Grid flex={1}>
+            <Stack spacing={2}>
+              <StatsCard
+                title={t(TranslationKey.TEACHER_STUDENT_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
+                value={detailsQuery.data?.totalAssignmentGroups}
+                icon={<Quiz />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_STUDENT_DETAILS_TOTAL_UPCOMING)}
+                value={detailsQuery.data?.totalUpcoming}
+                icon={<AccessTime />}
+                color="default"
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_STUDENT_DETAILS_TOTAL_IN_PROGRESS)}
+                value={detailsQuery.data?.totalInProgress}
+                icon={<AccessTime />}
+                color="warning"
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_STUDENT_DETAILS_TOTAL_ENDED)}
+                value={detailsQuery.data?.totalEnded}
+                icon={<AccessTime />}
+                color="success"
               />
             </Stack>
           </Grid>
