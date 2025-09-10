@@ -1,7 +1,9 @@
 import AdminLayout from "../layouts/AdminLayout"
 import AdminDashboard from "../pages/admin/AdminDashboard"
 import AdminUsers from "../pages/admin/AdminUsers"
+import AdminUserDetails from "../pages/admin/AdminUserDetails"
 import AdminClasses from "../pages/admin/AdminClasses"
+import AdminClassDetails from "../pages/admin/AdminClassDetails"
 import AdminSettings from "../pages/admin/AdminSettings"
 
 import TeacherLayout from "../layouts/TeacherLayout"
@@ -37,7 +39,9 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.ADMIN]: <Navigate to={Routes[RouteKeys.ADMIN_DASHBOARD]} />,
   [RouteKeys.ADMIN_DASHBOARD]: <AdminDashboard />,
   [RouteKeys.ADMIN_USERS]: <AdminUsers />,
+  [RouteKeys.ADMIN_USER_DETAILS]: <AdminUserDetails />,
   [RouteKeys.ADMIN_CLASSES]: <AdminClasses />,
+  [RouteKeys.ADMIN_CLASS_DETAILS]: <AdminClassDetails />,
   [RouteKeys.ADMIN_SETTINGS]: <AdminSettings />,
 
   [RouteKeys.TEACHER]: <Navigate to={Routes[RouteKeys.TEACHER_DASHBOARD]} />,
@@ -93,7 +97,9 @@ const useAuthRouter = () => {
         ...[
           RouteKeys.ADMIN_DASHBOARD,
           RouteKeys.ADMIN_USERS,
+          RouteKeys.ADMIN_USER_DETAILS,
           RouteKeys.ADMIN_CLASSES,
+          RouteKeys.ADMIN_CLASS_DETAILS,
           RouteKeys.ADMIN_SETTINGS,
         ].map(key => ({
           path: childPath(Routes[key], Routes[RouteKeys.ADMIN]),

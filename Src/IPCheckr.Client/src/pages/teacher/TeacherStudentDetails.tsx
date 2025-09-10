@@ -188,7 +188,7 @@ const TeacherStudentDetails = () => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="overline" color="text.secondary">
-                  {t(TranslationKey.STUDENT_STUDENT_DETAILS_SUCCESS_RATE)}
+                  {t(TranslationKey.TEACHER_STUDENT_DETAILS_SUCCESS_RATE)}
                 </Typography>
                 {(detailsQuery.data?.successRate?.length ?? 0) > 0 ? (
                   <LineChart
@@ -197,13 +197,13 @@ const TeacherStudentDetails = () => {
                       {
                         scaleType: "point",
                         data: detailsQuery.data!.successRate!.map(d => d.date),
-                        label: t(TranslationKey.STUDENT_STUDENT_DETAILS_DATE),
+                        label: t(TranslationKey.TEACHER_STUDENT_DETAILS_DATE),
                       },
                     ]}
                     series={[
                       {
                         data: detailsQuery.data!.successRate!.map(d => d.percentage),
-                        label: t(TranslationKey.STUDENT_STUDENT_DETAILS_PERCENTAGE),
+                        label: t(TranslationKey.TEACHER_STUDENT_DETAILS_PERCENTAGE),
                         area: true,
                       },
                     ]}

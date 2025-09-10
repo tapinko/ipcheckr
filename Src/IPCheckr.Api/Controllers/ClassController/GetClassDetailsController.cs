@@ -106,11 +106,16 @@ namespace IPCheckr.Api.Controllers
             int totalInProgress = assignmentGroups.Count(ag => ag.StartDate <= now && ag.Deadline >= now);
             int totalEnded = assignmentGroups.Count(ag => ag.Deadline <= now);
 
-            var teachersStr = string.Join(", ",
-                (@class.Teachers ?? Enumerable.Empty<Models.User>())
-                    .Select(t => t.Username)
-                    .Distinct()
-                    .OrderBy(n => n));
+            var teachers = Array.Empty<ClassDetailsTeachersDto>();
+            for (int i = 0; i < (@class.Teachers ?? Enumerable.Empty<Models.User>()).Count(); i++)
+            {
+                var t = (@class.Teachers ?? Enumerable.Empty<Models.User>()).ElementAt(i);
+                teachers = teachers.Append(new ClassDetailsTeachersDto
+                {
+                    TeacherId = t.Id,
+                    Username = t.Username
+                }).ToArray();
+            }
 
             var studentsArr = (@class.Students ?? Enumerable.Empty<Models.User>())
                 .Select(s => new ClassDetailsStudentsDto
@@ -180,7 +185,7 @@ namespace IPCheckr.Api.Controllers
                 TotalUpcoming = totalUpcoming,
                 TotalInProgress = totalInProgress,
                 TotalEnded = totalEnded,
-                Teachers = teachersStr,
+                Teachers = teachers,
                 CreatedAt = @class.CreatedAt,
                 Students = studentsArr,
                 LastSubmitAt = lastSubmit?.SubmittedAt,

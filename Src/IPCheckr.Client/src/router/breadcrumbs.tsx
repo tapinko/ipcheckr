@@ -19,6 +19,31 @@ const LinkRouter = (props: LinkRouterProps) => {
 
 const routes: BreadcrumbsRoute[] = [
   {
+    path: Routes[RouteKeys.ADMIN_USERS],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_USERS)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.ADMIN_USER_DETAILS],
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_USER_DETAILS)} {match.params.USER_ID}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.ADMIN_CLASSES],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_CLASSES)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.ADMIN_CLASS_DETAILS],
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_CLASS_DETAILS)} {match.params.CLASS_ID}
+      </Typography>
+  },
+
+  {
     path: Routes[RouteKeys.TEACHER_MY_CLASSES],
     breadcrumb: () => <Typography variant="body2" component="span">
         {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES)}

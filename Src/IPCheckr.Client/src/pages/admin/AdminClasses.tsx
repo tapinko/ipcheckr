@@ -29,6 +29,8 @@ import TableSkeleton from "../../components/TableSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
 import type { AxiosError, AxiosResponse } from "axios"
+import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import { useNavigate } from "react-router-dom"
 
 type CreateClassFormValues = {
   className: string
@@ -43,6 +45,7 @@ type EditClassFormValues = {
 type ClassRow = ClassDto & { teacherUsernamesDisplay: string; id: number }
 
 const AdminClasses = () => {
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
@@ -288,7 +291,14 @@ const AdminClasses = () => {
             }
           }
         }}
-        onDetails={() => {}}
+        onDetails={() => {
+          navigate(
+            getParametrizedUrl(RouteKeys.ADMIN_CLASS_DETAILS, {
+              [RouteParams.CLASS_ID]:
+                String(selectedRows.classId[0])
+            })
+          )
+        }}
         onDelete={() => setDeleteDialogvis(true)}
         disableEdit={selectedRows.classId.length !== 1}
         disableDetails={selectedRows.classId.length !== 1}

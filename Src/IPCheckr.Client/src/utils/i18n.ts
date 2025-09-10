@@ -74,6 +74,11 @@ export enum TranslationKey {
   ERROR_RETRY = "ERROR_RETRY",
 
   // Breadcrumbs
+  BREADCRUMBS_ADMIN_USERS = "BREADCRUMBS_ADMIN_USERS",
+  BREADCRUMBS_ADMIN_USER_DETAILS = "BREADCRUMBS_ADMIN_USER_DETAILS",
+  BREADCRUMBS_ADMIN_CLASSES = "BREADCRUMBS_ADMIN_CLASSES",
+  BREADCRUMBS_ADMIN_CLASS_DETAILS = "BREADCRUMBS_ADMIN_CLASS_DETAILS",
+
   BREADCRUMBS_TEACHER_MY_CLASSES = "BREADCRUMBS_TEACHER_MY_CLASSES",
   BREADCRUMBS_TEACHER_MY_CLASSES_STUDENT_DETAILS = "BREADCRUMBS_TEACHER_MY_CLASSES_STUDENT_DETAILS",
   BREADCRUMBS_TEACHER_MY_CLASSES_CLASS = "BREADCRUMBS_TEACHER_MY_CLASSES_CLASS",
@@ -150,6 +155,29 @@ export enum TranslationKey {
   ADMIN_USER_DELETE_ERROR = "ADMIN_DELETE_ERROR",
   ADMIN_USERS_SAVE = "ADMIN_USERS_SAVE",
 
+  // AdminUserDetails
+  ADMIN_USER_DETAILS_USERNAME = "ADMIN_USER_DETAILS_USERNAME",
+  ADMIN_USER_DETAILS_CLASSES = "ADMIN_USER_DETAILS_CLASSES",
+  ADMIN_USER_DETAILS_TOTAL_SUBMITS = "ADMIN_USER_DETAILS_TOTAL_SUBMITS",
+  ADMIN_USER_DETAILS_LAST_SUBMIT = "ADMIN_USER_DETAILS_LAST_SUBMIT",
+  ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP = "ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP",
+  ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE = "ADMIN_USER_DETAILS_SUCCESS_RATE",
+  ADMIN_USER_DETAILS_AVERAGES = "ADMIN_USER_DETAILS_AVERAGES",
+  ADMIN_USER_DETAILS_PERCENTAGE = "ADMIN_USER_DETAILS_PERCENTAGE",
+  ADMIN_USER_DETAILS_NETWORK = "ADMIN_USER_DETAILS_NETWORK",
+  ADMIN_USER_DETAILS_FIRST = "ADMIN_USER_DETAILS_FIRST",
+  ADMIN_USER_DETAILS_LAST = "ADMIN_USER_DETAILS_LAST",
+  ADMIN_USER_DETAILS_BROADCAST = "ADMIN_USER_DETAILS_BROADCAST",
+  ADMIN_USER_DETAILS_NO_DATA = "ADMIN_USER_DETAILS_NO_DATA",
+  ADMIN_USER_DETAILS_DATE = "ADMIN_USER_DETAILS_DATE",
+  ADMIN_USER_DETAILS_CREATED_AT = "ADMIN_USER_DETAILS_CREATED_AT",
+  ADMIN_USER_DETAILS_SHOW_DETAILS = "ADMIN_USER_DETAILS_SHOW_DETAILS",
+  ADMIN_USER_DETAILS_NO_CLASSES = "ADMIN_USER_DETAILS_NO_CLASSES",
+  ADMIN_USER_DETAILS_TOTAL_ASSIGNMENT_GROUPS = "ADMIN_USER_DETAILS_TOTAL_ASSIGNMENT_GROUPS",
+  ADMIN_USER_DETAILS_TOTAL_UPCOMING = "ADMIN_USER_DETAILS_TOTAL_UPCOMING",
+  ADMIN_USER_DETAILS_TOTAL_IN_PROGRESS = "ADMIN_USER_DETAILS_TOTAL_IN_PROGRESS",
+  ADMIN_USER_DETAILS_TOTAL_ENDED = "ADMIN_USER_DETAILS_TOTAL_ENDED",
+
   // Admin Classes
   ADMIN_CLASSES_TITLE = "ADMIN_CLASSES_TITLE",
   ADMIN_CLASSES_CREATE_CLASS = "ADMIN_CLASSES_CREATE_CLASS",
@@ -171,6 +199,25 @@ export enum TranslationKey {
   ADMIN_CLASSES_DELETE_SUCCESS = "ADMIN_CLASSES_DELETE_SUCCESS",
   ADMIN_CLASSES_DELETE_ERROR = "ADMIN_CLASSES_DELETE_ERROR",
   ADMIN_CLASSES_SAVE = "ADMIN_CLASSES_SAVE",
+
+  // AdminClassDetails
+  ADMIN_CLASS_DETAILS_CLASS_NAME = "ADMIN_CLASS_DETAILS_CLASS_NAME",
+  ADMIN_CLASS_DETAILS_TEACHERS = "ADMIN_CLASS_DETAILS_TEACHERS",
+  ADMIN_CLASS_DETAILS_TOTAL_SUBMITS = "ADMIN_CLASS_DETAILS_TOTAL_SUBMITS",
+  ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE = "ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE",
+  ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP = "ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP",
+  ADMIN_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS = "ADMIN_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS",
+  ADMIN_CLASS_DETAILS_TOTAL_UPCOMING = "ADMIN_CLASS_DETAILS_TOTAL_UPCOMING",
+  ADMIN_CLASS_DETAILS_TOTAL_IN_PROGRESS = "ADMIN_CLASS_DETAILS_TOTAL_IN_PROGRESS",
+  ADMIN_CLASS_DETAILS_TOTAL_ENDED = "ADMIN_CLASS_DETAILS_TOTAL_ENDED",
+  ADMIN_CLASS_DETAILS_LAST_SUBMIT = "ADMIN_CLASS_DETAILS_LAST_SUBMIT",
+  ADMIN_CLASS_DETAILS_SHOW_DETAILS = "ADMIN_CLASS_DETAILS_SHOW_DETAILS",
+  ADMIN_CLASS_DETAILS_AVERAGE_IN_STUDENTS = "ADMIN_CLASS_DETAILS_AVERAGE_IN_STUDENTS",
+  ADMIN_CLASS_DETAILS_PERCENTAGE = "ADMIN_CLASS_DETAILS_PERCENTAGE",
+  ADMIN_CLASS_DETAILS_NO_DATA = "ADMIN_CLASS_DETAILS_NO_DATA",
+  ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS = "ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS",
+  ADMIN_CLASS_DETAILS_STUDENTS = "ADMIN_CLASS_DETAILS_STUDENTS",
+  ADMIN_CLASS_DETAILS_NO_STUDENTS = "ADMIN_CLASS_DETAILS_NO_STUDENTS",
 
   // AdminSettings
   ADMIN_SETTINGS_TITLE = "ADMIN_SETTINGS_TITLE",
@@ -268,9 +315,7 @@ export enum TranslationKey {
   TEACHER_STUDENT_DETAILS_LAST = "TEACHER_STUDENT_DETAILS_LAST",
   TEACHER_STUDENT_DETAILS_BROADCAST = "TEACHER_STUDENT_DETAILS_BROADCAST",
   TEACHER_STUDENT_DETAILS_NO_DATA = "TEACHER_STUDENT_DETAILS_NO_DATA",
-  STUDENT_STUDENT_DETAILS_SUCCESS_RATE = "STUDENT_STUDENT_DETAILS_SUCCESS_RATE",
-  STUDENT_STUDENT_DETAILS_DATE = "STUDENT_STUDENT_DETAILS_DATE",
-  STUDENT_STUDENT_DETAILS_PERCENTAGE = "STUDENT_STUDENT_DETAILS_PERCENTAGE",
+  TEACHER_STUDENT_DETAILS_DATE = "TEACHER_STUDENT_DETAILS_DATE",
 
   // TeacherClassDetails
   TEACHER_CLASS_DETAILS_CLASS_NAME = "TEACHER_CLASS_DETAILS_CLASS_NAME",
@@ -486,6 +531,11 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ERROR_RETRY]: "Retry",
 
   // Breadcrumbs
+  [TranslationKey.BREADCRUMBS_ADMIN_USERS]: "Users",
+  [TranslationKey.BREADCRUMBS_ADMIN_USER_DETAILS]: "User detail",
+  [TranslationKey.BREADCRUMBS_ADMIN_CLASSES]: "Classes",
+  [TranslationKey.BREADCRUMBS_ADMIN_CLASS_DETAILS]: "Class detail",
+
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES]: "My classes",
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES_STUDENT_DETAILS]: "Student details",
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES_CLASS]: "Class details",
@@ -561,6 +611,29 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_USER_DELETE_ERROR]: "Error deleting users",
   [TranslationKey.ADMIN_USERS_SAVE]: "Save",
 
+  // AdminUserDetails
+  [TranslationKey.ADMIN_USER_DETAILS_USERNAME]: "Name",
+  [TranslationKey.ADMIN_USER_DETAILS_CLASSES]: "Classes",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_SUBMITS]: "Total submits",
+  [TranslationKey.ADMIN_USER_DETAILS_LAST_SUBMIT]: "Last submit",
+  [TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP]: "Average of all submits by the student.",
+  [TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE]: "Average success rate",
+  [TranslationKey.ADMIN_USER_DETAILS_AVERAGES]: "Averages",
+  [TranslationKey.ADMIN_USER_DETAILS_PERCENTAGE]: "Percentage",
+  [TranslationKey.ADMIN_USER_DETAILS_NETWORK]: "Network",
+  [TranslationKey.ADMIN_USER_DETAILS_FIRST]: "First",
+  [TranslationKey.ADMIN_USER_DETAILS_LAST]: "Last",
+  [TranslationKey.ADMIN_USER_DETAILS_BROADCAST]: "Broadcast",
+  [TranslationKey.ADMIN_USER_DETAILS_NO_DATA]: "No data available",
+  [TranslationKey.ADMIN_USER_DETAILS_DATE]: "Date",
+  [TranslationKey.ADMIN_USER_DETAILS_CREATED_AT]: "Added at",
+  [TranslationKey.ADMIN_USER_DETAILS_SHOW_DETAILS]: "Show details",
+  [TranslationKey.ADMIN_USER_DETAILS_NO_CLASSES]: "No classes assigned",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_ASSIGNMENT_GROUPS]: "Total assignments",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_UPCOMING]: "Total upcoming",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_IN_PROGRESS]: "Total in progress",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_ENDED]: "Total ended",
+
   // Admin Classes
   [TranslationKey.ADMIN_CLASSES_TITLE]: "Classes",
   [TranslationKey.ADMIN_CLASSES_CREATE_CLASS]: "Create class",
@@ -582,6 +655,25 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_CLASSES_DELETE_SUCCESS]: "Classes deleted successfully",
   [TranslationKey.ADMIN_CLASSES_DELETE_ERROR]: "Error deleting classes",
   [TranslationKey.ADMIN_CLASSES_SAVE]: "Save",
+
+  // ADMINClassDetails
+  [TranslationKey.ADMIN_CLASS_DETAILS_CLASS_NAME]: "Class name",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TEACHERS]: "Teachers",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_SUBMITS]: "Total submits",
+  [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE]: "Average success rate",
+  [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP]: "Average of all submits by students in this class.",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS]: "Total assignments",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_UPCOMING]: "Total upcoming",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_IN_PROGRESS]: "Total in progress",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ENDED]: "Total ended",
+  [TranslationKey.ADMIN_CLASS_DETAILS_LAST_SUBMIT]: "Last submit",
+  [TranslationKey.ADMIN_CLASS_DETAILS_SHOW_DETAILS]: "Show details",
+  [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_STUDENTS]: "Average in students",
+  [TranslationKey.ADMIN_CLASS_DETAILS_PERCENTAGE]: "Percentage",
+  [TranslationKey.ADMIN_CLASS_DETAILS_NO_DATA]: "No data available",
+  [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS]: "Average in assignment groups",
+  [TranslationKey.ADMIN_CLASS_DETAILS_STUDENTS]: "Students",
+  [TranslationKey.ADMIN_CLASS_DETAILS_NO_STUDENTS]: "No students in this class",
 
   // AdminSettings
   [TranslationKey.ADMIN_SETTINGS_TITLE]: "Settings",
@@ -680,9 +772,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_STUDENT_DETAILS_LAST]: "Last usable",
   [TranslationKey.TEACHER_STUDENT_DETAILS_BROADCAST]: "Broadcast",
   [TranslationKey.TEACHER_STUDENT_DETAILS_NO_DATA]: "No data available",
-  [TranslationKey.STUDENT_STUDENT_DETAILS_SUCCESS_RATE]: "Success rate",
-  [TranslationKey.STUDENT_STUDENT_DETAILS_DATE]: "Date",
-  [TranslationKey.STUDENT_STUDENT_DETAILS_PERCENTAGE]: "Percentage",
+  [TranslationKey.TEACHER_STUDENT_DETAILS_DATE]: "Date",
 
   // TeacherClassDetails
   [TranslationKey.TEACHER_CLASS_DETAILS_CLASS_NAME]: "Class name",
@@ -896,6 +986,11 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ERROR_RETRY]: "Skúsiť znova",
 
   // Breadcrumbs
+  [TranslationKey.BREADCRUMBS_ADMIN_USERS]: "Používatelia",
+  [TranslationKey.BREADCRUMBS_ADMIN_USER_DETAILS]: "Detail používateľa",
+  [TranslationKey.BREADCRUMBS_ADMIN_CLASSES]: "Triedy",
+  [TranslationKey.BREADCRUMBS_ADMIN_CLASS_DETAILS]: "Detail triedy",
+  
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES]: "Moje triedy",
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES_STUDENT_DETAILS]: "Detail študenta",
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES_CLASS]: "Detail triedy",
@@ -945,7 +1040,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_DASHBOARD_LOGS_CLEAR]: "Vyčistiť",
   [TranslationKey.ADMIN_DASHBOARD_LOGS_NO_LOGS]: "Žiadne dostupné logy",
 
-  // Admin Users
+  // AdminUsers
   [TranslationKey.ADMIN_USERS_TITLE]: "Používatelia",
   [TranslationKey.ADMIN_USERS_ADD_USER]: "Pridať používateľa",
   [TranslationKey.ADMIN_USERS_EDIT_USER]: "Upraviť používateľa",
@@ -971,6 +1066,29 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_USER_DELETE_ERROR]: "Chyba pri odstraňovaní používateľov",
   [TranslationKey.ADMIN_USERS_SAVE]: "Uložiť",
 
+  // AdminUserDetails
+  [TranslationKey.ADMIN_USER_DETAILS_USERNAME]: "Meno",
+  [TranslationKey.ADMIN_USER_DETAILS_CLASSES]: "Triedy",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_SUBMITS]: "Celkové odovzdania",
+  [TranslationKey.ADMIN_USER_DETAILS_LAST_SUBMIT]: "Posledné odovzdanie",
+  [TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP]: "Priemer všetkých odovzdaní študenta.",
+  [TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE]: "Priemerná úspešnosť",
+  [TranslationKey.ADMIN_USER_DETAILS_AVERAGES]: "Priemery",
+  [TranslationKey.ADMIN_USER_DETAILS_PERCENTAGE]: "Percentá",
+  [TranslationKey.ADMIN_USER_DETAILS_NETWORK]: "Sieť",
+  [TranslationKey.ADMIN_USER_DETAILS_FIRST]: "Prvá použiteľná",
+  [TranslationKey.ADMIN_USER_DETAILS_LAST]: "Posledná použiteľná",
+  [TranslationKey.ADMIN_USER_DETAILS_BROADCAST]: "Broadcast",
+  [TranslationKey.ADMIN_USER_DETAILS_NO_DATA]: "Žiadne dostupné údaje",
+  [TranslationKey.ADMIN_USER_DETAILS_DATE]: "Dátum",
+  [TranslationKey.ADMIN_USER_DETAILS_CREATED_AT]: "Dátum pridania",
+  [TranslationKey.ADMIN_USER_DETAILS_SHOW_DETAILS]: "Zobraziť detaily",
+  [TranslationKey.ADMIN_USER_DETAILS_NO_CLASSES]: "Žiadne pridenelé triedy",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_ASSIGNMENT_GROUPS]: "Celkové zadania",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_UPCOMING]: "Celkové nadchádzajúce",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_IN_PROGRESS]: "Celkové prebiehajúce",
+  [TranslationKey.ADMIN_USER_DETAILS_TOTAL_ENDED]: "Celkové ukončené",
+
   // AdminClasses
   [TranslationKey.ADMIN_CLASSES_TITLE]: "Triedy",
   [TranslationKey.ADMIN_CLASSES_CREATE_CLASS]: "Vytvoriť triedu",
@@ -992,6 +1110,25 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_CLASSES_DELETE_SUCCESS]: "Triedy boli úspešne odstránené",
   [TranslationKey.ADMIN_CLASSES_DELETE_ERROR]: "Chyba pri odstraňovaní tried",
   [TranslationKey.ADMIN_CLASSES_SAVE]: "Uložiť",
+
+  // AdminClassDetails
+  [TranslationKey.ADMIN_CLASS_DETAILS_CLASS_NAME]: "Názov triedy",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TEACHERS]: "Učitelia",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_SUBMITS]: "Celkové odovzdania",
+  [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE]: "Priemerná úspešnosť",
+  [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP]: "Priemer všetkých odovzdaní v triede.",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS]: "Celkové zadania",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_UPCOMING]: "Celkové nadchádzajúce",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_IN_PROGRESS]: "Celkové prebiehajúce",
+  [TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ENDED]: "Celkové ukončené",
+  [TranslationKey.ADMIN_CLASS_DETAILS_LAST_SUBMIT]: "Posledné odovzdanie",
+  [TranslationKey.ADMIN_CLASS_DETAILS_SHOW_DETAILS]: "Zobraziť detaily",
+  [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_STUDENTS]: "Priemer v študentoch",
+  [TranslationKey.ADMIN_CLASS_DETAILS_PERCENTAGE]: "Percentá",
+  [TranslationKey.ADMIN_CLASS_DETAILS_NO_DATA]: "Žiadne dostupné údaje",
+  [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS]: "Priemer v zadaniach",
+  [TranslationKey.ADMIN_CLASS_DETAILS_STUDENTS]: "Študenti",
+  [TranslationKey.ADMIN_CLASS_DETAILS_NO_STUDENTS]: "V tiejto triede zatiaľ nie sú žiadni študenti.",
 
   // AdminSettings
   [TranslationKey.ADMIN_SETTINGS_TITLE]: "Nastavenia",
@@ -1089,9 +1226,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_STUDENT_DETAILS_LAST]: "Posledná použiteľná",
   [TranslationKey.TEACHER_STUDENT_DETAILS_BROADCAST]: "Broadcast",
   [TranslationKey.TEACHER_STUDENT_DETAILS_NO_DATA]: "Žiadne dostupné údaje",
-  [TranslationKey.STUDENT_STUDENT_DETAILS_SUCCESS_RATE]: "Úspešnosť",
-  [TranslationKey.STUDENT_STUDENT_DETAILS_DATE]: "Dátum",
-  [TranslationKey.STUDENT_STUDENT_DETAILS_PERCENTAGE]: "Percentá",
+  [TranslationKey.TEACHER_STUDENT_DETAILS_DATE]: "Dátum",
 
   // TeacherClassDetails
   [TranslationKey.TEACHER_CLASS_DETAILS_CLASS_NAME]: "Názov triedy",

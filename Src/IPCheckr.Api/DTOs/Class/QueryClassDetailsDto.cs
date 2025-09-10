@@ -33,7 +33,7 @@ namespace IPCheckr.Api.DTOs.Class
         [Required]
         public int TotalEnded { get; set; }
 
-        public string? Teachers { get; set; }
+        public ClassDetailsTeachersDto[]? Teachers { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
@@ -53,6 +53,15 @@ namespace IPCheckr.Api.DTOs.Class
         public AverageSuccessRateInStudentsDto[]? AverageSuccessRateInStudents { get; set; }
 
         public AverageSuccessRateInAssignmentGroupsDto[]? AverageSuccessRateInAssignmentGroups { get; set; }
+    }
+
+    public class ClassDetailsTeachersDto
+    {
+        [Required]
+        public required int TeacherId { get; set; }
+
+        [Required]
+        public required string Username { get; set; }
     }
 
     public class AverageSuccessRateInStudentsDto : IBarChartData

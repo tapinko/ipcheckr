@@ -529,6 +529,25 @@ export interface ClassDetailsStudentsDto {
 /**
  * 
  * @export
+ * @interface ClassDetailsTeachersDto
+ */
+export interface ClassDetailsTeachersDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof ClassDetailsTeachersDto
+     */
+    'teacherId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClassDetailsTeachersDto
+     */
+    'username': string;
+}
+/**
+ * 
+ * @export
  * @interface ClassDto
  */
 export interface ClassDto {
@@ -1319,10 +1338,10 @@ export interface QueryClassDetailsRes {
     'totalEnded': number;
     /**
      * 
-     * @type {string}
+     * @type {Array<ClassDetailsTeachersDto>}
      * @memberof QueryClassDetailsRes
      */
-    'teachers'?: string | null;
+    'teachers'?: Array<ClassDetailsTeachersDto> | null;
     /**
      * 
      * @type {string}
@@ -1560,6 +1579,30 @@ export interface QueryStudentDetailsRes {
      * @memberof QueryStudentDetailsRes
      */
     'successRate': Array<StudentDetailsSuccessRateDto>;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'totalAssignmentGroups': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'totalUpcoming': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'totalInProgress': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryStudentDetailsRes
+     */
+    'totalEnded': number;
 }
 /**
  * 
@@ -1663,6 +1706,127 @@ export interface QueryTeacherDashboardRes {
      * @memberof QueryTeacherDashboardRes
      */
     'averagePercentageInClasses'?: Array<AveragePercentageInClassesDto> | null;
+}
+/**
+ * 
+ * @export
+ * @interface QueryUserDetailsRes
+ */
+export interface QueryUserDetailsRes {
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryUserDetailsRes
+     */
+    'username': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'totalSubmits': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'lastSubmitGroupId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'lastSubmitAssignmentId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'lastSubmitAttempt'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryUserDetailsRes
+     */
+    'lastSubmitAt'?: string | null;
+    /**
+     * 
+     * @type {Array<StudentDetailsClassesDto>}
+     * @memberof QueryUserDetailsRes
+     */
+    'classes'?: Array<StudentDetailsClassesDto> | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'averageNetwork'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'averageFirst'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'averageLast'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'averageBroadcast'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'averageTotal': number;
+    /**
+     * 
+     * @type {Array<StudentDetailsSuccessRateDto>}
+     * @memberof QueryUserDetailsRes
+     */
+    'successRate': Array<StudentDetailsSuccessRateDto>;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'totalAssignmentGroups': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'totalUpcoming': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'totalInProgress': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryUserDetailsRes
+     */
+    'totalEnded': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryUserDetailsRes
+     */
+    'role': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryUserDetailsRes
+     */
+    'createdAt': string;
 }
 /**
  * 
@@ -3927,6 +4091,43 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         /**
          * 
          * @param {number | null} [userId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userQueryUserDetails: async (userId?: number | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/users/get-user-details`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['UserId'] = userId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number | null} [userId] 
          * @param {string | null} [username] 
          * @param {string | null} [role] 
          * @param {number | null} [classId] 
@@ -4047,6 +4248,18 @@ export const UserApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {number | null} [userId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userQueryUserDetails(userId?: number | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryUserDetailsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userQueryUserDetails(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.userQueryUserDetails']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number | null} [userId] 
          * @param {string | null} [username] 
          * @param {string | null} [role] 
          * @param {number | null} [classId] 
@@ -4106,6 +4319,15 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
          */
         userQueryStudentDetails(studentId?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<QueryStudentDetailsRes> {
             return localVarFp.userQueryStudentDetails(studentId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number | null} [userId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userQueryUserDetails(userId?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<QueryUserDetailsRes> {
+            return localVarFp.userQueryUserDetails(userId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4173,6 +4395,17 @@ export class UserApi extends BaseAPI {
      */
     public userQueryStudentDetails(studentId?: number | null, options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).userQueryStudentDetails(studentId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number | null} [userId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public userQueryUserDetails(userId?: number | null, options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userQueryUserDetails(userId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

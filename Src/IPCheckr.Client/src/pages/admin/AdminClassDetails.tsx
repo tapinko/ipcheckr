@@ -30,7 +30,7 @@ import {
 } from "@mui/icons-material"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 
-const TeacherClassDetails = () => {
+const AdminClassDetails = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -72,7 +72,7 @@ const TeacherClassDetails = () => {
           <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
-                title={t(TranslationKey.TEACHER_CLASS_DETAILS_CLASS_NAME)}
+                title={t(TranslationKey.ADMIN_CLASS_DETAILS_CLASS_NAME)}
                 value={detailsQuery.data?.className}
                 icon={<Class />}
               />
@@ -84,16 +84,16 @@ const TeacherClassDetails = () => {
           <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
-                title={t(TranslationKey.TEACHER_CLASS_DETAILS_TEACHERS)}
+                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TEACHERS)}
                 value={
                   detailsQuery.data?.teachers
-                    && detailsQuery.data?.teachers.map(t => t.username).join(", ")
+                    && detailsQuery.data.teachers.map(t => t.username).join(", ")
                 }
                 icon={<Groups />}
               />
-              <Tooltip title={t(TranslationKey.TEACHER_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}>
+              <Tooltip title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}>
                 <StatsCard
-                  title={t(TranslationKey.TEACHER_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
+                  title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
                   value={`${detailsQuery.data?.averageSuccessRate ?? 0}%`}
                   icon={<Percent />}
                 />
@@ -116,30 +116,9 @@ const TeacherClassDetails = () => {
                   ) : ("-")
                 }
                 icon={<AccessTime />}
-                actions={
-                  <Button variant="outlined" onClick={() => 
-                    navigate(
-                      getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT, {
-                        [RouteParams.ASSIGNMENT_GROUP_ID]:
-                          detailsQuery.data?.lastSubmitGroupId!.toString(),
-                        [RouteParams.ASSIGNMENT_ID]:
-                          detailsQuery.data?.lastSubmitId!.toString(),
-                        [RouteParams.ATTEMPT]: "1"
-                      })
-                    )}
-                    disabled={
-                      !detailsQuery.data?.lastSubmitGroupId ||
-                      !detailsQuery.data?.lastSubmitId ||
-                      !detailsQuery.data?.lastSubmitAt ||
-                      !detailsQuery.data?.lastSubmitUsername
-                    }
-                  >
-                    {t(TranslationKey.TEACHER_CLASS_DETAILS_SHOW_DETAILS)}
-                  </Button>
-                }
               />
               <StatsCard
-                title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_SUBMITS)}
+                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_SUBMITS)}
                 value={detailsQuery.data?.totalSubmits}
                 icon={<TaskAlt />}
               />
@@ -149,24 +128,24 @@ const TeacherClassDetails = () => {
           <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
-                title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
+                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
                 value={detailsQuery.data?.totalAssignmentGroups}
                 icon={<Quiz />}
               />
               <StatsCard
-                title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_UPCOMING)}
+                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_UPCOMING)}
                 value={detailsQuery.data?.totalUpcoming}
                 icon={<AccessTime />}
                 color="default"
               />
               <StatsCard
-                title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_IN_PROGRESS)}
+                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_IN_PROGRESS)}
                 value={detailsQuery.data?.totalInProgress}
                 icon={<AccessTime />}
                 color="warning"
               />
               <StatsCard
-                title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_ENDED)}
+                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ENDED)}
                 value={detailsQuery.data?.totalEnded}
                 icon={<AccessTime />}
                 color="success"
@@ -175,59 +154,108 @@ const TeacherClassDetails = () => {
           </Grid>
         </Grid>
 
-        <Box>
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="overline" color="text.secondary">
-                {t(TranslationKey.TEACHER_CLASS_DETAILS_STUDENTS)}
-              </Typography>
-
-              {detailsQuery.data?.students?.length ? (
-                <Stack spacing={1} sx={{ mt: 1 }}>
-                  {detailsQuery.data.students.map(s => (
-                    <Stack
-                      key={s.studentId}
-                      direction="row"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      sx={{
-                        border: theme => `1px solid ${theme.palette.divider}`,
-                        borderRadius: 1,
-                        p: 1
-                      }}
-                    >
-                      <Typography variant="body2">{s.username}</Typography>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          navigate(
-                            getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS, {
-                              [RouteParams.STUDENT_ID]: s.studentId.toString()
-                            })
-                          )
-                        }
-                      >
-                        {t(TranslationKey.TEACHER_CLASS_DETAILS_SHOW_DETAILS)}
-                      </Button>
-                    </Stack>
-                  ))}
-                </Stack>
-              ) : (
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {t(TranslationKey.TEACHER_CLASS_DETAILS_NO_STUDENTS)}
+        <Stack spacing={2} direction="row">
+          <Box flex={1}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="overline" color="text.secondary">
+                  {t(TranslationKey.ADMIN_CLASS_DETAILS_STUDENTS)}
                 </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Box>
+
+                {detailsQuery.data?.students?.length ? (
+                  <Stack spacing={1} sx={{ mt: 1 }}>
+                    {detailsQuery.data.students.map(s => (
+                      <Stack
+                        key={s.studentId}
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        sx={{
+                          border: theme => `1px solid ${theme.palette.divider}`,
+                          borderRadius: 1,
+                          p: 1
+                        }}
+                      >
+                        <Typography variant="body2">{s.username}</Typography>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            navigate(
+                              getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
+                                [RouteParams.USER_ID]: s.studentId.toString()
+                              })
+                            )
+                          }
+                        >
+                          {t(TranslationKey.ADMIN_CLASS_DETAILS_SHOW_DETAILS)}
+                        </Button>
+                      </Stack>
+                    ))}
+                  </Stack>
+                ) : (
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    {t(TranslationKey.ADMIN_CLASS_DETAILS_NO_STUDENTS)}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Box>
+
+          <Box flex={1}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="overline" color="text.secondary">
+                  {t(TranslationKey.ADMIN_CLASS_DETAILS_TEACHERS)}
+                </Typography>
+
+                {detailsQuery.data?.teachers?.length ? (
+                  <Stack spacing={1} sx={{ mt: 1 }}>
+                    {detailsQuery.data.teachers.map(te => (
+                      <Stack
+                        key={te.teacherId}
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        sx={{
+                          border: theme => `1px solid ${theme.palette.divider}`,
+                          borderRadius: 1,
+                          p: 1
+                        }}
+                      >
+                        <Typography variant="body2">{te.username}</Typography>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() =>
+                            navigate(
+                              getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
+                                [RouteParams.USER_ID]: te.teacherId.toString()
+                              })
+                            )
+                          }
+                        >
+                          {t(TranslationKey.ADMIN_CLASS_DETAILS_SHOW_DETAILS)}
+                        </Button>
+                      </Stack>
+                    ))}
+                  </Stack>
+                ) : (
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    {t(TranslationKey.ADMIN_CLASS_DETAILS_NO_STUDENTS)}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Box>
+        </Stack>
 
         <Box sx={{ display: "flex", gap: 2 }}>
           <Box sx={{ flex: 3 }}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="overline" color="text.secondary">
-                  {t(TranslationKey.TEACHER_CLASS_DETAILS_AVERAGE_IN_STUDENTS)}
+                  {t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_STUDENTS)}
                 </Typography>
                 {(avgStudents.length ?? 0) > 0 ? (
                   <BarChart
@@ -241,7 +269,7 @@ const TeacherClassDetails = () => {
                     series={[
                       {
                         data: avgStudents.map(s => s.percentage),
-                        label: t(TranslationKey.TEACHER_CLASS_DETAILS_PERCENTAGE),
+                        label: t(TranslationKey.ADMIN_CLASS_DETAILS_PERCENTAGE),
                       },
                     ]}
                     yAxis={[
@@ -255,7 +283,7 @@ const TeacherClassDetails = () => {
                   />
                 ) : (
                   <Typography variant="body2" color="text.secondary">
-                    {t(TranslationKey.TEACHER_CLASS_DETAILS_NO_DATA)}
+                    {t(TranslationKey.ADMIN_CLASS_DETAILS_NO_DATA)}
                   </Typography>
                 )}
               </CardContent>
@@ -266,7 +294,7 @@ const TeacherClassDetails = () => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="overline" color="text.secondary">
-                  {t(TranslationKey.TEACHER_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS)}
+                  {t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS)}
                 </Typography>
                 {(avgGroups.length ?? 0) > 0 ? (
                   <LineChart
@@ -280,7 +308,7 @@ const TeacherClassDetails = () => {
                     series={[
                       {
                         data: avgGroups.map(g => g.percentage),
-                        label: t(TranslationKey.TEACHER_CLASS_DETAILS_PERCENTAGE),
+                        label: t(TranslationKey.ADMIN_CLASS_DETAILS_PERCENTAGE),
                         area: true,
                       },
                     ]}
@@ -295,7 +323,7 @@ const TeacherClassDetails = () => {
                   />
                 ) : (
                   <Typography variant="body2" color="text.secondary">
-                    {t(TranslationKey.TEACHER_CLASS_DETAILS_NO_DATA)}
+                    {t(TranslationKey.ADMIN_CLASS_DETAILS_NO_DATA)}
                   </Typography>
                 )}
               </CardContent>
@@ -307,4 +335,4 @@ const TeacherClassDetails = () => {
   )
 }
 
-export default TeacherClassDetails
+export default AdminClassDetails

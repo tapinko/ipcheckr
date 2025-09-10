@@ -30,6 +30,8 @@ import ErrorLoading from "../../components/ErrorLoading"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
 import { AxiosError, type AxiosResponse } from "axios"
 import UserRole from "../../types/UserRole"
+import { useNavigate } from "react-router-dom"
+import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 
 type AddUserFormValues = {
   username: string
@@ -48,6 +50,7 @@ type UserRow = UserDto & { classNamesDisplay: string }
 
 const AdminUsers = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const addUserDefaultValues: AddUserFormValues = {
@@ -309,7 +312,14 @@ const AdminUsers = () => {
             setEditDialogVis(true)
           }
         }}
-        onDetails={() => {}}
+        onDetails={() => {
+          navigate(
+            getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
+              [RouteParams.USER_ID]:
+                String(selectedRows.userId[0])
+            })
+          )
+        }}
         onDelete={() => setDeleteDialogvis(true)}
         disableEdit={selectedRows.userId.length !== 1}
         disableDetails={selectedRows.userId.length !== 1 || hasAdminSelected}

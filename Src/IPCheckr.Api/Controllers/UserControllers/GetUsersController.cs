@@ -11,6 +11,9 @@ namespace IPCheckr.Api.Controllers
         {
             var query = _db.Users.AsQueryable();
 
+            if (req.UserId.HasValue)
+                query = query.Where(u => u.Id == req.UserId.Value);
+
             if (!string.IsNullOrEmpty(req.Username))
                 query = query.Where(u => u.Username.Contains(req.Username));
 
