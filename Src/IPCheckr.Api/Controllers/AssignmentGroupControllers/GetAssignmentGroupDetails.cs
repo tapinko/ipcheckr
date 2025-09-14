@@ -28,7 +28,6 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Skupina úloh nebola nájdená."
                 });
 
-            // Determine state
             AssignmentGroupState state = DateTime.UtcNow < ag.StartDate
                 ? AssignmentGroupState.UPCOMING
                 : DateTime.UtcNow <= ag.Deadline
@@ -73,7 +72,7 @@ namespace IPCheckr.Api.Controllers
             var assignmentDetails = new List<AssignmentGroupSubmitDetailsDto>();
             int totalAssignments = assignments.Count;
 
-            int totalStudents = assignmentStudentIds.Count; // students already having assignments
+            int totalStudents = assignmentStudentIds.Count;
             int submittedStudents = submits.Select(s => s.Assignment.Student.Id).Distinct().Count();
 
             double sumFirstAttemptPercentages = 0.0;

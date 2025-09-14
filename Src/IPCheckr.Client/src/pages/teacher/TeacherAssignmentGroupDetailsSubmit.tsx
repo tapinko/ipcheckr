@@ -9,15 +9,19 @@ import {
   CardContent,
   CardHeader,
   Divider,
+  Grid,
+  Pagination,
   Stack,
   Typography
 } from "@mui/material"
 import { TranslationKey } from "../../utils/i18n"
-import SelectSearchField from "../../components/SelectSearchField"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import ErrorLoading from "../../components/ErrorLoading"
 import SubmissionSkeleton from "../../components/SubmissionSkeleton"
 import CardSingleDetail from "../../components/AssignmentCardSingleDetail"
+import StatsCard from "../../components/StatsCard"
+import { AccessTime, Percent, Person, PlaylistAddCheck, TaskAlt } from "@mui/icons-material"
+import { useMemo } from "react"
 
 const TeacherAssignmentGroupDetailsSubmit = () => {
   const { t } = useTranslation()
@@ -42,9 +46,25 @@ const TeacherAssignmentGroupDetailsSubmit = () => {
     placeholderData: prev => prev
   })
 
-  const data = detailsQuery.data
+  const correctStats = useMemo(() => {
+    const results = detailsQuery.data?.results
+    if (!results || results.length === 0) return null
+    const fields = ["network", "firstUsable", "lastUsable", "broadcast"] as const
+    let total = results.length * fields.length
+    let correct = 0
+    for (const r of results) {
+      for (const f of fields) {
+        const submitted = r[f].submitted
+        const expected = r[f].correct
+        if (submitted !== undefined && submitted !== null && submitted !== "" && submitted === expected) {
+          correct++
+        }
+      }
+    }
+    return { correct, total }
+  }, [detailsQuery.data])
 
-  if (detailsQuery.isLoading && !data) {
+  if (detailsQuery.isLoading && !detailsQuery.data) {
     return <SubmissionSkeleton />
   }
 
@@ -62,41 +82,84 @@ const TeacherAssignmentGroupDetailsSubmit = () => {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <SelectSearchField
-          label={`${t(
-            TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_ATTEMPT
-          )} (${attempt ?? "?"}/${data?.numberOfSubmits ?? 0})`}
-          items={
-            data
-              ? Array.from({ length: data.numberOfSubmits }, (_, i) => ({
-                  attempt: i + 1
-                }))
-              : []
-          }
-          value={attempt ? Number(attempt) : undefined}
-          valueKey="attempt"
-          labelKey="attempt"
-          onChange={selected =>
-            navigate(
-              getParametrizedUrl(
-                RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
-                {
-                  [RouteParams.ASSIGNMENT_GROUP_ID]:
-                    assignmentGroupId?.toString(),
-                  [RouteParams.ASSIGNMENT_ID]: assignmentId?.toString(),
-                  [RouteParams.ATTEMPT]: selected.attempt.toString()
+      <Stack spacing={2}>
+       <Grid container spacing={2}>
+          <Grid flex={1}>
+            <Stack spacing={2}>
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_NAME)}
+                value={detailsQuery.data?.studentName ?? "-"}
+                icon={<Person />}
+              />
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2}>
+          <Grid flex={1}>
+            <Stack spacing={2}>
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_SUCCESS_RATE)}
+                value={detailsQuery.data?.successRate}
+                icon={<Percent />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_ATTEMPT)}
+                value={attempt}
+                icon={<PlaylistAddCheck />}
+                actions={
+                  detailsQuery.data?.numberOfSubmits ? (
+                    <Pagination
+                      count={detailsQuery.data.numberOfSubmits}
+                      page={attempt ? Number(attempt) : 1}
+                      onChange={(_, attempt) =>
+                        navigate(
+                          getParametrizedUrl(
+                            RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
+                            {
+                              [RouteParams.ASSIGNMENT_GROUP_ID]: assignmentGroupId?.toString(),
+                              [RouteParams.ASSIGNMENT_ID]: assignmentId?.toString(),
+                              [RouteParams.ATTEMPT]: attempt.toString()
+                            }
+                          )
+                        )
+                      }
+                      siblingCount={0}
+                      boundaryCount={0}
+                      size="small"
+                    />
+                  ) : null
                 }
-              )
-            )
-          }
-          sx={{ mb: 2, width: 220 }}
-        />
-      </Box>
+              />
+            </Stack>
+          </Grid>
+
+          <Grid flex={1}>
+            <Stack spacing={2}>
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_SUBMITTED_AT)}
+                value={detailsQuery.data?.submittedAt
+                  ? new Date(detailsQuery.data.submittedAt).toLocaleString() : "-"}
+                icon={<AccessTime />}
+              />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_CORRECT)}
+                value={
+                  correctStats ? `${correctStats.correct}/${correctStats.total}` : "-"
+                }
+                icon={<TaskAlt />}
+              />
+            </Stack>
+          </Grid>
+
+        </Grid>
+      </Stack>
+
+      <Divider sx={{ my: 2 }} />
 
       <Box
         sx={{
-          display: (data?.results.length ?? 0) === 1 ? "flex" : "grid",
+          display: (detailsQuery.data?.results.length ?? 0) === 1 ? "flex" : "grid",
           gridTemplateColumns: "repeat(2, 1fr)",
           gap: 2,
           width: "100%",
@@ -104,8 +167,8 @@ const TeacherAssignmentGroupDetailsSubmit = () => {
           justifyContent: "center"
         }}
       >
-        {data &&
-          data.results.map((result, index) => (
+        {detailsQuery.data &&
+          detailsQuery.data.results.map((result, index) => (
             <Card key={index} sx={{ width: "100%" }}>
               <CardHeader
                 title={

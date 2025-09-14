@@ -23,6 +23,15 @@ namespace IPCheckr.Api.DTOs.Assignment
 
         [Required]
         public int NumberOfSubmits { get; set; }
+
+        [Required]
+        public DateTime SubmittedAt { get; set; }
+
+        [Required]
+        public required string StudentName { get; set; }
+
+        [Required]
+        public double SuccessRate { get; set; }
     }
 
     public class QueryAssignmentSubmitDetailsFullRecordField

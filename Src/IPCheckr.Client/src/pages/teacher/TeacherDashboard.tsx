@@ -89,7 +89,7 @@ const TeacherDashboard = () => {
           <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_INSTITUTION_NAME)}
+                title={t(TranslationKey.TEACHER_DASHBOARD_INSTITUTION_NAME)}
                 value={dashboardQuery.data?.institutionName ?? "-"}
                 icon={<School />}
               />

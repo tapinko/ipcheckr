@@ -1268,6 +1268,24 @@ export interface QueryAssignmentSubmitDetailsFullRes {
      * @memberof QueryAssignmentSubmitDetailsFullRes
      */
     'numberOfSubmits': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAssignmentSubmitDetailsFullRes
+     */
+    'submittedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAssignmentSubmitDetailsFullRes
+     */
+    'studentName': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAssignmentSubmitDetailsFullRes
+     */
+    'successRate': number;
 }
 /**
  * 

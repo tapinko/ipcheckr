@@ -13,17 +13,8 @@ namespace IPCheckr.Api.Controllers
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<QueryAssignmentSubmitDetailsFullRes>> QueryAssignmentSubmitDetailsFull([FromQuery] QueryAssignmentSubmitDetailsFullReq req)
         {
-            var callerIdStr = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            int callerId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
             var callerRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
-            if (!int.TryParse(callerIdStr, out int callerId))
-                return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
-                {
-                    Title = "Forbidden",
-                    Detail = "You must be logged in to access assignment submit details.",
-                    Status = StatusCodes.Status403Forbidden,
-                    MessageEn = "You must be logged in to access assignment submit details.",
-                    MessageSk = "Musíte byť prihlásený, aby ste mohli pristupovať k detailom odovzdania zadania."
-                });
 
             var assignment = await _db.Assignments
                 .Include(a => a.AssignmentGroup)
@@ -80,6 +71,16 @@ namespace IPCheckr.Api.Controllers
                 .Where(s => s.Assignment.Id == assignment.Id && s.Attempt == req.Attempt)
                 .FirstOrDefaultAsync();
 
+            if (submit == null)
+                return NotFound(new ApiProblemDetails
+                {
+                    Title = "Not Found",
+                    Detail = "This attempt does not exist.",
+                    Status = StatusCodes.Status404NotFound,
+                    MessageEn = "This attempt does not exist.",
+                    MessageSk = "Tento pokus neexistuje."
+                });
+
             var numberOfSubmits = await _db.AssignmentSubmits
                 .CountAsync(s => s.Assignment.Id == assignment.Id);
 
@@ -114,11 +115,51 @@ namespace IPCheckr.Api.Controllers
                 });
             }
 
+            double successRate = 0.0;
+            if (submit != null)
+            {
+                string[][] answerArrays =
+                {
+                    answerKey.Networks ?? Array.Empty<string>(),
+                    answerKey.FirstUsables ?? Array.Empty<string>(),
+                    answerKey.LastUsables ?? Array.Empty<string>(),
+                    answerKey.Broadcasts ?? Array.Empty<string>()
+                };
+                string[][] submitArrays =
+                {
+                    submit.Networks ?? Array.Empty<string>(),
+                    submit.FirstUsables ?? Array.Empty<string>(),
+                    submit.LastUsables ?? Array.Empty<string>(),
+                    submit.Broadcasts ?? Array.Empty<string>()
+                };
+
+                int totalFields = answerArrays.Sum(a => a.Length);
+                if (totalFields > 0)
+                {
+                    int correctFields = 0;
+                    for (int i = 0; i < answerArrays.Length; i++)
+                    {
+                        var ansArr = answerArrays[i];
+                        var subArr = submitArrays[i];
+                        int len = Math.Min(ansArr.Length, subArr.Length);
+                        for (int j = 0; j < len; j++)
+                        {
+                            if (ansArr[j] == subArr[j])
+                                correctFields++;
+                        }
+                    }
+                    successRate = (double)correctFields / totalFields * 100.0;
+                }
+            }
+
             return Ok(new QueryAssignmentSubmitDetailsFullRes
             {
                 AssignmentGroupName = assignment.AssignmentGroup.Name,
                 Results = results.ToArray(),
-                NumberOfSubmits = numberOfSubmits
+                NumberOfSubmits = numberOfSubmits,
+                SubmittedAt = submit?.SubmittedAt ?? DateTime.MinValue,
+                StudentName = assignment.Student.Username,
+                SuccessRate = successRate
             });
         }
     }
