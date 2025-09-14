@@ -27,8 +27,8 @@ Provides role-based management for administrators, teachers and students with a 
    `docker pull tapinko/ipcheckr:latest`
 2. Download the docker compose file (Docker/compose.yml)
 3. Start services (API + DB):
-   docker compose -f Docker/compose.yml up -d
-4. Open the app at: http://localhost:8080
+   `docker compose -f Docker/compose.yml up -d`
+4. Open the app at: https://localhost:8081
 
 ## Development
 - Client: open [Src/IPCheckr.Client](Src/IPCheckr.Client) in your preferred code editor. Use Vite for local dev (`npm run dev` in Client directory).
@@ -39,15 +39,7 @@ Provides role-based management for administrators, teachers and students with a 
 - Client: React + Vite app ([`IPCheckr.Client`](Src/IPCheckr.Client/src/)) — [Src/IPCheckr.Client/src/](Src/IPCheckr.Client/src/)  
 - Client i18n: language enums and keys ([`Language`, `TranslationKey`](Src/IPCheckr.Client/src/utils/i18n.ts)) — [Src/IPCheckr.Client/src/utils/i18n.ts](Src/IPCheckr.Client/src/utils/i18n.ts)  
 - Client entry: [Src/IPCheckr.Client/index.html](Src/IPCheckr.Client/index.html)  
-- Docker: multi-stage build and compose files — [Docker/Dockerfile](Docker/Dockerfile), [Docker/compose.yml](Docker/compose.yml)  
-
-## TODO
-
-Because this is in very early development, not all features are working. Here are some features planned/in-scope:
-
-- Refactoring the API code to make it more readable (this whole project is for me to learn .NET)
-- More advanced admin settings page
-- Personalized settings pages (long-term)
+- Docker: multi-stage build and compose files — [Docker/Dockerfile](Docker/Dockerfile), [Docker/compose.yml](Docker/compose.yml)
 
 ## License
 

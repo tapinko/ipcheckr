@@ -1,6 +1,6 @@
 services:
   ipcheckr-mariadb-dev:
-    image: mariadb:latest
+    image: mariadb:12.0.2
     container_name: ipcheckr-mariadb-dev
     environment:
       - MYSQL_ROOT_PASSWORD=cisco

@@ -19,7 +19,7 @@ RUN dotnet publish -c Release -o /app/publish -p:UseAppHost=false -p:DebugType=N
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
 WORKDIR /app
-ENV ASPNETCORE_URLS=http://0.0.0.0:8080 \
+ENV ASPNETCORE_URLS=https://0.0.0.0:8080 \
     ASPNETCORE_ENVIRONMENT=Production \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 COPY --from=api-build /app/publish .

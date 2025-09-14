@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using IPCheckr.Api.Services.Logging;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Net;
 
 namespace IPCheckr.Api
 {
@@ -14,6 +17,36 @@ namespace IPCheckr.Api
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // HTTPS + self-signed certificate
+            builder.WebHost.ConfigureKestrel((ctx, kestrel) =>
+            {
+                static X509Certificate2 CreateEphemeralCert()
+                {
+                    using var rsa = RSA.Create(2048);
+                    var cn = "CN=ipcheckr-" + Guid.NewGuid().ToString("N").Substring(0, 12);
+                    var req = new CertificateRequest(cn, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+
+                    var san = new SubjectAlternativeNameBuilder();
+                    san.AddDnsName("localhost");
+                    san.AddDnsName("ipcheckr.local");
+                    san.AddDnsName(Environment.MachineName);
+                    san.AddIpAddress(IPAddress.Loopback);
+                    san.AddIpAddress(IPAddress.IPv6Loopback);
+                    req.CertificateExtensions.Add(san.Build());
+                    req.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, false));
+                    req.CertificateExtensions.Add(new X509KeyUsageExtension(
+                        X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment, false));
+                    req.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(req.PublicKey, false));
+
+                    var notBefore = DateTimeOffset.UtcNow.AddMinutes(-5);
+                    var notAfter = notBefore.AddDays(90);
+                    return req.CreateSelfSigned(notBefore, notAfter);
+                }
+
+                var cert = CreateEphemeralCert();
+                kestrel.ListenAnyIP(8081, o => o.UseHttps(cert));
+            });
 
             // service registrations
             builder.Services.AddScoped<ITokenService, TokenService>();
@@ -59,12 +92,15 @@ namespace IPCheckr.Api
             if (app.Environment.IsDevelopment())
             {
                 app.UseCors("AllowVite");
+                app.UseSwaggerUi();
             }
 
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseOpenApi();
-            app.UseSwaggerUi();
+
+            // app.UseHttpsRedirection();
+            // app.UseHsts();
 
             app.MapControllers();
             app.MapFallbackToFile("index.html");

@@ -12,11 +12,11 @@ services:
       - DB_PASSWORD=mystrongpassword # CHANGE
       - TZ=Europe/Bratislava
     ports:
-      - "8080:8080"
+      - "8081:8081" # https
     restart: unless-stopped
 
   db:
-    image: mariadb:latest
+    image: mariadb:12.0.2
     container_name: ipcheckr-db
     environment:
       - MYSQL_ROOT_PASSWORD=mystrongpassword # CHANGE
