@@ -240,14 +240,12 @@ const TeacherAssignmentGroupDetails = () => {
             <Stack spacing={2}>
               <StatsCard
                 title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMITTED)}
-                value={data ? `${data.submitted}/${data.total}` : "-"}
+                value={`${data?.submitted}/${data?.total}`}
                 icon={<TaskAlt />}
               />
               <StatsCard
                 title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE)}
-                value={
-                  data?.successRate != null ? `${data.successRate}%` : "-"
-                }
+                value={`${data?.successRate.toFixed(2)}%`}
                 icon={<Percent />}
               />
               <StatsCard
@@ -280,7 +278,7 @@ const TeacherAssignmentGroupDetails = () => {
               key={a.assignmentId}
               assignmentId={a.assignmentId}
               studentUsername={a.studentUsername}
-              successRate={a.successRate}
+              successRate={a.successRate.toFixed(2) as unknown as number}
               attemptCount={a.attemptCount}
               lastSubmit={a.lastSubmit ? new Date(a.lastSubmit) : undefined}
               status={a.status}

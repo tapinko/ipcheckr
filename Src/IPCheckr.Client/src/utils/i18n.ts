@@ -218,6 +218,7 @@ export enum TranslationKey {
   ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS = "ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS",
   ADMIN_CLASS_DETAILS_STUDENTS = "ADMIN_CLASS_DETAILS_STUDENTS",
   ADMIN_CLASS_DETAILS_NO_STUDENTS = "ADMIN_CLASS_DETAILS_NO_STUDENTS",
+  ADMIN_CLASS_DETAILS_CREATED_AT = "ADMIN_CLASS_DETAILS_CREATED_AT",
 
   // AdminSettings
   ADMIN_SETTINGS_TITLE = "ADMIN_SETTINGS_TITLE",
@@ -684,6 +685,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS]: "Average in assignment groups",
   [TranslationKey.ADMIN_CLASS_DETAILS_STUDENTS]: "Students",
   [TranslationKey.ADMIN_CLASS_DETAILS_NO_STUDENTS]: "No students in this class",
+  [TranslationKey.ADMIN_CLASS_DETAILS_CREATED_AT]: "Created at",
 
   // AdminSettings
   [TranslationKey.ADMIN_SETTINGS_TITLE]: "Settings",
@@ -1149,6 +1151,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS]: "Priemer v zadaniach",
   [TranslationKey.ADMIN_CLASS_DETAILS_STUDENTS]: "Študenti",
   [TranslationKey.ADMIN_CLASS_DETAILS_NO_STUDENTS]: "V tiejto triede zatiaľ nie sú žiadni študenti.",
+  [TranslationKey.ADMIN_CLASS_DETAILS_CREATED_AT]: "Dátum vytvorenia",
 
   // AdminSettings
   [TranslationKey.ADMIN_SETTINGS_TITLE]: "Nastavenia",

@@ -100,7 +100,7 @@ const TeacherAssignmentGroupDetailsSubmit = () => {
             <Stack spacing={2}>
               <StatsCard
                 title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_SUCCESS_RATE)}
-                value={detailsQuery.data?.successRate}
+                value={`${detailsQuery.data?.successRate.toFixed(2)}%`}
                 icon={<Percent />}
               />
               <StatsCard

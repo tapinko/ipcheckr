@@ -672,7 +672,7 @@ const TeacherAssignmentGroups = () => {
                   id={ag.assignmentGroupId}
                   key={ag.assignmentGroupId}
                   name={ag.assignmentGroupName}
-                  successRate={ag.successRate}
+                  successRate={ag.successRate.toFixed(2) as unknown as number}
                   submitted={ag.submitted}
                   total={ag.total}
                   state={ag.state}

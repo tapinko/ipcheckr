@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using IPCheckr.Api.Interfaces;
 
 namespace IPCheckr.Api.DTOs.User
 {
@@ -6,10 +7,10 @@ namespace IPCheckr.Api.DTOs.User
     {
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "User ID must be a positive integer.")]
-        public int? UserId { get; set; }
+        public int? Id { get; set; }
     }
 
-    public class QueryUserDetailsRes : QueryStudentDetailsRes
+    public class QueryUserDetailsRes
     {
         [Required]
         public required string Role { get; set; }
@@ -17,6 +18,76 @@ namespace IPCheckr.Api.DTOs.User
         [Required]
         public required DateTime CreatedAt { get; set; }
 
-        
+        [Required]
+        public required string Username { get; set; }
+
+        [Required]
+        public int TotalSubmits { get; set; }
+
+        public int? LastSubmitGroupId { get; set; }
+
+        public int? LastSubmitAssignmentId { get; set; }
+
+        public int? LastSubmitAttempt { get; set; }
+
+        public DateTime? LastSubmitAt { get; set; }
+
+        public UserDetailsClassesDto[]? Classes { get; set; }
+
+        public double? AverageNetwork { get; set; }
+
+        public double? AverageFirst { get; set; }
+
+        public double? AverageLast { get; set; }
+
+        public double? AverageBroadcast { get; set; }
+
+        [Required]
+        public double AverageTotal { get; set; }
+
+        [Required]
+        public UserDetailsSuccessRateDto[]? SuccessRate { get; set; }
+
+        [Required]
+        public int TotalAssignmentGroups { get; set; }
+
+        [Required]
+        public int TotalUpcoming { get; set; }
+
+        [Required]
+        public int TotalInProgress { get; set; }
+
+        [Required]
+        public int TotalEnded { get; set; }
+    }
+
+    public class UserDetailsClassesDto
+    {
+        [Required]
+        public required int Id { get; set; }
+
+        [Required]
+        public required string Name { get; set; }
+    }
+
+    public class UserDetailsSuccessRateDto : ILinesChartData
+    {
+        [Required]
+        public required string Date { get; set; }
+
+        [Required]
+        public double Percentage { get; set; }
+
+        string IChartDataBase.Label
+        {
+            get => Date;
+            set => Date = value;
+        }
+
+        double IChartDataBase.Value
+        {
+            get => Percentage;
+            set => Percentage = value;
+        }
     }
 }

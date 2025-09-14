@@ -84,22 +84,21 @@ const AdminClassDetails = () => {
           <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
-                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TEACHERS)}
-                value={
-                  detailsQuery.data?.teachers
-                    && detailsQuery.data.teachers.map(t => t.username).join(", ")
-                }
+                title={t(TranslationKey.ADMIN_CLASS_DETAILS_CREATED_AT)}
+                value={new Date(detailsQuery.data?.createdAt ?? "").toLocaleString()}
                 icon={<Groups />}
               />
               <Tooltip title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}>
-                <StatsCard
-                  title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
-                  value={`${detailsQuery.data?.averageSuccessRate ?? 0}%`}
-                  icon={<Percent />}
-                />
+                <Box>
+                  <StatsCard
+                    title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
+                    value={`${detailsQuery.data?.averageSuccessRate.toFixed(2)}%`}
+                    icon={<Percent />}
+                  />
+                </Box>
               </Tooltip>
               <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_LAST_SUBMIT)}
+                title={t(TranslationKey.ADMIN_CLASS_DETAILS_LAST_SUBMIT)}
                 value={
                   detailsQuery.data?.lastSubmitUsername ? (
                     <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
@@ -270,6 +269,7 @@ const AdminClassDetails = () => {
                       {
                         data: avgStudents.map(s => s.percentage),
                         label: t(TranslationKey.ADMIN_CLASS_DETAILS_PERCENTAGE),
+                        valueFormatter: (v: number | null) => `${v?.toFixed(2)}%`
                       },
                     ]}
                     yAxis={[
@@ -310,6 +310,7 @@ const AdminClassDetails = () => {
                         data: avgGroups.map(g => g.percentage),
                         label: t(TranslationKey.ADMIN_CLASS_DETAILS_PERCENTAGE),
                         area: true,
+                        valueFormatter: (v: number | null) => `${v?.toFixed(2)}%`
                       },
                     ]}
                     yAxis={[

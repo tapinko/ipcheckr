@@ -224,11 +224,13 @@ const AdminUserDetails = () => {
                 icon={<AccessTime />}
               />
               <Tooltip title={t(TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}>
-                <StatsCard
-                  title={t(TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE)}
-                  value={`${detailsQuery.data?.averageTotal}%`}
-                  icon={<Percent />}
-                />
+                <Box>
+                  <StatsCard
+                    title={t(TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE)}
+                    value={`${detailsQuery.data?.averageTotal.toFixed(2)}%`}
+                    icon={<Percent />}
+                  />
+                </Box>
               </Tooltip>
             </Stack>
           </Grid>
@@ -327,6 +329,7 @@ const AdminUserDetails = () => {
                         data: [avgNetwork, avgFirst, avgLast, avgBroadcast],
                         label: t(TranslationKey.ADMIN_USER_DETAILS_PERCENTAGE),
                         fillArea: true,
+                        valueFormatter: (v: number) => `${v.toFixed(2)}%`,
                       }
                     ]}
                     radar={{
@@ -374,7 +377,7 @@ const AdminUserDetails = () => {
                       {
                         min: 0,
                         max: 100,
-                        valueFormatter: (v: number) => `${v}%`,
+                        valueFormatter: (v: number) => `${v.toFixed(2)}%`,
                       },
                     ]}
                   />

@@ -12,7 +12,7 @@ namespace IPCheckr.Api.Controllers
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<QueryUserDetailsRes>> QueryUserDetails([FromQuery] QueryUserDetailsReq req)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == req.UserId!.Value);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == req.Id!.Value);
             if (user == null)
                 return StatusCode(StatusCodes.Status404NotFound, new ApiProblemDetails
                 {
@@ -30,11 +30,11 @@ namespace IPCheckr.Api.Controllers
                 .OrderBy(c => c.Name)
                 .ToListAsync();
 
-            var classesDto = Array.Empty<StudentDetailsClassesDto>();
+            var classesDto = Array.Empty<UserDetailsClassesDto>();
 
             for (int i = 0; i < classes.Count; i++)
             {
-                classesDto = classesDto.Append(new StudentDetailsClassesDto
+                classesDto = classesDto.Append(new UserDetailsClassesDto
                 {
                     Id = classes[i].Id,
                     Name = classes[i].Name
@@ -96,7 +96,11 @@ namespace IPCheckr.Api.Controllers
                     AverageLast = null,
                     AverageBroadcast = null,
                     AverageTotal = 0.0,
-                    SuccessRate = Array.Empty<StudentDetailsSuccessRateDto>(),
+                    SuccessRate = Array.Empty<UserDetailsSuccessRateDto>(),
+                    TotalAssignmentGroups = totalAssignmentGroups,
+                    TotalUpcoming = totalUpcoming,
+                    TotalInProgress = totalInProgress,
+                    TotalEnded = totalEnded,
                     Role = user.Role,
                     CreatedAt = user.CreatedAt
                 };
@@ -174,7 +178,7 @@ namespace IPCheckr.Api.Controllers
             double? avgBroadcast = broadcastPercents.Count > 0 ? broadcastPercents.Average() : (double?)null;
             double avgTotal = totalPercents.Count > 0 ? totalPercents.Average() : 0.0;
 
-            var successRate = new List<StudentDetailsSuccessRateDto>();
+            var successRate = new List<UserDetailsSuccessRateDto>();
             foreach (var submit in submits.OrderBy(s => s.SubmittedAt).ThenBy(s => s.Id))
             {
                 if (!answerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key))
@@ -207,7 +211,7 @@ namespace IPCheckr.Api.Controllers
                 }
                 double percentage = total == 0 ? 0.0 : (double)correct / total * 100.0;
 
-                successRate.Add(new StudentDetailsSuccessRateDto
+                successRate.Add(new UserDetailsSuccessRateDto
                 {
                     Date = submit.SubmittedAt.ToString("yyyy-MM-dd"),
                     Percentage = percentage

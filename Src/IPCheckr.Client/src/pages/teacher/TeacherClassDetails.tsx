@@ -92,11 +92,13 @@ const TeacherClassDetails = () => {
                 icon={<Groups />}
               />
               <Tooltip title={t(TranslationKey.TEACHER_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}>
-                <StatsCard
-                  title={t(TranslationKey.TEACHER_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
-                  value={`${detailsQuery.data?.averageSuccessRate ?? 0}%`}
-                  icon={<Percent />}
-                />
+                <Box>
+                  <StatsCard
+                    title={t(TranslationKey.TEACHER_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
+                    value={`${detailsQuery.data?.averageSuccessRate ?? 0}%`}
+                    icon={<Percent />}
+                  />
+                </Box>
               </Tooltip>
               <StatsCard
                 title={t(TranslationKey.TEACHER_DASHBOARD_LAST_SUBMIT)}

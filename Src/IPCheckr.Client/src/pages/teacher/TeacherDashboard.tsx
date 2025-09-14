@@ -228,6 +228,7 @@ const TeacherDashboard = () => {
                         data:
                           dashboardQuery.data!.averagePercentageInStudents!.map(d => d.percentage),
                         label: t(TranslationKey.TEACHER_DASHBOARD_PERCENTAGE),
+                        valueFormatter: (v: number | null) => `${v?.toFixed(2)}%`,
                       },
                     ]}
                     yAxis={[
@@ -269,6 +270,7 @@ const TeacherDashboard = () => {
                         data:
                           dashboardQuery.data!.averagePercentageInClasses!.map(d => d.percentage),
                         label: t(TranslationKey.TEACHER_DASHBOARD_PERCENTAGE),
+                        valueFormatter: (v: number| null) => `${v?.toFixed(2)}%`,
                       },
                     ]}
                     yAxis={[

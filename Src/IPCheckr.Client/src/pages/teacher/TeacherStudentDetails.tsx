@@ -18,7 +18,7 @@ import CardsSkeleton from "../../components/CardsSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import StatsCard from "../../components/StatsCard"
 import { TranslationKey } from "../../utils/i18n"
-import type { QueryStudentDetailsRes } from "../../dtos"
+import type { QueryUserDetailsRes } from "../../dtos"
 import { userApi } from "../../utils/apiClients"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 
@@ -28,10 +28,10 @@ const TeacherStudentDetails = () => {
   const queryClient = useQueryClient()
   const { [RouteParams.STUDENT_ID]: studentId } = useParams()
 
-  const detailsQuery = useQuery<QueryStudentDetailsRes, Error>({
+  const detailsQuery = useQuery<QueryUserDetailsRes, Error>({
     queryKey: ["teacherStudentDetails", studentId],
     enabled: !!studentId,
-    queryFn: () => userApi.userQueryStudentDetails(Number(studentId)).then(r => r.data),
+    queryFn: () => userApi.userQueryUserDetails(Number(studentId)).then(r => r.data),
     placeholderData: prev => prev
   })
 
@@ -123,11 +123,13 @@ const TeacherStudentDetails = () => {
                 }
               />
               <Tooltip title={t(TranslationKey.TEACHER_STUDENT_DETAILS_SUCCESS_RATE_TOOLTIP)}>
-                <StatsCard
-                  title={t(TranslationKey.TEACHER_STUDENT_DETAILS_SUCCESS_RATE)}
-                  value={`${detailsQuery.data?.averageTotal}%`}
-                  icon={<Percent />}
-                />
+                <Box>
+                  <StatsCard
+                    title={t(TranslationKey.TEACHER_STUDENT_DETAILS_SUCCESS_RATE)}
+                    value={`${detailsQuery.data?.averageTotal.toFixed(2)}%`}
+                    icon={<Percent />}
+                  />
+                </Box>
               </Tooltip>
               <StatsCard
                 title={t(TranslationKey.TEACHER_STUDENT_DETAILS_CLASSES)}
@@ -186,6 +188,7 @@ const TeacherStudentDetails = () => {
                         data: [avgNetwork, avgFirst, avgLast, avgBroadcast],
                         label: t(TranslationKey.TEACHER_STUDENT_DETAILS_PERCENTAGE),
                         fillArea: true,
+                        valueFormatter: (v: number | null) => `${v?.toFixed(2)}%`
                       }
                     ]}
                     radar={{
@@ -227,6 +230,7 @@ const TeacherStudentDetails = () => {
                         data: detailsQuery.data!.successRate!.map(d => d.percentage),
                         label: t(TranslationKey.TEACHER_STUDENT_DETAILS_PERCENTAGE),
                         area: true,
+                        valueFormatter: (v: number | null) => `${v?.toFixed(2)}%`
                       },
                     ]}
                     yAxis={[

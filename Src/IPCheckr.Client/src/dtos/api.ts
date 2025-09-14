@@ -1516,115 +1516,6 @@ export interface QueryStudentDashboardRes {
 /**
  * 
  * @export
- * @interface QueryStudentDetailsRes
- */
-export interface QueryStudentDetailsRes {
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryStudentDetailsRes
-     */
-    'username': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'totalSubmits': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'lastSubmitGroupId'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'lastSubmitAssignmentId'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'lastSubmitAttempt'?: number | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryStudentDetailsRes
-     */
-    'lastSubmitAt'?: string | null;
-    /**
-     * 
-     * @type {Array<StudentDetailsClassesDto>}
-     * @memberof QueryStudentDetailsRes
-     */
-    'classes'?: Array<StudentDetailsClassesDto> | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'averageNetwork'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'averageFirst'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'averageLast'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'averageBroadcast'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'averageTotal': number;
-    /**
-     * 
-     * @type {Array<StudentDetailsSuccessRateDto>}
-     * @memberof QueryStudentDetailsRes
-     */
-    'successRate': Array<StudentDetailsSuccessRateDto>;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'totalAssignmentGroups': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'totalUpcoming': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'totalInProgress': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryStudentDetailsRes
-     */
-    'totalEnded': number;
-}
-/**
- * 
- * @export
  * @interface QueryTeacherDashboardRes
  */
 export interface QueryTeacherDashboardRes {
@@ -1736,6 +1627,18 @@ export interface QueryUserDetailsRes {
      * @type {string}
      * @memberof QueryUserDetailsRes
      */
+    'role': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryUserDetailsRes
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryUserDetailsRes
+     */
     'username': string;
     /**
      * 
@@ -1769,10 +1672,10 @@ export interface QueryUserDetailsRes {
     'lastSubmitAt'?: string | null;
     /**
      * 
-     * @type {Array<StudentDetailsClassesDto>}
+     * @type {Array<UserDetailsClassesDto>}
      * @memberof QueryUserDetailsRes
      */
-    'classes'?: Array<StudentDetailsClassesDto> | null;
+    'classes'?: Array<UserDetailsClassesDto> | null;
     /**
      * 
      * @type {number}
@@ -1805,10 +1708,10 @@ export interface QueryUserDetailsRes {
     'averageTotal': number;
     /**
      * 
-     * @type {Array<StudentDetailsSuccessRateDto>}
+     * @type {Array<UserDetailsSuccessRateDto>}
      * @memberof QueryUserDetailsRes
      */
-    'successRate': Array<StudentDetailsSuccessRateDto>;
+    'successRate': Array<UserDetailsSuccessRateDto>;
     /**
      * 
      * @type {number}
@@ -1833,18 +1736,6 @@ export interface QueryUserDetailsRes {
      * @memberof QueryUserDetailsRes
      */
     'totalEnded': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryUserDetailsRes
-     */
-    'role': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryUserDetailsRes
-     */
-    'createdAt': string;
 }
 /**
  * 
@@ -1881,44 +1772,6 @@ export interface StudentDashboardSuccessRateDto {
      * 
      * @type {number}
      * @memberof StudentDashboardSuccessRateDto
-     */
-    'percentage': number;
-}
-/**
- * 
- * @export
- * @interface StudentDetailsClassesDto
- */
-export interface StudentDetailsClassesDto {
-    /**
-     * 
-     * @type {number}
-     * @memberof StudentDetailsClassesDto
-     */
-    'id': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof StudentDetailsClassesDto
-     */
-    'name': string;
-}
-/**
- * 
- * @export
- * @interface StudentDetailsSuccessRateDto
- */
-export interface StudentDetailsSuccessRateDto {
-    /**
-     * 
-     * @type {string}
-     * @memberof StudentDetailsSuccessRateDto
-     */
-    'date': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof StudentDetailsSuccessRateDto
      */
     'percentage': number;
 }
@@ -2009,6 +1862,44 @@ export interface UserConflictInfoDto {
      * @memberof UserConflictInfoDto
      */
     'attemptedValue'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface UserDetailsClassesDto
+ */
+export interface UserDetailsClassesDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof UserDetailsClassesDto
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserDetailsClassesDto
+     */
+    'name': string;
+}
+/**
+ * 
+ * @export
+ * @interface UserDetailsSuccessRateDto
+ */
+export interface UserDetailsSuccessRateDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserDetailsSuccessRateDto
+     */
+    'date': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserDetailsSuccessRateDto
+     */
+    'percentage': number;
 }
 /**
  * 
@@ -4071,48 +3962,11 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
-         * @param {number | null} [studentId] 
+         * @param {number | null} [id] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userQueryStudentDetails: async (studentId?: number | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/users/get-student-details`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication JWT required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-            if (studentId !== undefined) {
-                localVarQueryParameter['StudentId'] = studentId;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {number | null} [userId] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        userQueryUserDetails: async (userId?: number | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        userQueryUserDetails: async (id?: number | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/users/get-user-details`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4128,8 +3982,8 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             // authentication JWT required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
-            if (userId !== undefined) {
-                localVarQueryParameter['UserId'] = userId;
+            if (id !== undefined) {
+                localVarQueryParameter['Id'] = id;
             }
 
 
@@ -4253,24 +4107,12 @@ export const UserApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {number | null} [studentId] 
+         * @param {number | null} [id] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async userQueryStudentDetails(studentId?: number | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryStudentDetailsRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.userQueryStudentDetails(studentId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['UserApi.userQueryStudentDetails']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {number | null} [userId] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async userQueryUserDetails(userId?: number | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryUserDetailsRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.userQueryUserDetails(userId, options);
+        async userQueryUserDetails(id?: number | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryUserDetailsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userQueryUserDetails(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserApi.userQueryUserDetails']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -4331,21 +4173,12 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * 
-         * @param {number | null} [studentId] 
+         * @param {number | null} [id] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userQueryStudentDetails(studentId?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<QueryStudentDetailsRes> {
-            return localVarFp.userQueryStudentDetails(studentId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {number | null} [userId] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        userQueryUserDetails(userId?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<QueryUserDetailsRes> {
-            return localVarFp.userQueryUserDetails(userId, options).then((request) => request(axios, basePath));
+        userQueryUserDetails(id?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<QueryUserDetailsRes> {
+            return localVarFp.userQueryUserDetails(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4406,24 +4239,13 @@ export class UserApi extends BaseAPI {
 
     /**
      * 
-     * @param {number | null} [studentId] 
+     * @param {number | null} [id] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UserApi
      */
-    public userQueryStudentDetails(studentId?: number | null, options?: RawAxiosRequestConfig) {
-        return UserApiFp(this.configuration).userQueryStudentDetails(studentId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {number | null} [userId] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UserApi
-     */
-    public userQueryUserDetails(userId?: number | null, options?: RawAxiosRequestConfig) {
-        return UserApiFp(this.configuration).userQueryUserDetails(userId, options).then((request) => request(this.axios, this.basePath));
+    public userQueryUserDetails(id?: number | null, options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userQueryUserDetails(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
