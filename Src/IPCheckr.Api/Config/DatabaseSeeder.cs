@@ -44,6 +44,16 @@ namespace IPCheckr.Api.Config
                 });
                 await db.SaveChangesAsync();
             }
+
+            if (!db.AppSettings.Any(a => a.Name == "AuthType"))
+            {
+                db.AppSettings.Add(new AppSettings
+                {
+                    Name = "AuthType",
+                    Value = AuthType.LOCAL.ToString()
+                });
+                await db.SaveChangesAsync();
+            }
         }
     }
 }
