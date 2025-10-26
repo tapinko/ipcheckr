@@ -3,6 +3,7 @@ using IPCheckr.Api.DTOs.AssignmentGroup;
 using IPCheckr.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using IPCheckr.Api.Common.Enums;
 
 namespace IPCheckr.Api.Controllers
 {
@@ -39,7 +40,8 @@ namespace IPCheckr.Api.Controllers
                 PossibleAttempts = req.PossibleAttempts,
                 Class = classObj,
                 StartDate = req.StartDate,
-                Deadline = req.Deadline
+                Deadline = req.Deadline,
+                AssignmentIpCat = req.AssignmentIpCat
             };
             _db.AssignmentGroups.Add(assignmentGroup);
             await _db.SaveChangesAsync();
@@ -54,7 +56,7 @@ namespace IPCheckr.Api.Controllers
                 if (!students.TryGetValue(studentId, out var studentUser))
                     continue;
 
-                var assignmentData = TryGenerateAssignmentData(req.NumberOfRecords);
+                var assignmentData = TryGenerateAssignmentData(req.NumberOfRecords, req.AssignmentIpCat);
                 if (assignmentData == null)
                     return StatusCode(StatusCodes.Status500InternalServerError, new ApiProblemDetails
                     {
@@ -94,26 +96,131 @@ namespace IPCheckr.Api.Controllers
             return Ok(new CreateAssignmentGroupRes { AssignmentGroupId = assignmentGroup.Id });
         }
 
-        private (string cidr, int[] hosts)? TryGenerateAssignmentData(int numberOfRecords, int maxAttempts = 1000)
+        private (string cidr, int[] hosts)? TryGenerateAssignmentData(
+            int numberOfRecords, AssignmentGroupIpCat ipCat, int maxAttempts = 1000)
         {
-            for (int attempt = 0; attempt < maxAttempts; attempt++)
+            int attempts = ipCat == AssignmentGroupIpCat.LOCAL ? Math.Max(maxAttempts, 5000) : maxAttempts;
+            for (int attempt = 0; attempt < attempts; attempt++)
             {
                 var rand = new Random(Guid.NewGuid().GetHashCode() ^ Environment.TickCount ^ attempt);
-                int prefix = rand.Next(16, 28); // choose a random prefix
-                var ip = $"{rand.Next(1, 223)}.{rand.Next(0, 255)}.{rand.Next(0, 255)}.0";
-                var cidr = $"{ip}/{prefix}";
+                int prefix = rand.Next(16, 29);
+
+                uint ipUint = GenerateRandomIpUint(rand, ipCat);
+                if (!IsIpAllowedByCategory(ipUint, ipCat))
+                    continue;
+
+                uint mask = PrefixToMask(prefix);
+                uint networkIpUint = ipUint & mask;
+                var cidr = $"{UintToIp(networkIpUint)}/{prefix}";
 
                 var hosts = Enumerable.Range(0, numberOfRecords)
-                    .Select(_ => rand.Next(2, 254)) // requested usable hosts per subnet
+                    .Select(_ => rand.Next(2, 254))
                     .OrderByDescending(h => h)
                     .ToArray();
 
-                int totalNeeded = hosts.Select(h => h + 2).Sum(); // + network + broadcast
+                int totalNeeded = hosts.Select(h => h + 2).Sum();
                 int available = 1 << (32 - prefix);
                 if (totalNeeded <= available)
                     return (cidr, hosts);
             }
             return null;
+        }
+
+        private static uint PrefixToMask(int prefix)
+        {
+            return prefix == 0 ? 0u : 0xFFFFFFFFu << (32 - prefix);
+        }
+
+        private static uint GenerateRandomIpUint(Random rand, AssignmentGroupIpCat cat)
+        {
+            int a, b, c;
+            switch (cat)
+            {
+                case AssignmentGroupIpCat.LOCAL:
+                    int choice = rand.Next(0, 3);
+                    if (choice == 0)
+                    {
+                        a = 10;
+                        b = rand.Next(0, 256);
+                        c = rand.Next(0, 256);
+                    }
+                    else if (choice == 1)
+                    {
+                        a = 172;
+                        b = rand.Next(16, 32);
+                        c = rand.Next(0, 256);
+                    }
+                    else
+                    {
+                        a = 192;
+                        b = 168;
+                        c = rand.Next(0, 256);
+                    }
+                    break;
+                case AssignmentGroupIpCat.ABC:
+                    while (true)
+                    {
+                        a = rand.Next(1, 224);
+                        if (a == 127) continue;
+                        if (a == 10) continue;
+                        if (a == 192)
+                        {
+                            b = rand.Next(0, 256);
+                            if (b == 168) continue;
+                        }
+                        else if (a == 172)
+                        {
+                            b = rand.Next(0, 256);
+                            if (b >= 16 && b <= 31) continue;
+                        }
+                        else if (a == 169)
+                        {
+                            b = rand.Next(0, 256);
+                            if (b == 254) continue;
+                        }
+                        else
+                        {
+                            b = rand.Next(0, 256);
+                        }
+                        c = rand.Next(0, 256);
+                        break;
+                    }
+                    break;
+                case AssignmentGroupIpCat.ALL:
+                default:
+                    a = rand.Next(1, 224);
+                    if (a == 127) a = 126;
+                    b = rand.Next(0, 256);
+                    c = rand.Next(0, 256);
+                    break;
+            }
+            var d = 0;
+            return (uint)(a << 24 | b << 16 | c << 8 | d);
+        }
+
+        private static bool IsIpAllowedByCategory(uint ip, AssignmentGroupIpCat cat)
+        {
+            int a = (int)((ip >> 24) & 0xFF);
+            int b = (int)((ip >> 16) & 0xFF);
+            int c = (int)((ip >> 8) & 0xFF);
+
+            bool isClassABC = a >= 1 && a <= 223 && a != 127;
+            bool isPrivate =
+                a == 10 ||
+                (a == 172 && b >= 16 && b <= 31) ||
+                (a == 192 && b == 168);
+            bool isLinkLocal = a == 169 && b == 254;
+
+            switch (cat)
+            {
+                case AssignmentGroupIpCat.LOCAL:
+                    return isPrivate;
+                case AssignmentGroupIpCat.ABC:
+                    return isClassABC && !isPrivate && !isLinkLocal;
+                case AssignmentGroupIpCat.ALL:
+                default:
+                    return isClassABC;
+            }
         }
 
         private (string[] Networks, string[] FirstUsables, string[] LastUsables, string[] Broadcasts) CalculateSubnettingAnswerKey(string cidr, int[] hosts)
@@ -126,7 +233,7 @@ namespace IPCheckr.Api.Controllers
             var results = new List<(string net, string first, string last, string broadcast)>();
             foreach (var h in hosts)
             {
-                int needed = h + 2; // include network + broadcast
+                int needed = h + 2;
                 int subnetBits = 32 - (int)Math.Ceiling(Math.Log(needed, 2));
                 int subnetSize = 1 << (32 - subnetBits);
 

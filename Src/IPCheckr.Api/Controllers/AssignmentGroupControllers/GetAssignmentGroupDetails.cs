@@ -178,7 +178,8 @@ namespace IPCheckr.Api.Controllers
                 PossibleAttempts = ag.PossibleAttempts,
                 Assignments = assignmentDetails.ToArray(),
                 Submitted = assignmentGroupDto.Submitted,
-                Total = assignmentGroupDto.Total
+                Total = assignmentGroupDto.Total,
+                AssignmentGroupIpCat = ag.AssignmentIpCat
             };
 
             return Ok(res);

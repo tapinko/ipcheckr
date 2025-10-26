@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using IPCheckr.Api.Common.Enums;
 
 namespace IPCheckr.Api.DTOs.Assignment
 {
@@ -18,6 +20,8 @@ namespace IPCheckr.Api.DTOs.Assignment
         [Required]
         public required string AssignmentGroupName { get; set; }
 
+        public string? Description { get; set; }
+
         [Required]
         public required QueryAssignmentSubmitDetailsFullRecordField[] Results { get; set; }
 
@@ -29,6 +33,10 @@ namespace IPCheckr.Api.DTOs.Assignment
 
         [Required]
         public required string StudentName { get; set; }
+
+        [Required]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public required AssignmentGroupIpCat AssignmentGroupIpCat { get; set; }
 
         [Required]
         public double SuccessRate { get; set; }
