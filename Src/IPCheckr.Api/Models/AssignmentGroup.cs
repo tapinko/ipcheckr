@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using IPCheckr.Api.Common.Enums;
 
 namespace IPCheckr.Api.Models
 {
@@ -32,6 +33,8 @@ namespace IPCheckr.Api.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Required(ErrorMessage = "Deadline is required.")]
+
+        public required AssignmentGroupIpCat AssignmentIpCat { get; set; }
         public DateTime Deadline { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

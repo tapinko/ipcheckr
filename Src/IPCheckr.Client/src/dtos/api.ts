@@ -351,6 +351,21 @@ export interface AssignmentGroupDto {
  * @enum {string}
  */
 
+export const AssignmentGroupIpCat = {
+    Local: 'LOCAL',
+    All: 'ALL',
+    Abc: 'ABC'
+} as const;
+
+export type AssignmentGroupIpCat = typeof AssignmentGroupIpCat[keyof typeof AssignmentGroupIpCat];
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
 export const AssignmentGroupState = {
     Upcoming: 'UPCOMING',
     InProgress: 'IN_PROGRESS',
@@ -630,7 +645,15 @@ export interface CreateAssignmentGroupReq {
      * @memberof CreateAssignmentGroupReq
      */
     'deadline': string;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof CreateAssignmentGroupReq
+     */
+    'assignmentIpCat': AssignmentGroupIpCat;
 }
+
+
 /**
  * 
  * @export
@@ -1166,6 +1189,12 @@ export interface QueryAssignmentGroupDetailsRes {
      * @memberof QueryAssignmentGroupDetailsRes
      */
     'assignments': Array<AssignmentGroupSubmitDetailsDto>;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof QueryAssignmentGroupDetailsRes
+     */
+    'assignmentGroupIpCat': AssignmentGroupIpCat;
 }
 
 
@@ -1258,6 +1287,12 @@ export interface QueryAssignmentSubmitDetailsFullRes {
     'assignmentGroupName': string;
     /**
      * 
+     * @type {string}
+     * @memberof QueryAssignmentSubmitDetailsFullRes
+     */
+    'description'?: string | null;
+    /**
+     * 
      * @type {Array<QueryAssignmentSubmitDetailsFullRecordField>}
      * @memberof QueryAssignmentSubmitDetailsFullRes
      */
@@ -1282,11 +1317,19 @@ export interface QueryAssignmentSubmitDetailsFullRes {
     'studentName': string;
     /**
      * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof QueryAssignmentSubmitDetailsFullRes
+     */
+    'assignmentGroupIpCat': AssignmentGroupIpCat;
+    /**
+     * 
      * @type {number}
      * @memberof QueryAssignmentSubmitDetailsFullRes
      */
     'successRate': number;
 }
+
+
 /**
  * 
  * @export

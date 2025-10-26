@@ -24,6 +24,7 @@ import {
 import { useTranslation } from "react-i18next"
 import {
   AssignmentGroupState,
+  AssignmentGroupIpCat,
   type ApiProblemDetails,
   type AssignmentGroupDto,
   type ClassDto,
@@ -212,6 +213,7 @@ type CreateAssignmentGroupFormValues = {
   studentsIds: number[]
   startDate: string
   deadline: string
+  assignmentGroupIpCat: AssignmentGroupIpCat
 }
 
 type EditAssignmentGroupFormValues = {
@@ -254,7 +256,8 @@ const TeacherAssignmentGroups = () => {
     startDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
     deadline: new Date(
       new Date().setDate(new Date().getDate() + 7) // 7 days from now
-    ).toISOString()
+    ).toISOString(),
+    assignmentGroupIpCat: AssignmentGroupIpCat.Abc
   })
 
   const {
@@ -421,7 +424,8 @@ const TeacherAssignmentGroups = () => {
         classId: selectedClass!.classId,
         students: data.studentsIds.length === 0 ? null : data.studentsIds,
         startDate: data.startDate,
-        deadline: data.deadline
+        deadline: data.deadline,
+        assignmentIpCat: data.assignmentGroupIpCat
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["assignmentGroups"] })
@@ -838,6 +842,36 @@ const TeacherAssignmentGroups = () => {
                           : ""
                       }
                     />
+                  )}
+                />
+                <Controller
+                  name="assignmentGroupIpCat"
+                  control={createAGControl}
+                  render={({ field }) => (
+                    <Tooltip
+                      title={t(
+                        TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY_TOOLTIP
+                      )}
+                    >
+                      <FormControl fullWidth margin="dense">
+                        <InputLabel>{t(
+                          TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY
+                        )}</InputLabel>
+                        <Select
+                          value={field.value}
+                          label={t(
+                            TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY
+                          )}
+                          onChange={e =>
+                            field.onChange(e.target.value as AssignmentGroupIpCat)
+                          }
+                        >
+                          <MenuItem value={AssignmentGroupIpCat.All}>{t(TranslationKey.IP_CATEGORY_ALL)}</MenuItem>
+                          <MenuItem value={AssignmentGroupIpCat.Abc}>{t(TranslationKey.IP_CATEGORY_ABC)}</MenuItem>
+                          <MenuItem value={AssignmentGroupIpCat.Local}>{t(TranslationKey.IP_CATEGORY_PRIVATE)}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Tooltip>
                   )}
                 />
                 <Controller

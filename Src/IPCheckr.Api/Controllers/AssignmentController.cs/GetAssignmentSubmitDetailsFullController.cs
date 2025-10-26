@@ -155,11 +155,13 @@ namespace IPCheckr.Api.Controllers
             return Ok(new QueryAssignmentSubmitDetailsFullRes
             {
                 AssignmentGroupName = assignment.AssignmentGroup.Name,
+                Description = assignment.AssignmentGroup.Description,
                 Results = results.ToArray(),
                 NumberOfSubmits = numberOfSubmits,
                 SubmittedAt = submit?.SubmittedAt ?? DateTime.MinValue,
                 StudentName = assignment.Student.Username,
-                SuccessRate = successRate
+                SuccessRate = successRate,
+                AssignmentGroupIpCat = assignment.AssignmentGroup.AssignmentIpCat
             });
         }
     }

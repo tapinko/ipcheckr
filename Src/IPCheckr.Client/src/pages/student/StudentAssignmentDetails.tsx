@@ -22,7 +22,8 @@ import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert
 import { useEffect, useMemo, useState } from "react"
 import CardSingleDetail from "../../components/AssignmentCardSingleDetail"
 import StatsCard from "../../components/StatsCard"
-import { AccessTime, Percent, Person, PlaylistAddCheck, TaskAlt } from "@mui/icons-material"
+import { AccessTime, Category, Percent, Person, PlaylistAddCheck, TaskAlt } from "@mui/icons-material"
+import { getIpCatLabel } from "../../utils/getIpCatLabel"
 
 const StudentAssignmentDetails = () => {
   const { t } = useTranslation()
@@ -115,6 +116,12 @@ const StudentAssignmentDetails = () => {
           <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
+                title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_DESCRIPTION)}
+                value={detailsQuery.data?.description === ""
+                  ? "-" : detailsQuery.data?.description}
+                icon={<Percent />}
+              />
+              <StatsCard
                 title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUCCESS_RATE)}
                 value={detailsQuery.data?.successRate}
                 icon={<Percent />}
@@ -151,6 +158,15 @@ const StudentAssignmentDetails = () => {
 
           <Grid flex={1}>
             <Stack spacing={2}>
+              <StatsCard
+                title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_IP_CATEGORY)}
+                value={
+                  detailsQuery.data?.assignmentGroupIpCat
+                    ? getIpCatLabel(detailsQuery.data.assignmentGroupIpCat, t)
+                    : "-"
+                }
+                icon={<Category />}
+              />
               <StatsCard
                 title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUBMITTED_AT)}
                 value={detailsQuery.data?.submittedAt

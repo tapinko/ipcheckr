@@ -73,6 +73,11 @@ export enum TranslationKey {
   ERROR_MESSAGE = "ERROR_MESSAGE",
   ERROR_RETRY = "ERROR_RETRY",
 
+  // IP Categories
+  IP_CATEGORY_ALL = "IP_CATEGORY_ALL",
+  IP_CATEGORY_ABC = "IP_CATEGORY_ABC",
+  IP_CATEGORY_PRIVATE = "IP_CATEGORY_PRIVATE",
+
   // Breadcrumbs
   BREADCRUMBS_ADMIN_USERS = "BREADCRUMBS_ADMIN_USERS",
   BREADCRUMBS_ADMIN_USER_DETAILS = "BREADCRUMBS_ADMIN_USER_DETAILS",
@@ -231,6 +236,10 @@ export enum TranslationKey {
   ADMIN_SETTINGS_RESET = "ADMIN_SETTINGS_RESET",
   ADMIN_SETTINGS_SUCCESS = "ADMIN_SETTINGS_SUCCESS",
   ADMIN_SETTINGS_ERROR = "ADMIN_SETTINGS_ERROR",
+  ADMIN_SETTINGS_AUTH_TYPE = "ADMIN_SETTINGS_AUTH_TYPE",
+  ADMIN_SETTINGS_AUTH_TYPE_LOCAL = "ADMIN_SETTINGS_AUTH_TYPE_LOCAL",
+  ADMIN_SETTINGS_AUTH_TYPE_LDAP = "ADMIN_SETTINGS_AUTH_TYPE_LDAP",
+  ADMIN_SETTINGS_AUTH_TYPE_LDAPS = "ADMIN_SETTINGS_AUTH_TYPE_LDAPS",
   // |                        |
   // ||-----------------------||
 
@@ -380,6 +389,8 @@ export enum TranslationKey {
   TEACHER_ASSIGNMENT_GROUPS_SAVE = "TEACHER_ASSIGNMENT_GROUPS_SAVE",
   TEACHER_ASSIGNMENT_GROUPS_LOADING = "TEACHER_ASSIGNMENT_GROUPS_LOADING",
   TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED_TOOLTIP = "TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED",
+  TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY = "TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY",
+  TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY_TOOLTIP = "TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY_TOOLTIP",
 
   // TeacherAssignmentGroupDetails
   TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE = "TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE",
@@ -396,6 +407,7 @@ export enum TranslationKey {
   TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE = "TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE",
   TEACHER_ASSIGNMENT_GROUP_DETAILS_START_DATE = "TEACHER_ASSIGNMENT_GROUP_DETAILS_START_DATE",
   TEACHER_ASSIGNMENT_GROUP_DETAILS_DEADLINE = "TEACHER_ASSIGNMENT_GROUP_DETAILS_DEADLINE",
+  TEACHER_ASSIGNMENT_GROUP_DETAILS_IP_CATEGORY = "TEACHER_ASSIGNMENT_GROUP_DETAILS_IP_CATEGORY",
 
   // TeacherAssignmentGroupDetailsSubmit
   TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_HOSTS = "TEACHER_ASSIGNMENT_DETAILS_HOSTS",
@@ -477,6 +489,8 @@ export enum TranslationKey {
   STUDENT_ASSIGNMENT_DETAILS_ASSIGNMENT_GROUP_NAME = "STUDENT_ASSIGNMENT_DETAILS_ASSIGNMENT_GROUP_NAME",
   STUDENT_ASSIGNMENT_DETAILS_SUCCESS_RATE = "STUDENT_ASSIGNMENT_DETAILS_SUCCESS_RATE",
   STUDENT_ASSIGNMENT_DETAILS_SUBMITTED_AT = "STUDENT_ASSIGNMENT_DETAILS_SUBMITTED_AT",
+  STUDENT_ASSIGNMENT_DETAILS_DESCRIPTION = "STUDENT_ASSIGNMENT_DETAILS_DESCRIPTION",
+  STUDENT_ASSIGNMENT_DETAILS_IP_CATEGORY = "STUDENT_ASSIGNMENT_DETAILS_IP_CATEGORY",
   // |                        |
   // ||----------------------||
 }
@@ -540,6 +554,11 @@ const _EN: Record<TranslationKey, string> = {
   // Error messages
   [TranslationKey.ERROR_MESSAGE]: "An error occurred while loading data.",
   [TranslationKey.ERROR_RETRY]: "Retry",
+
+  // IP Categories
+  [TranslationKey.IP_CATEGORY_ALL]: "All addresses",
+  [TranslationKey.IP_CATEGORY_ABC]: "Class A, B and C addresses",
+  [TranslationKey.IP_CATEGORY_PRIVATE]: "Private addresses (RFC 1918)",
 
   // Breadcrumbs
   [TranslationKey.BREADCRUMBS_ADMIN_USERS]: "Users",
@@ -698,7 +717,10 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_RESET]: "Reset",
   [TranslationKey.ADMIN_SETTINGS_SUCCESS]: "Settings saved successfully",
   [TranslationKey.ADMIN_SETTINGS_ERROR]: "Error saving settings",
-
+  [TranslationKey.ADMIN_SETTINGS_AUTH_TYPE]: "Authentication type",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_TYPE_LOCAL]: "Local",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_TYPE_LDAP]: "LDAP",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_TYPE_LDAPS]: "LDAPS",
   // |                        |
   // ||-----------------------||
 
@@ -847,6 +869,8 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_SAVE]: "Save",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_LOADING]: "Loading assignments...",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED_TOOLTIP]: "When no students are selected, the assignment will be assigned to all student.",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY]: "Category",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY_TOOLTIP]: "Select the range of IP addresses.",
 
   // TeacherAssignmentGroupDetails
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE]: "Success rate",
@@ -863,6 +887,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE]: "Success rate",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_START_DATE]: "Start date",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DEADLINE]: "Deadline",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_IP_CATEGORY]: "IP address category",
 
   // TeacherAssignmentGroupDetailsSubmit
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_HOSTS]: "Hosts",
@@ -943,6 +968,8 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_ASSIGNMENT_GROUP_NAME]: "Assignment name",
   [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUCCESS_RATE]: "Success rate",
   [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUBMITTED_AT]: "Submitted at",
+  [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_DESCRIPTION]: "Description",
+  [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_IP_CATEGORY]: "IP Category",
   // |                        |
   // ||-----------------------||
 }
@@ -1006,6 +1033,11 @@ const _SK: Record<TranslationKey, string> = {
   // Error messages
   [TranslationKey.ERROR_MESSAGE]: "Pri načítavaní sa vyskytla chyba.",
   [TranslationKey.ERROR_RETRY]: "Skúsiť znova",
+
+  // IP Categories
+  [TranslationKey.IP_CATEGORY_ALL]: "Všetky adresy",
+  [TranslationKey.IP_CATEGORY_ABC]: "Všetky adresy (A, B, C trieda)",
+  [TranslationKey.IP_CATEGORY_PRIVATE]: "Lokálne adresy (RFC 1918)",
 
   // Breadcrumbs
   [TranslationKey.BREADCRUMBS_ADMIN_USERS]: "Používatelia",
@@ -1164,6 +1196,10 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_RESET]: "Resetovať",
   [TranslationKey.ADMIN_SETTINGS_SUCCESS]: "Nastavenia boli úspešne uložené",
   [TranslationKey.ADMIN_SETTINGS_ERROR]: "Chyba pri ukladaní nastavení. {{value}}",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_TYPE]: "Typ autentifikácie",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_TYPE_LOCAL]: "Lokálny",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_TYPE_LDAP]: "LDAP",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_TYPE_LDAPS]: "LDAPS",
   // |                        |
   // ||-----------------------||
 
@@ -1312,6 +1348,8 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_SAVE]: "Uložiť",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_LOADING]: "Načítavanie zadaní...",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED_TOOLTIP]: "Keď nie sú vybraní žiadni študenti, zadanie bude priradené všetkým študentom.",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY]: "Kategória IP adries",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY_TOOLTIP]: "Vyberte rozsah IP adries.",
 
   // TeacherAssignmentGroupDetails
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE]: "Úspešnosť",
@@ -1328,6 +1366,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE]: "Úspešnosť",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_START_DATE]: "Dátum začiatku",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DEADLINE]: "Dátum ukončenia",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_IP_CATEGORY]: "Kategória IP adries",
   
   // TeacherAssignmentGroupDetailsSubmit
   [TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT_HOSTS]: "Hostov",
@@ -1408,6 +1447,8 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_ASSIGNMENT_GROUP_NAME]: "Názov zadania",
   [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUCCESS_RATE]: "Úspešnosť",
   [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUBMITTED_AT]: "Odovzdané",
+  [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_DESCRIPTION]: "Popis",
+  [TranslationKey.STUDENT_ASSIGNMENT_DETAILS_IP_CATEGORY]: "IP Kategória",
   // |                        |
   // ||-----------------------||
 }

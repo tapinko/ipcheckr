@@ -124,12 +124,28 @@ namespace IPCheckr.Api.Controllers
                         .Where(s => newStudentIds.Contains(s.Id))
                         .ToDictionary(s => s.Id, s => s);
 
+                    AssignmentGroupIpCat ipCatToUse;
+                    if (existingAssignments.Any())
+                    {
+                        var sampleCidr = existingAssignments[0].Cidr;
+                        var baseIpStr = sampleCidr.Split('/')[0];
+                        var parts = baseIpStr.Split('.');
+                        int a = int.Parse(parts[0]);
+                        int b = int.Parse(parts[1]);
+                        bool isPrivate = a == 10 || (a == 172 && b >= 16 && b <= 31) || (a == 192 && b == 168);
+                        ipCatToUse = isPrivate ? AssignmentGroupIpCat.LOCAL : AssignmentGroupIpCat.ABC;
+                    }
+                    else
+                    {
+                        ipCatToUse = AssignmentGroupIpCat.ALL;
+                    }
+
                     foreach (var sid in newStudentIds)
                     {
                         if (!studentsDict.TryGetValue(sid, out var studentUser))
                             continue;
 
-                        var assignmentData = TryGenerateAssignmentData(assignmentGroup.NumberOfRecords);
+                        var assignmentData = TryGenerateAssignmentData(assignmentGroup.NumberOfRecords, ipCatToUse);
                         if (assignmentData == null)
                             return StatusCode(StatusCodes.Status500InternalServerError, new ApiProblemDetails
                             {

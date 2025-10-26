@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using IPCheckr.Api.Common.Enums;
 
 namespace IPCheckr.Api.DTOs.AssignmentGroup
 {
@@ -34,6 +36,10 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         [DataType(DataType.Date, ErrorMessage = "Deadline must be a valid date.")]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public required DateTime Deadline { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [Required(ErrorMessage = "Assignment IP category is required.")]
+        public required AssignmentGroupIpCat AssignmentIpCat { get; set; }
     }
 
     public class CreateAssignmentGroupRes

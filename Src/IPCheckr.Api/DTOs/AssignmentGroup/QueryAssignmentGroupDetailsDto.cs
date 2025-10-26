@@ -21,6 +21,10 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
 
         [Required]
         public required AssignmentGroupSubmitDetailsDto[] Assignments { get; set; }
+
+        [Required]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public required AssignmentGroupIpCat AssignmentGroupIpCat { get; set; }
     }
     public class AssignmentGroupSubmitDetailsDto
     {

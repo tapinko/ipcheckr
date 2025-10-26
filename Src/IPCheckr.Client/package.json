@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dtos": "openapi-generator-cli generate -i http://localhost:5236/swagger/v1/swagger.json -g typescript-axios -o src/dtos/ --global-property=apiDocs=false,apiTests=false,modelDocs=false,modelTests=false,supportingFiles=none"
+    "dtos": "openapi-generator-cli version-manager set 7.9.0 && openapi-generator-cli generate -i http://localhost:5236/swagger/v1/swagger.json -g typescript-axios -o src/dtos/ --global-property=apiDocs=false,apiTests=false,modelDocs=false,modelTests=false --additional-properties=hideGenerationTimestamp=false && node -e \"const fs=require('fs');const del=p=>{try{fs.rmSync(p,{recursive:true,force:true});}catch{}};['src/dtos/git_push.sh','src/dtos/.npmignore','src/dtos/.gitignore','src/dtos/.openapi-generator-ignore','src/dtos/README.md','src/dtos/package.json','src/dtos/.openapi-generator'].forEach(del);\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

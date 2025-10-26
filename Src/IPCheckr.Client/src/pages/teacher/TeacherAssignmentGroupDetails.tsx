@@ -5,6 +5,7 @@ import {
 } from "../../dtos"
 import { TranslationKey } from "../../utils/i18n"
 import { getStatusMap } from "../../utils/getStatusMap"
+import { getIpCatLabel } from "../../utils/getIpCatLabel"
 import {
   Box,
   Button,
@@ -27,6 +28,7 @@ import TableSkeleton from "../../components/TableSkeleton"
 import StatsCard from "../../components/StatsCard"
 import {
   AccessTime,
+  Category,
   Class,
   Description,
   Dns,
@@ -205,6 +207,12 @@ const TeacherAssignmentGroupDetails = () => {
                 value={data?.assignmentGroupName ?? "-"}
                 icon={<Quiz />}
               />
+              <StatsCard
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DESCRIPTION)}
+                value={data?.assignmentGroupDescription === ""
+                  ? "-" : data?.assignmentGroupDescription}
+                icon={<Description />}
+              />
             </Stack>
           </Grid>
         </Grid>
@@ -213,10 +221,13 @@ const TeacherAssignmentGroupDetails = () => {
           <Grid flex={1}>
             <Stack spacing={2}>
               <StatsCard
-                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DESCRIPTION)}
-                value={data?.assignmentGroupDescription === ""
-                  ? "-" : data?.assignmentGroupDescription}
-                icon={<Description />}
+                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_IP_CATEGORY)}
+                value={
+                  data?.assignmentGroupIpCat
+                    ? getIpCatLabel(data.assignmentGroupIpCat, t)
+                    : "-"
+                }
+                icon={<Category />}
               />
               <StatsCard
                 title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CLASS)}
