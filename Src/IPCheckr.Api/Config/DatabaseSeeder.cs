@@ -25,32 +25,35 @@ namespace IPCheckr.Api.Config
                 await db.SaveChangesAsync();
             }
 
-            if (!db.AppSettings.Any(a => a.Name == "Language"))
-            {
-                db.AppSettings.Add(new AppSettings
-                {
-                    Name = "Language",
-                    Value = "EN"
-                });
-                await db.SaveChangesAsync();
-            }
+            await EnsureAppSettingAsync(db, "Language", "EN");
+            await EnsureAppSettingAsync(db, "InstitutionName", "");
+            await EnsureAppSettingAsync(db, "AuthType", AuthType.LOCAL.ToString());
 
-            if (!db.AppSettings.Any(a => a.Name == "InstitutionName"))
-            {
-                db.AppSettings.Add(new AppSettings
-                {
-                    Name = "InstitutionName",
-                    Value = ""
-                });
-                await db.SaveChangesAsync();
-            }
+            await EnsureAppSettingAsync(db, "Ldap_Enabled", "false");
+            await EnsureAppSettingAsync(db, "Ldap_Host", "ldap.example.local");
+            await EnsureAppSettingAsync(db, "Ldap_Port", "389");
+            await EnsureAppSettingAsync(db, "Ldap_UseSsl", "false");
+            await EnsureAppSettingAsync(db, "Ldap_StartTls", "false");
+            await EnsureAppSettingAsync(db, "Ldap_Domain", "");
+            await EnsureAppSettingAsync(db, "Ldap_BindMode", "UpnOrDomain");
+            await EnsureAppSettingAsync(db, "Ldap_UserDnTemplate", "uid={0},ou=Users,dc=example,dc=com");
+            await EnsureAppSettingAsync(db, "Ldap_SearchBase", "dc=example,dc=com");
+            await EnsureAppSettingAsync(db, "Ldap_UsernameAttribute", "sAMAccountName");
+            await EnsureAppSettingAsync(db, "Ldap_GroupMembershipAttribute", "memberOf");
+            await EnsureAppSettingAsync(db, "Ldap_StudentGroupDn", "cn=students,ou=Groups,dc=example,dc=com");
+            await EnsureAppSettingAsync(db, "Ldap_TeacherGroupDn", "cn=teachers,ou=Groups,dc=example,dc=com");
+            await EnsureAppSettingAsync(db, "Ldap_ValidateServerCertificate", "true");
+            await EnsureAppSettingAsync(db, "Ldap_ConnectTimeoutSeconds", "10");
+        }
 
-            if (!db.AppSettings.Any(a => a.Name == "AuthType"))
+        private static async Task EnsureAppSettingAsync(ApiDbContext db, string name, string defaultValue)
+        {
+            if (!await db.AppSettings.AnyAsync(a => a.Name == name))
             {
                 db.AppSettings.Add(new AppSettings
                 {
-                    Name = "AuthType",
-                    Value = AuthType.LOCAL.ToString()
+                    Name = name,
+                    Value = defaultValue
                 });
                 await db.SaveChangesAsync();
             }
