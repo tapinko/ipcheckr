@@ -78,7 +78,25 @@ namespace IPCheckr.Api.Controllers
 
             if (!string.IsNullOrEmpty(req.Username))
             {
-                if (await _db.Users.AnyAsync(u => u.Username == req.Username && u.Id != req.Id))
+                var desired = (req.Username ?? string.Empty).Trim();
+
+                // preserve domain suffix when LDAP auth is enabled
+                var authTypeSetting = await _db.AppSettings.FirstOrDefaultAsync(a => a.Name == "AuthType");
+                var authTypeRaw = (authTypeSetting?.Value ?? "LOCAL").Trim().ToUpperInvariant();
+                bool isLdapAuth = authTypeRaw == "LDAP";
+
+                string finalUsername = desired;
+                if (isLdapAuth)
+                {
+                    int atOld = user.Username.IndexOf('@');
+                    if (!string.IsNullOrEmpty(desired) && !desired.Contains('@') && atOld > 0)
+                    {
+                        var suffix = user.Username.Substring(atOld);
+                        finalUsername = desired + suffix;
+                    }
+                }
+
+                if (await _db.Users.AnyAsync(u => u.Username == finalUsername && u.Id != req.Id))
                     return BadRequest(new ApiProblemDetails
                     {
                         Title = "Bad Request",
@@ -88,7 +106,7 @@ namespace IPCheckr.Api.Controllers
                         MessageSk = "Používateľ s týmto používateľským menom už existuje."
                     });
 
-                user.Username = req.Username;
+                user.Username = finalUsername;
             }
 
             if (!string.IsNullOrEmpty(req.Password))

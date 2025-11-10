@@ -1,4 +1,5 @@
 using IPCheckr.Api.DTOs.User;
+using IPCheckr.Api.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,7 +43,7 @@ namespace IPCheckr.Api.Controllers
                 return new UserDto
                 {
                     Id = u.Id,
-                    Username = u.Username,
+                    Username = UsernameUtils.ToDisplay(u.Username),
                     Role = u.Role,
                     ClassIds = userClasses.Select(c => c.Id).ToArray(),
                     ClassNames = userClasses.Select(c => c.Name).ToArray()

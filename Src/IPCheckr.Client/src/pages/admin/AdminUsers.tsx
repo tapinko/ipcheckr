@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   Button,
   Checkbox,
@@ -13,10 +13,11 @@ import {
   OutlinedInput,
   Select,
   TextField,
+  Autocomplete,
 } from "@mui/material"
 import { useTranslation } from "react-i18next"
-import type { AddUserRes, ApiProblemDetails, ClassDto, UserDto } from "../../dtos"
-import { classApi, userApi } from "../../utils/apiClients"
+import type { AddUserRes, ApiProblemDetails, ClassDto, UserDto, AppSettingDto, LdapUserDto } from "../../dtos"
+import { appSettingsApi, classApi, userApi } from "../../utils/apiClients"
 import DataGridWithSearch from "../../components/DataGridWithSearch"
 import ActionPanel from "../../components/ActionPanel"
 import type { IUsersSelectedRows } from "../../types/ISelectedRows"
@@ -52,6 +53,8 @@ const AdminUsers = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+
+  const minLdapSearchChars = 2
 
   const addUserDefaultValues: AddUserFormValues = {
     username: "",
@@ -110,6 +113,17 @@ const AdminUsers = () => {
 
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
 
+  const settingsQuery = useQuery({
+    queryKey: ["appsettings"],
+    queryFn: () => appSettingsApi.appSettingsQueryAppSettings(),
+    staleTime: 5 * 60_000
+  })
+  const authSetting = useMemo(() => {
+    const list: AppSettingDto[] = settingsQuery.data?.data?.appSettings ?? []
+    return list.find(s => (s.name ?? "").toLowerCase() === "authtype") ?? null
+  }, [settingsQuery.data])
+  const isLdapAuth = useMemo(() => ((authSetting?.value ?? "").toUpperCase() === "LDAP"), [authSetting])
+
   const usersQuery = useQuery<UserRow[], Error>({
     queryKey: ["users", { searchValue, roleFilterValue, classFilterValue, descending }],
     queryFn: () =>
@@ -153,7 +167,7 @@ const AdminUsers = () => {
       queryClient.invalidateQueries({ queryKey: ["users"] })
       setAlert({
         severity: "success",
-        message: t(TranslationKey.ADMIN_USER_ADD_SUCCESS, { value: addWatch.username })
+        message: t(TranslationKey.ADMIN_USERS_ADD_SUCCESS, { value: addWatch.username })
       })
     },
     onError: (error) => {
@@ -164,7 +178,7 @@ const AdminUsers = () => {
           : details?.messageSk
       setAlert({
         severity: "error",
-        message: `${t(TranslationKey.ADMIN_USER_ADD_ERROR)}. ${localMessage ?? ""}`,
+        message: `${t(TranslationKey.ADMIN_USERS_ADD_ERROR)}. ${localMessage ?? ""}`,
       })
     }
   })
@@ -180,7 +194,7 @@ const AdminUsers = () => {
       queryClient.invalidateQueries({ queryKey: ["users"] })
       setAlert({
         severity: "warning",
-        message: t(TranslationKey.ADMIN_USER_DELETE_SUCCESS)
+        message: t(TranslationKey.ADMIN_USERS_DELETE_SUCCESS)
       })
     },
     onError: (error) => {
@@ -191,7 +205,7 @@ const AdminUsers = () => {
           : details?.messageSk
       setAlert({
         severity: "error",
-        message: `${t(TranslationKey.ADMIN_USER_DELETE_ERROR)}. ${localMessage ?? ""}`,
+        message: `${t(TranslationKey.ADMIN_USERS_DELETE_ERROR)}. ${localMessage ?? ""}`,
       })
     }
   })
@@ -212,7 +226,7 @@ const AdminUsers = () => {
       queryClient.invalidateQueries({ queryKey: ["users"] })
       setAlert({
         severity: "success",
-        message: t(TranslationKey.ADMIN_USER_EDIT_SUCCESS, { value: editWatch.username })
+        message: t(TranslationKey.ADMIN_USERS_EDIT_SUCCESS, { value: editWatch.username })
       })
     },
     onError: (error) => {
@@ -223,7 +237,7 @@ const AdminUsers = () => {
           : details?.messageSk
       setAlert({
         severity: "error",
-        message: `${t(TranslationKey.ADMIN_USER_EDIT_ERROR)}. ${localMessage ?? ""}`,
+        message: `${t(TranslationKey.ADMIN_USERS_EDIT_ERROR)}. ${localMessage ?? ""}`,
       })
     }
   })
@@ -281,7 +295,7 @@ const AdminUsers = () => {
 
   const addDisabled =
     !addWatch.username ||
-    !addWatch.password ||
+    (!isLdapAuth && !addWatch.password) ||
     !addWatch.role ||
     addUserMutation.isPending
 
@@ -366,34 +380,85 @@ const AdminUsers = () => {
         <form onSubmit={handleAddUserSubmit(handleAddUser)}>
           <DialogTitle>{t(TranslationKey.ADMIN_USERS_ADD_USER)}</DialogTitle>
           <DialogContent>
-            <Controller
-              name="username"
-              control={addUserControl}
-              rules={{
-                ...FormRules.required(),
-                ...FormRules.minLengthShort(),
-                ...FormRules.maxLengthShort(),
-                ...FormRules.patternLettersNumbersDots()
-              }}
-              render={({ field }) => (
-                <TextField
-                  margin="dense"
-                  label={t(TranslationKey.ADMIN_USERS_USERNAME)}
-                  fullWidth
-                  {...field}
-                  error={!!addUserErrors.username}
-                  helperText={
-                    addUserErrors.username
-                      ? t(addUserErrors.username.message as string)
-                      : ""
-                  }
-                />
-              )}
-            />
+            {isLdapAuth ? (
+              <Controller
+                name="username"
+                control={addUserControl}
+                rules={{ ...FormRules.required() }}
+                render={({ field }) => {
+                  const [options, setOptions] = useState<LdapUserDto[]>([])
+                  const [input, setInput] = useState<string>("")
+                  const [loading, setLoading] = useState(false)
+                  useEffect(() => {
+                    const q = input.trim()
+                    if (!q || q.length < minLdapSearchChars) { setOptions([]); return }
+                    let cancelled = false
+                    setLoading(true)
+                    const timer = setTimeout(() => {
+                      userApi
+                        .userLdapSearchUsers(q)
+                        .then(res => res.data.users)
+                        .then(users => { if (!cancelled) setOptions(users) })
+                        .finally(() => { if (!cancelled) setLoading(false) })
+                    }, 250)
+                    return () => { cancelled = true; clearTimeout(timer) }
+                  }, [input])
+                  return (
+                    <Autocomplete
+                      loading={loading}
+                      options={options}
+                      getOptionLabel={(o) => o.username}
+                      noOptionsText={t(TranslationKey.ADMIN_USERS_NO_DATA)}
+                      loadingText={t(TranslationKey.ADMIN_USERS_LOADING)}
+                      onInputChange={(_, v) => setInput(v)}
+                      onChange={(_, v) => field.onChange(v ? (v as LdapUserDto).username : "")}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          margin="dense"
+                          label={t(TranslationKey.ADMIN_USERS_USERNAME)}
+                          placeholder={t(TranslationKey.ADMIN_USERS_LDAP_USERNAME_PLACEHOLDER, {
+                            value: minLdapSearchChars
+                          })}
+                          fullWidth
+                          error={!!addUserErrors.username}
+                          helperText={addUserErrors.username ? t(addUserErrors.username.message as string) : ""}
+                        />
+                      )}
+                    />
+                  )
+                }}
+              />
+            ) : (
+              <Controller
+                name="username"
+                control={addUserControl}
+                rules={{
+                  ...FormRules.required(),
+                  ...FormRules.minLengthShort(),
+                  ...FormRules.maxLengthShort(),
+                  ...FormRules.patternLettersNumbersDots()
+                }}
+                render={({ field }) => (
+                  <TextField
+                    margin="dense"
+                    label={t(TranslationKey.ADMIN_USERS_USERNAME)}
+                    fullWidth
+                    {...field}
+                    error={!!addUserErrors.username}
+                    helperText={
+                      addUserErrors.username
+                        ? t(addUserErrors.username.message as string)
+                        : ""
+                    }
+                  />
+                )}
+              />
+            )}
             <Controller
               name="password"
               control={addUserControl}
-              rules={{
+              rules={isLdapAuth ? {} : {
                 ...FormRules.required(),
                 ...FormRules.minLengthLong(),
                 ...FormRules.maxLengthLong(),
@@ -401,17 +466,14 @@ const AdminUsers = () => {
               }}
               render={({ field }) => (
                 <TextField
+                  disabled={isLdapAuth}
                   margin="dense"
                   label={t(TranslationKey.ADMIN_USERS_PASSWORD)}
                   type="password"
                   fullWidth
                   {...field}
                   error={!!addUserErrors.password}
-                  helperText={
-                    addUserErrors.password
-                      ? t(addUserErrors.password.message as string)
-                      : ""
-                  }
+                  helperText={isLdapAuth ? "" : (addUserErrors.password ? t(addUserErrors.password.message as string) : "")}
                 />
               )}
             />
@@ -541,7 +603,7 @@ const AdminUsers = () => {
               }}
               render={({ field }) => (
                 <TextField
-                  disabled={hasAdminSelected}
+                  disabled={hasAdminSelected || isLdapAuth}
                   margin="dense"
                   label={t(TranslationKey.ADMIN_USERS_USERNAME)}
                   fullWidth
@@ -565,17 +627,18 @@ const AdminUsers = () => {
               }}
               render={({ field }) => (
                 <TextField
+                  disabled={isLdapAuth}
                   margin="dense"
                   label={t(TranslationKey.ADMIN_USERS_PASSWORD)}
                   type="password"
                   fullWidth
                   {...field}
                   error={!!editUserErrors.password}
-                  helperText={
+                  helperText={isLdapAuth ? "" : (
                     editUserErrors.password
                       ? t(editUserErrors.password.message as string)
                       : ""
-                  }
+                  )}
                 />
               )}
             />

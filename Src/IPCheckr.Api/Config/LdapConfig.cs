@@ -11,6 +11,7 @@ namespace IPCheckr.Api.Config
             services.Configure<LdapSettings>(configuration.GetSection("Ldap"));
             services.AddScoped<Services.Config.ILdapSettingsProvider, Services.Config.LdapSettingsProvider>();
             services.AddScoped<Services.Auth.ILdapAuthService, Services.Auth.LdapAuthService>();
+            services.AddScoped<Services.Auth.ILdapDirectoryService, Services.Auth.LdapDirectoryService>();
             return services;
         }
     }
@@ -46,5 +47,9 @@ namespace IPCheckr.Api.Config
         public bool ValidateServerCertificate { get; set; } = true;
         
         public int ConnectTimeoutSeconds { get; set; } = 10;
+
+        public string? BindDn { get; set; }
+        
+        public string? BindPassword { get; set; }
     }
 }

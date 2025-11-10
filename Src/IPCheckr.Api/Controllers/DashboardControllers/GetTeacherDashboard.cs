@@ -1,4 +1,5 @@
 using IPCheckr.Api.Common.Constants;
+using IPCheckr.Api.Common.Utils;
 using IPCheckr.Api.DTOs.Dashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -90,7 +91,7 @@ namespace IPCheckr.Api.Controllers
                     var avg = g.Average(s => ComputeSubmitPercent(answerKeyByAssignment[s.Assignment.Id], s));
                     return new AveragePercentageInStudentsDto
                     {
-                        Username = g.Key.Username,
+                        Username = UsernameUtils.ToDisplay(g.Key.Username),
                         Percentage = avg
                     };
                 })
@@ -116,7 +117,7 @@ namespace IPCheckr.Api.Controllers
                 .OrderByDescending(s => s.SubmittedAt)
                 .ThenByDescending(s => s.Id)
                 .FirstOrDefault();
-            var lastSubmitUsername = lastSubmit?.Assignment.Student.Username;
+            var lastSubmitUsername = lastSubmit != null ? UsernameUtils.ToDisplay(lastSubmit.Assignment.Student.Username) : null;
             DateTime? lastSubmitAt = lastSubmit?.SubmittedAt;
 
             int? lastSubmitId = lastSubmit?.Assignment.Id;
@@ -153,6 +154,8 @@ namespace IPCheckr.Api.Controllers
                 .Count();
 
             var mostSuccessfulStudent = studentAverages.FirstOrDefault()?.Username;
+            if (!string.IsNullOrEmpty(mostSuccessfulStudent))
+                mostSuccessfulStudent = UsernameUtils.ToDisplay(mostSuccessfulStudent);
             var mostSuccessfulClass = classAverages.FirstOrDefault()?.ClassName;
 
             int take = req.BarChartLength > 0 ? req.BarChartLength : int.MaxValue;

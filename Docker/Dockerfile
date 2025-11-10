@@ -22,6 +22,11 @@ WORKDIR /app
 ENV ASPNETCORE_URLS=https://0.0.0.0:8080 \
     ASPNETCORE_ENVIRONMENT=Production \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+
+RUN apk add --no-cache openldap ca-certificates \
+    && update-ca-certificates \
+    && if [ ! -e /usr/lib/libldap-2.5.so.0 ]; then ln -s /usr/lib/libldap.so.2 /usr/lib/libldap-2.5.so.0; fi \
+    && if [ ! -e /usr/lib/liblber-2.5.so.0 ]; then ln -s /usr/lib/liblber.so.2 /usr/lib/liblber-2.5.so.0; fi
 COPY --from=api-build /app/publish .
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "IPCheckr.Api.dll"]

@@ -1,4 +1,5 @@
 using IPCheckr.Api.Common.Constants;
+using IPCheckr.Api.Common.Utils;
 using IPCheckr.Api.DTOs.Dashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -125,7 +126,7 @@ namespace IPCheckr.Api.Controllers
             var teachersStr = string.Join(", ",
                 classes
                     .SelectMany(c => c.Teachers ?? Enumerable.Empty<Models.User>())
-                    .Select(t => t.Username)
+                    .Select(t => UsernameUtils.ToDisplay(t.Username))
                     .Distinct()
                     .OrderBy(n => n));
 

@@ -30,6 +30,10 @@ namespace IPCheckr.Api.Controllers
                     }
                 });
 
+            var authTypeSetting = await _db.AppSettings.FirstOrDefaultAsync(a => a.Name == "AuthType");
+            var authTypeRaw = (authTypeSetting?.Value ?? "LOCAL").Trim().ToUpperInvariant();
+            var isLdapAuth = authTypeRaw == "LDAP";
+
             var callerRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
             var callerIdStr = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             _ = int.TryParse(callerIdStr, out int callerId);
@@ -87,7 +91,25 @@ namespace IPCheckr.Api.Controllers
                     });
             }
 
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(req.Password);
+            // when using local auth the password is required
+            string passwordHash;
+            if (!isLdapAuth)
+            {
+                if (string.IsNullOrWhiteSpace(req.Password))
+                    return BadRequest(new ApiProblemDetails
+                    {
+                        Title = "Bad Request",
+                        Detail = "Password is required for LOCAL authentication.",
+                        Status = StatusCodes.Status400BadRequest,
+                        MessageEn = "Password is required for LOCAL authentication.",
+                        MessageSk = "Heslo je povinné pri lokálnom overovaní."
+                    });
+                passwordHash = BCrypt.Net.BCrypt.HashPassword(req.Password);
+            }
+            else
+            {
+                passwordHash = "LDAP";
+            }
 
             var newUser = new User
             {

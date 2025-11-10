@@ -2,6 +2,7 @@ using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.Assignment;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using IPCheckr.Api.Common.Utils;
 
 namespace IPCheckr.Api.Controllers
 {
@@ -159,7 +160,7 @@ namespace IPCheckr.Api.Controllers
                 Results = results.ToArray(),
                 NumberOfSubmits = numberOfSubmits,
                 SubmittedAt = submit?.SubmittedAt ?? DateTime.MinValue,
-                StudentName = assignment.Student.Username,
+                StudentName = UsernameUtils.ToDisplay(assignment.Student.Username),
                 SuccessRate = successRate,
                 AssignmentGroupIpCat = assignment.AssignmentGroup.AssignmentIpCat
             });

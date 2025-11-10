@@ -152,13 +152,16 @@ export enum TranslationKey {
   ADMIN_USERS_TEACHER = "ADMIN_USERS_TEACHER",
   ADMIN_USERS_STUDENT = "ADMIN_USERS_STUDENT",
   ADMIN_USERS_ADD = "ADMIN_USERS_ADD",
-  ADMIN_USER_ADD_SUCCESS = "ADMIN_CREATE_SUCCESS",
-  ADMIN_USER_ADD_ERROR = "ADMIN_CREATE_ERROR",
-  ADMIN_USER_EDIT_SUCCESS = "ADMIN_EDIT_SUCCESS",
-  ADMIN_USER_EDIT_ERROR = "ADMIN_EDIT_ERROR",
-  ADMIN_USER_DELETE_SUCCESS = "ADMIN_DELETE_SUCCESS",
-  ADMIN_USER_DELETE_ERROR = "ADMIN_DELETE_ERROR",
+  ADMIN_USERS_ADD_SUCCESS = "ADMIN_CREATE_SUCCESS",
+  ADMIN_USERS_ADD_ERROR = "ADMIN_CREATE_ERROR",
+  ADMIN_USERS_EDIT_SUCCESS = "ADMIN_EDIT_SUCCESS",
+  ADMIN_USERS_EDIT_ERROR = "ADMIN_EDIT_ERROR",
+  ADMIN_USERS_DELETE_SUCCESS = "ADMIN_DELETE_SUCCESS",
+  ADMIN_USERS_DELETE_ERROR = "ADMIN_DELETE_ERROR",
   ADMIN_USERS_SAVE = "ADMIN_USERS_SAVE",
+  ADMIN_USERS_NO_DATA = "ADMIN_USERS_NO_DATA",
+  ADMIN_USERS_LOADING = "ADMIN_USERS_LOADING",
+  ADMIN_USERS_LDAP_USERNAME_PLACEHOLDER = "ADMIN_USERS_LDAP_USERNAME_PLACEHOLDER",
 
   // AdminUserDetails
   ADMIN_USER_DETAILS_USERNAME = "ADMIN_USER_DETAILS_USERNAME",
@@ -258,6 +261,10 @@ export enum TranslationKey {
   ADMIN_SETTINGS_AUTH_LDAP_TEACHER_GROUP_DN = "ADMIN_SETTINGS_AUTH_LDAP_TEACHER_GROUP_DN",
   ADMIN_SETTINGS_AUTH_LDAP_STUDENT_GROUP_DN = "ADMIN_SETTINGS_AUTH_LDAP_STUDENT_GROUP_DN",
   ADMIN_SETTINGS_AUTH_LDAP_CONNECT_TIMEOUT = "ADMIN_SETTINGS_AUTH_LDAP_CONNECT_TIMEOUT",
+  ADMIN_SETTINGS_AUTH_LDAP_SERVICE_ACCOUNT = "ADMIN_SETTINGS_AUTH_LDAP_SERVICE_ACCOUNT",
+  ADMIN_SETTINGS_AUTH_LDAP_BIND_DN = "ADMIN_SETTINGS_AUTH_LDAP_BIND_DN",
+  ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD = "ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD",
+  ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER = "ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER",
   // |                        |
   // ||-----------------------||
 
@@ -651,13 +658,16 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_USERS_TEACHER]: "Teacher",
   [TranslationKey.ADMIN_USERS_STUDENT]: "Student",
   [TranslationKey.ADMIN_USERS_ADD]: "Add",
-  [TranslationKey.ADMIN_USER_ADD_SUCCESS]: "User '{{value}}' added successfully",
-  [TranslationKey.ADMIN_USER_ADD_ERROR]: "Error adding user",
-  [TranslationKey.ADMIN_USER_EDIT_SUCCESS]: "User edited successfully",
-  [TranslationKey.ADMIN_USER_EDIT_ERROR]: "Error editing user",
-  [TranslationKey.ADMIN_USER_DELETE_SUCCESS]: "Users deleted successfully",
-  [TranslationKey.ADMIN_USER_DELETE_ERROR]: "Error deleting users",
+  [TranslationKey.ADMIN_USERS_ADD_SUCCESS]: "User '{{value}}' added successfully",
+  [TranslationKey.ADMIN_USERS_ADD_ERROR]: "Error adding user",
+  [TranslationKey.ADMIN_USERS_EDIT_SUCCESS]: "User edited successfully",
+  [TranslationKey.ADMIN_USERS_EDIT_ERROR]: "Error editing user",
+  [TranslationKey.ADMIN_USERS_DELETE_SUCCESS]: "Users deleted successfully",
+  [TranslationKey.ADMIN_USERS_DELETE_ERROR]: "Error deleting users",
   [TranslationKey.ADMIN_USERS_SAVE]: "Save",
+  [TranslationKey.ADMIN_USERS_NO_DATA]: "No users available",
+  [TranslationKey.ADMIN_USERS_LOADING]: "Loading",
+  [TranslationKey.ADMIN_USERS_LDAP_USERNAME_PLACEHOLDER]: "Type at least {{value}} letters to search",
 
   // AdminUserDetails
   [TranslationKey.ADMIN_USER_DETAILS_USERNAME]: "Name",
@@ -757,6 +767,10 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_TEACHER_GROUP_DN]: "LDAP Teacher group DN",
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_STUDENT_GROUP_DN]: "LDAP Student group DN",
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_CONNECT_TIMEOUT]: "LDAP Connect timeout (ms)",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_SERVICE_ACCOUNT]: "Service account DN",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_DN]: "Service account username",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD]: "Service account password",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER]: "Leave blank to keep current",
   // |                        |
   // ||-----------------------||
 
@@ -1148,13 +1162,16 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_USERS_TEACHER]: "Učiteľ",
   [TranslationKey.ADMIN_USERS_STUDENT]: "Študent",
   [TranslationKey.ADMIN_USERS_ADD]: "Pridať",
-  [TranslationKey.ADMIN_USER_ADD_SUCCESS]: "Používateľ '{{value}}' bol úspešne pridaný",
-  [TranslationKey.ADMIN_USER_ADD_ERROR]: "Chyba pri pridávaní používateľa",
-  [TranslationKey.ADMIN_USER_EDIT_SUCCESS]: "Používateľ bol úspešne upravený",
-  [TranslationKey.ADMIN_USER_EDIT_ERROR]: "Chyba pri úprave používateľa",
-  [TranslationKey.ADMIN_USER_DELETE_SUCCESS]: "Používatelia boli úspešne odstránení",
-  [TranslationKey.ADMIN_USER_DELETE_ERROR]: "Chyba pri odstraňovaní používateľov",
+  [TranslationKey.ADMIN_USERS_ADD_SUCCESS]: "Používateľ '{{value}}' bol úspešne pridaný",
+  [TranslationKey.ADMIN_USERS_ADD_ERROR]: "Chyba pri pridávaní používateľa",
+  [TranslationKey.ADMIN_USERS_EDIT_SUCCESS]: "Používateľ bol úspešne upravený",
+  [TranslationKey.ADMIN_USERS_EDIT_ERROR]: "Chyba pri úprave používateľa",
+  [TranslationKey.ADMIN_USERS_DELETE_SUCCESS]: "Používatelia boli úspešne odstránení",
+  [TranslationKey.ADMIN_USERS_DELETE_ERROR]: "Chyba pri odstraňovaní používateľov",
   [TranslationKey.ADMIN_USERS_SAVE]: "Uložiť",
+  [TranslationKey.ADMIN_USERS_NO_DATA]: "Žiadny dostupní používatelia",
+  [TranslationKey.ADMIN_USERS_LOADING]: "Načítavam používateľov...",
+  [TranslationKey.ADMIN_USERS_LDAP_USERNAME_PLACEHOLDER]: "Zadajte aspoň {{value}} písmená pre vyhľadávanie",
 
   // AdminUserDetails
   [TranslationKey.ADMIN_USER_DETAILS_USERNAME]: "Meno",
@@ -1254,6 +1271,10 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_TEACHER_GROUP_DN]: "LDAP DN skupiny učiteľov",
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_STUDENT_GROUP_DN]: "LDAP DN skupiny študentov",
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_CONNECT_TIMEOUT]: "LDAP Časový limit pripojenia (ms)",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_SERVICE_ACCOUNT]: "Servisný účet LDAP",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_DN]: "Servisný účet DN",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD]: "Servisné heslo účtu",
+  [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER]: "Nechajte prázdne pre zachovanie aktuálneho",
   // |                        |
   // ||-----------------------||
 
