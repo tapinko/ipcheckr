@@ -105,8 +105,12 @@ namespace IPCheckr.Api.Controllers
             else
             {
                 var desired = role;
-                if (user.Role != desired && (desired == Roles.Teacher || user.Role == Roles.Student))
+                if (user.Role != desired)
+                {
+                    var previous = user.Role;
                     user.Role = desired;
+                    _logger.LogInformation("LDAP role sync: user {Username} role changed from {PrevRole} to {NewRole}", user.Username, previous, desired);
+                }
             }
 
             await _db.SaveChangesAsync();

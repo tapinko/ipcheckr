@@ -1,5 +1,6 @@
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.User;
+using IPCheckr.Api.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -84,7 +85,7 @@ namespace IPCheckr.Api.Controllers
             {
                 var resNoSubmits = new QueryUserDetailsRes
                 {
-                    Username = user.Username,
+                    Username = UsernameUtils.ToDisplay(user.Username),
                     TotalSubmits = 0,
                     LastSubmitGroupId = null,
                     LastSubmitAssignmentId = null,
@@ -222,7 +223,7 @@ namespace IPCheckr.Api.Controllers
 
             var res = new QueryUserDetailsRes
             {
-                Username = user.Username,
+                Username = UsernameUtils.ToDisplay(user.Username),
                 TotalSubmits = totalSubmits,
                 LastSubmitGroupId = lastSubmitGroupId,
                 LastSubmitAssignmentId = lastSubmitAssignmentId,

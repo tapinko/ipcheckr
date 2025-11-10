@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IPCheckr.Api.Common.Enums;
 using IPCheckr.Api.DTOs;
+using IPCheckr.Api.Common.Utils;
 
 namespace IPCheckr.Api.Controllers
 {
@@ -100,7 +101,8 @@ namespace IPCheckr.Api.Controllers
 
             var resultAssignments = assignments.Select(a =>
             {
-                var teacherUsername = a.AssignmentGroup.Class.Teachers?.FirstOrDefault()?.Username ?? "Unknown";
+                var teacherUsernameRaw = a.AssignmentGroup.Class.Teachers?.FirstOrDefault()?.Username ?? "Unknown";
+                var teacherUsername = UsernameUtils.ToDisplay(teacherUsernameRaw);
 
                 var start = a.AssignmentGroup.StartDate;
                 var deadline = a.AssignmentGroup.Deadline;
@@ -131,7 +133,7 @@ namespace IPCheckr.Api.Controllers
                     State = state,
                     StartDate = start,
                     Deadline = deadline,
-                    StudentUsername = a.Student.Username,
+                    StudentUsername = UsernameUtils.ToDisplay(a.Student.Username),
                     Status = (AssignmentGroupStatus)state
                 };
             }).ToArray();

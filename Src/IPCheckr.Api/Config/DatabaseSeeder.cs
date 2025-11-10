@@ -34,16 +34,18 @@ namespace IPCheckr.Api.Config
             await EnsureAppSettingAsync(db, "Ldap_Port", "389");
             await EnsureAppSettingAsync(db, "Ldap_UseSsl", "false");
             await EnsureAppSettingAsync(db, "Ldap_StartTls", "false");
-            await EnsureAppSettingAsync(db, "Ldap_Domain", "");
+            await EnsureAppSettingAsync(db, "Ldap_Domain", "ldap.example.local");
             await EnsureAppSettingAsync(db, "Ldap_BindMode", "UpnOrDomain");
-            await EnsureAppSettingAsync(db, "Ldap_UserDnTemplate", "uid={0},ou=Users,dc=example,dc=com");
-            await EnsureAppSettingAsync(db, "Ldap_SearchBase", "dc=example,dc=com");
+            await EnsureAppSettingAsync(db, "Ldap_UserDnTemplate", "uid={0},ou=Users,dc=ldap,dc=example,dc=local");
+            await EnsureAppSettingAsync(db, "Ldap_SearchBase", "dc=ldap,dc=example,dc=local");
             await EnsureAppSettingAsync(db, "Ldap_UsernameAttribute", "sAMAccountName");
             await EnsureAppSettingAsync(db, "Ldap_GroupMembershipAttribute", "memberOf");
-            await EnsureAppSettingAsync(db, "Ldap_StudentGroupDn", "cn=students,ou=Groups,dc=example,dc=com");
-            await EnsureAppSettingAsync(db, "Ldap_TeacherGroupDn", "cn=teachers,ou=Groups,dc=example,dc=com");
+            await EnsureAppSettingAsync(db, "Ldap_StudentGroupDn", "cn=students,ou=Groups,dc=ldap,dc=example,dc=local");
+            await EnsureAppSettingAsync(db, "Ldap_TeacherGroupDn", "cn=teachers,ou=Groups,dc=ldap,dc=example,dc=local");
             await EnsureAppSettingAsync(db, "Ldap_ValidateServerCertificate", "true");
             await EnsureAppSettingAsync(db, "Ldap_ConnectTimeoutSeconds", "10");
+            await EnsureAppSettingAsync(db, "Ldap_BindDn", "");
+            await EnsureAppSettingAsync(db, "Ldap_BindPassword", "");
         }
 
         private static async Task EnsureAppSettingAsync(ApiDbContext db, string name, string defaultValue)

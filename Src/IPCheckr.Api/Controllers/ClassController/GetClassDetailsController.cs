@@ -2,6 +2,7 @@ using IPCheckr.Api.DTOs.Class;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IPCheckr.Api.DTOs;
+using IPCheckr.Api.Common.Utils;
 
 namespace IPCheckr.Api.Controllers
 {
@@ -113,7 +114,7 @@ namespace IPCheckr.Api.Controllers
                 teachers = teachers.Append(new ClassDetailsTeachersDto
                 {
                     TeacherId = t.Id,
-                    Username = t.Username
+                    Username = UsernameUtils.ToDisplay(t.Username)
                 }).ToArray();
             }
 
@@ -121,7 +122,7 @@ namespace IPCheckr.Api.Controllers
                 .Select(s => new ClassDetailsStudentsDto
                 {
                     StudentId = s.Id,
-                    Username = s.Username
+                    Username = UsernameUtils.ToDisplay(s.Username)
                 })
                 .OrderBy(s => s.Username)
                 .ToArray();
@@ -134,7 +135,7 @@ namespace IPCheckr.Api.Controllers
                     var avg = g.Average(s => ComputeSubmitPercent(answerKeyByAssignment[s.Assignment.Id], s));
                     return new AverageSuccessRateInStudentsDto
                     {
-                        Username = g.Key.Username,
+                        Username = UsernameUtils.ToDisplay(g.Key.Username),
                         Percentage = avg
                     };
                 })
@@ -171,7 +172,7 @@ namespace IPCheckr.Api.Controllers
                 .OrderByDescending(s => s.SubmittedAt)
                 .ThenByDescending(s => s.Id)
                 .FirstOrDefault();
-            var lastSubmitUsername = lastSubmit?.Assignment.Student.Username;
+            var lastSubmitUsername = lastSubmit != null ? UsernameUtils.ToDisplay(lastSubmit.Assignment.Student.Username) : null;
             int? lastSubmitId = lastSubmit?.Assignment.Id;
             int? lastSubmitGroupId = lastSubmit?.Assignment.AssignmentGroup.Id;
             int? lastSubmitAttempt = lastSubmit?.Attempt;

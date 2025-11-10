@@ -40,6 +40,8 @@ const AdminSettings = () => {
   const [ldapTeacherGroupDn, setLdapTeacherGroupDn] = useState<string>("")
   const [ldapValidateCert, setLdapValidateCert] = useState<boolean>(true)
   const [ldapTimeoutSec, setLdapTimeoutSec] = useState<string>("10")
+  const [ldapBindDn, setLdapBindDn] = useState<string>("")
+  const [ldapBindPassword, setLdapBindPassword] = useState<string>("")
 
   const settingsQuery = useQuery({
     queryKey: ["appsettings"],
@@ -89,6 +91,8 @@ const AdminSettings = () => {
     teacherGroupDn: findSettingByName("Ldap_TeacherGroupDn"),
     validateCert: findSettingByName("Ldap_ValidateServerCertificate"),
     timeoutSec: findSettingByName("Ldap_ConnectTimeoutSeconds"),
+    bindDn: findSettingByName("Ldap_BindDn"),
+    bindPassword: findSettingByName("Ldap_BindPassword"),
   }), [settingsQuery.data])
 
   useEffect(() => {
@@ -141,6 +145,9 @@ const AdminSettings = () => {
     if (ldapSettings.teacherGroupDn) setLdapTeacherGroupDn(ldapSettings.teacherGroupDn.value ?? ""); else setLdapTeacherGroupDn("")
     if (ldapSettings.validateCert) setLdapValidateCert(bool(ldapSettings.validateCert.value, true)); else setLdapValidateCert(true)
     if (ldapSettings.timeoutSec) setLdapTimeoutSec(numStr(ldapSettings.timeoutSec.value, "10")); else setLdapTimeoutSec("10")
+    if (ldapSettings.bindDn) setLdapBindDn(ldapSettings.bindDn.value ?? ""); else setLdapBindDn("")
+
+    setLdapBindPassword("")
   }, [languageSetting, institutionSetting, authSetting, ldapSettings])
 
   const editMutation = useMutation<
@@ -204,11 +211,16 @@ const AdminSettings = () => {
     pushIfChanged(ldapSettings.teacherGroupDn, ldapTeacherGroupDn)
     pushIfChanged(ldapSettings.validateCert, ldapValidateCert)
     pushIfChanged(ldapSettings.timeoutSec, ldapTimeoutSec)
+    pushIfChanged(ldapSettings.bindDn, ldapBindDn)
+
+    if (ldapSettings.bindPassword && (ldapBindPassword ?? "").trim().length > 0) {
+      list.push({ id: ldapSettings.bindPassword.id, name: ldapSettings.bindPassword.name, value: ldapBindPassword })
+    }
     return list
   }, [language, institutionName, languageSetting, institutionSetting, authType, authSetting,
       ldapEnabled, ldapHost, ldapPort, ldapUseSsl, ldapStartTls, ldapDomain, ldapBindMode,
       ldapUserDnTemplate, ldapSearchBase, ldapUsernameAttr, ldapGroupAttr, ldapStudentGroupDn,
-      ldapTeacherGroupDn, ldapValidateCert, ldapTimeoutSec, ldapSettings])
+      ldapTeacherGroupDn, ldapValidateCert, ldapTimeoutSec, ldapSettings, ldapBindDn, ldapBindPassword])
 
   const saveDisabled = changedFields.length === 0 || editMutation.isPending
 
@@ -330,6 +342,12 @@ const AdminSettings = () => {
 
             <Typography variant="body2">{t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_CONNECT_TIMEOUT)}</Typography>
             <TextField value={ldapTimeoutSec} onChange={(e) => setLdapTimeoutSec(e.target.value.replace(/[^0-9]/g, ""))} fullWidth />
+
+            <Divider textAlign="left">{t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_SERVICE_ACCOUNT)}</Divider>
+            <Typography variant="body2">{t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_DN)}</Typography>
+            <TextField value={ldapBindDn} onChange={(e) => setLdapBindDn(e.target.value)} fullWidth />
+            <Typography variant="body2">{t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD)}</Typography>
+            <TextField value={ldapBindPassword} onChange={(e) => setLdapBindPassword(e.target.value)} type="password" fullWidth placeholder={t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER)} />
           </Box>
         )}
 

@@ -1,4 +1,5 @@
 using IPCheckr.Api.Common.Constants;
+using IPCheckr.Api.Common.Utils;
 using IPCheckr.Api.DTOs.Dashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +49,8 @@ namespace IPCheckr.Api.Controllers
                 TotalStudents = totalStudents,
                 TotalAssignmentGroups = totalAssignmentGroups,
                 TotalSubmits = totalSubmits,
-                LastSubmitUsername = lastSubmit?.Assignment.Student.Username,
+                LastSubmitUsername = lastSubmit != null
+                    ? UsernameUtils.ToDisplay(lastSubmit.Assignment.Student.Username) : null,
                 LastSubmitAt = lastSubmit?.SubmittedAt,
                 TotalUpcoming = totalUpcoming,
                 TotalInProgress = totalInProgress,

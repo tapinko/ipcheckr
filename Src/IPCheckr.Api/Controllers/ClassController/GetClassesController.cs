@@ -1,6 +1,7 @@
 using IPCheckr.Api.DTOs.Class;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using IPCheckr.Api.Common.Utils;
 
 namespace IPCheckr.Api.Controllers
 {
@@ -40,7 +41,7 @@ namespace IPCheckr.Api.Controllers
                 ClassId = c.Id,
                 ClassName = c.Name,
                 Teachers = c.Teachers?.Select(t => t.Id).ToArray() ?? Array.Empty<int>(),
-                TeacherUsernames = c.Teachers?.Select(t => t.Username).ToArray() ?? Array.Empty<string>()
+                TeacherUsernames = c.Teachers?.Select(t => UsernameUtils.ToDisplay(t.Username)).ToArray() ?? Array.Empty<string>()
             }).ToArray();
 
             var res = new QueryClassesRes

@@ -40,7 +40,7 @@ export interface AddUserReq {
      * @type {string}
      * @memberof AddUserReq
      */
-    'password': string;
+    'password'?: string | null;
     /**
      * 
      * @type {string}
@@ -904,6 +904,44 @@ export interface EditUserReq {
      * @memberof EditUserReq
      */
     'classIds'?: Array<number> | null;
+}
+/**
+ * 
+ * @export
+ * @interface LdapUserDto
+ */
+export interface LdapUserDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof LdapUserDto
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LdapUserDto
+     */
+    'distinguishedName': string;
+}
+/**
+ * 
+ * @export
+ * @interface LdapUserSearchRes
+ */
+export interface LdapUserSearchRes {
+    /**
+     * 
+     * @type {Array<LdapUserDto>}
+     * @memberof LdapUserSearchRes
+     */
+    'users': Array<LdapUserDto>;
+    /**
+     * 
+     * @type {number}
+     * @memberof LdapUserSearchRes
+     */
+    'totalCount': number;
 }
 /**
  * 
@@ -4005,6 +4043,58 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
+         * @param {string | null} [q] 
+         * @param {string | null} [ouDn] 
+         * @param {string | null} [groupDn] 
+         * @param {number | null} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userLdapSearchUsers: async (q?: string | null, ouDn?: string | null, groupDn?: string | null, limit?: number | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/users/ldap-search-users`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (q !== undefined) {
+                localVarQueryParameter['Q'] = q;
+            }
+
+            if (ouDn !== undefined) {
+                localVarQueryParameter['OuDn'] = ouDn;
+            }
+
+            if (groupDn !== undefined) {
+                localVarQueryParameter['GroupDn'] = groupDn;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['Limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {number | null} [id] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4150,6 +4240,21 @@ export const UserApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string | null} [q] 
+         * @param {string | null} [ouDn] 
+         * @param {string | null} [groupDn] 
+         * @param {number | null} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userLdapSearchUsers(q?: string | null, ouDn?: string | null, groupDn?: string | null, limit?: number | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LdapUserSearchRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userLdapSearchUsers(q, ouDn, groupDn, limit, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.userLdapSearchUsers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {number | null} [id] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4216,6 +4321,18 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * 
+         * @param {string | null} [q] 
+         * @param {string | null} [ouDn] 
+         * @param {string | null} [groupDn] 
+         * @param {number | null} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userLdapSearchUsers(q?: string | null, ouDn?: string | null, groupDn?: string | null, limit?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<LdapUserSearchRes> {
+            return localVarFp.userLdapSearchUsers(q, ouDn, groupDn, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {number | null} [id] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4278,6 +4395,20 @@ export class UserApi extends BaseAPI {
      */
     public userEditUser(editUserReq: EditUserReq, options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).userEditUser(editUserReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string | null} [q] 
+     * @param {string | null} [ouDn] 
+     * @param {string | null} [groupDn] 
+     * @param {number | null} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public userLdapSearchUsers(q?: string | null, ouDn?: string | null, groupDn?: string | null, limit?: number | null, options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userLdapSearchUsers(q, ouDn, groupDn, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
