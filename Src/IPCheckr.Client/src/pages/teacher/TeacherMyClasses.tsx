@@ -15,7 +15,8 @@ import {
   OutlinedInput,
   Select,
   TextField,
-  Typography
+  Typography,
+  Autocomplete
 } from "@mui/material"
 import { useTranslation } from "react-i18next"
 import type {
@@ -23,7 +24,9 @@ import type {
   ApiProblemDetails,
   ClassDto,
   CreateClassRes,
-  UserDto
+  UserDto,
+  LdapUserDto,
+  IsLdapAuthRes
 } from "../../dtos"
 import { classApi, userApi } from "../../utils/apiClients"
 import DataGridWithSearch from "../../components/DataGridWithSearch"
@@ -174,6 +177,7 @@ const TeacherMyClasses = () => {
   const [studentsDescending, setStudentsDescending] = useState(false)
 
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
+  const minLdapSearchChars = 2
 
   const studentsColumns = [
     { label: t(TranslationKey.TEACHER_MY_CLASSES_USERNAME), key: "username" }
@@ -197,8 +201,15 @@ const TeacherMyClasses = () => {
         .then(r => r.data.users)
   })
 
+  const ldapAuthQuery = useQuery<IsLdapAuthRes>({
+    queryKey: ["isLdapAuth"],
+    queryFn: async () => userApi.userIsLdapAuth().then(r => r.data),
+    staleTime: 5 * 60_000
+  })
+  const isLdapAuth = ldapAuthQuery.data?.isLdapAuth === true
+
   const studentsQuery = useQuery<StudentRow[], Error>({
-    queryKey: [
+    queryKey: [ 
       "classStudents",
       {
         classId: selectedClass?.classId,
@@ -242,7 +253,7 @@ const TeacherMyClasses = () => {
       queryClient.invalidateQueries({ queryKey: ["classStudents"] })
       setAlert({
         severity: "success",
-        message: t(TranslationKey.ADMIN_USER_ADD_SUCCESS, { value: addStudentWatchValues.username })
+        message: t(TranslationKey.TEACHER_MY_CLASSES_ADD_STUDENT_SUCCESS, { value: addStudentWatchValues.username })
       })
       },
     onError: (error) => {
@@ -253,7 +264,7 @@ const TeacherMyClasses = () => {
           : details?.messageSk
       setAlert({
         severity: "error",
-        message: `${t(TranslationKey.ADMIN_USER_ADD_ERROR)}. ${localMessage ?? ""}`,
+        message: `${t(TranslationKey.TEACHER_MY_CLASSES_ADD_STUDENT_ERROR)}. ${localMessage ?? ""}`,
       })
     }
   })
@@ -378,7 +389,7 @@ const TeacherMyClasses = () => {
       queryClient.invalidateQueries({ queryKey: ["classStudents"] })
       setAlert({
         severity: "success",
-        message: t(TranslationKey.ADMIN_USER_EDIT_SUCCESS, { value: editStudentWatchValues.username })
+        message: t(TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT_SUCCESS, { value: editStudentWatchValues.username })
       })
     },
     onError: (error) => {
@@ -387,7 +398,7 @@ const TeacherMyClasses = () => {
         i18n.language === Language.EN ? details?.messageEn : details?.messageSk
       setAlert({
         severity: "error",
-        message: `${t(TranslationKey.ADMIN_USER_EDIT_ERROR)}. ${localMessage ?? ""}`
+        message: `${t(TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT_ERROR)}. ${localMessage ?? ""}`
       })
     }
   })
@@ -407,7 +418,7 @@ const TeacherMyClasses = () => {
       queryClient.invalidateQueries({ queryKey: ["teacherClasses"] })
       setAlert({
         severity: "success",
-        message: t(TranslationKey.ADMIN_CLASSES_EDIT_SUCCESS, {
+        message: t(TranslationKey.TEACHER_MY_CLASSES_CLASSES_EDIT_SUCCESS, {
           value: editClassWatchValues.className
         })
       })
@@ -418,7 +429,7 @@ const TeacherMyClasses = () => {
         i18n.language === Language.EN ? details?.messageEn : details?.messageSk
       setAlert({
         severity: "error",
-        message: `${t(TranslationKey.ADMIN_CLASSES_EDIT_ERROR)}. ${localMessage ?? ""}`
+        message: `${t(TranslationKey.TEACHER_MY_CLASSES_CLASSES_EDIT_ERROR)}. ${localMessage ?? ""}`
       })
     }
   })
@@ -540,7 +551,7 @@ const TeacherMyClasses = () => {
 
   const addStudentDisabled =
     !addStudentWatchValues.username ||
-    !addStudentWatchValues.password ||
+    (!isLdapAuth && !addStudentWatchValues.password) ||
     (addStudentWatchValues.classIds?.length ?? 0) === 0 ||
     addStudentMutation.isPending
 
@@ -733,34 +744,83 @@ const TeacherMyClasses = () => {
             {t(TranslationKey.TEACHER_MY_CLASSES_ADD_STUDENT)}
           </DialogTitle>
           <DialogContent>
-            <Controller
-              name="username"
-              control={addStudentControl}
-              rules={{
-                ...FormRules.required(),
-                ...FormRules.minLengthShort(),
-                ...FormRules.maxLengthShort(),
-                ...FormRules.patternLettersNumbersDots()
-              }}
-              render={({ field }) => (
-                <TextField
-                  margin="dense"
-                  label={t(TranslationKey.TEACHER_MY_CLASSES_USERNAME)}
-                  fullWidth
-                  {...field}
-                  error={!!addStudentErrors.username}
-                  helperText={
-                    addStudentErrors.username
-                      ? t(addStudentErrors.username.message as string)
-                      : ""
-                  }
-                />
-              )}
-            />
+            {isLdapAuth ? (
+              <Controller
+                name="username"
+                control={addStudentControl}
+                rules={{ ...FormRules.required() }}
+                render={({ field }) => {
+                  const [options, setOptions] = useState<LdapUserDto[]>([])
+                  const [input, setInput] = useState("")
+                  const [loading, setLoading] = useState(false)
+                  useEffect(() => {
+                    const q = input.trim()
+                    if (!q || q.length < minLdapSearchChars) { setOptions([]); return }
+                    let cancelled = false
+                    setLoading(true)
+                    const timer = setTimeout(() => {
+                      userApi
+                        .userLdapSearchUsers(q)
+                        .then(res => res.data.users)
+                        .then(users => { if (!cancelled) setOptions(users) })
+                        .finally(() => { if (!cancelled) setLoading(false) })
+                    }, 250)
+                    return () => { cancelled = true; clearTimeout(timer) }
+                  }, [input])
+                  return (
+                    <Autocomplete
+                      loading={loading}
+                      options={options}
+                      getOptionLabel={o => o.username}
+                      noOptionsText={t(TranslationKey.TEACHER_MY_CLASSES_NO_DATA)}
+                      loadingText={t(TranslationKey.TEACHER_MY_CLASSES_LOADING)}
+                      onInputChange={(_, v) => setInput(v)}
+                      onChange={(_, v) => field.onChange(v ? (v as LdapUserDto).username : "")}
+                      renderInput={params => (
+                        <TextField
+                          {...params}
+                          margin="dense"
+                          label={t(TranslationKey.TEACHER_MY_CLASSES_USERNAME)}
+                          placeholder={t(TranslationKey.TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER, { value: minLdapSearchChars })}
+                          fullWidth
+                          error={!!addStudentErrors.username}
+                          helperText={addStudentErrors.username ? t(addStudentErrors.username.message as string) : ""}
+                        />
+                      )}
+                    />
+                  )
+                }}
+              />
+            ) : (
+              <Controller
+                name="username"
+                control={addStudentControl}
+                rules={{
+                  ...FormRules.required(),
+                  ...FormRules.minLengthShort(),
+                  ...FormRules.maxLengthShort(),
+                  ...FormRules.patternLettersNumbersDots()
+                }}
+                render={({ field }) => (
+                  <TextField
+                    margin="dense"
+                    label={t(TranslationKey.TEACHER_MY_CLASSES_USERNAME)}
+                    fullWidth
+                    {...field}
+                    error={!!addStudentErrors.username}
+                    helperText={
+                      addStudentErrors.username
+                        ? t(addStudentErrors.username.message as string)
+                        : ""
+                    }
+                  />
+                )}
+              />
+            )}
             <Controller
               name="password"
               control={addStudentControl}
-              rules={{
+              rules={isLdapAuth ? {} : {
                 ...FormRules.required(),
                 ...FormRules.minLengthLong(),
                 ...FormRules.maxLengthLong(),
@@ -768,17 +828,14 @@ const TeacherMyClasses = () => {
               }}
               render={({ field }) => (
                 <TextField
+                  disabled={isLdapAuth}
                   margin="dense"
                   label={t(TranslationKey.TEACHER_MY_CLASSES_PASSWORD)}
                   fullWidth
                   type="password"
                   {...field}
                   error={!!addStudentErrors.password}
-                  helperText={
-                    addStudentErrors.password
-                      ? t(addStudentErrors.password.message as string)
-                      : ""
-                  }
+                  helperText={isLdapAuth ? "" : (addStudentErrors.password ? t(addStudentErrors.password.message as string) : "")}
                 />
               )}
             />
@@ -975,7 +1032,7 @@ const TeacherMyClasses = () => {
       >
         <form onSubmit={handleEditStudentSubmit(handleEditStudent)}>
           <DialogTitle>
-            {t(TranslationKey.ADMIN_USERS_EDIT_USER)}
+            {t(TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT)}
           </DialogTitle>
           <DialogContent>
             <Controller
@@ -989,6 +1046,7 @@ const TeacherMyClasses = () => {
               }}
               render={({ field }) => (
                 <TextField
+                  disabled={isLdapAuth}
                   margin="dense"
                   label={t(TranslationKey.TEACHER_MY_CLASSES_USERNAME)}
                   fullWidth
@@ -1012,17 +1070,14 @@ const TeacherMyClasses = () => {
               }}
               render={({ field }) => (
                 <TextField
+                  disabled={isLdapAuth}
                   margin="dense"
                   type="password"
                   label={t(TranslationKey.TEACHER_MY_CLASSES_PASSWORD)}
                   fullWidth
                   {...field}
                   error={!!editStudentErrors.password}
-                  helperText={
-                    editStudentErrors.password
-                      ? t(editStudentErrors.password.message as string)
-                      : ""
-                  }
+                  helperText={isLdapAuth ? "" : (editStudentErrors.password ? t(editStudentErrors.password.message as string) : "")}
                 />
               )}
             />
@@ -1091,7 +1146,7 @@ const TeacherMyClasses = () => {
               color="success"
               disabled={editStudentDisabled}
             >
-              {t(TranslationKey.ADMIN_USERS_SAVE)}
+              {t(TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT_SAVE)}
             </Button>
           </DialogActions>
         </form>
@@ -1111,7 +1166,7 @@ const TeacherMyClasses = () => {
       >
         <form onSubmit={handleEditClassSubmit(handleEditClass)}>
           <DialogTitle>
-            {t(TranslationKey.ADMIN_CLASSES_EDIT_CLASS)}
+            {t(TranslationKey.TEACHER_MY_CLASSES_EDIT_CLASS)}
           </DialogTitle>
           <DialogContent>
             <Controller
@@ -1150,7 +1205,7 @@ const TeacherMyClasses = () => {
                   disabled={teachersQuery.isLoading || teachersQuery.isError}
                 >
                   <InputLabel id="edit-class-teachers-label">
-                    {t(TranslationKey.ADMIN_CLASSES_TEACHERS)}
+                    {t(TranslationKey.TEACHER_MY_CLASSES_TEACHERS)}
                   </InputLabel>
                   <Select
                     multiple
@@ -1165,7 +1220,7 @@ const TeacherMyClasses = () => {
                     }
                     input={
                       <OutlinedInput
-                        label={t(TranslationKey.ADMIN_CLASSES_TEACHERS)}
+                        label={t(TranslationKey.TEACHER_MY_CLASSES_TEACHERS)}
                       />
                     }
                     renderValue={selected =>
@@ -1208,7 +1263,7 @@ const TeacherMyClasses = () => {
               color="success"
               disabled={editClassDisabled}
             >
-              {t(TranslationKey.ADMIN_CLASSES_SAVE)}
+              {t(TranslationKey.TEACHER_MY_CLASSES_SAVE)}
             </Button>
           </DialogActions>
         </form>

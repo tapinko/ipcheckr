@@ -3,6 +3,7 @@ using IPCheckr.Api.Common.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IPCheckr.Api.DTOs;
+using IPCheckr.Api.Common.Utils;
 
 namespace IPCheckr.Api.Controllers
 {
@@ -141,7 +142,7 @@ namespace IPCheckr.Api.Controllers
                 assignmentDetails.Add(new AssignmentGroupSubmitDetailsDto
                 {
                     AssignmentId = assignment.Id,
-                    StudentUsername = studentUsername,
+                    StudentUsername = UsernameUtils.ToDisplay(assignment.Student.Username),
                     StudentId = assignment.Student.Id,
                     SuccessRate = attemptCount > 0 ? firstAttemptSuccessRate : 0.0,
                     AttemptCount = attemptCount,

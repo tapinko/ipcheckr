@@ -331,9 +331,16 @@ export enum TranslationKey {
   TEACHER_MY_CLASSES_SAVE = "TEACHER_MY_CLASSES_SAVE",
   TEACHER_MY_CLASSES_EDIT_CLASS = "TEACHER_MY_CLASSES_EDIT_CLASS",
   TEACHER_MY_CLASSES_EDIT_STUDENT = "TEACHER_MY_CLASSES_EDIT_STUDENT",
+  TEACHER_MY_CLASSES_CLASSES_EDIT_SUCCESS = "TEACHER_MY_CLASSES_CLASSES_EDIT_SUCCESS",
+  TEACHER_MY_CLASSES_CLASSES_EDIT_ERROR = "TEACHER_MY_CLASSES_CLASSES_EDIT_ERROR",
+  TEACHER_MY_CLASSES_EDIT_STUDENT_SAVE = "TEACHER_MY_CLASSES_EDIT_STUDENT_SAVE",
+  TEACHER_MY_CLASSES_TEACHERS = "TEACHER_MY_CLASSES_TEACHERS",
   TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_TITLE = "TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_TITLE",
   TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_MESSAGE = "TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_MESSAGE",
   TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_CONFIRM = "TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_CONFIRM",
+  TEACHER_MY_CLASSES_NO_DATA = "TEACHER_MY_CLASSES_NO_DATA",
+  TEACHER_MY_CLASSES_LOADING = "TEACHER_MY_CLASSES_LOADING",
+  TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER = "TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER",
 
   // TeacherStudentDetails
   TEACHER_STUDENT_DETAILS_USERNAME = "TEACHER_STUDENT_DETAILS_USERNAME",
@@ -837,9 +844,16 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_MY_CLASSES_SAVE]: "Save",
   [TranslationKey.TEACHER_MY_CLASSES_EDIT_CLASS]: "Edit class",
   [TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT]: "Edit student",
+  [TranslationKey.TEACHER_MY_CLASSES_CLASSES_EDIT_SUCCESS]: "Edit class",
+  [TranslationKey.TEACHER_MY_CLASSES_CLASSES_EDIT_ERROR]: "Error editing class",
+  [TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT_SAVE]: "Save",
+  [TranslationKey.TEACHER_MY_CLASSES_TEACHERS]: "Teachers",
   [TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_TITLE]: "Warning",
   [TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_MESSAGE]: "You are about to remove yourself from this class. Only administrator can add you back.",
   [TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_CONFIRM]: "I understand",
+  [TranslationKey.TEACHER_MY_CLASSES_NO_DATA]: "No students available",
+  [TranslationKey.TEACHER_MY_CLASSES_LOADING]: "Loading",
+  [TranslationKey.TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER]: "Type at least {{value}} letters to search",
 
   // TeacherStudentDetails
   [TranslationKey.TEACHER_STUDENT_DETAILS_USERNAME]: "Name",
@@ -1086,7 +1100,7 @@ const _SK: Record<TranslationKey, string> = {
 
   // IP Categories
   [TranslationKey.IP_CATEGORY_ALL]: "Všetky adresy",
-  [TranslationKey.IP_CATEGORY_ABC]: "Všetky adresy (A, B, C trieda)",
+  [TranslationKey.IP_CATEGORY_ABC]: "Adresy A, B a C triedy",
   [TranslationKey.IP_CATEGORY_PRIVATE]: "Lokálne adresy (RFC 1918)",
 
   // Breadcrumbs
@@ -1283,7 +1297,7 @@ const _SK: Record<TranslationKey, string> = {
   // Teacher Navbar           |
   [TranslationKey.TEACHER_NAVBAR_DASHBOARD]: "Hlavný panel",
   [TranslationKey.TEACHER_NAVBAR_MY_CLASSES]: "Moje triedy",
-  [TranslationKey.TEACHER_NAVBAR_ASSIGNMENT_GROUPS]: "Skupiny zadaní",
+  [TranslationKey.TEACHER_NAVBAR_ASSIGNMENT_GROUPS]: "Zadania",
 
   // TeacherDashboard
   [TranslationKey.TEACHER_DASHBOARD_TITLE]: "Hlavný panel",
@@ -1341,9 +1355,16 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_MY_CLASSES_SAVE]: "Uložiť",
   [TranslationKey.TEACHER_MY_CLASSES_EDIT_CLASS]: "Upraviť triedu",
   [TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT]: "Upraviť študenta",
+  [TranslationKey.TEACHER_MY_CLASSES_CLASSES_EDIT_SUCCESS]: "Trieda bola úspešne upravená",
+  [TranslationKey.TEACHER_MY_CLASSES_CLASSES_EDIT_ERROR]: "Chyba pri úprave triedy",
+  [TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT_SAVE]: "Uložiť",
+  [TranslationKey.TEACHER_MY_CLASSES_TEACHERS]: "Učitelia",
   [TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_TITLE]: "Upozornenie",
   [TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_MESSAGE]: "Chystáte sa odstrániť seba z tejto triedy. Iba administrátor vás môže pridať späť.",
   [TranslationKey.TEACHER_MY_CLASSES_REMOVE_SELF_WARNING_CONFIRM]: "Rozumiem",
+  [TranslationKey.TEACHER_MY_CLASSES_NO_DATA]: "Žiadni dostupní študenti",
+  [TranslationKey.TEACHER_MY_CLASSES_LOADING]: "Načítavam",
+  [TranslationKey.TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER]: "Zadajte aspoň {{value}} písmená pre vyhľadávanie",
 
   // TeacherStudentDetails
   [TranslationKey.TEACHER_STUDENT_DETAILS_USERNAME]: "Meno",
