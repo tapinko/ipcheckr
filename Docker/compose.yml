@@ -11,8 +11,10 @@ services:
       - DB_USER=ipcheckr
       - DB_PASSWORD=mystrongpassword # CHANGE
       - TZ=Europe/Bratislava
+      - Ldap__Host=server.ldap.example.local
+      - LDAP_HOST=server.ldap.example.local
     ports:
-      - "8081:8081" # https
+      - "8081:8080"
     restart: unless-stopped
 
   db:
