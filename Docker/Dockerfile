@@ -23,10 +23,12 @@ ENV ASPNETCORE_URLS=https://0.0.0.0:8080 \
     ASPNETCORE_ENVIRONMENT=Production \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
-RUN apk add --no-cache openldap ca-certificates \
+RUN apk add --no-cache openldap ca-certificates openssl \
     && update-ca-certificates \
     && if [ ! -e /usr/lib/libldap-2.5.so.0 ]; then ln -s /usr/lib/libldap.so.2 /usr/lib/libldap-2.5.so.0; fi \
     && if [ ! -e /usr/lib/liblber-2.5.so.0 ]; then ln -s /usr/lib/liblber.so.2 /usr/lib/liblber-2.5.so.0; fi
 COPY --from=api-build /app/publish .
+COPY Docker/fetch-ldap-cert.sh /app/fetch-ldap-cert.sh
+RUN chmod +x /app/fetch-ldap-cert.sh
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "IPCheckr.Api.dll"]
+ENTRYPOINT ["/app/fetch-ldap-cert.sh"]
