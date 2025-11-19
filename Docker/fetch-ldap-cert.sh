@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-LDAP_HOST="${LDAP_HOST:-dsm-masina.acdir.tapusik.sk}"
-LDAP_PORT="${LDAP_PORT:-636}"
-LDAP_STARTTLS="${LDAP_STARTTLS:-false}"
-LDAP_FETCH_CERT="${LDAP_FETCH_CERT:-true}"
+LDAP_HOST="${LDAP_HOST}"
+LDAP_PORT="${LDAP_PORT}"
+LDAP_STARTTLS="${LDAP_STARTTLS}"
+LDAP_FETCH_CERT="${LDAP_FETCH_CERT}"
 CERT_FILE="/usr/local/share/ca-certificates/ldap-server.crt"
 
 log() { printf '%s\n' "$*"; }
