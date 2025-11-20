@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -euo pipefail
 
 LDAP_HOST="${LDAP_HOST}"
 LDAP_PORT="${LDAP_PORT:-636}"
@@ -17,16 +17,24 @@ fetch_and_install() {
   else
     cmd="openssl s_client -connect ${LDAP_HOST}:${LDAP_PORT} -showcerts -servername ${LDAP_HOST}"
   fi
-  local raw
-  if ! raw=$(eval "$cmd" </dev/null 2>/dev/null); then
+
+  if ! eval "$cmd" </dev/null 2>/dev/null > /tmp/ldap_s_client.out; then
     warn "OpenSSL connection failed; skipping certificate import"
     return 0
   fi
-  echo "$raw" | awk 'BEGIN{c=0} /BEGIN CERTIFICATE/{c++} {print > ("'$CERT_DIR'/ldap-chain-" c ".crt")}' /dev/null
+  awk -v dir="$CERT_DIR" 'BEGIN{c=0;inside=0} \
+    /-----BEGIN CERTIFICATE-----/{inside=1;c++;file=sprintf("%s/ldap-chain-%d.crt",dir,c)} \
+    {if(inside) print >> file} \
+    /-----END CERTIFICATE-----/{inside=0}' /tmp/ldap_s_client.out
   local count=$(ls -1 $CERT_DIR/ldap-chain-*.crt 2>/dev/null | wc -l | tr -d ' ')
   if [ "$count" -eq 0 ]; then
-    warn "No certificates parsed from server output"
-    return 0
+    sed -n '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/p' /tmp/ldap_s_client.out > "$CERT_DIR/ldap-chain-1.crt" || true
+    if [ -s "$CERT_DIR/ldap-chain-1.crt" ]; then
+      count=1
+    else
+      warn "No certificates parsed from server output"
+      return 0
+    fi
   fi
   for f in $CERT_DIR/ldap-chain-*.crt; do chmod 644 "$f"; done
   if update-ca-certificates 2>/dev/null; then
