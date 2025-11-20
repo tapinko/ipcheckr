@@ -18,6 +18,14 @@ namespace IPCheckr.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var ldapDiag = Environment.GetEnvironmentVariable("LDAP_DIAG");
+            if (string.Equals(ldapDiag, "1", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.Logging.ClearProviders();
+                builder.Logging.AddConsole();
+                builder.Logging.SetMinimumLevel(LogLevel.Debug);
+            }
+
             // HTTPS + self-signed certificate (Production only)
             if (!builder.Environment.IsDevelopment())
             {
