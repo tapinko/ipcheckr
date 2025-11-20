@@ -6,6 +6,8 @@ LDAP_PORT="${LDAP_PORT:-636}"
 LDAP_STARTTLS="${LDAP_STARTTLS}"
 LDAP_FETCH_CERT="${LDAP_FETCH_CERT}"
 CERT_DIR="/usr/local/share/ca-certificates"
+REQCERT_MODE="${LDAP_TLS_REQCERT:-demand}"   # demand|allow|try|never
+TLS_DEBUG="${LDAP_TLS_DEBUG:-false}"          # true/false
 
 log() { printf '%s\n' "$*"; }
 warn() { printf 'WARNING: %s\n' "$*"; }
@@ -49,6 +51,22 @@ if [ "$LDAP_FETCH_CERT" = "true" ] && [ -n "$LDAP_HOST" ]; then
   fetch_and_install
 else
   log "LDAP certificate fetch disabled or host not set"
+fi
+
+mkdir -p /etc/ldap
+cat > /etc/ldap/ldap.conf <<EOF
+TLS_CACERT /etc/ssl/certs/ca-certificates.crt
+TLS_REQCERT ${REQCERT_MODE}
+EOF
+log "OpenLDAP TLS config: TLS_REQCERT=${REQCERT_MODE} (file: /etc/ldap/ldap.conf)"
+
+if [ "$TLS_DEBUG" = "true" ] && [ -n "$LDAP_HOST" ]; then
+  log "TLS debug: openssl s_client handshake to ${LDAP_HOST}:${LDAP_PORT} (STARTTLS=${LDAP_STARTTLS})"
+  if [ "$LDAP_STARTTLS" = "true" ]; then
+    openssl s_client -brief -state -status -starttls ldap -connect "${LDAP_HOST}:${LDAP_PORT}" -servername "$LDAP_HOST" </dev/null || true
+  else
+    openssl s_client -brief -state -status -connect "${LDAP_HOST}:${LDAP_PORT}" -servername "$LDAP_HOST" </dev/null || true
+  fi
 fi
 
 exec dotnet IPCheckr.Api.dll

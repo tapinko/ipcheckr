@@ -55,7 +55,8 @@ namespace IPCheckr.Api.Services.Auth
 
         private LdapAuthResult AuthenticateInternal(string username, string password, LdapSettings _settings)
         {
-            var identifier = new LdapDirectoryIdentifier(_settings.Host, _settings.Port, true, false);
+            // Use fullyQualifiedDnsHostName=false to avoid extra reverse DNS validation which sometimes breaks with internal CA names.
+            var identifier = new LdapDirectoryIdentifier(_settings.Host, _settings.Port, false, false);
             using var connection = new LdapConnection(identifier)
             {
                 SessionOptions =
@@ -70,7 +71,10 @@ namespace IPCheckr.Api.Services.Auth
                 connection.SessionOptions.VerifyServerCertificate += (_, _) => true;
 
             if (_settings.UseSsl)
+            {
+                _logger.LogInformation("LDAP auth: enabling LDAPS before bind");
                 connection.SessionOptions.SecureSocketLayer = true;
+            }
 
             if (_settings.StartTls)
                 connection.SessionOptions.StartTransportLayerSecurity(null);
@@ -125,6 +129,8 @@ namespace IPCheckr.Api.Services.Auth
                 catch (LdapException lex)
                 {
                     _logger.LogWarning(lex, "LDAP auth bind error UserName={UserName} Code={Code} ServerMsg={ServerMsg}", cred.UserName, lex.ErrorCode, lex.ServerErrorMessage);
+                    LogTcpDiagnostics(_settings.Host, _settings.Port);
+                    LogSslHandshakeAttempt(_settings.Host, _settings.Port);
                     throw; // non-credential related error
                 }
             }
@@ -370,6 +376,67 @@ namespace IPCheckr.Api.Services.Auth
                 }
             }
             return sb.ToString();
+        }
+
+        private void LogTcpDiagnostics(string host, int port)
+        {
+            try
+            {
+                using var client = new System.Net.Sockets.TcpClient();
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                var connectTask = client.ConnectAsync(host, port);
+                if (!connectTask.Wait(TimeSpan.FromSeconds(5)))
+                {
+                    _logger.LogWarning("LDAP diag: TCP connect timeout after 5s host={Host} port={Port}", host, port);
+                    return;
+                }
+                sw.Stop();
+                if (client.Connected)
+                {
+                    _logger.LogInformation("LDAP diag: TCP connected host={Host} port={Port} latency={LatencyMs}ms local={Local} remote={Remote}", host, port, sw.ElapsedMilliseconds, client.Client.LocalEndPoint, client.Client.RemoteEndPoint);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "LDAP diag: TCP connect failed host={Host} port={Port}", host, port);
+            }
+        }
+
+        private void LogSslHandshakeAttempt(string host, int port)
+        {
+            try
+            {
+                using var client = new System.Net.Sockets.TcpClient();
+                var connectTask = client.ConnectAsync(host, port);
+                if (!connectTask.Wait(TimeSpan.FromSeconds(5)) || !client.Connected)
+                {
+                    _logger.LogWarning("LDAP diag: cannot initiate SSL handshake (no TCP connection) host={Host} port={Port}", host, port);
+                    return;
+                }
+                using var ssl = new System.Net.Security.SslStream(client.GetStream(), false, (sender, cert, chain, errors) => {
+                    _logger.LogInformation("LDAP diag: SSL cert subject={Subject} issuer={Issuer} errors={Errors}", cert?.Subject, cert?.Issuer, errors);
+                    if (chain != null)
+                    {
+                        for (int i = 0; i < chain.ChainElements.Count; i++)
+                        {
+                            var ce = chain.ChainElements[i];
+                            _logger.LogInformation("LDAP diag: chain[{Index}] subject={Subject} issuer={Issuer} status={Status}", i, ce.Certificate.Subject, ce.Certificate.Issuer, string.Join(";", ce.ChainElementStatus.Select(s => s.StatusInformation.Trim())));
+                        }
+                    }
+                    return true; // allow handshake to proceed for diagnostics
+                });
+                var authTask = ssl.AuthenticateAsClientAsync(host);
+                if (!authTask.Wait(TimeSpan.FromSeconds(8)))
+                {
+                    _logger.LogWarning("LDAP diag: SSL handshake timeout host={Host} port={Port}", host, port);
+                    return;
+                }
+                _logger.LogInformation("LDAP diag: SSL handshake succeeded host={Host} port={Port} protocol={Protocol} cipher={CipherAlgorithm} strength={Strength}", host, port, ssl.SslProtocol, ssl.CipherAlgorithm, ssl.CipherStrength);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "LDAP diag: SSL handshake failed host={Host} port={Port}", host, port);
+            }
         }
     }
 }
