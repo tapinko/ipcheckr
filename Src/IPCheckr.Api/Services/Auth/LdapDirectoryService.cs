@@ -63,6 +63,8 @@ namespace IPCheckr.Api.Services.Auth
             if (s.ConnectTimeoutSeconds > 0)
                 connection.Timeout = TimeSpan.FromSeconds(s.ConnectTimeoutSeconds);
 
+            _logger.LogInformation("LDAP directory: bind Host={Host} Port={Port} UseSsl={UseSsl} StartTls={StartTls} ValidateCert={ValidateCert}", s.Host, s.Port, s.UseSsl, s.StartTls, s.ValidateServerCertificate);
+
             var bindName = (s.BindDn ?? string.Empty).Trim();
             var bindPass = (s.BindPassword ?? string.Empty).Trim();
 
@@ -74,8 +76,10 @@ namespace IPCheckr.Api.Services.Auth
             {
                 try
                 {
+                    _logger.LogDebug("LDAP directory bind attempt with UserName={UserName}", cred.UserName);
                     connection.Bind(cred);
                     bound = true;
+                    _logger.LogInformation("LDAP directory bind succeeded with UserName={UserName}", cred.UserName);
                     break;
                 }
                 catch (LdapException lex) when (lex.ErrorCode == (int)ResultCode.StrongAuthRequired && !s.UseSsl && !s.StartTls)
@@ -84,20 +88,29 @@ namespace IPCheckr.Api.Services.Auth
                     try
                     {
                         connection.SessionOptions.StartTransportLayerSecurity(null);
+                        _logger.LogInformation("LDAP directory StartTLS initiated for UserName={UserName}", cred.UserName);
                         connection.Bind(cred);
                         bound = true;
+                        _logger.LogInformation("LDAP directory bind succeeded after StartTLS with UserName={UserName}", cred.UserName);
                         break;
                     }
                     catch (LdapException inner) when (inner.ErrorCode == 49)
                     {
                         lastInvalidCred = inner;
+                        _logger.LogDebug("LDAP directory invalid credentials after StartTLS UserName={UserName} Code={Code} Msg={Msg}", cred.UserName, inner.ErrorCode, inner.ServerErrorMessage);
                         continue;
                     }
                 }
                 catch (LdapException lex) when (lex.ErrorCode == 49)
                 {
                     lastInvalidCred = lex;
+                    _logger.LogDebug("LDAP directory invalid credentials UserName={UserName} Code={Code} Msg={Msg}", cred.UserName, lex.ErrorCode, lex.ServerErrorMessage);
                     continue;
+                }
+                catch (LdapException lex)
+                {
+                    _logger.LogWarning(lex, "LDAP directory bind error UserName={UserName} Code={Code} Msg={Msg}", cred.UserName, lex.ErrorCode, lex.ServerErrorMessage);
+                    throw; // non credential related
                 }
             }
 
@@ -146,6 +159,7 @@ namespace IPCheckr.Api.Services.Auth
                 }
                 if (list.Count >= limit) break;
             }
+            _logger.LogDebug("LDAP directory search completed Query={Query} Returned={Count} Limit={Limit}", query, list.Count, limit);
             return list;
         }
 

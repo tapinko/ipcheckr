@@ -81,12 +81,16 @@ namespace IPCheckr.Api.Services.Auth
             var candidates = BuildCandidateCredentials(username, password, _settings);
             LdapException? lastInvalidCredEx = null;
             var bound = false;
+            _logger.LogInformation("LDAP auth: attempting bind. Host={Host} Port={Port} UseSsl={UseSsl} StartTls={StartTls} ValidateCert={ValidateCert} Candidates={CandidateCount}",
+                _settings.Host, _settings.Port, _settings.UseSsl, _settings.StartTls, _settings.ValidateServerCertificate, candidates.Count);
             foreach (var cred in candidates)
             {
                 try
                 {
+                    _logger.LogDebug("LDAP auth bind attempt with credential UserName={UserName}", cred.UserName);
                     connection.Bind(cred);
                     bound = true;
+                    _logger.LogInformation("LDAP auth bind succeeded with UserName={UserName}", cred.UserName);
                     break;
                 }
                 catch (LdapException lex) when (lex.ErrorCode == (int)ResultCode.StrongAuthRequired && !_settings.UseSsl && !_settings.StartTls)
@@ -99,28 +103,37 @@ namespace IPCheckr.Api.Services.Auth
                             connection.SessionOptions.VerifyServerCertificate += (_, _) => true;
                         }
                         connection.SessionOptions.StartTransportLayerSecurity(null);
+                        _logger.LogInformation("StartTLS initiated. Retrying bind for UserName={UserName}", cred.UserName);
                         connection.Bind(cred);
                         bound = true;
+                        _logger.LogInformation("LDAP auth bind succeeded after StartTLS with UserName={UserName}", cred.UserName);
                         break;
                     }
                     catch (LdapException innerLex) when (innerLex.ErrorCode == 49)
                     {
                         lastInvalidCredEx = innerLex;
+                        _logger.LogDebug("LDAP auth invalid credentials after StartTLS attempt UserName={UserName} Code={Code} ServerMsg={ServerMsg}", cred.UserName, innerLex.ErrorCode, innerLex.ServerErrorMessage);
                         continue; // try next candidate
                     }
                 }
                 catch (LdapException lex) when (lex.ErrorCode == 49)
                 {
                     lastInvalidCredEx = lex;
+                    _logger.LogDebug("LDAP auth invalid credentials UserName={UserName} Code={Code} ServerMsg={ServerMsg}", cred.UserName, lex.ErrorCode, lex.ServerErrorMessage);
                     continue; // try next candidate as well
+                }
+                catch (LdapException lex)
+                {
+                    _logger.LogWarning(lex, "LDAP auth bind error UserName={UserName} Code={Code} ServerMsg={ServerMsg}", cred.UserName, lex.ErrorCode, lex.ServerErrorMessage);
+                    throw; // non-credential related error
                 }
             }
 
             if (!bound)
             {
                 var reason = lastInvalidCredEx != null
-                    ? "Invalid username/password or domain/UPN mismatch"
-                    : "Bind failed";
+                    ? ($"Invalid username/password or domain/UPN mismatch (Code={lastInvalidCredEx.ErrorCode} Msg={lastInvalidCredEx.ServerErrorMessage})")
+                    : "Bind failed (no credential candidates succeeded)";
                 return new LdapAuthResult { Succeeded = false, FailureReason = reason };
             }
 
@@ -140,6 +153,10 @@ namespace IPCheckr.Api.Services.Auth
                 if (!string.IsNullOrWhiteSpace(cfgStudent) && groups.Contains(cfgStudent))
                     roles.Add(Roles.Student);
             }
+            catch (LdapException lex)
+            {
+                _logger.LogWarning(lex, "Group lookup LDAP error for {UserDn} Code={Code} ServerMsg={ServerMsg}", userDn, lex.ErrorCode, lex.ServerErrorMessage);
+            }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Group lookup failed for {UserDn}", userDn);
@@ -151,7 +168,7 @@ namespace IPCheckr.Api.Services.Auth
                 _logger.LogWarning("Role defaulted to: Student");
             }
 
-            _logger.LogWarning("Final roles: [{Roles}]", string.Join(", ", roles));
+            _logger.LogInformation("LDAP auth success for {NormUser} Roles=[{Roles}]", normUser ?? username, string.Join(", ", roles));
 
             return new LdapAuthResult
             {

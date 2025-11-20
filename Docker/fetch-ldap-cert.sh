@@ -2,39 +2,45 @@
 set -e
 
 LDAP_HOST="${LDAP_HOST}"
-LDAP_PORT="${LDAP_PORT}"
+LDAP_PORT="${LDAP_PORT:-636}"
 LDAP_STARTTLS="${LDAP_STARTTLS}"
 LDAP_FETCH_CERT="${LDAP_FETCH_CERT}"
-CERT_FILE="/usr/local/share/ca-certificates/ldap-server.crt"
+CERT_DIR="/usr/local/share/ca-certificates"
 
 log() { printf '%s\n' "$*"; }
 warn() { printf 'WARNING: %s\n' "$*"; }
 
-if [ "$LDAP_FETCH_CERT" = "true" ]; then
-  log "Fetching LDAP certificate from $LDAP_HOST:$LDAP_PORT (STARTTLS=$LDAP_STARTTLS) ..."
+fetch_and_install() {
+  local cmd
   if [ "$LDAP_STARTTLS" = "true" ]; then
-    FETCH_CMD="openssl s_client -starttls ldap -connect ${LDAP_HOST}:${LDAP_PORT} -showcerts"
+    cmd="openssl s_client -starttls ldap -connect ${LDAP_HOST}:${LDAP_PORT} -showcerts -servername ${LDAP_HOST}"
   else
-    FETCH_CMD="openssl s_client -connect ${LDAP_HOST}:${LDAP_PORT} -showcerts -servername ${LDAP_HOST}"
+    cmd="openssl s_client -connect ${LDAP_HOST}:${LDAP_PORT} -showcerts -servername ${LDAP_HOST}"
   fi
+  local raw
+  if ! raw=$(eval "$cmd" </dev/null 2>/dev/null); then
+    warn "OpenSSL connection failed; skipping certificate import"
+    return 0
+  fi
+  echo "$raw" | awk 'BEGIN{c=0} /BEGIN CERTIFICATE/{c++} {print > ("'$CERT_DIR'/ldap-chain-" c ".crt")}' /dev/null
+  local count=$(ls -1 $CERT_DIR/ldap-chain-*.crt 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$count" -eq 0 ]; then
+    warn "No certificates parsed from server output"
+    return 0
+  fi
+  for f in $CERT_DIR/ldap-chain-*.crt; do chmod 644 "$f"; done
+  if update-ca-certificates 2>/dev/null; then
+    log "Imported $count LDAP certificate(s) into system trust store"
+  else
+    warn "update-ca-certificates failed (continuing)"
+  fi
+}
 
-  if $FETCH_CMD </dev/null 2>/dev/null | sed -n '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/p' > "$CERT_FILE.tmp"; then
-    if [ -s "$CERT_FILE.tmp" ]; then
-      mv "$CERT_FILE.tmp" "$CERT_FILE"
-      chmod 644 "$CERT_FILE"
-      if update-ca-certificates 2>/dev/null; then
-        log "LDAP certificate(s) installed into trust store."
-      else
-        warn "update-ca-certificates failed (continuing)."
-      fi
-    else
-      warn "No certificate data captured; continuing without installing."
-      rm -f "$CERT_FILE.tmp"
-    fi
-  else
-    warn "OpenSSL fetch failed; continuing without installing certificate."
-    rm -f "$CERT_FILE.tmp" 2>/dev/null || true
-  fi
+if [ "$LDAP_FETCH_CERT" = "true" ] && [ -n "$LDAP_HOST" ]; then
+  log "Attempting LDAP certificate fetch from $LDAP_HOST:$LDAP_PORT (STARTTLS=$LDAP_STARTTLS)"
+  fetch_and_install
+else
+  log "LDAP certificate fetch disabled or host not set"
 fi
 
 exec dotnet IPCheckr.Api.dll
