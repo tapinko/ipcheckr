@@ -57,6 +57,13 @@ namespace IPCheckr.Api.Services.Auth
         {
             // Use fullyQualifiedDnsHostName=false to avoid extra reverse DNS validation which sometimes breaks with internal CA names.
             var identifier = new LdapDirectoryIdentifier(_settings.Host, _settings.Port, false, false);
+            _logger.LogInformation("LDAP diag pre-bind: Host={Host} Port={Port} UseSsl={UseSsl} StartTls={StartTls} ValidateCert={ValidateCert} Domain={Domain} BindMode={BindMode} Timeout={Timeout}s", _settings.Host, _settings.Port, _settings.UseSsl, _settings.StartTls, _settings.ValidateServerCertificate, _settings.Domain, _settings.BindMode, _settings.ConnectTimeoutSeconds);
+            LogEnvironmentSnapshot();
+            if (_settings.UseSsl)
+            {
+                // Early SSL handshake probe before using System.DirectoryServices.Protocols
+                EarlySslHandshakeProbe(_settings.Host, _settings.Port, _settings.ValidateServerCertificate);
+            }
             using var connection = new LdapConnection(identifier)
             {
                 SessionOptions =
@@ -436,6 +443,60 @@ namespace IPCheckr.Api.Services.Auth
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "LDAP diag: SSL handshake failed host={Host} port={Port}", host, port);
+            }
+        }
+
+        private void EarlySslHandshakeProbe(string host, int port, bool validate)
+        {
+            try
+            {
+                using var client = new System.Net.Sockets.TcpClient();
+                if (!client.ConnectAsync(host, port).Wait(TimeSpan.FromSeconds(4)))
+                {
+                    _logger.LogWarning("LDAP early probe: TCP timeout host={Host} port={Port}", host, port);
+                    return;
+                }
+                using var ssl = new System.Net.Security.SslStream(client.GetStream(), false, (sender, cert, chain, errors) => {
+                    _logger.LogInformation("LDAP early probe cert: subject={Subject} issuer={Issuer} errors={Errors}", cert?.Subject, cert?.Issuer, errors);
+                    if (chain != null)
+                    {
+                        for (int i = 0; i < chain.ChainElements.Count; i++)
+                        {
+                            var ce = chain.ChainElements[i];
+                            _logger.LogInformation("LDAP early probe chain[{Index}] subject={Subject} issuer={Issuer} status={Status}", i, ce.Certificate.Subject, ce.Certificate.Issuer, string.Join(";", ce.ChainElementStatus.Select(s => s.StatusInformation.Trim())));
+                        }
+                    }
+                    return !validate || errors == System.Net.Security.SslPolicyErrors.None;
+                });
+                var authTask = ssl.AuthenticateAsClientAsync(host);
+                if (!authTask.Wait(TimeSpan.FromSeconds(6)))
+                {
+                    _logger.LogWarning("LDAP early probe: SSL handshake timeout host={Host} port={Port}", host, port);
+                    return;
+                }
+                _logger.LogInformation("LDAP early probe: SSL OK protocol={Protocol} cipher={Cipher} strength={Strength}", ssl.SslProtocol, ssl.CipherAlgorithm, ssl.CipherStrength);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "LDAP early probe: SSL failed host={Host} port={Port}", host, port);
+            }
+        }
+
+        private void LogEnvironmentSnapshot()
+        {
+            try
+            {
+                var envVars = new[] {"LDAP_HOST","LDAP_PORT","LDAP_STARTTLS","LDAP_FETCH_CERT","LDAP_TLS_REQCERT","LDAP_TLS_DEBUG","LDAP_DIAG"};
+                foreach (var v in envVars)
+                {
+                    var val = Environment.GetEnvironmentVariable(v);
+                    if (!string.IsNullOrWhiteSpace(val))
+                        _logger.LogInformation("Env {Key}={Value}", v, val);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to log environment snapshot");
             }
         }
     }
