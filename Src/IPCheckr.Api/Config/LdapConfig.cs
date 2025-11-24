@@ -44,8 +44,6 @@ namespace IPCheckr.Api.Config
         
         public string? TeacherGroupDn { get; set; }
 
-        public bool ValidateServerCertificate { get; set; } = true;
-        
         public int ConnectTimeoutSeconds { get; set; } = 10;
 
         public string? BindDn { get; set; }

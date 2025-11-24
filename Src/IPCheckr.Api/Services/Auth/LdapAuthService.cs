@@ -66,9 +66,6 @@ namespace IPCheckr.Api.Services.Auth
 
             connection.AuthType = AuthType.Basic;
 
-            if (!_settings.ValidateServerCertificate)
-                connection.SessionOptions.VerifyServerCertificate += (_, _) => true;
-
             if (_settings.UseSsl)
                 connection.SessionOptions.SecureSocketLayer = true;
 
@@ -94,10 +91,6 @@ namespace IPCheckr.Api.Services.Auth
                     _logger.LogInformation("LDAP server requires strong auth. Attempting StartTLS fallback before re-binding."); // the worst error :sob:
                     try
                     {
-                        if (!_settings.ValidateServerCertificate)
-                        {
-                            connection.SessionOptions.VerifyServerCertificate += (_, _) => true;
-                        }
                         connection.SessionOptions.StartTransportLayerSecurity(null);
                         connection.Bind(cred);
                         bound = true;

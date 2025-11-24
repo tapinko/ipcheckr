@@ -30,9 +30,10 @@ namespace IPCheckr.Api.Config
             await EnsureAppSettingAsync(db, "AuthType", AuthType.LOCAL.ToString());
 
             await EnsureAppSettingAsync(db, "Ldap_Enabled", "false");
-            await EnsureAppSettingAsync(db, "Ldap_Host", "ldap.example.local");
-            await EnsureAppSettingAsync(db, "Ldap_Port", "389");
-            await EnsureAppSettingAsync(db, "Ldap_UseSsl", "false");
+            await EnsureAppSettingAsync(db, "Ldap_Host", "server.ldap.example.local");
+            await EnsureAppSettingAsync(db, "Ldap_Port", "636");
+            await EnsureAppSettingAsync(db, "Ldap_AllowSelfSignUp", "false");
+            await EnsureAppSettingAsync(db, "Ldap_UseSsl", "true");
             await EnsureAppSettingAsync(db, "Ldap_StartTls", "false");
             await EnsureAppSettingAsync(db, "Ldap_Domain", "ldap.example.local");
             await EnsureAppSettingAsync(db, "Ldap_BindMode", "UpnOrDomain");
@@ -42,7 +43,6 @@ namespace IPCheckr.Api.Config
             await EnsureAppSettingAsync(db, "Ldap_GroupMembershipAttribute", "memberOf");
             await EnsureAppSettingAsync(db, "Ldap_StudentGroupDn", "cn=students,ou=Groups,dc=ldap,dc=example,dc=local");
             await EnsureAppSettingAsync(db, "Ldap_TeacherGroupDn", "cn=teachers,ou=Groups,dc=ldap,dc=example,dc=local");
-            await EnsureAppSettingAsync(db, "Ldap_ValidateServerCertificate", "true");
             await EnsureAppSettingAsync(db, "Ldap_ConnectTimeoutSeconds", "10");
             await EnsureAppSettingAsync(db, "Ldap_BindDn", "");
             await EnsureAppSettingAsync(db, "Ldap_BindPassword", "");

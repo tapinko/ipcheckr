@@ -19,6 +19,7 @@ namespace IPCheckr.Api.Controllers
             var username = (req.Username ?? string.Empty).Trim();
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username);
             var authTypeSetting = await _db.AppSettings.FirstOrDefaultAsync(a => a.Name == "AuthType");
+            var ldapAllowSelfSignUpSetting = await _db.AppSettings.FirstOrDefaultAsync(a => a.Name == "Ldap_AllowSelfSignUp");
             var authTypeRaw = (authTypeSetting?.Value ?? nameof(AuthType.LOCAL)).Trim();
             var parsed = Enum.TryParse<AuthType>(authTypeRaw, true, out var authTypeEnum);
 
@@ -51,6 +52,22 @@ namespace IPCheckr.Api.Controllers
                 var ldapFirst = await _ldapAuth.AuthenticateAsync(username, req.Password);
                 if (ldapFirst.Succeeded)
                 {
+                    // block login if self-signup is disabled
+                    var allowSelfSignUpRaw = (ldapAllowSelfSignUpSetting?.Value ?? "false").Trim().ToLowerInvariant();
+                    var allowSelfSignUp = allowSelfSignUpRaw == "true";
+
+                    if (!allowSelfSignUp && user == null)
+                    {
+                        return StatusCode(StatusCodes.Status401Unauthorized, new ApiProblemDetails
+                        {
+                            Title = "Unauthorized",
+                            Detail = "User is not allowed to sign up via LDAP.",
+                            Status = StatusCodes.Status401Unauthorized,
+                            MessageEn = "User is not allowed to sign up via LDAP.",
+                            MessageSk = "Používateľ sa nemôže prvýkrát prihlásiť cez LDAP.",
+                        });
+                    }
+
                     var roles = ldapFirst.Roles?.Count > 0 ? ldapFirst.Roles : new List<string> { Roles.Student };
                     var roleForResponse = roles.Contains(Roles.Teacher) ? Roles.Teacher : roles[0];
                     var localUser = await EnsureLocalUserForExternalAsync(ldapFirst.NormalizedUsername ?? username, roleForResponse);
