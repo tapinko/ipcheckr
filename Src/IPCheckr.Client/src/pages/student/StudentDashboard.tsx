@@ -73,12 +73,12 @@ const StudentDashboard = () => {
             <Stack spacing={2}>
               <StatsCard
                 title={t(TranslationKey.STUDENT_DASHBOARD_CLASSES)}
-                value={dashboardQuery.data?.classes}
+                value={dashboardQuery.data?.classes ? dashboardQuery.data.classes : "-"}
                 icon={<Class />}
               />
               <StatsCard
                 title={t(TranslationKey.STUDENT_DASHBOARD_TEACHERS)}
-                value={dashboardQuery.data?.teachers}
+                value={dashboardQuery.data?.teachers ? dashboardQuery.data.teachers : "-"}
                 icon={<Groups />}
               />
               <StatsCard
