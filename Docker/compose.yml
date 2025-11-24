@@ -11,6 +11,10 @@ services:
       - DB_USER=ipcheckr
       - DB_PASSWORD=mystrongpassword # CHANGE
       - TZ=Europe/Bratislava
+      - LDAP_HOST=server.ldap.domain.local
+      - LDAP_PORT=636
+      - LDAP_STARTTLS=false
+      - LDAP_FETCH_CERT=true # set this to false if you don't plan to use LDAP authentication
     ports:
       - "8081:8081" # https
     restart: unless-stopped
