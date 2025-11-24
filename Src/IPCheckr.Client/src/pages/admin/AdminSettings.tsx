@@ -29,6 +29,7 @@ const AdminSettings = () => {
   const [ldapEnabled, setLdapEnabled] = useState<boolean>(false)
   const [ldapHost, setLdapHost] = useState<string>("")
   const [ldapPort, setLdapPort] = useState<string>("")
+  const [ldapAllowSelfSignUp, setLdapAllowSelfSignUp] = useState<boolean>(false)
   const [ldapUseSsl, setLdapUseSsl] = useState<boolean>(false)
   const [ldapStartTls, setLdapStartTls] = useState<boolean>(false)
   const [ldapDomain, setLdapDomain] = useState<string>("")
@@ -79,6 +80,7 @@ const AdminSettings = () => {
     enabled: findSettingByName("Ldap_Enabled"),
     host: findSettingByName("Ldap_Host"),
     port: findSettingByName("Ldap_Port"),
+    allowSelfSignUp: findSettingByName("Ldap_AllowSelfSignUp"),
     useSsl: findSettingByName("Ldap_UseSsl"),
     startTls: findSettingByName("Ldap_StartTls"),
     domain: findSettingByName("Ldap_Domain"),
@@ -131,8 +133,9 @@ const AdminSettings = () => {
     }
     if (ldapSettings.enabled) setLdapEnabled(bool(ldapSettings.enabled.value, false)); else setLdapEnabled(false)
     if (ldapSettings.host) setLdapHost(ldapSettings.host.value ?? ""); else setLdapHost("")
-    if (ldapSettings.port) setLdapPort(numStr(ldapSettings.port.value, "389")); else setLdapPort("389")
-    if (ldapSettings.useSsl) setLdapUseSsl(bool(ldapSettings.useSsl.value, false)); else setLdapUseSsl(false)
+    if (ldapSettings.port) setLdapPort(numStr(ldapSettings.port.value, "636")); else setLdapPort("636")
+    if (ldapSettings.allowSelfSignUp) setLdapAllowSelfSignUp(bool(ldapSettings.allowSelfSignUp.value, false)); else setLdapAllowSelfSignUp(false)
+    if (ldapSettings.useSsl) setLdapUseSsl(bool(ldapSettings.useSsl.value, false)); else setLdapUseSsl(true)
     if (ldapSettings.startTls) setLdapStartTls(bool(ldapSettings.startTls.value, false)); else setLdapStartTls(false)
     if (ldapSettings.domain) setLdapDomain(ldapSettings.domain.value ?? ""); else setLdapDomain("")
     if (ldapSettings.bindMode) setLdapBindMode(ldapSettings.bindMode.value ?? "UpnOrDomain"); else setLdapBindMode("UpnOrDomain")
@@ -197,6 +200,7 @@ const AdminSettings = () => {
     pushIfChanged(ldapSettings.enabled, ldapEnabled)
     pushIfChanged(ldapSettings.host, ldapHost)
     pushIfChanged(ldapSettings.port, ldapPort)
+    pushIfChanged(ldapSettings.allowSelfSignUp, ldapAllowSelfSignUp)
     pushIfChanged(ldapSettings.useSsl, ldapUseSsl)
     pushIfChanged(ldapSettings.startTls, ldapStartTls)
     pushIfChanged(ldapSettings.domain, ldapDomain)
@@ -215,7 +219,7 @@ const AdminSettings = () => {
     }
     return list
   }, [language, institutionName, languageSetting, institutionSetting, authType, authSetting,
-      ldapEnabled, ldapHost, ldapPort, ldapUseSsl, ldapStartTls, ldapDomain, ldapBindMode,
+      ldapEnabled, ldapHost, ldapPort, ldapAllowSelfSignUp, ldapUseSsl, ldapStartTls, ldapDomain, ldapBindMode,
       ldapUserDnTemplate, ldapSearchBase, ldapUsernameAttr, ldapGroupAttr, ldapStudentGroupDn,
       ldapTeacherGroupDn, ldapTimeoutSec, ldapSettings, ldapBindDn, ldapBindPassword])
 
@@ -295,6 +299,18 @@ const AdminSettings = () => {
 
             <Typography variant="body2">{t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_PORT)}</Typography>
             <TextField value={ldapPort} onChange={(e) => setLdapPort(e.target.value.replace(/[^0-9]/g, ""))} fullWidth />
+
+            <FormControlLabel
+              control={
+              <Checkbox
+                checked={ldapAllowSelfSignUp}
+                onChange={(e) => setLdapAllowSelfSignUp(e.target.checked)}
+                icon={<RadioButtonUnchecked />}
+                checkedIcon={<RadioButtonChecked />}
+              />
+              }
+              label={t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_ALLOW_SELF_SIGN_UP)}
+            />
 
             <Box sx={{ display: "flex", gap: 3 }}>
               <FormControlLabel

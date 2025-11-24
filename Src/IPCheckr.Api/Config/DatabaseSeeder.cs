@@ -32,6 +32,7 @@ namespace IPCheckr.Api.Config
             await EnsureAppSettingAsync(db, "Ldap_Enabled", "false");
             await EnsureAppSettingAsync(db, "Ldap_Host", "server.ldap.example.local");
             await EnsureAppSettingAsync(db, "Ldap_Port", "636");
+            await EnsureAppSettingAsync(db, "Ldap_AllowSelfSignUp", "false");
             await EnsureAppSettingAsync(db, "Ldap_UseSsl", "true");
             await EnsureAppSettingAsync(db, "Ldap_StartTls", "false");
             await EnsureAppSettingAsync(db, "Ldap_Domain", "ldap.example.local");
