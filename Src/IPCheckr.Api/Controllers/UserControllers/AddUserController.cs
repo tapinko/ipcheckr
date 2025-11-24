@@ -12,7 +12,6 @@ namespace IPCheckr.Api.Controllers
         [ProducesResponseType(typeof(AddUserRes), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status409Conflict)]
         public async Task<ActionResult<AddUserRes>> AddUser([FromBody] AddUserReq req)
         {
             var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Username == req.Username);
@@ -44,6 +43,36 @@ namespace IPCheckr.Api.Controllers
                     MessageEn = "Teachers can only create students in specific classes.",
                     MessageSk = "Učitelia môžu vytvárať študentov iba v konkrétnych triedach."
                 });
+
+            if (callerRole == "Teacher" && req.Role == "Student" && existingUser != null &&
+                string.Equals(existingUser.Role, "Teacher", StringComparison.OrdinalIgnoreCase))
+                return BadRequest(new ApiProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = "You cannot add a teacher as a student.",
+                    Status = StatusCodes.Status403Forbidden,
+                    MessageEn = "You cannot add a teacher as a student.",
+                    MessageSk = "Nie je možné pridať učiteľa ako študenta."
+                });
+
+            if (isLdapAuth && callerRole == "Teacher" && req.Role == "Student")
+            {
+                var ldapSettings = await _ldapSettingsProvider.GetCurrentAsync();
+                if (ldapSettings.Enabled && !string.IsNullOrWhiteSpace(ldapSettings.TeacherGroupDn))
+                {
+                    var hits = await _ldapDirectory.SearchUsersAsync(req.Username, groupDn: ldapSettings.TeacherGroupDn, limit: 10);
+                    var isTeacherInLdap = hits.Any(u => string.Equals(u.Username, req.Username, StringComparison.OrdinalIgnoreCase));
+                    if (isTeacherInLdap)
+                        return BadRequest(new ApiProblemDetails
+                        {
+                            Title = "Forbidden",
+                            Detail = "You cannot add a teacher as a student.",
+                            Status = StatusCodes.Status403Forbidden,
+                            MessageEn = "You cannot add a teacher as a student.",
+                            MessageSk = "Nie je možné pridať učiteľa ako študenta."
+                        });
+                }
+            }
 
             List<Class> classes = [];
             if (req.ClassIds != null && req.ClassIds.Length > 0)
