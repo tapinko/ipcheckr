@@ -17,16 +17,16 @@ COPY --from=client-build /client/dist/ Src/IPCheckr.Api/wwwroot/
 WORKDIR /src/Src/IPCheckr.Api
 RUN dotnet publish -c Release -o /app/publish -p:UseAppHost=false -p:DebugType=None -p:SkipCopyingSymbols=true
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-ENV ASPNETCORE_URLS=https://0.0.0.0:8080 \
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080 \
     ASPNETCORE_ENVIRONMENT=Production \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
-RUN apk add --no-cache openldap ca-certificates openssl \
-    && update-ca-certificates \
-    && if [ ! -e /usr/lib/libldap-2.5.so.0 ]; then ln -s /usr/lib/libldap.so.2 /usr/lib/libldap-2.5.so.0; fi \
-    && if [ ! -e /usr/lib/liblber-2.5.so.0 ]; then ln -s /usr/lib/liblber.so.2 /usr/lib/liblber-2.5.so.0; fi
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates openssl ldap-utils tzdata \
+    && rm -rf /var/lib/apt/lists/* \
+    && update-ca-certificates
 COPY --from=api-build /app/publish .
 COPY Docker/fetch-ldap-cert.sh /app/fetch-ldap-cert.sh
 RUN chmod +x /app/fetch-ldap-cert.sh
