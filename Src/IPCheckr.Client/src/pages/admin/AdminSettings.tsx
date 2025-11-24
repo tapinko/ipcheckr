@@ -10,6 +10,7 @@ import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert
 import i18n, { Language, TranslationKey } from "../../utils/i18n"
 import type { AxiosError, AxiosResponse } from "axios"
 import AuthType from "../../types/AuthType"
+import { RadioButtonChecked, RadioButtonUnchecked } from "@mui/icons-material"
 
 const AdminSettings = () => {
   const { t } = useTranslation()
@@ -27,19 +28,18 @@ const AdminSettings = () => {
   
   const [ldapEnabled, setLdapEnabled] = useState<boolean>(false)
   const [ldapHost, setLdapHost] = useState<string>("")
-  const [ldapPort, setLdapPort] = useState<string>("389")
+  const [ldapPort, setLdapPort] = useState<string>("")
   const [ldapUseSsl, setLdapUseSsl] = useState<boolean>(false)
   const [ldapStartTls, setLdapStartTls] = useState<boolean>(false)
   const [ldapDomain, setLdapDomain] = useState<string>("")
-  const [ldapBindMode, setLdapBindMode] = useState<string>("UpnOrDomain")
+  const [ldapBindMode, setLdapBindMode] = useState<string>("")
   const [ldapUserDnTemplate, setLdapUserDnTemplate] = useState<string>("")
   const [ldapSearchBase, setLdapSearchBase] = useState<string>("")
-  const [ldapUsernameAttr, setLdapUsernameAttr] = useState<string>("sAMAccountName")
-  const [ldapGroupAttr, setLdapGroupAttr] = useState<string>("memberOf")
+  const [ldapUsernameAttr, setLdapUsernameAttr] = useState<string>("")
+  const [ldapGroupAttr, setLdapGroupAttr] = useState<string>("")
   const [ldapStudentGroupDn, setLdapStudentGroupDn] = useState<string>("")
   const [ldapTeacherGroupDn, setLdapTeacherGroupDn] = useState<string>("")
-  const [ldapValidateCert, setLdapValidateCert] = useState<boolean>(true)
-  const [ldapTimeoutSec, setLdapTimeoutSec] = useState<string>("10")
+  const [ldapTimeoutSec, setLdapTimeoutSec] = useState<string>("")
   const [ldapBindDn, setLdapBindDn] = useState<string>("")
   const [ldapBindPassword, setLdapBindPassword] = useState<string>("")
 
@@ -89,7 +89,6 @@ const AdminSettings = () => {
     groupAttr: findSettingByName("Ldap_GroupMembershipAttribute"),
     studentGroupDn: findSettingByName("Ldap_StudentGroupDn"),
     teacherGroupDn: findSettingByName("Ldap_TeacherGroupDn"),
-    validateCert: findSettingByName("Ldap_ValidateServerCertificate"),
     timeoutSec: findSettingByName("Ldap_ConnectTimeoutSeconds"),
     bindDn: findSettingByName("Ldap_BindDn"),
     bindPassword: findSettingByName("Ldap_BindPassword"),
@@ -143,7 +142,6 @@ const AdminSettings = () => {
     if (ldapSettings.groupAttr) setLdapGroupAttr(ldapSettings.groupAttr.value ?? "memberOf"); else setLdapGroupAttr("memberOf")
     if (ldapSettings.studentGroupDn) setLdapStudentGroupDn(ldapSettings.studentGroupDn.value ?? ""); else setLdapStudentGroupDn("")
     if (ldapSettings.teacherGroupDn) setLdapTeacherGroupDn(ldapSettings.teacherGroupDn.value ?? ""); else setLdapTeacherGroupDn("")
-    if (ldapSettings.validateCert) setLdapValidateCert(bool(ldapSettings.validateCert.value, true)); else setLdapValidateCert(true)
     if (ldapSettings.timeoutSec) setLdapTimeoutSec(numStr(ldapSettings.timeoutSec.value, "10")); else setLdapTimeoutSec("10")
     if (ldapSettings.bindDn) setLdapBindDn(ldapSettings.bindDn.value ?? ""); else setLdapBindDn("")
 
@@ -209,7 +207,6 @@ const AdminSettings = () => {
     pushIfChanged(ldapSettings.groupAttr, ldapGroupAttr)
     pushIfChanged(ldapSettings.studentGroupDn, ldapStudentGroupDn)
     pushIfChanged(ldapSettings.teacherGroupDn, ldapTeacherGroupDn)
-    pushIfChanged(ldapSettings.validateCert, ldapValidateCert)
     pushIfChanged(ldapSettings.timeoutSec, ldapTimeoutSec)
     pushIfChanged(ldapSettings.bindDn, ldapBindDn)
 
@@ -220,7 +217,7 @@ const AdminSettings = () => {
   }, [language, institutionName, languageSetting, institutionSetting, authType, authSetting,
       ldapEnabled, ldapHost, ldapPort, ldapUseSsl, ldapStartTls, ldapDomain, ldapBindMode,
       ldapUserDnTemplate, ldapSearchBase, ldapUsernameAttr, ldapGroupAttr, ldapStudentGroupDn,
-      ldapTeacherGroupDn, ldapValidateCert, ldapTimeoutSec, ldapSettings, ldapBindDn, ldapBindPassword])
+      ldapTeacherGroupDn, ldapTimeoutSec, ldapSettings, ldapBindDn, ldapBindPassword])
 
   const saveDisabled = changedFields.length === 0 || editMutation.isPending
 
@@ -300,9 +297,36 @@ const AdminSettings = () => {
             <TextField value={ldapPort} onChange={(e) => setLdapPort(e.target.value.replace(/[^0-9]/g, ""))} fullWidth />
 
             <Box sx={{ display: "flex", gap: 3 }}>
-              <FormControlLabel control={<Checkbox checked={ldapUseSsl} onChange={(e) => { setLdapUseSsl(e.target.checked); if (e.target.checked) setLdapStartTls(false) }} />} label={t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_USE_SSL)} />
-              <FormControlLabel control={<Checkbox checked={ldapStartTls} onChange={(e) => { setLdapStartTls(e.target.checked); if (e.target.checked) setLdapUseSsl(false) }} />} label={t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_USE_STARTTLS)} />
-              <FormControlLabel control={<Checkbox checked={ldapValidateCert} onChange={(e) => setLdapValidateCert(e.target.checked)} />} label={t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_VALIDATE_CERT)} />
+              <FormControlLabel
+              control={
+                <Checkbox
+                checked={ldapUseSsl}
+                onChange={(e) => {
+                  const checked = e.target.checked
+                  setLdapUseSsl(checked)
+                  if (checked) setLdapStartTls(false)
+                }}
+                icon={<RadioButtonUnchecked />}
+                checkedIcon={<RadioButtonChecked />}
+                />
+              }
+              label={t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_USE_SSL)}
+              />
+              <FormControlLabel
+              control={
+                <Checkbox
+                checked={ldapStartTls}
+                onChange={(e) => {
+                  const checked = e.target.checked
+                  setLdapStartTls(checked)
+                  if (checked) setLdapUseSsl(false)
+                }}
+                icon={<RadioButtonUnchecked />}
+                checkedIcon={<RadioButtonChecked />}
+                />
+              }
+              label={t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_USE_STARTTLS)}
+              />
             </Box>
 
             <Divider textAlign="left">{t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_MODE)}</Divider>

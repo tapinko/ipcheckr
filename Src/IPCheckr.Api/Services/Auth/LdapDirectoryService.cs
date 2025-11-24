@@ -56,8 +56,6 @@ namespace IPCheckr.Api.Services.Auth
                 SessionOptions = { ProtocolVersion = 3 }
             };
             connection.AuthType = AuthType.Basic;
-            if (!s.ValidateServerCertificate)
-                connection.SessionOptions.VerifyServerCertificate += (_, _) => true;
             if (s.UseSsl) connection.SessionOptions.SecureSocketLayer = true;
             if (s.StartTls) connection.SessionOptions.StartTransportLayerSecurity(null);
             if (s.ConnectTimeoutSeconds > 0)

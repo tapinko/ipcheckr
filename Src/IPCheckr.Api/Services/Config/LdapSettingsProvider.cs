@@ -37,7 +37,6 @@ namespace IPCheckr.Api.Services.Config
                 GroupMembershipAttribute = _options.Value.GroupMembershipAttribute,
                 StudentGroupDn = _options.Value.StudentGroupDn,
                 TeacherGroupDn = _options.Value.TeacherGroupDn,
-                ValidateServerCertificate = _options.Value.ValidateServerCertificate,
                 ConnectTimeoutSeconds = _options.Value.ConnectTimeoutSeconds,
                 BindDn = _options.Value.BindDn,
                 BindPassword = _options.Value.BindPassword
@@ -66,7 +65,6 @@ namespace IPCheckr.Api.Services.Config
                     case "Ldap_GroupMembershipAttribute": if (!string.IsNullOrWhiteSpace(val)) s.GroupMembershipAttribute = val; break;
                     case "Ldap_StudentGroupDn": s.StudentGroupDn = string.IsNullOrWhiteSpace(val) ? null : val; break;
                     case "Ldap_TeacherGroupDn": s.TeacherGroupDn = string.IsNullOrWhiteSpace(val) ? null : val; break;
-                    case "Ldap_ValidateServerCertificate": s.ValidateServerCertificate = ParseBool(val, s.ValidateServerCertificate); break;
                     case "Ldap_ConnectTimeoutSeconds": s.ConnectTimeoutSeconds = ParseInt(val, s.ConnectTimeoutSeconds); break;
                     case "Ldap_BindDn": s.BindDn = string.IsNullOrWhiteSpace(val) ? null : val; break;
                     case "Ldap_BindPassword": s.BindPassword = string.IsNullOrWhiteSpace(val) ? null : val; break;
