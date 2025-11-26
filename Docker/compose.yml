@@ -14,11 +14,8 @@ services:
       - LDAP_HOST=server.ldap.example.local
       - LDAP_PORT=636
       - LDAP_STARTTLS=false
-<<<<<<< HEAD
       - LDAP_FETCH_CERT=true
-=======
       - LDAP_FETCH_CERT=true # set this to false if you don't plan to use LDAP authentication
->>>>>>> feature/ldap-auth
     ports:
       - "8081:8080"
     dns:

@@ -7,14 +7,12 @@ LDAP_PORT="${LDAP_PORT}"
 LDAP_STARTTLS="${LDAP_STARTTLS}"
 LDAP_FETCH_CERT="${LDAP_FETCH_CERT}"
 CERT_FILE="/usr/local/share/ca-certificates/ldap-server.crt"
-=======
 LDAP_PORT="${LDAP_PORT:-636}"
 LDAP_STARTTLS="${LDAP_STARTTLS}"
 LDAP_FETCH_CERT="${LDAP_FETCH_CERT}"
 CERT_DIR="/usr/local/share/ca-certificates"
 REQCERT_MODE="${LDAP_TLS_REQCERT:-demand}"   # demand|allow|try|never
 TLS_DEBUG="${LDAP_TLS_DEBUG:-false}"
->>>>>>> feature/ldap-auth
 
 log() { printf '%s\n' "$*"; }
 warn() { printf 'WARNING: %s\n' "$*"; }
