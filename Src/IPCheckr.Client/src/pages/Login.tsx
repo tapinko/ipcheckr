@@ -81,26 +81,34 @@ const Login = () => {
         alignItems="center"
         minHeight="100vh"
         bgcolor="background.default"
-        gap={6}
+        gap={{ xs: 3, md: 6 }}
+        px={{ xs: 2, sm: 4 }}
+        py={{ xs: 4, md: 6 }}
       >
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={{ xs: 1.5, sm: 2 }}
+          alignItems="center"
+          justifyContent="center"
+          sx={{ flexWrap: "nowrap", textAlign: "center" }}
+        >
           <Box
             component="img"
             src={bg_w_cr_text}
             alt="IPCheckr"
             sx={{
-              height: 56,
+              height: { xs: 48, sm: 56 },
               display: "block",
               filter: "drop-shadow(0px 6px 6px rgba(0, 0, 0, 0.3))",
             }}
           />
-          <Divider orientation="vertical" flexItem />
+          <Divider orientation="vertical" flexItem sx={{ height: 40 }} />
           <Box
             component="a"
             href="https://github.com/tapinko/ipcheckr"
             target="_blank"
             rel="noopener noreferrer"
-            sx={{ display: "flex", alignItems: "center" }}
+            sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
           >
             <GitHub fontSize="large" color="action" />
           </Box>
@@ -111,9 +119,17 @@ const Login = () => {
           justifyContent="center"
           alignItems="center"
           width="100%"
-          height="100%"
         >
-          <Paper elevation={3} sx={{ p: 4, width: "30%" }}>
+          <Paper
+            elevation={3}
+            sx={{
+              width: "100%",
+              maxWidth: 420, // haha
+              mx: "auto",
+              p: { xs: 3, sm: 4 },
+              borderRadius: 3,
+            }}
+          >
             <Typography variant="h5" mb={2} align="center">
               {t(TranslationKey.LOGIN_TITLE)}
             </Typography>
