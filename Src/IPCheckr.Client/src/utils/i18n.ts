@@ -41,6 +41,10 @@ export enum TranslationKey {
   // Navbar
   NAVBAR_LOGOUT = "NAVBAR_LOGOUT",
   NAVBAR_LOGGED_IN_AS = "NAVBAR_LOGGED_IN_AS",
+  NAVBAR_THEME = "NAVBAR_THEME",
+  NAVBAR_THEME_LIGHT = "NAVBAR_THEME_LIGHT",
+  NAVBAR_THEME_DARK = "NAVBAR_THEME_DARK",
+  NAVBAR_LANGUAGE = "NAVBAR_LANGUAGE",
 
   // DeleteDialog
   DELETE_DIALOG_DELETE = "DELETE_DIALOG_DELETE",
@@ -555,6 +559,10 @@ const _EN: Record<TranslationKey, string> = {
   // Navbar
   [TranslationKey.NAVBAR_LOGOUT]: "Logout",
   [TranslationKey.NAVBAR_LOGGED_IN_AS]: "Logged in as:",
+  [TranslationKey.NAVBAR_THEME]: "Theme",
+  [TranslationKey.NAVBAR_THEME_LIGHT]: "Light mode",
+  [TranslationKey.NAVBAR_THEME_DARK]: "Dark mode",
+  [TranslationKey.NAVBAR_LANGUAGE]: "Language",
 
   // DeleteDialog
   [TranslationKey.DELETE_DIALOG_DELETE]: "Delete",
@@ -1066,6 +1074,10 @@ const _SK: Record<TranslationKey, string> = {
   // Navbar
   [TranslationKey.NAVBAR_LOGOUT]: "Odhlásiť sa",
   [TranslationKey.NAVBAR_LOGGED_IN_AS]: "Prihlásený ako:",
+  [TranslationKey.NAVBAR_THEME]: "Téma",
+  [TranslationKey.NAVBAR_THEME_LIGHT]: "Svetlý režim",
+  [TranslationKey.NAVBAR_THEME_DARK]: "Tmavý režim",
+  [TranslationKey.NAVBAR_LANGUAGE]: "Jazyk",
 
   // DeleteDialog
   [TranslationKey.DELETE_DIALOG_DELETE]: "Odstrániť",
