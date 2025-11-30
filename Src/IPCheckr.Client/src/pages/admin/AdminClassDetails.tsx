@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   Chip,
-  Grid,
   Stack,
   Tooltip,
   Typography,
@@ -29,6 +28,7 @@ import {
   TaskAlt,
 } from "@mui/icons-material"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
 
 const AdminClassDetails = () => {
   const { t } = useTranslation()
@@ -68,90 +68,82 @@ const AdminClassDetails = () => {
   return (
     <>
       <Stack spacing={2}>
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.ADMIN_CLASS_DETAILS_CLASS_NAME)}
-                value={detailsQuery.data?.className}
-                icon={<Class />}
-              />
-            </Stack>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.ADMIN_CLASS_DETAILS_CREATED_AT)}
-                value={new Date(detailsQuery.data?.createdAt ?? "").toLocaleString()}
-                icon={<Groups />}
-              />
-              <Tooltip title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}>
-                <Box>
-                  <StatsCard
-                    title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
-                    value={`${detailsQuery.data?.averageSuccessRate.toFixed(2)}%`}
-                    icon={<Percent />}
-                  />
-                </Box>
-              </Tooltip>
-              <StatsCard
-                title={t(TranslationKey.ADMIN_CLASS_DETAILS_LAST_SUBMIT)}
-                value={
-                  detailsQuery.data?.lastSubmitUsername ? (
-                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                      <span>{detailsQuery.data.lastSubmitUsername}</span>
-                      {detailsQuery.data.lastSubmitAt && (
-                        <Chip
-                          size="small"
-                          icon={<AccessTime />}
-                          label={new Date(detailsQuery.data.lastSubmitAt).toLocaleString()}
-                          variant="outlined"
-                        />
-                      )}
-                    </Stack>
-                  ) : ("-")
-                }
-                icon={<AccessTime />}
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_SUBMITS)}
-                value={detailsQuery.data?.totalSubmits}
-                icon={<TaskAlt />}
-              />
-            </Stack>
-          </Grid>
-
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
-                value={detailsQuery.data?.totalAssignmentGroups}
-                icon={<Quiz />}
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_UPCOMING)}
-                value={detailsQuery.data?.totalUpcoming}
-                icon={<AccessTime />}
-                color="default"
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_IN_PROGRESS)}
-                value={detailsQuery.data?.totalInProgress}
-                icon={<AccessTime />}
-                color="warning"
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ENDED)}
-                value={detailsQuery.data?.totalEnded}
-                icon={<AccessTime />}
-                color="success"
-              />
-            </Stack>
-          </Grid>
-        </Grid>
+        <ResponsiveStatsSection
+          highlight={
+            <StatsCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_CLASS_NAME)}
+              value={detailsQuery.data?.className}
+              icon={<Class />}
+            />
+          }
+          leftColumn={[
+            <StatsCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_CREATED_AT)}
+              value={new Date(detailsQuery.data?.createdAt ?? "").toLocaleString()}
+              icon={<Groups />}
+            />,
+            <Tooltip
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}
+            >
+              <Box>
+                <StatsCard
+                  title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
+                  value={`${detailsQuery.data?.averageSuccessRate.toFixed(2)}%`}
+                  icon={<Percent />}
+                />
+              </Box>
+            </Tooltip>,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_LAST_SUBMIT)}
+              value={
+                detailsQuery.data?.lastSubmitUsername ? (
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                    <span>{detailsQuery.data.lastSubmitUsername}</span>
+                    {detailsQuery.data.lastSubmitAt && (
+                      <Chip
+                        size="small"
+                        icon={<AccessTime />}
+                        label={new Date(detailsQuery.data.lastSubmitAt).toLocaleString()}
+                        variant="outlined"
+                      />
+                    )}
+                  </Stack>
+                ) : ("-")
+              }
+              icon={<AccessTime />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_SUBMITS)}
+              value={detailsQuery.data?.totalSubmits}
+              icon={<TaskAlt />}
+            />
+          ]}
+          rightColumn={[
+            <StatsCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
+              value={detailsQuery.data?.totalAssignmentGroups}
+              icon={<Quiz />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_UPCOMING)}
+              value={detailsQuery.data?.totalUpcoming}
+              icon={<AccessTime />}
+              color="default"
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_IN_PROGRESS)}
+              value={detailsQuery.data?.totalInProgress}
+              icon={<AccessTime />}
+              color="warning"
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ENDED)}
+              value={detailsQuery.data?.totalEnded}
+              icon={<AccessTime />}
+              color="success"
+            />
+          ]}
+        />
 
         <Stack spacing={2} direction="row">
           <Box flex={1}>

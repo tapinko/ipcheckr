@@ -15,8 +15,7 @@ import {
   Chip,
   Divider,
   Typography,
-  Stack,
-  Grid
+  Stack
 } from "@mui/material"
 import { useNavigate, useParams } from "react-router-dom"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
@@ -37,6 +36,7 @@ import {
   Quiz,
   TaskAlt
 } from "@mui/icons-material"
+import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
 
 interface IAssignmentGroupSubmitDetailsCard {
   assignmentId: number
@@ -199,8 +199,8 @@ const TeacherAssignmentGroupDetails = () => {
   return (
     <>
       <Stack spacing={2}>
-        <Grid container spacing={2}>
-          <Grid flex={1}>
+        <ResponsiveStatsSection
+          highlight={
             <Stack spacing={2}>
               <StatsCard
                 title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_NAME)}
@@ -214,72 +214,64 @@ const TeacherAssignmentGroupDetails = () => {
                 icon={<Description />}
               />
             </Stack>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_IP_CATEGORY)}
-                value={
-                  data?.assignmentGroupIpCat
-                    ? getIpCatLabel(data.assignmentGroupIpCat, t)
-                    : "-"
-                }
-                icon={<Category />}
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CLASS)}
-                value={data?.className ?? "-"}
-                icon={<Class />}
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_NUMBER_OF_RECORDS)}
-                value={data?.numberOfRecords ?? "-"}
-                icon={<Dns />}
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_POSSIBLE_ATTEMPTS)}
-                value={data?.possibleAttempts ?? "-"}
-                icon={<PlaylistAddCheck />}
-              />
-            </Stack>
-          </Grid>
-
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMITTED)}
-                value={`${data?.submitted}/${data?.total}`}
-                icon={<TaskAlt />}
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE)}
-                value={`${data?.successRate.toFixed(2)}%`}
-                icon={<Percent />}
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_START_DATE)}
-                value={
-                  data?.startDate
-                    ? new Date(data.startDate).toLocaleString()
-                    : "-"
-                }
-                icon={<AccessTime />}
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DEADLINE)}
-                value={
-                  data?.deadline
-                    ? new Date(data.deadline).toLocaleString()
-                    : "-"
-                }
-                icon={<AccessTime />}
-              />
-            </Stack>
-          </Grid>
-        </Grid>
+          }
+          leftColumn={[
+            <StatsCard
+              title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_IP_CATEGORY)}
+              value={
+                data?.assignmentGroupIpCat
+                  ? getIpCatLabel(data.assignmentGroupIpCat, t)
+                  : "-"
+              }
+              icon={<Category />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CLASS)}
+              value={data?.className ?? "-"}
+              icon={<Class />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_NUMBER_OF_RECORDS)}
+              value={data?.numberOfRecords ?? "-"}
+              icon={<Dns />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_POSSIBLE_ATTEMPTS)}
+              value={data?.possibleAttempts ?? "-"}
+              icon={<PlaylistAddCheck />}
+            />
+          ]}
+          rightColumn={[
+            <StatsCard
+              title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMITTED)}
+              value={`${data?.submitted}/${data?.total}`}
+              icon={<TaskAlt />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE)}
+              value={`${data?.successRate.toFixed(2)}%`}
+              icon={<Percent />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_START_DATE)}
+              value={
+                data?.startDate
+                  ? new Date(data.startDate).toLocaleString()
+                  : "-"
+              }
+              icon={<AccessTime />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_DEADLINE)}
+              value={
+                data?.deadline
+                  ? new Date(data.deadline).toLocaleString()
+                  : "-"
+              }
+              icon={<AccessTime />}
+            />
+          ]}
+        />
 
         <Divider sx={{ my: 2 }} />
 

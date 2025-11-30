@@ -2,7 +2,6 @@ import {
   Box,
   Chip,
   Divider,
-  Grid,
   Stack,
   Typography,
   Button,
@@ -26,6 +25,7 @@ import { dashboardApi } from "../../utils/apiClients"
 import type { QueryAdminDashboardRes } from "../../dtos"
 import { useEffect, useMemo, useRef, useState } from "react"
 import getApiBase from "../../utils/getApiBase"
+import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
 
 type LogLevel = "Trace" | "Debug" | "Information" | "Warning" | "Error" | "Critical"
 type StreamLogEntry = {
@@ -245,86 +245,76 @@ const AdminDashboard = () => {
           }
         />
       ) : (<Stack spacing={2}>
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_INSTITUTION_NAME)}
-                value={dashboardQuery.data?.institutionName ?? "-"}
-                icon={<School />}
-              />
-            </Stack>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT)}
-                value={
-                  dashboardQuery.data?.lastSubmitUsername ? (
-                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                      <span>{dashboardQuery.data.lastSubmitUsername}</span>
-                      {dashboardQuery.data.lastSubmitAt && (
-                        <Chip
-                          size="small"
-                          icon={<AccessTime />}
-                          label={new Date(dashboardQuery.data.lastSubmitAt).toLocaleString()}
-                          variant="outlined"
-                        />
-                      )}
-                    </Stack>
-                  ) : ("-")
-                }
-                icon={<AccessTime />}
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_SUBMITS)}
-                value={dashboardQuery.data?.totalSubmits}
-                icon={<TaskAlt />}
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_CLASSES)}
-                value={dashboardQuery.data?.totalClasses}
-                icon={<Class />}
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_STUDENTS)}
-                value={dashboardQuery.data?.totalStudents}
-                icon={<Groups />}
-              />
-            </Stack>
-          </Grid>
-
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
-                value={dashboardQuery.data?.totalAssignmentGroups}
-                icon={<Quiz />}
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_UPCOMING)}
-                value={dashboardQuery.data?.totalUpcoming}
-                icon={<AccessTime />}
-                color="default"
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_IN_PROGRESS)}
-                value={dashboardQuery.data?.totalInProgress}
-                icon={<AccessTime />}
-                color="warning"
-              />
-              <StatsCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ENDED)}
-                value={dashboardQuery.data?.totalEnded}
-                icon={<AccessTime />}
-                color="success"
-              />
-            </Stack>
-          </Grid>
-        </Grid>
+        <ResponsiveStatsSection
+          highlight={
+            <StatsCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_INSTITUTION_NAME)}
+              value={dashboardQuery.data?.institutionName ?? "-"}
+              icon={<School />}
+            />
+          }
+          leftColumn={[
+            <StatsCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT)}
+              value={
+                dashboardQuery.data?.lastSubmitUsername ? (
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                    <span>{dashboardQuery.data.lastSubmitUsername}</span>
+                    {dashboardQuery.data.lastSubmitAt && (
+                      <Chip
+                        size="small"
+                        icon={<AccessTime />}
+                        label={new Date(dashboardQuery.data.lastSubmitAt).toLocaleString()}
+                        variant="outlined"
+                      />
+                    )}
+                  </Stack>
+                ) : ("-")
+              }
+              icon={<AccessTime />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_SUBMITS)}
+              value={dashboardQuery.data?.totalSubmits}
+              icon={<TaskAlt />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_CLASSES)}
+              value={dashboardQuery.data?.totalClasses}
+              icon={<Class />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_STUDENTS)}
+              value={dashboardQuery.data?.totalStudents}
+              icon={<Groups />}
+            />
+          ]}
+          rightColumn={[
+            <StatsCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
+              value={dashboardQuery.data?.totalAssignmentGroups}
+              icon={<Quiz />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_UPCOMING)}
+              value={dashboardQuery.data?.totalUpcoming}
+              icon={<AccessTime />}
+              color="default"
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_IN_PROGRESS)}
+              value={dashboardQuery.data?.totalInProgress}
+              icon={<AccessTime />}
+              color="warning"
+            />,
+            <StatsCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ENDED)}
+              value={dashboardQuery.data?.totalEnded}
+              icon={<AccessTime />}
+              color="success"
+            />
+          ]}
+        />
 
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Stack direction="row" spacing={2} alignItems="flex-end" flexWrap="wrap">

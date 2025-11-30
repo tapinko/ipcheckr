@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Divider,
-  Grid,
   Stack,
   Typography,
   Card,
@@ -22,6 +21,7 @@ import { useAuth } from "../../contexts/AuthContext"
 import { LineChart } from "@mui/x-charts"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { useNavigate } from "react-router-dom"
+import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
 
 const StudentDashboard = () => {
   const { t } = useTranslation()
@@ -56,93 +56,85 @@ const StudentDashboard = () => {
           }
         />
       ) : (<Stack spacing={2}>
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_INSTITUTION_NAME)}
-                value={dashboardQuery.data?.institutionName ?? "-"}
-                icon={<School />}
-              />
-            </Stack>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_CLASSES)}
-                value={dashboardQuery.data?.classes ? dashboardQuery.data.classes : "-"}
-                icon={<Class />}
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_TEACHERS)}
-                value={dashboardQuery.data?.teachers ? dashboardQuery.data.teachers : "-"}
-                icon={<Groups />}
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_SUBMITS)}
-                value={dashboardQuery.data?.totalSubmits}
-                icon={<TaskAlt />}
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_LAST_SUBMIT)}
-                value={
-                  dashboardQuery.data?.lastSubmitAt ? (
-                      new Date(dashboardQuery.data.lastSubmitAt).toLocaleString()
-                  ) : ("-")
-                }
-                icon={<AccessTime />}
-                actions={
-                  <Button variant="outlined" onClick={() => 
+        <ResponsiveStatsSection
+          highlight={
+            <StatsCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_INSTITUTION_NAME)}
+              value={dashboardQuery.data?.institutionName ?? "-"}
+              icon={<School />}
+            />
+          }
+          leftColumn={[
+            <StatsCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_CLASSES)}
+              value={dashboardQuery.data?.classes ? dashboardQuery.data.classes : "-"}
+              icon={<Class />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TEACHERS)}
+              value={dashboardQuery.data?.teachers ? dashboardQuery.data.teachers : "-"}
+              icon={<Groups />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_SUBMITS)}
+              value={dashboardQuery.data?.totalSubmits}
+              icon={<TaskAlt />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_LAST_SUBMIT)}
+              value={
+                dashboardQuery.data?.lastSubmitAt ? (
+                  new Date(dashboardQuery.data.lastSubmitAt).toLocaleString()
+                ) : ("-")
+              }
+              icon={<AccessTime />}
+              actions={
+                <Button
+                  variant="outlined"
+                  onClick={() =>
                     navigate(
                       getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_DETAILS, {
                         [RouteParams.ASSIGNMENT_ID]: dashboardQuery.data?.lastSubmitId!.toString(),
                         [RouteParams.ATTEMPT]: "1"
                       })
                     )}
-                    disabled={
-                      !dashboardQuery.data?.lastSubmitGroupId ||
-                      !dashboardQuery.data?.lastSubmitId ||
-                      !dashboardQuery.data?.lastSubmitAt
-                    }
-                  >
-                    {t(TranslationKey.STUDENT_DASHBOARD_SHOW_DETAILS)}
-                  </Button>
-                }
-              />
-            </Stack>
-          </Grid>
-
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
-                value={dashboardQuery.data?.totalAssignmentGroups}
-                icon={<Quiz />}
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_UPCOMING)}
-                value={dashboardQuery.data?.totalUpcoming}
-                icon={<AccessTime />}
-                color="default"
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_IN_PROGRESS)}
-                value={dashboardQuery.data?.totalInProgress}
-                icon={<AccessTime />}
-                color="warning"
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_ENDED)}
-                value={dashboardQuery.data?.totalEnded}
-                icon={<AccessTime />}
-                color="success"
-              />
-            </Stack>
-          </Grid>
-        </Grid>
+                  disabled={
+                    !dashboardQuery.data?.lastSubmitGroupId ||
+                    !dashboardQuery.data?.lastSubmitId ||
+                    !dashboardQuery.data?.lastSubmitAt
+                  }
+                >
+                  {t(TranslationKey.STUDENT_DASHBOARD_SHOW_DETAILS)}
+                </Button>
+              }
+            />
+          ]}
+          rightColumn={[
+            <StatsCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
+              value={dashboardQuery.data?.totalAssignmentGroups}
+              icon={<Quiz />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_UPCOMING)}
+              value={dashboardQuery.data?.totalUpcoming}
+              icon={<AccessTime />}
+              color="default"
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_IN_PROGRESS)}
+              value={dashboardQuery.data?.totalInProgress}
+              icon={<AccessTime />}
+              color="warning"
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_ENDED)}
+              value={dashboardQuery.data?.totalEnded}
+              icon={<AccessTime />}
+              color="success"
+            />
+          ]}
+        />
 
         <Box>
           <Card variant="outlined">

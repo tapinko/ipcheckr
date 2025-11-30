@@ -9,7 +9,6 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  Grid,
   Pagination,
   Stack,
   Typography
@@ -24,6 +23,7 @@ import CardSingleDetail from "../../components/AssignmentCardSingleDetail"
 import StatsCard from "../../components/StatsCard"
 import { AccessTime, Category, Percent, Person, PlaylistAddCheck, TaskAlt } from "@mui/icons-material"
 import { getIpCatLabel } from "../../utils/getIpCatLabel"
+import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
 
 const StudentAssignmentDetails = () => {
   const { t } = useTranslation()
@@ -100,90 +100,79 @@ const StudentAssignmentDetails = () => {
   return (
     <>
       <Stack spacing={2}>
-       <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_ASSIGNMENT_GROUP_NAME)}
-                value={detailsQuery.data?.assignmentGroupName ?? "-"}
-                icon={<Person />}
-              />
-            </Stack>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_DESCRIPTION)}
-                value={detailsQuery.data?.description === ""
-                  ? "-" : detailsQuery.data?.description}
-                icon={<Percent />}
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUCCESS_RATE)}
-                value={detailsQuery.data?.successRate}
-                icon={<Percent />}
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_ATTEMPT)}
-                value={attempt}
-                icon={<PlaylistAddCheck />}
-                actions={
-                  detailsQuery.data?.numberOfSubmits ? (
-                    <Pagination
-                      count={detailsQuery.data.numberOfSubmits}
-                      page={attempt ? Number(attempt) : 1}
-                      onChange={(_, attempt) =>
-                        navigate(
-                          getParametrizedUrl(
-                            RouteKeys.STUDENT_ASSIGNMENT_DETAILS,
-                            {
-                              [RouteParams.ASSIGNMENT_ID]: assignmentId?.toString(),
-                              [RouteParams.ATTEMPT]: attempt.toString()
-                            }
-                          )
+        <ResponsiveStatsSection
+          highlight={
+            <StatsCard
+              title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_ASSIGNMENT_GROUP_NAME)}
+              value={detailsQuery.data?.assignmentGroupName ?? "-"}
+              icon={<Person />}
+            />
+          }
+          leftColumn={[
+            <StatsCard
+              title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_DESCRIPTION)}
+              value={detailsQuery.data?.description === ""
+                ? "-" : detailsQuery.data?.description}
+              icon={<Percent />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUCCESS_RATE)}
+              value={detailsQuery.data?.successRate}
+              icon={<Percent />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_ATTEMPT)}
+              value={attempt}
+              icon={<PlaylistAddCheck />}
+              actions={
+                detailsQuery.data?.numberOfSubmits ? (
+                  <Pagination
+                    count={detailsQuery.data.numberOfSubmits}
+                    page={attempt ? Number(attempt) : 1}
+                    onChange={(_, attempt) =>
+                      navigate(
+                        getParametrizedUrl(
+                          RouteKeys.STUDENT_ASSIGNMENT_DETAILS,
+                          {
+                            [RouteParams.ASSIGNMENT_ID]: assignmentId?.toString(),
+                            [RouteParams.ATTEMPT]: attempt.toString()
+                          }
                         )
-                      }
-                      siblingCount={0}
-                      boundaryCount={0}
-                      size="small"
-                    />
-                  ) : null
-                }
-              />
-            </Stack>
-          </Grid>
-
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_IP_CATEGORY)}
-                value={
-                  detailsQuery.data?.assignmentGroupIpCat
-                    ? getIpCatLabel(detailsQuery.data.assignmentGroupIpCat, t)
-                    : "-"
-                }
-                icon={<Category />}
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUBMITTED_AT)}
-                value={detailsQuery.data?.submittedAt
-                  ? new Date(detailsQuery.data.submittedAt).toLocaleString() : "-"}
-                icon={<AccessTime />}
-              />
-              <StatsCard
-                title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_CORRECT)}
-                value={
-                  correctStats ? `${correctStats.correct}/${correctStats.total}` : "-"
-                }
-                icon={<TaskAlt />}
-              />
-            </Stack>
-          </Grid>
-
-        </Grid>
+                      )
+                    }
+                    siblingCount={0}
+                    boundaryCount={0}
+                    size="small"
+                  />
+                ) : null
+              }
+            />
+          ]}
+          rightColumn={[
+            <StatsCard
+              title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_IP_CATEGORY)}
+              value={
+                detailsQuery.data?.assignmentGroupIpCat
+                  ? getIpCatLabel(detailsQuery.data.assignmentGroupIpCat, t)
+                  : "-"
+              }
+              icon={<Category />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_SUBMITTED_AT)}
+              value={detailsQuery.data?.submittedAt
+                ? new Date(detailsQuery.data.submittedAt).toLocaleString() : "-"}
+              icon={<AccessTime />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.STUDENT_ASSIGNMENT_DETAILS_CORRECT)}
+              value={
+                correctStats ? `${correctStats.correct}/${correctStats.total}` : "-"
+              }
+              icon={<TaskAlt />}
+            />
+          ]}
+        />
       </Stack>
 
       <Divider sx={{ my: 2 }} />

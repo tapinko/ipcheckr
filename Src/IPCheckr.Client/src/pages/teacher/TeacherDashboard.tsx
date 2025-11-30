@@ -12,7 +12,6 @@ import {
   Stack,
   Tooltip,
   Typography,
-  Grid,
   Button
 } from "@mui/material"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -29,6 +28,7 @@ import StatsCard from "../../components/StatsCard"
 import TableSkeleton from "../../components/TableSkeleton"
 import { useNavigate } from "react-router-dom"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
 
 const TeacherDashboard = () => {
   const { t } = useTranslation()
@@ -85,41 +85,37 @@ const TeacherDashboard = () => {
           }
         />
       ) : (<Stack spacing={2}>
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_INSTITUTION_NAME)}
-                value={dashboardQuery.data?.institutionName ?? "-"}
-                icon={<School />}
-              />
-            </Stack>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={2}>
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_LAST_SUBMIT)}
-                value={
-                  dashboardQuery.data?.lastSubmitUsername ? (
-                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                      <span>{dashboardQuery.data.lastSubmitUsername}</span>
-                      {dashboardQuery.data.lastSubmitAt && (
-                        <Chip
-                          size="small"
-                          icon={<AccessTime />}
-                          label={new Date(dashboardQuery.data.lastSubmitAt).toLocaleString()}
-                          variant="outlined"
-                        />
-                      )}
-                    </Stack>
-                  ) : ("-")
-                }
-                icon={<AccessTime />}
-                actions={
-                  <Button variant="outlined" onClick={() => 
+        <ResponsiveStatsSection
+          highlight={
+            <StatsCard
+              title={t(TranslationKey.TEACHER_DASHBOARD_INSTITUTION_NAME)}
+              value={dashboardQuery.data?.institutionName ?? "-"}
+              icon={<School />}
+            />
+          }
+          leftColumn={[
+            <StatsCard
+              title={t(TranslationKey.TEACHER_DASHBOARD_LAST_SUBMIT)}
+              value={
+                dashboardQuery.data?.lastSubmitUsername ? (
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                    <span>{dashboardQuery.data.lastSubmitUsername}</span>
+                    {dashboardQuery.data.lastSubmitAt && (
+                      <Chip
+                        size="small"
+                        icon={<AccessTime />}
+                        label={new Date(dashboardQuery.data.lastSubmitAt).toLocaleString()}
+                        variant="outlined"
+                      />
+                    )}
+                  </Stack>
+                ) : ("-")
+              }
+              icon={<AccessTime />}
+              actions={
+                <Button
+                  variant="outlined"
+                  onClick={() =>
                     navigate(
                       getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT, {
                         [RouteParams.ASSIGNMENT_GROUP_ID]:
@@ -129,82 +125,81 @@ const TeacherDashboard = () => {
                         [RouteParams.ATTEMPT]: "1"
                       })
                     )}
-                    disabled={
-                      !dashboardQuery.data?.lastSubmitGroupId ||
-                      !dashboardQuery.data?.lastSubmitId ||
-                      !dashboardQuery.data?.lastSubmitAt ||
-                      !dashboardQuery.data?.lastSubmitUsername
-                    }
-                  >
-                    {t(TranslationKey.STUDENT_DASHBOARD_SHOW_DETAILS)}
-                  </Button>
-                }
-              />
-              <Tooltip title={t(TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_CLASS_TOOLTIP)}>
-                <Box component="span" sx={{ display: "block" }}>
-                  <StatsCard
-                    title={t(TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_CLASS)}
-                    value={dashboardQuery.data?.mostSuccessfulClass ?? "-"}
-                    icon={<Class />}
-                  />
-                </Box>
-              </Tooltip>
-              <Tooltip title={t(TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_STUDENT_TOOLTIP)}>
-                <Box component="span" sx={{ display: "block" }}>
-                  <StatsCard
-                    title={t(TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_STUDENT)}
-                    value={dashboardQuery.data?.mostSuccessfulStudent ?? "-"}
-                    icon={<EmojiEvents />}
-                  />
-                </Box>
-              </Tooltip>
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_CLASSES)}
-                value={dashboardQuery.data?.totalClasses}
-                icon={<Class />}
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_STUDENTS)}
-                value={dashboardQuery.data?.totalStudents}
-                icon={<Groups />}
-              />
-            </Stack>
-          </Grid>
-
-          <Grid flex={1}>
-            <Stack spacing={2}>
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_SUBMITS)}
-                value={dashboardQuery.data?.totalSubmits}
-                icon={<TaskAlt />}
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
-                value={dashboardQuery.data?.totalAssignmentGroups}
-                icon={<Quiz />}
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_UPCOMING)}
-                value={dashboardQuery.data?.totalUpcoming}
-                icon={<AccessTime />}
-                color="default"
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_IN_PROGRESS)}
-                value={dashboardQuery.data?.totalInProgress}
-                icon={<AccessTime />}
-                color="warning"
-              />
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_ENDED)}
-                value={dashboardQuery.data?.totalEnded}
-                icon={<AccessTime />}
-                color="success"
-              />
-            </Stack>
-          </Grid>
-
-        </Grid>
+                  disabled={
+                    !dashboardQuery.data?.lastSubmitGroupId ||
+                    !dashboardQuery.data?.lastSubmitId ||
+                    !dashboardQuery.data?.lastSubmitAt ||
+                    !dashboardQuery.data?.lastSubmitUsername
+                  }
+                >
+                  {t(TranslationKey.STUDENT_DASHBOARD_SHOW_DETAILS)}
+                </Button>
+              }
+            />,
+            <Tooltip
+              title={t(TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_CLASS_TOOLTIP)}
+            >
+              <Box component="span" sx={{ display: "block" }}>
+                <StatsCard
+                  title={t(TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_CLASS)}
+                  value={dashboardQuery.data?.mostSuccessfulClass ?? "-"}
+                  icon={<Class />}
+                />
+              </Box>
+            </Tooltip>,
+            <Tooltip
+              title={t(TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_STUDENT_TOOLTIP)}
+            >
+              <Box component="span" sx={{ display: "block" }}>
+                <StatsCard
+                  title={t(TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_STUDENT)}
+                  value={dashboardQuery.data?.mostSuccessfulStudent ?? "-"}
+                  icon={<EmojiEvents />}
+                />
+              </Box>
+            </Tooltip>,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_DASHBOARD_CLASSES)}
+              value={dashboardQuery.data?.totalClasses}
+              icon={<Class />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_DASHBOARD_STUDENTS)}
+              value={dashboardQuery.data?.totalStudents}
+              icon={<Groups />}
+            />
+          ]}
+          rightColumn={[
+            <StatsCard
+              title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_SUBMITS)}
+              value={dashboardQuery.data?.totalSubmits}
+              icon={<TaskAlt />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
+              value={dashboardQuery.data?.totalAssignmentGroups}
+              icon={<Quiz />}
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_UPCOMING)}
+              value={dashboardQuery.data?.totalUpcoming}
+              icon={<AccessTime />}
+              color="default"
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_IN_PROGRESS)}
+              value={dashboardQuery.data?.totalInProgress}
+              icon={<AccessTime />}
+              color="warning"
+            />,
+            <StatsCard
+              title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_ENDED)}
+              value={dashboardQuery.data?.totalEnded}
+              icon={<AccessTime />}
+              color="success"
+            />
+          ]}
+        />
 
         <Box sx={{ display: "flex", gap: 2 }}>
           <Box sx={{ flex: 3 }}>
