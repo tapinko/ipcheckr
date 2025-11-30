@@ -618,7 +618,7 @@ const TeacherMyClasses = () => {
                   onChange={item => setSelectedClass(item as ISelectedClass)}
                   valueKey="classId"
                   labelKey="className"
-                  sx={{ width: "30vw" }}
+                  sx={{ width: { xs: "100%", md: "30vw" } }}
                 />
               )
             }
