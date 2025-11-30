@@ -201,8 +201,8 @@ const TeacherDashboard = () => {
           ]}
         />
 
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <Box sx={{ flex: 3 }}>
+        <Stack spacing={2} direction={{ xs: "column", md: "row" }}>
+          <Box sx={{ flex: { md: 3 }, width: "100%" }}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="overline" color="text.secondary">
@@ -244,7 +244,7 @@ const TeacherDashboard = () => {
             </Card>
           </Box>
 
-          <Box sx={{ flex: 2 }}>
+          <Box sx={{ flex: { md: 2 }, width: "100%" }}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="overline" color="text.secondary">
@@ -285,7 +285,7 @@ const TeacherDashboard = () => {
               </CardContent>
             </Card>
           </Box>
-        </Box>
+        </Stack>
       </Stack>)}
     </>
   )

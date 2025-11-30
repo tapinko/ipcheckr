@@ -162,8 +162,8 @@ const TeacherStudentDetails = () => {
           ]}
         />
 
-        <Stack spacing={2} direction="row">
-          <Box flex={1}>
+        <Stack spacing={2} direction={{ xs: "column", md: "row" }}>
+          <Box sx={{ flex: 1, width: "100%" }}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="overline" color="text.secondary">
@@ -201,7 +201,7 @@ const TeacherStudentDetails = () => {
               </CardContent>
             </Card>
           </Box>
-          <Box flex={1} height="100%">
+          <Box sx={{ flex: 1, width: "100%" }} height="100%">
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="overline" color="text.secondary">

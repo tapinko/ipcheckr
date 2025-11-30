@@ -97,6 +97,8 @@ const StudentAssignmentDetails = () => {
     )
   }
 
+  const isSingleResult = (detailsQuery.data?.results.length ?? 0) === 1
+
   return (
     <>
       <Stack spacing={2}>
@@ -179,12 +181,16 @@ const StudentAssignmentDetails = () => {
 
       <Box
         sx={{
-          display: (detailsQuery.data?.results.length ?? 0) === 1 ? "flex" : "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: isSingleResult ? "1fr" : "repeat(2, 1fr)"
+          },
           gap: 2,
           width: "100%",
           maxWidth: 1200,
-          justifyContent: "center"
+          justifyContent: "center",
+          justifyItems: isSingleResult ? "center" : "stretch"
         }}
       >
         {detailsQuery.data &&
