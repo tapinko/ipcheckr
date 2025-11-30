@@ -254,13 +254,22 @@ const AdminSettings = () => {
 
   return (
     <>
-      <Box sx={{ maxWidth: "50vw", display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box
+        sx={{
+          maxWidth: { xs: "100%", md: "50vw" },
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2
+        }}
+      >
         <Typography variant="h5">{t(TranslationKey.ADMIN_SETTINGS_TITLE)}</Typography>
 
         <Typography variant="body2">{t(TranslationKey.ADMIN_SETTINGS_LANGUAGE)}</Typography>
         <Select
           value={language ?? ""}
           onChange={(e) => setLanguage(e.target.value as Language)}
+          fullWidth
         >
           <MenuItem value={Language.EN}>{t(TranslationKey.ADMIN_SETTINGS_EN)}</MenuItem>
           <MenuItem value={Language.SK}>{t(TranslationKey.ADMIN_SETTINGS_SK)}</MenuItem>
@@ -290,7 +299,15 @@ const AdminSettings = () => {
         </Select>
 
         {authType === AuthType.LDAP && (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              mt: 2,
+              width: "100%"
+            }}
+          >
             <Divider textAlign="left">{t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP)}</Divider>
             
 
@@ -312,7 +329,13 @@ const AdminSettings = () => {
               label={t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_ALLOW_SELF_SIGN_UP)}
             />
 
-            <Box sx={{ display: "flex", gap: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: 3
+              }}
+            >
               <FormControlLabel
               control={
                 <Checkbox

@@ -145,6 +145,10 @@ const StudentAssignmentSubmission = () => {
 
   const submitting = submitAssignmentMutation.isPending
   const assignment = assignmentQuery.data
+  const hostCount = assignment?.hostsPerNetwork?.length ?? 0
+  const gridColumnsMd = hostCount < 3
+    ? "repeat(2, minmax(0, 1fr))"
+    : "repeat(3, minmax(0, 1fr))"
   const isAvailable = assignment?.isAvailableForSubmission
 
   if (assignmentQuery.isLoading && !assignment) {
@@ -171,31 +175,45 @@ const StudentAssignmentSubmission = () => {
           sx={{ alignItems: "center", width: "100%" }}
           component="section"
         >
-          <Card
+          <Box
             sx={{
+              width: "100%",
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "fit-content",
-              px: 6
+              justifyContent: "center",
+              position: "sticky",
+              top: { xs: 16, md: 24 },
+              zIndex: theme => theme.zIndex.appBar,
+              backgroundColor: theme => theme.palette.background.default,
+              py: 1
             }}
           >
-            <CardContent
+            <Card
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
-                gap: 1
+                alignItems: "center",
+                width: { xs: "100%", sm: "fit-content" },
+                maxWidth: 480,
+                px: { xs: 3, md: 6 }
               }}
             >
-              <Typography align="center" variant="body2">
-                {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMISSION_NETWORK)}
-              </Typography>
-              <Typography align="center" variant="h6">
-                {assignment?.cidr}
-              </Typography>
-            </CardContent>
-          </Card>
+              <CardContent
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  gap: 1
+                }}
+              >
+                <Typography align="center" variant="body2">
+                  {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMISSION_NETWORK)}
+                </Typography>
+                <Typography align="center" variant="h6">
+                  {assignment?.cidr}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Box>
 
           <Divider sx={{ width: "100%", maxWidth: 1200 }} />
 
@@ -206,9 +224,11 @@ const StudentAssignmentSubmission = () => {
               setConfirmSubmitVis(true)
             }}
             sx={{
-              display:
-                (assignment?.hostsPerNetwork?.length || 0) < 3 ? "flex" : "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: hostCount === 0 ? "1fr" : gridColumnsMd
+              },
               gap: 2,
               width: "100%",
               maxWidth: 1200,
@@ -218,12 +238,7 @@ const StudentAssignmentSubmission = () => {
             {assignment?.hostsPerNetwork?.map((host, index) => (
               <Card
                 key={fields[index]?.id ?? index}
-                sx={{
-                  width:
-                    (assignment.hostsPerNetwork.length || 0) < 3
-                      ? "50%"
-                      : "100%"
-                }}
+                sx={{ width: "100%" }}
               >
                 <CardHeader
                   title={
