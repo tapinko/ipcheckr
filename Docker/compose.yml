@@ -22,6 +22,9 @@ services:
       - ${DNS_NAMESERVER:-10.0.0.1}
     dns_search:
       - ${DNS_SEARCH_DOMAIN:-ldap.example.local}
+    extra_hosts:
+      - "ldap.example.local:<IP_ADDRESS>"
+      - "server.ldap.example.local:<IP_ADDRESS>"
     restart: unless-stopped
 
   db:
