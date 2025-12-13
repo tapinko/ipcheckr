@@ -375,7 +375,8 @@ const AdminUsers = () => {
           setAddDialogVis(false)
           resetAddUser(addUserDefaultValues)
         }}
-        sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+        fullWidth
+        maxWidth="md"
       >
         <form onSubmit={handleAddUserSubmit(handleAddUser)}>
           <DialogTitle>{t(TranslationKey.ADMIN_USERS_ADD_USER)}</DialogTitle>
@@ -587,7 +588,8 @@ const AdminUsers = () => {
           setEditDialogVis(false)
           resetEditUser(editUserDefaultValues)
         }}
-        sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+        fullWidth
+        maxWidth="md"
       >
         <form onSubmit={handleEditUserSubmit(handleEditUser)}>
           <DialogTitle>{t(TranslationKey.ADMIN_USERS_EDIT_USER)}</DialogTitle>

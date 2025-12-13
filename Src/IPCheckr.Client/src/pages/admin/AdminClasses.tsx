@@ -338,7 +338,8 @@ const AdminClasses = () => {
       <Dialog
         open={createDialogVis}
         onClose={() => setCreateDialogVis(false)}
-        sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+        fullWidth
+        maxWidth="sm"
       >
         <form onSubmit={handleCreateClassSubmit(handleCreateClass)}>
           <DialogTitle>
@@ -452,7 +453,8 @@ const AdminClasses = () => {
           setEditDialogVis(false)
           resetEditClass(editClassDefaultValues)
         }}
-        sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+        fullWidth
+        maxWidth="sm"
       >
         <form onSubmit={handleEditClassSubmit(handleEditClass)}>
           <DialogTitle>

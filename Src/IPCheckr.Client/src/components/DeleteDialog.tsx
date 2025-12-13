@@ -41,7 +41,7 @@ export default function DeleteDialog({
   const { t } = useTranslation()
 
   return (
-    <Dialog open={open} onClose={onClose} sx={{ "& .MuiDialog-paper": { width: "30vw" } }}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle>{title}</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography>{question}</Typography>

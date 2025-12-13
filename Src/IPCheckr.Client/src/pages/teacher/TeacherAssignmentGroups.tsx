@@ -712,7 +712,8 @@ const TeacherAssignmentGroups = () => {
           <Dialog
             open={createAssignmentGroupDialogVis}
             onClose={() => setCreateAssignmentGroupDialogVis(false)}
-            sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+            fullWidth
+            maxWidth="md"
           >
             <form
               onSubmit={handleCreateAGSubmit(handleCreateAssignmentGroup)}
@@ -1082,7 +1083,8 @@ const TeacherAssignmentGroups = () => {
             onClose={() => {
               setEditAssignmentGroupDialogVis(false)
             }}
-            sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+            fullWidth
+            maxWidth="md"
           >
             <form
               onSubmit={handleEditAGSubmit(handleEditAssignmentGroup)}

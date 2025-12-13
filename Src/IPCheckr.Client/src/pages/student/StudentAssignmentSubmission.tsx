@@ -418,7 +418,8 @@ const StudentAssignmentSubmission = () => {
       <Dialog
         open={confirmSubmitVis}
         onClose={() => setConfirmSubmitVis(false)}
-        sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+        fullWidth
+        maxWidth="xs"
       >
         <DialogTitle>
           {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMISSION_CONFIRM_TITLE)}

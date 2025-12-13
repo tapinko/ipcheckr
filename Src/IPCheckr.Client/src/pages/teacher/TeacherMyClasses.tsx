@@ -737,7 +737,8 @@ const TeacherMyClasses = () => {
           setAddStudentDialogVis(false)
           resetAddStudent(getAddStudentDefaultValues())
         }}
-        sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+        fullWidth
+        maxWidth="md"
       >
         <form onSubmit={handleAddStudentSubmit(handleAddStudent)}>
           <DialogTitle>
@@ -927,7 +928,8 @@ const TeacherMyClasses = () => {
           setCreateClassDialogVis(false)
           resetCreateClass(getCreateClassDefaultValues())
         }}
-        sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+        fullWidth
+        maxWidth="sm"
       >
         <form onSubmit={handleCreateClassSubmit(handleCreateClass)}>
           <DialogTitle>
@@ -1028,7 +1030,8 @@ const TeacherMyClasses = () => {
             classIds: []
           })
         }}
-        sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+        fullWidth
+        maxWidth="md"
       >
         <form onSubmit={handleEditStudentSubmit(handleEditStudent)}>
           <DialogTitle>
@@ -1162,7 +1165,8 @@ const TeacherMyClasses = () => {
             teachers: userId ? [userId] : []
           })
         }}
-        sx={{ "& .MuiDialog-paper": { width: "30vw" } }}
+        fullWidth
+        maxWidth="md"
       >
         <form onSubmit={handleEditClassSubmit(handleEditClass)}>
           <DialogTitle>
