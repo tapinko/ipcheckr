@@ -30,6 +30,13 @@ Provides role-based management for administrators, teachers and students with a 
    `docker compose -f Docker/compose.yml up -d`
 4. Open the app at: https://localhost:8081
 
+## Authentication
+IPCheckr supports both local accounts and LDAP-backed sign-in.
+
+- Local (default): user data lives in the MariaDB schema. On first run a default admin `admin`/`admin` is seeded — please change it after signing in.
+- LDAP: switch the auth type in the Admin → Settings page (stored in the `AuthType` app setting). LDAP connection details are managed through the `Ldap_*` app settings (host, port, SSL/StartTLS, bind mode or DN template, search base, username attribute, and optional student/teacher group DNs for role mapping). When LDAP is active, the Admin → Users flow searches your directory instead of requesting local passwords.
+- Docker image knobs: see `Docker/compose.yml` for `LDAP_HOST`, `LDAP_PORT`, `LDAP_USESSL`, `LDAP_STARTTLS`, `LDAP_FETCH_CERT`, `DNS_NAMESERVER`, and `DNS_SEARCH_DOMAIN`. `Docker/fetch-ldap-cert.sh` can pull and trust the LDAP server certificate on startup when `LDAP_FETCH_CERT=true`; set `extra_hosts` or your own DNS so the container can resolve the LDAP host.
+
 ## Development
 - Client: open [Src/IPCheckr.Client](Src/IPCheckr.Client) in your preferred code editor. Use Vite for local dev (`npm run dev` in Client directory).
 - API: open [Src/IPCheckr.Api](Src/IPCheckr.Api) in your preferred code editor. The API serves static client files from wwwroot in production. For development, deploy the [ipcheckr-mariadb-dev container](Dev/ipcheckr-mariadb-dev.yml) and run `dotnet watch` inside the API directory.
