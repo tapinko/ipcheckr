@@ -29,6 +29,8 @@ namespace IPCheckr.Api.Config
             await EnsureAppSettingAsync(db, "InstitutionName", "");
             await EnsureAppSettingAsync(db, "AuthType", AuthType.LOCAL.ToString());
 
+            await EnsureAppSettingAsync(db, "Gns3_Enabled", "false");
+
             await EnsureAppSettingAsync(db, "Ldap_Enabled", "false");
             await EnsureAppSettingAsync(db, "Ldap_Host", "server.ldap.example.local");
             await EnsureAppSettingAsync(db, "Ldap_Port", "636");

@@ -269,6 +269,8 @@ export enum TranslationKey {
   ADMIN_SETTINGS_AUTH_LDAP_BIND_DN = "ADMIN_SETTINGS_AUTH_LDAP_BIND_DN",
   ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD = "ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD",
   ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER = "ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER",
+  ADMIN_SETTINGS_GNS3 = "ADMIN_SETTINGS_GNS3",
+  ADMIN_SETTINGS_GNS3_ENABLE = "ADMIN_SETTINGS_GNS3_ENABLE",
   // |                        |
   // ||-----------------------||
 
@@ -786,6 +788,8 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_DN]: "Service account username",
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD]: "Service account password",
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER]: "Leave blank to keep current",
+  [TranslationKey.ADMIN_SETTINGS_GNS3]: "GNS3",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_ENABLE]: "Enable GNS3 integration",
   // |                        |
   // ||-----------------------||
 
@@ -1301,6 +1305,8 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_DN]: "Servisný účet DN",
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD]: "Servisné heslo účtu",
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER]: "Nechajte prázdne pre zachovanie aktuálneho",
+  [TranslationKey.ADMIN_SETTINGS_GNS3]: "GNS3",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_ENABLE]: "Povoliť integráciu GNS3",
   // |                        |
   // ||-----------------------||
 

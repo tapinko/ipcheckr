@@ -25,6 +25,8 @@ const AdminSettings = () => {
   const [originalAuth, setOriginalAuth] = useState<string | null>(null)
 
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
+
+  const [gns3Enabled, setGns3Enabled] = useState<boolean>(false)
   
   const [ldapEnabled, setLdapEnabled] = useState<boolean>(false)
   const [ldapHost, setLdapHost] = useState<string>("")
@@ -76,6 +78,8 @@ const AdminSettings = () => {
     const list: AppSettingDto[] = settingsQuery.data?.data?.appSettings ?? []
     return list.find(s => s.name === name) ?? null
   }
+  const gns3Setting = useMemo(() => findSettingByName("Gns3_Enabled"), [settingsQuery.data])
+
   const ldapSettings = useMemo(() => ({
     enabled: findSettingByName("Ldap_Enabled"),
     host: findSettingByName("Ldap_Host"),
@@ -131,6 +135,9 @@ const AdminSettings = () => {
       const s = (v ?? "").trim()
       return s.length ? s : fallback
     }
+
+    if (gns3Setting) setGns3Enabled(bool(gns3Setting.value, false)); else setGns3Enabled(false)
+
     if (ldapSettings.enabled) setLdapEnabled(bool(ldapSettings.enabled.value, false)); else setLdapEnabled(false)
     if (ldapSettings.host) setLdapHost(ldapSettings.host.value ?? ""); else setLdapHost("")
     if (ldapSettings.port) setLdapPort(numStr(ldapSettings.port.value, "636")); else setLdapPort("636")
@@ -149,7 +156,7 @@ const AdminSettings = () => {
     if (ldapSettings.bindDn) setLdapBindDn(ldapSettings.bindDn.value ?? ""); else setLdapBindDn("")
 
     setLdapBindPassword("")
-  }, [languageSetting, institutionSetting, authSetting, ldapSettings])
+  }, [languageSetting, institutionSetting, authSetting, gns3Setting, ldapSettings])
 
   const editMutation = useMutation<
     AxiosResponse<void>,
@@ -197,6 +204,8 @@ const AdminSettings = () => {
         list.push({ id: setting.id, name: setting.name, value: currentStr })
       }
     }
+    pushIfChanged(gns3Setting, gns3Enabled)
+    
     pushIfChanged(ldapSettings.enabled, ldapEnabled)
     pushIfChanged(ldapSettings.host, ldapHost)
     pushIfChanged(ldapSettings.port, ldapPort)
@@ -219,7 +228,8 @@ const AdminSettings = () => {
     }
     return list
   }, [language, institutionName, languageSetting, institutionSetting, authType, authSetting,
-      ldapEnabled, ldapHost, ldapPort, ldapAllowSelfSignUp, ldapUseSsl, ldapStartTls, ldapDomain, ldapBindMode,
+      gns3Enabled, gns3Setting, ldapEnabled, ldapHost, ldapPort, ldapAllowSelfSignUp, ldapUseSsl,
+      ldapStartTls, ldapDomain, ldapBindMode,
       ldapUserDnTemplate, ldapSearchBase, ldapUsernameAttr, ldapGroupAttr, ldapStudentGroupDn,
       ldapTeacherGroupDn, ldapTimeoutSec, ldapSettings, ldapBindDn, ldapBindPassword])
 
@@ -413,6 +423,19 @@ const AdminSettings = () => {
             <TextField value={ldapBindPassword} onChange={(e) => setLdapBindPassword(e.target.value)} type="password" fullWidth placeholder={t(TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER)} />
           </Box>
         )}
+
+        <Divider textAlign="left">{t(TranslationKey.ADMIN_SETTINGS_GNS3)}</Divider>
+        <FormControlLabel
+          control={
+          <Checkbox
+            checked={gns3Enabled}
+            onChange={(e) => setGns3Enabled(e.target.checked)}
+            icon={<RadioButtonUnchecked />}
+            checkedIcon={<RadioButtonChecked />}
+          />
+          }
+          label={t(TranslationKey.ADMIN_SETTINGS_GNS3_ENABLE)}
+        />
 
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button variant="contained" color="success" onClick={handleSave} disabled={saveDisabled}>

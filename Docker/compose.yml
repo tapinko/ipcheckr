@@ -14,12 +14,11 @@ services:
       - LDAP_HOST=server.ldap.example.local
       - LDAP_PORT=636
       - LDAP_STARTTLS=false
-      - LDAP_FETCH_CERT=true
       - LDAP_FETCH_CERT=true # set this to false if you don't plan to use LDAP authentication
     ports:
       - "8081:8080"
     dns:
-      - ${DNS_NAMESERVER:-10.0.0.1}
+      - ${DNS_NAMESERVER:-<IP_ADDRESS>}
     dns_search:
       - ${DNS_SEARCH_DOMAIN:-ldap.example.local}
     extra_hosts:
