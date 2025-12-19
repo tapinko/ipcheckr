@@ -8,18 +8,21 @@ namespace IPCheckr.Api.Controllers
 {
     [ApiController]
     [Authorize(Policy = Roles.Teacher)]
-    [Route("api/users")]
-    public partial class UserController : ControllerBase
+    [Route("api/gns3")]
+    public partial class Gns3Controller : ControllerBase
     {
         private readonly ApiDbContext _db;
         private readonly ILdapDirectoryService _ldapDirectory;
         private readonly ILdapSettingsProvider _ldapSettingsProvider;
+        protected readonly ILdapAuthService _ldapAuth;
 
-        public UserController(ApiDbContext db, ILdapDirectoryService ldapDirectory, ILdapSettingsProvider ldapSettingsProvider)
+        public Gns3Controller(ApiDbContext db, ILdapDirectoryService ldapDirectory,
+            ILdapSettingsProvider ldapSettingsProvider, ILdapAuthService ldapAuth)
         {
             _db = db;
             _ldapDirectory = ldapDirectory;
             _ldapSettingsProvider = ldapSettingsProvider;
+            _ldapAuth = ldapAuth;
         }
     }
 }
