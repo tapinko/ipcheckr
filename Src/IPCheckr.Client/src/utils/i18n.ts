@@ -38,6 +38,24 @@ export enum TranslationKey {
   DATA_GRID_ASC = "DATA_GRID_ASC",
   DATA_GRID_NO_DATA = "DATA_GRID_NO_DATA",
 
+  // Gns3DataGridWithSearch
+  GNS3_DATA_GRID_ROLE = "GNS3_DATA_GRID_ROLE",
+  GNS3_DATA_GRID_ALL = "GNS3_DATA_GRID_ALL",
+  GNS3_DATA_GRID_STUDENT = "GNS3_DATA_GRID_STUDENT",
+  GNS3_DATA_GRID_TEACHER = "GNS3_DATA_GRID_TEACHER",
+  GNS3_DATA_GRID_USERNAME = "GNS3_DATA_GRID_USERNAME",
+  GNS3_DATA_GRID_STATUS = "GNS3_DATA_GRID_STATUS",
+  GNS3_DATA_GRID_PORT = "GNS3_DATA_GRID_PORT",
+  GNS3_DATA_GRID_STARTED_AT = "GNS3_DATA_GRID_STARTED_AT",
+  GNS3_DATA_GRID_DURATION = "GNS3_DATA_GRID_DURATION",
+  GNS3_DATA_GRID_STOPPED_AT = "GNS3_DATA_GRID_STOPPED_AT",
+  GNS3_DATA_GRID_NO_DATA = "GNS3_DATA_GRID_NO_DATA",
+  GNS3_DATA_GRID_EXTEND = "GNS3_DATA_GRID_EXTEND",
+  GNS3_DATA_GRID_STATUS_RUNNING = "GNS3_DATA_GRID_STATUS_RUNNING",
+  GNS3_DATA_GRID_STATUS_STOPPED = "GNS3_DATA_GRID_STATUS_STOPPED",
+  GNS3_DATA_GRID_STATUS_ERROR = "GNS3_DATA_GRID_STATUS_ERROR",
+  GNS3_DATA_GRID_STATUS_UNKNOWN = "GNS3_DATA_GRID_STATUS_UNKNOWN",
+
   // Navbar
   NAVBAR_LOGOUT = "NAVBAR_LOGOUT",
   NAVBAR_LOGGED_IN_AS = "NAVBAR_LOGGED_IN_AS",
@@ -87,6 +105,7 @@ export enum TranslationKey {
   BREADCRUMBS_ADMIN_USER_DETAILS = "BREADCRUMBS_ADMIN_USER_DETAILS",
   BREADCRUMBS_ADMIN_CLASSES = "BREADCRUMBS_ADMIN_CLASSES",
   BREADCRUMBS_ADMIN_CLASS_DETAILS = "BREADCRUMBS_ADMIN_CLASS_DETAILS",
+  BREADCRUMBS_ADMIN_GNS3 = "BREADCRUMBS_ADMIN_GNS3",
 
   BREADCRUMBS_TEACHER_MY_CLASSES = "BREADCRUMBS_TEACHER_MY_CLASSES",
   BREADCRUMBS_TEACHER_MY_CLASSES_STUDENT_DETAILS = "BREADCRUMBS_TEACHER_MY_CLASSES_STUDENT_DETAILS",
@@ -105,7 +124,16 @@ export enum TranslationKey {
   ADMIN_NAVBAR_DASHBOARD = "ADMIN_NAVBAR_DASHBOARD",
   ADMIN_NAVBAR_USERS = "ADMIN_NAVBAR_USERS",
   ADMIN_NAVBAR_CLASSES = "ADMIN_NAVBAR_CLASSES",
+  ADMIN_NAVBAR_GNS3 = "ADMIN_NAVBAR_GNS3",
   ADMIN_NAVBAR_SETTINGS = "ADMIN_NAVBAR_SETTINGS",
+
+  // Admin GNS3
+  ADMIN_GNS3_TITLE = "ADMIN_GNS3_TITLE",
+  ADMIN_GNS3_START = "ADMIN_GNS3_START",
+  ADMIN_GNS3_STOP = "ADMIN_GNS3_STOP",
+  ADMIN_GNS3_EXTEND = "ADMIN_GNS3_EXTEND",
+  ADMIN_GNS3_FORCE_KILL_ALL = "ADMIN_GNS3_FORCE_KILL_ALL",
+  ADMIN_GNS3_FORCE_KILL_SUCCESS = "ADMIN_GNS3_FORCE_KILL_SUCCESS",
 
   // Admin Dashboard
   ADMIN_DASHBOARD_TITLE = "ADMIN_DASHBOARD_TITLE",
@@ -271,6 +299,8 @@ export enum TranslationKey {
   ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER = "ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER",
   ADMIN_SETTINGS_GNS3 = "ADMIN_SETTINGS_GNS3",
   ADMIN_SETTINGS_GNS3_ENABLE = "ADMIN_SETTINGS_GNS3_ENABLE",
+  ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN = "ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN",
+  ADMIN_SETTINGS_GNS3_EXTENSION_MIN = "ADMIN_SETTINGS_GNS3_EXTENSION_MIN",
   // |                        |
   // ||-----------------------||
 
@@ -558,6 +588,24 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.DATA_GRID_ASC]: "Asc",
   [TranslationKey.DATA_GRID_NO_DATA]: "No data available",
 
+  // Gns3DataGridWithSearch
+  [TranslationKey.GNS3_DATA_GRID_ROLE]: "Role",
+  [TranslationKey.GNS3_DATA_GRID_ALL]: "All",
+  [TranslationKey.GNS3_DATA_GRID_STUDENT]: "Student",
+  [TranslationKey.GNS3_DATA_GRID_TEACHER]: "Teacher",
+  [TranslationKey.GNS3_DATA_GRID_USERNAME]: "Username",
+  [TranslationKey.GNS3_DATA_GRID_STATUS]: "Status",
+  [TranslationKey.GNS3_DATA_GRID_PORT]: "Port",
+  [TranslationKey.GNS3_DATA_GRID_STARTED_AT]: "Started at",
+  [TranslationKey.GNS3_DATA_GRID_DURATION]: "Duration",
+  [TranslationKey.GNS3_DATA_GRID_STOPPED_AT]: "Stopped at",
+  [TranslationKey.GNS3_DATA_GRID_NO_DATA]: "No data available",
+  [TranslationKey.GNS3_DATA_GRID_EXTEND]: "Extend",
+  [TranslationKey.GNS3_DATA_GRID_STATUS_RUNNING]: "Running",
+  [TranslationKey.GNS3_DATA_GRID_STATUS_STOPPED]: "Stopped",
+  [TranslationKey.GNS3_DATA_GRID_STATUS_ERROR]: "Error",
+  [TranslationKey.GNS3_DATA_GRID_STATUS_UNKNOWN]: "Unknown",
+
   // Navbar
   [TranslationKey.NAVBAR_LOGOUT]: "Logout",
   [TranslationKey.NAVBAR_LOGGED_IN_AS]: "Logged in as:",
@@ -607,6 +655,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.BREADCRUMBS_ADMIN_USER_DETAILS]: "User detail",
   [TranslationKey.BREADCRUMBS_ADMIN_CLASSES]: "Classes",
   [TranslationKey.BREADCRUMBS_ADMIN_CLASS_DETAILS]: "Class detail",
+  [TranslationKey.BREADCRUMBS_ADMIN_GNS3]: "GNS3",
 
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES]: "My classes",
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES_STUDENT_DETAILS]: "Student details",
@@ -625,7 +674,16 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_NAVBAR_DASHBOARD]: "Dashboard",
   [TranslationKey.ADMIN_NAVBAR_USERS]: "Users",
   [TranslationKey.ADMIN_NAVBAR_CLASSES]: "Classes",
+  [TranslationKey.ADMIN_NAVBAR_GNS3]: "GNS3",
   [TranslationKey.ADMIN_NAVBAR_SETTINGS]: "Settings",
+
+  // Admin GNS3
+  [TranslationKey.ADMIN_GNS3_TITLE]: "GNS3 sessions",
+  [TranslationKey.ADMIN_GNS3_START]: "Successfully started session for user '{{value}}'.",
+  [TranslationKey.ADMIN_GNS3_STOP]: "Successfully stopped session for user '{{value}}'.",
+  [TranslationKey.ADMIN_GNS3_EXTEND]: "Successfully extended for user '{{value}}' by {{minutes}}min.",
+  [TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL]: "Force stop all sessions",
+  [TranslationKey.ADMIN_GNS3_FORCE_KILL_SUCCESS]: "All sessions stop command sent.",
 
   // Admin Dashboard
   [TranslationKey.ADMIN_DASHBOARD_TITLE]: "Dashboard",
@@ -790,6 +848,8 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER]: "Leave blank to keep current",
   [TranslationKey.ADMIN_SETTINGS_GNS3]: "GNS3",
   [TranslationKey.ADMIN_SETTINGS_GNS3_ENABLE]: "Enable GNS3 integration",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN]: "Default session length (minutes)",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_EXTENSION_MIN]: "Extend button adds (minutes)",
   // |                        |
   // ||-----------------------||
 
@@ -1075,6 +1135,25 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.DATA_GRID_ASC]: "ABC",
   [TranslationKey.DATA_GRID_NO_DATA]: "Žiadne dostupné údaje",
 
+
+  // Gns3DataGridWithSearch
+  [TranslationKey.GNS3_DATA_GRID_ROLE]: "Rola",
+  [TranslationKey.GNS3_DATA_GRID_ALL]: "Všetky",
+  [TranslationKey.GNS3_DATA_GRID_STUDENT]: "Študent",
+  [TranslationKey.GNS3_DATA_GRID_TEACHER]: "Učiteľ",
+  [TranslationKey.GNS3_DATA_GRID_USERNAME]: "Používateľské meno",
+  [TranslationKey.GNS3_DATA_GRID_STATUS]: "Status",
+  [TranslationKey.GNS3_DATA_GRID_PORT]: "Port",
+  [TranslationKey.GNS3_DATA_GRID_STARTED_AT]: "Začiatok",
+  [TranslationKey.GNS3_DATA_GRID_DURATION]: "Trvanie",
+  [TranslationKey.GNS3_DATA_GRID_STOPPED_AT]: "Koniec",
+  [TranslationKey.GNS3_DATA_GRID_NO_DATA]: "Žiadne dostupné údaje",
+  [TranslationKey.GNS3_DATA_GRID_EXTEND]: "Predĺžiť",
+  [TranslationKey.GNS3_DATA_GRID_STATUS_RUNNING]: "Beží",
+  [TranslationKey.GNS3_DATA_GRID_STATUS_STOPPED]: "Zastavený",
+  [TranslationKey.GNS3_DATA_GRID_STATUS_ERROR]: "Chyba",
+  [TranslationKey.GNS3_DATA_GRID_STATUS_UNKNOWN]: "Neznáme",
+
   // Navbar
   [TranslationKey.NAVBAR_LOGOUT]: "Odhlásiť sa",
   [TranslationKey.NAVBAR_LOGGED_IN_AS]: "Prihlásený ako:",
@@ -1124,6 +1203,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.BREADCRUMBS_ADMIN_USER_DETAILS]: "Detail používateľa",
   [TranslationKey.BREADCRUMBS_ADMIN_CLASSES]: "Triedy",
   [TranslationKey.BREADCRUMBS_ADMIN_CLASS_DETAILS]: "Detail triedy",
+  [TranslationKey.BREADCRUMBS_ADMIN_GNS3]: "GNS3",
   
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES]: "Moje triedy",
   [TranslationKey.BREADCRUMBS_TEACHER_MY_CLASSES_STUDENT_DETAILS]: "Detail študenta",
@@ -1142,7 +1222,16 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_NAVBAR_DASHBOARD]: "Hlavný panel",
   [TranslationKey.ADMIN_NAVBAR_USERS]: "Používatelia",
   [TranslationKey.ADMIN_NAVBAR_CLASSES]: "Triedy",
+  [TranslationKey.ADMIN_NAVBAR_GNS3]: "GNS3",
   [TranslationKey.ADMIN_NAVBAR_SETTINGS]: "Nastavenia",
+
+  // Admin GNS3
+  [TranslationKey.ADMIN_GNS3_TITLE]: "GNS3 relácie",
+  [TranslationKey.ADMIN_GNS3_START]: "Úspešne spustená relácia pre používateľa '{{value}}'.",
+  [TranslationKey.ADMIN_GNS3_STOP]: "Úspešne zastavená relácia pre používateľa '{{value}}'.",
+  [TranslationKey.ADMIN_GNS3_EXTEND]: "Úspešne predĺžená relácia pre používateľa '{{value}}' o {{minutes}} min.",
+  [TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL]: "Vynútene zastaviť všetky session",
+  [TranslationKey.ADMIN_GNS3_FORCE_KILL_SUCCESS]: "Príkaz na zastavenie všetkých session odoslaný.",
 
   // AdminDashboard
   [TranslationKey.ADMIN_DASHBOARD_TITLE]: "Hlavný panel",
@@ -1307,6 +1396,8 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_AUTH_LDAP_BIND_PASSWORD_PLACEHOLDER]: "Nechajte prázdne pre zachovanie aktuálneho",
   [TranslationKey.ADMIN_SETTINGS_GNS3]: "GNS3",
   [TranslationKey.ADMIN_SETTINGS_GNS3_ENABLE]: "Povoliť integráciu GNS3",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN]: "Predvolená dĺžka session (minúty)",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_EXTENSION_MIN]: "Tlačidlo predĺži o (minúty)",
   // |                        |
   // ||-----------------------||
 

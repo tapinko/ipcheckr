@@ -16,6 +16,7 @@ namespace IPCheckr.Api
         public DbSet<AssignmentAnswerKey> AssignmentAnswerKeys { get; set; }
         public DbSet<AssignmentSubmit> AssignmentSubmits { get; set; }
         public DbSet<AppSettings> AppSettings { get; set; }
+        public DbSet<Gns3Session> Gns3Sessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -92,6 +93,20 @@ namespace IPCheckr.Api
                 entity.Property(a => a.Value)
                       .HasColumnType("text")
                       .IsRequired(false);
+            });
+
+            modelBuilder.Entity<Gns3Session>(entity =>
+            {
+                entity.ToTable("Gns3Sessions");
+                entity.HasKey(s => s.Id);
+                entity.Property(s => s.Status)
+                      .HasConversion<string>()
+                      .IsRequired();
+
+                entity.HasOne(s => s.User)
+                      .WithMany()
+                      .HasForeignKey(s => s.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

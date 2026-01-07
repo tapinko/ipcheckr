@@ -2,7 +2,7 @@ import { Box, Button, Checkbox, InputAdornment, MenuItem, Paper, Stack, Table, T
 import SearchIcon from "@mui/icons-material/Search"
 import { useTranslation } from "react-i18next"
 import { TranslationKey } from "../utils/i18n"
-import type { FC } from "react"
+import type { FC, ReactNode } from "react"
 
 interface IDataGridWithSearchProps {
   filter1?: {
@@ -21,11 +21,13 @@ interface IDataGridWithSearchProps {
   setSearchValue: (val: string) => void
   descending?: boolean
   setDescending?: (val: boolean) => void
-  columns: { label: string; key: string }[],
+  columns: { label: string; key: string; width?: string | number; hideOnMobile?: boolean }[],
   rows?: Record<string, any>[]
   selectableRows?: boolean
   selectedRows?: number[]
   setSelectedRows?: (rows: number[]) => void
+  expandedRowId?: number | null
+  renderExpandedRow?: (row: any) => ReactNode
 }
 
 const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
@@ -40,6 +42,8 @@ const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
   selectableRows = false,
   selectedRows = [],
   setSelectedRows,
+  expandedRowId,
+  renderExpandedRow,
 }) => {
   const { t } = useTranslation()
 
@@ -138,12 +142,21 @@ const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
         </Box>
       </Stack>
 
-      <Table>
+      <Table sx={{ tableLayout: "fixed" }}>
         <TableHead>
           <TableRow>
             {selectableRows && <TableCell />}
             {columns.map(col => (
-              <TableCell key={col.key}>{col.label}</TableCell>
+              <TableCell
+                key={col.key}
+                sx={{
+                  ...(col.width ? { width: col.width, minWidth: col.width } : {}),
+                  textAlign: "left",
+                  ...(col.hideOnMobile ? { display: { xs: "none", md: "table-cell" } } : {})
+                }}
+              >
+                {col.label}
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>
@@ -155,31 +168,53 @@ const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
               </TableCell>
             </TableRow>
           ) : (
-            rows.map((row, idx) => (
-              <TableRow
-                key={row.id ?? idx}
-                hover={selectableRows}
-                selected={selectableRows && selectedRows.includes(row.id)}
-                onClick={selectableRows ? () => handleRowSelect(row) : undefined}
-                style={selectableRows ? { cursor: "pointer" } : undefined}
-              >
-                {selectableRows && (
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedRows.includes(row.id)}
-                      onChange={() => handleRowSelect(row)}
-                      onClick={e => e.stopPropagation()}
-                      color="primary"
-                    />
-                  </TableCell>
-                )}
-                {columns.map(col => (
-                  <TableCell key={col.key}>
-                    {row[col.key]}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            rows.flatMap((row, idx) => {
+              const baseRow = (
+                <TableRow
+                  key={row.id ?? idx}
+                  hover={selectableRows}
+                  selected={selectableRows && selectedRows.includes(row.id)}
+                  onClick={selectableRows ? () => handleRowSelect(row) : undefined}
+                  style={selectableRows ? { cursor: "pointer" } : undefined}
+                >
+                  {selectableRows && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectedRows.includes(row.id)}
+                        onChange={() => handleRowSelect(row)}
+                        onClick={e => e.stopPropagation()}
+                        color="primary"
+                      />
+                    </TableCell>
+                  )}
+                  {columns.map(col => (
+                    <TableCell
+                      key={col.key}
+                      sx={{
+                          ...(col.width ? { width: col.width, minWidth: col.width } : {}),
+                          textAlign: "left",
+                          ...(col.hideOnMobile ? { display: { xs: "none", md: "table-cell" } } : {})
+                        }}
+                    >
+                      {row[col.key]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              )
+
+              if (expandedRowId != null && renderExpandedRow && expandedRowId === row.id) {
+                return [
+                  baseRow,
+                  <TableRow key={`expanded-${row.id}`}>
+                    <TableCell colSpan={columns.length + (selectableRows ? 1 : 0)} sx={{ p: 0 }}>
+                      {renderExpandedRow(row)}
+                    </TableCell>
+                  </TableRow>
+                ]
+              }
+
+              return [baseRow]
+            })
           )}
         </TableBody>
       </Table>

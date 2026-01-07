@@ -26,25 +26,22 @@ namespace IPCheckr.Api.Controllers
             var username = (creds.Username ?? string.Empty).Trim();
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (string.Equals(username, "admin", StringComparison.OrdinalIgnoreCase) || user?.Role == Roles.Admin)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, new ApiProblemDetails
-                {
-                    Title = "Unauthorized",
-                    Detail = "Admin access is not allowed for GNS3.",
-                    Status = StatusCodes.Status401Unauthorized,
-                    MessageEn = "Admin user cannot log in to GNS3.",
-                    MessageSk = "Admin používateľ sa nemôže prihlásiť do GNS3.",
-                });
-            }
+                return StatusCode(StatusCodes.Status401Unauthorized);
+
             var authTypeSetting = await _db.AppSettings.FirstOrDefaultAsync(a => a.Name == "AuthType");
             var authTypeRaw = (authTypeSetting?.Value ?? nameof(AuthType.LOCAL)).Trim();
+
             var parsed = Enum.TryParse<AuthType>(authTypeRaw, true, out var authTypeEnum);
             if (!parsed)
                 authTypeEnum = AuthType.LOCAL;
 
             if (user != null && user.Role != Roles.Admin && BCrypt.Net.BCrypt.Verify(creds.Password ?? string.Empty, user.PasswordHash))
             {
-                Response.Headers["X-Gns3-Port"] = "3080";
+                var port = await GetActivePortAsync(user.Id);
+                if (port == null)
+                    return StatusCode(StatusCodes.Status401Unauthorized);
+
+                Response.Headers["X-Gns3-Port"] = port.Value.ToString();
                 Response.Headers["X-User"] = username;
                 return Ok();
             }
@@ -56,31 +53,23 @@ namespace IPCheckr.Api.Controllers
                 {
                     var roles = ldapResult.Roles?.Count > 0 ? ldapResult.Roles : new List<string> { Roles.Student };
                     if (roles.Contains(Roles.Admin))
-                    {
-                        return StatusCode(StatusCodes.Status401Unauthorized, new ApiProblemDetails
-                        {
-                            Title = "Unauthorized",
-                            Detail = "Admin role is not allowed for GNS3.",
-                            Status = StatusCodes.Status401Unauthorized,
-                            MessageEn = "Admin role is not allowed for GNS3.",
-                            MessageSk = "Rola admin nie je pre GNS3 povolená.",
-                        });
-                    }
+                        return StatusCode(StatusCodes.Status401Unauthorized);
 
-                    Response.Headers["X-Gns3-Port"] = "3080";
+                    var dbUser = user ?? await _db.Users.FirstOrDefaultAsync(u => u.Username == username);
+                    if (dbUser == null)
+                        return StatusCode(StatusCodes.Status401Unauthorized);
+
+                    var port = await GetActivePortAsync(dbUser.Id);
+                    if (port == null)
+                        return StatusCode(StatusCodes.Status401Unauthorized);
+
+                    Response.Headers["X-Gns3-Port"] = port.Value.ToString();
                     Response.Headers["X-User"] = username;
                     return Ok();
                 }
             }
 
-            return StatusCode(StatusCodes.Status401Unauthorized, new ApiProblemDetails
-            {
-                Title = "Unauthorized",
-                Detail = "Invalid username or password.",
-                Status = StatusCodes.Status401Unauthorized,
-                MessageEn = "Invalid username or password.",
-                MessageSk = "Neplatné používateľské meno alebo heslo.",
-            });
+            return StatusCode(StatusCodes.Status401Unauthorized);
         }
 
         private AuthReq ReadBasicAuthOrFallback()
@@ -102,6 +91,16 @@ namespace IPCheckr.Api.Controllers
             }
 
             return new AuthReq { Username = string.Empty, Password = string.Empty };
+        }
+
+        private async Task<int?> GetActivePortAsync(int userId)
+        {
+            var session = await _db.Gns3Sessions
+                .Where(s => s.UserId == userId && s.Status == GNS3SessionStatus.RUNNING)
+                .OrderByDescending(s => s.SessionStart)
+                .FirstOrDefaultAsync();
+
+            return session?.Port > 0 ? session.Port : null;
         }
     }
 }

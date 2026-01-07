@@ -27,6 +27,8 @@ const AdminSettings = () => {
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
 
   const [gns3Enabled, setGns3Enabled] = useState<boolean>(false)
+  const [gns3DefaultMinutes, setGns3DefaultMinutes] = useState<string>("120")
+  const [gns3ExtensionMinutes, setGns3ExtensionMinutes] = useState<string>("30")
   
   const [ldapEnabled, setLdapEnabled] = useState<boolean>(false)
   const [ldapHost, setLdapHost] = useState<string>("")
@@ -79,6 +81,8 @@ const AdminSettings = () => {
     return list.find(s => s.name === name) ?? null
   }
   const gns3Setting = useMemo(() => findSettingByName("Gns3_Enabled"), [settingsQuery.data])
+  const gns3DefaultSetting = useMemo(() => findSettingByName("Gns3_DefaultSessionMinutes"), [settingsQuery.data])
+  const gns3ExtensionSetting = useMemo(() => findSettingByName("Gns3_ExtendedMinutes"), [settingsQuery.data])
 
   const ldapSettings = useMemo(() => ({
     enabled: findSettingByName("Ldap_Enabled"),
@@ -137,6 +141,8 @@ const AdminSettings = () => {
     }
 
     if (gns3Setting) setGns3Enabled(bool(gns3Setting.value, false)); else setGns3Enabled(false)
+    if (gns3DefaultSetting) setGns3DefaultMinutes(numStr(gns3DefaultSetting.value, "120")); else setGns3DefaultMinutes("120")
+    if (gns3ExtensionSetting) setGns3ExtensionMinutes(numStr(gns3ExtensionSetting.value, "30")); else setGns3ExtensionMinutes("30")
 
     if (ldapSettings.enabled) setLdapEnabled(bool(ldapSettings.enabled.value, false)); else setLdapEnabled(false)
     if (ldapSettings.host) setLdapHost(ldapSettings.host.value ?? ""); else setLdapHost("")
@@ -156,7 +162,7 @@ const AdminSettings = () => {
     if (ldapSettings.bindDn) setLdapBindDn(ldapSettings.bindDn.value ?? ""); else setLdapBindDn("")
 
     setLdapBindPassword("")
-  }, [languageSetting, institutionSetting, authSetting, gns3Setting, ldapSettings])
+  }, [languageSetting, institutionSetting, authSetting, gns3Setting, gns3DefaultSetting, gns3ExtensionSetting, ldapSettings])
 
   const editMutation = useMutation<
     AxiosResponse<void>,
@@ -205,6 +211,8 @@ const AdminSettings = () => {
       }
     }
     pushIfChanged(gns3Setting, gns3Enabled)
+    pushIfChanged(gns3DefaultSetting, gns3DefaultMinutes)
+    pushIfChanged(gns3ExtensionSetting, gns3ExtensionMinutes)
     
     pushIfChanged(ldapSettings.enabled, ldapEnabled)
     pushIfChanged(ldapSettings.host, ldapHost)
@@ -228,7 +236,7 @@ const AdminSettings = () => {
     }
     return list
   }, [language, institutionName, languageSetting, institutionSetting, authType, authSetting,
-      gns3Enabled, gns3Setting, ldapEnabled, ldapHost, ldapPort, ldapAllowSelfSignUp, ldapUseSsl,
+      gns3Enabled, gns3Setting, gns3DefaultMinutes, gns3ExtensionMinutes, ldapEnabled, ldapHost, ldapPort, ldapAllowSelfSignUp, ldapUseSsl,
       ldapStartTls, ldapDomain, ldapBindMode,
       ldapUserDnTemplate, ldapSearchBase, ldapUsernameAttr, ldapGroupAttr, ldapStudentGroupDn,
       ldapTeacherGroupDn, ldapTimeoutSec, ldapSettings, ldapBindDn, ldapBindPassword])
@@ -436,6 +444,28 @@ const AdminSettings = () => {
           }
           label={t(TranslationKey.ADMIN_SETTINGS_GNS3_ENABLE)}
         />
+
+        {gns3Enabled && (
+          <>
+            <Typography variant="body2">{t(TranslationKey.ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN)}</Typography>
+            <TextField
+              value={gns3DefaultMinutes}
+              onChange={(e) => setGns3DefaultMinutes(e.target.value.replace(/[^0-9]/g, ""))}
+              fullWidth
+              placeholder="120"
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            />
+
+            <Typography variant="body2">{t(TranslationKey.ADMIN_SETTINGS_GNS3_EXTENSION_MIN)}</Typography>
+            <TextField
+              value={gns3ExtensionMinutes}
+              onChange={(e) => setGns3ExtensionMinutes(e.target.value.replace(/[^0-9]/g, ""))}
+              fullWidth
+              placeholder="30"
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            />
+          </>
+        )}
 
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button variant="contained" color="success" onClick={handleSave} disabled={saveDisabled}>

@@ -16,6 +16,7 @@ export enum RouteKeys {
   ADMIN_USER_DETAILS,
   ADMIN_CLASSES,
   ADMIN_CLASS_DETAILS,
+  ADMIN_GNS3,
   ADMIN_SETTINGS,
 
   TEACHER,
@@ -42,6 +43,7 @@ const ADMIN_USERS = `${ADMIN}/users`
 const ADMIN_USER_DETAILS = `${ADMIN_USERS}/details/:${RouteParams.USER_ID}`
 const ADMIN_CLASSES = `${ADMIN}/classes`
 const ADMIN_CLASS_DETAILS = `${ADMIN_CLASSES}/details/:${RouteParams.CLASS_ID}`
+const ADMIN_GNS3 = `${ADMIN}/gns3`
 const ADMIN_SETTINGS = `${ADMIN}/settings`
 
 const TEACHER = "/teacher"
@@ -79,6 +81,7 @@ export const Routes: Record<RouteKeys, string> = {
   [RouteKeys.ADMIN_USER_DETAILS]: ADMIN_USER_DETAILS,
   [RouteKeys.ADMIN_CLASSES]: ADMIN_CLASSES,
   [RouteKeys.ADMIN_CLASS_DETAILS]: ADMIN_CLASS_DETAILS,
+  [RouteKeys.ADMIN_GNS3]: ADMIN_GNS3,
   [RouteKeys.ADMIN_SETTINGS]: ADMIN_SETTINGS,
 
   [RouteKeys.TEACHER]: TEACHER,

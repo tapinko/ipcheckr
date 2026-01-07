@@ -449,6 +449,25 @@ export interface AssignmentGroupSubmitDetailsDto {
 /**
  * 
  * @export
+ * @interface AuthReq
+ */
+export interface AuthReq {
+    /**
+     * 
+     * @type {string}
+     * @memberof AuthReq
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AuthReq
+     */
+    'password': string;
+}
+/**
+ * 
+ * @export
  * @interface AveragePercentageInClassesDto
  */
 export interface AveragePercentageInClassesDto {
@@ -905,6 +924,139 @@ export interface EditUserReq {
      */
     'classIds'?: Array<number> | null;
 }
+/**
+ * 
+ * @export
+ * @interface ExtendSessionReq
+ */
+export interface ExtendSessionReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof ExtendSessionReq
+     */
+    'userId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ExtendSessionReq
+     */
+    'minutes'?: number | null;
+}
+/**
+ * 
+ * @export
+ * @interface ForceStopAllRes
+ */
+export interface ForceStopAllRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof ForceStopAllRes
+     */
+    'stoppedCount': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ForceStopAllRes
+     */
+    'failedCount': number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ForceStopAllRes
+     */
+    'failedUsers'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ForceStopAllRes
+     */
+    'failedReasons'?: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const GNS3SessionStatus = {
+    Running: 'RUNNING',
+    Stopped: 'STOPPED'
+} as const;
+
+export type GNS3SessionStatus = typeof GNS3SessionStatus[keyof typeof GNS3SessionStatus];
+
+
+/**
+ * 
+ * @export
+ * @interface Gns3SessionBase
+ */
+export interface Gns3SessionBase {
+    /**
+     * 
+     * @type {number}
+     * @memberof Gns3SessionBase
+     */
+    'userId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Gns3SessionBase
+     */
+    'username': string;
+    /**
+     * 
+     * @type {GNS3SessionStatus}
+     * @memberof Gns3SessionBase
+     */
+    'status': GNS3SessionStatus;
+    /**
+     * 
+     * @type {number}
+     * @memberof Gns3SessionBase
+     */
+    'port': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Gns3SessionBase
+     */
+    'sessionStart'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Gns3SessionBase
+     */
+    'sessionEnd'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Gns3SessionBase
+     */
+    'errorMessage'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof Gns3SessionBase
+     */
+    'pid'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof Gns3SessionBase
+     */
+    'duration': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Gns3SessionBase
+     */
+    'extendedDuration': number;
+}
+
+
 /**
  * 
  * @export
@@ -1531,6 +1683,88 @@ export interface QueryClassesRes {
 /**
  * 
  * @export
+ * @interface QuerySessionHistoryRes
+ */
+export interface QuerySessionHistoryRes {
+    /**
+     * 
+     * @type {Array<Gns3SessionBase>}
+     * @memberof QuerySessionHistoryRes
+     */
+    'sessions': Array<Gns3SessionBase>;
+}
+/**
+ * 
+ * @export
+ * @interface QuerySessionRes
+ */
+export interface QuerySessionRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySessionRes
+     */
+    'userId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySessionRes
+     */
+    'username': string;
+    /**
+     * 
+     * @type {GNS3SessionStatus}
+     * @memberof QuerySessionRes
+     */
+    'status': GNS3SessionStatus;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySessionRes
+     */
+    'port': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySessionRes
+     */
+    'sessionStart'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySessionRes
+     */
+    'sessionEnd'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySessionRes
+     */
+    'errorMessage'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySessionRes
+     */
+    'pid'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySessionRes
+     */
+    'duration': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySessionRes
+     */
+    'extendedDuration': number;
+}
+
+
+/**
+ * 
+ * @export
  * @interface QueryStudentDashboardRes
  */
 export interface QueryStudentDashboardRes {
@@ -1849,6 +2083,38 @@ export interface QueryUsersRes {
      * @memberof QueryUsersRes
      */
     'totalCount': number;
+}
+/**
+ * 
+ * @export
+ * @interface StartSessionReq
+ */
+export interface StartSessionReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof StartSessionReq
+     */
+    'userId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof StartSessionReq
+     */
+    'duration': number;
+}
+/**
+ * 
+ * @export
+ * @interface StopSessionReq
+ */
+export interface StopSessionReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof StopSessionReq
+     */
+    'userId': number;
 }
 /**
  * 
@@ -3929,6 +4195,520 @@ export class DashboardApi extends BaseAPI {
      */
     public dashboardStreamLogs(minLevel?: string | null, categoryStartsWith?: string | null, contains?: string | null, options?: RawAxiosRequestConfig) {
         return DashboardApiFp(this.configuration).dashboardStreamLogs(minLevel, categoryStartsWith, contains, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * Gns3Api - axios parameter creator
+ * @export
+ */
+export const Gns3ApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {AuthReq} [authReq] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3Auth: async (authReq?: AuthReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/gns3/auth`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(authReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {ExtendSessionReq} extendSessionReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3ExtendSession: async (extendSessionReq: ExtendSessionReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'extendSessionReq' is not null or undefined
+            assertParamExists('gns3ExtendSession', 'extendSessionReq', extendSessionReq)
+            const localVarPath = `/api/gns3/sessions/extend`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(extendSessionReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3ForceStopAll: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/gns3/sessions/force-stop-all`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3QuerySession: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('gns3QuerySession', 'userId', userId)
+            const localVarPath = `/api/gns3/sessions/{userId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3QuerySessionHistory: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('gns3QuerySessionHistory', 'userId', userId)
+            const localVarPath = `/api/gns3/sessions/{userId}/history`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {StartSessionReq} startSessionReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3StartSession: async (startSessionReq: StartSessionReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'startSessionReq' is not null or undefined
+            assertParamExists('gns3StartSession', 'startSessionReq', startSessionReq)
+            const localVarPath = `/api/gns3/sessions/start`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(startSessionReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {StopSessionReq} stopSessionReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3StopSession: async (stopSessionReq: StopSessionReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'stopSessionReq' is not null or undefined
+            assertParamExists('gns3StopSession', 'stopSessionReq', stopSessionReq)
+            const localVarPath = `/api/gns3/sessions/stop`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(stopSessionReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * Gns3Api - functional programming interface
+ * @export
+ */
+export const Gns3ApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = Gns3ApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {AuthReq} [authReq] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async gns3Auth(authReq?: AuthReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.gns3Auth(authReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['Gns3Api.gns3Auth']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {ExtendSessionReq} extendSessionReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async gns3ExtendSession(extendSessionReq: ExtendSessionReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Gns3SessionBase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.gns3ExtendSession(extendSessionReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['Gns3Api.gns3ExtendSession']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async gns3ForceStopAll(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ForceStopAllRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.gns3ForceStopAll(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['Gns3Api.gns3ForceStopAll']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async gns3QuerySession(userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuerySessionRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.gns3QuerySession(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['Gns3Api.gns3QuerySession']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async gns3QuerySessionHistory(userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuerySessionHistoryRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.gns3QuerySessionHistory(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['Gns3Api.gns3QuerySessionHistory']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {StartSessionReq} startSessionReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async gns3StartSession(startSessionReq: StartSessionReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Gns3SessionBase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.gns3StartSession(startSessionReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['Gns3Api.gns3StartSession']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {StopSessionReq} stopSessionReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async gns3StopSession(stopSessionReq: StopSessionReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Gns3SessionBase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.gns3StopSession(stopSessionReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['Gns3Api.gns3StopSession']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * Gns3Api - factory interface
+ * @export
+ */
+export const Gns3ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = Gns3ApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {AuthReq} [authReq] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3Auth(authReq?: AuthReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.gns3Auth(authReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {ExtendSessionReq} extendSessionReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3ExtendSession(extendSessionReq: ExtendSessionReq, options?: RawAxiosRequestConfig): AxiosPromise<Gns3SessionBase> {
+            return localVarFp.gns3ExtendSession(extendSessionReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3ForceStopAll(options?: RawAxiosRequestConfig): AxiosPromise<ForceStopAllRes> {
+            return localVarFp.gns3ForceStopAll(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3QuerySession(userId: number, options?: RawAxiosRequestConfig): AxiosPromise<QuerySessionRes> {
+            return localVarFp.gns3QuerySession(userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3QuerySessionHistory(userId: number, options?: RawAxiosRequestConfig): AxiosPromise<QuerySessionHistoryRes> {
+            return localVarFp.gns3QuerySessionHistory(userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {StartSessionReq} startSessionReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3StartSession(startSessionReq: StartSessionReq, options?: RawAxiosRequestConfig): AxiosPromise<Gns3SessionBase> {
+            return localVarFp.gns3StartSession(startSessionReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {StopSessionReq} stopSessionReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        gns3StopSession(stopSessionReq: StopSessionReq, options?: RawAxiosRequestConfig): AxiosPromise<Gns3SessionBase> {
+            return localVarFp.gns3StopSession(stopSessionReq, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * Gns3Api - object-oriented interface
+ * @export
+ * @class Gns3Api
+ * @extends {BaseAPI}
+ */
+export class Gns3Api extends BaseAPI {
+    /**
+     * 
+     * @param {AuthReq} [authReq] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Gns3Api
+     */
+    public gns3Auth(authReq?: AuthReq, options?: RawAxiosRequestConfig) {
+        return Gns3ApiFp(this.configuration).gns3Auth(authReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {ExtendSessionReq} extendSessionReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Gns3Api
+     */
+    public gns3ExtendSession(extendSessionReq: ExtendSessionReq, options?: RawAxiosRequestConfig) {
+        return Gns3ApiFp(this.configuration).gns3ExtendSession(extendSessionReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Gns3Api
+     */
+    public gns3ForceStopAll(options?: RawAxiosRequestConfig) {
+        return Gns3ApiFp(this.configuration).gns3ForceStopAll(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Gns3Api
+     */
+    public gns3QuerySession(userId: number, options?: RawAxiosRequestConfig) {
+        return Gns3ApiFp(this.configuration).gns3QuerySession(userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Gns3Api
+     */
+    public gns3QuerySessionHistory(userId: number, options?: RawAxiosRequestConfig) {
+        return Gns3ApiFp(this.configuration).gns3QuerySessionHistory(userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {StartSessionReq} startSessionReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Gns3Api
+     */
+    public gns3StartSession(startSessionReq: StartSessionReq, options?: RawAxiosRequestConfig) {
+        return Gns3ApiFp(this.configuration).gns3StartSession(startSessionReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {StopSessionReq} stopSessionReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Gns3Api
+     */
+    public gns3StopSession(stopSessionReq: StopSessionReq, options?: RawAxiosRequestConfig) {
+        return Gns3ApiFp(this.configuration).gns3StopSession(stopSessionReq, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

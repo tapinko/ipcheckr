@@ -30,6 +30,10 @@ namespace IPCheckr.Api.Config
             await EnsureAppSettingAsync(db, "AuthType", AuthType.LOCAL.ToString());
 
             await EnsureAppSettingAsync(db, "Gns3_Enabled", "false");
+            await EnsureAppSettingAsync(db, "Gns3_RemoteServer", "127.0.0.1");
+            await EnsureAppSettingAsync(db, "Gns3_RemotePort", "6769");
+            await EnsureAppSettingAsync(db, "Gns3_DefaultSessionMinutes", "120");
+            await EnsureAppSettingAsync(db, "Gns3_ExtendedMinutes", "30");
 
             await EnsureAppSettingAsync(db, "Ldap_Enabled", "false");
             await EnsureAppSettingAsync(db, "Ldap_Host", "server.ldap.example.local");

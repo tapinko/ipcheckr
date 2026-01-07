@@ -42,6 +42,7 @@ const roleConfig: Record<UserRole, RoleConfig> = {
       { labelKey: TranslationKey.ADMIN_NAVBAR_DASHBOARD, routeKey: RouteKeys.ADMIN_DASHBOARD },
       { labelKey: TranslationKey.ADMIN_NAVBAR_USERS, routeKey: RouteKeys.ADMIN_USERS },
       { labelKey: TranslationKey.ADMIN_NAVBAR_CLASSES, routeKey: RouteKeys.ADMIN_CLASSES },
+      { labelKey: TranslationKey.ADMIN_NAVBAR_GNS3, routeKey: RouteKeys.ADMIN_GNS3 },
       { labelKey: TranslationKey.ADMIN_NAVBAR_SETTINGS, routeKey: RouteKeys.ADMIN_SETTINGS }
     ]
   },

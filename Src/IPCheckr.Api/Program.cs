@@ -59,6 +59,8 @@ namespace IPCheckr.Api
             builder.Services.AddSwaggerDocumentation();
             builder.Services.AddControllers();
             builder.Services.AddCustomAuthorization();
+            builder.Services.AddMemoryCache();
+            builder.Services.AddHostedService<Gns3SessionCleanupService>();
 
             builder.Services.AddSingleton<ILogStreamBroker, LogStreamBroker>();
             builder.Logging.Services.AddSingleton<ILoggerProvider, BroadcastLoggerProvider>();
