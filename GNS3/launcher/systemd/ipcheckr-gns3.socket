@@ -1,0 +1,12 @@
+[Unit]
+Description=IPCheckr GNS3 launcher socket
+
+[Socket]
+ListenStream=0.0.0.0:6769 
+SocketUser=root
+SocketGroup=ipcheckr
+SocketMode=0660
+RemoveOnStop=true
+
+[Install]
+WantedBy=sockets.target

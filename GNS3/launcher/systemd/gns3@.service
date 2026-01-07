@@ -1,0 +1,21 @@
+[Unit]
+Description=Per-user GNS3 server
+After=network.target
+
+[Service]
+Type=simple
+User=gns3svc
+Group=gns3svc
+WorkingDirectory=/var/lib/gns3
+EnvironmentFile=-/var/lib/gns3/%i/env
+
+ExecStartPre=/bin/mkdir -p /var/lib/gns3/%i/projects
+ExecStartPre=/bin/chown -R gns3svc:gns3svc /var/lib/gns3/%i
+
+ExecStart=/bin/sh -c '/usr/bin/gns3server --port ${GNS3_PORT:-0}'
+
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
