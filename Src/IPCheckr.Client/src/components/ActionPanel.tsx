@@ -27,6 +27,7 @@ interface IActionPanelProps {
   addLabel?: string
   children?: ReactNode
   customActions?: ReactNode
+  hideActions?: boolean
 }
 
 const ActionPanel = ({
@@ -43,6 +44,7 @@ const ActionPanel = ({
   addLabel,
   children,
   customActions,
+  hideActions = false,
 }: IActionPanelProps) => {
   const { t } = useTranslation()
   const theme = useTheme()
@@ -84,99 +86,101 @@ const ActionPanel = ({
         {title ? <Typography variant="h5">{title}</Typography> : null}
         {children ? <Box>{children}</Box> : null}
       </Box>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: isMobile ? "space-between" : "flex-end",
-          gap: 1,
-          width: { xs: "100%", md: "auto" }
-        }}
-      >
-        {customActions ? (
-          <Box sx={{ width: isMobile ? "100%" : "auto", display: "flex", gap: 1, justifyContent: "flex-end" }}>
-            {customActions}
-          </Box>
-        ) : (
-          <>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={onAdd}
-              disabled={disableAdd}
-              fullWidth={isMobile}
-            >
-              {addLabelText}
-            </Button>
-            {isMobile ? (
-              <>
-                {showDetails && (
+      {hideActions ? null : (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: isMobile ? "space-between" : "flex-end",
+            gap: 1,
+            width: { xs: "100%", md: "auto" }
+          }}
+        >
+          {customActions ? (
+            <Box sx={{ width: isMobile ? "100%" : "auto", display: "flex", gap: 1, justifyContent: "flex-end" }}>
+              {customActions}
+            </Box>
+          ) : (
+            <>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={onAdd}
+                disabled={disableAdd}
+                fullWidth={isMobile}
+              >
+                {addLabelText}
+              </Button>
+              {isMobile ? (
+                <>
+                  {showDetails && (
+                    <Button
+                      variant="contained"
+                      color="info"
+                      onClick={onDetails}
+                      disabled={disableDetails}
+                      fullWidth
+                    >
+                      {t(TranslationKey.ACTION_PANEL_DETAILS)}
+                    </Button>
+                  )}
+                  <IconButton
+                    aria-label="more"
+                    onClick={openMenu}
+                    disabled={disableEdit && disableDelete}
+                    sx={{ alignSelf: "stretch" }}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={menuAnchor}
+                    open={Boolean(menuAnchor)}
+                    onClose={closeMenu}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                  >
+                    <MenuItem onClick={handleEdit} disabled={disableEdit}>
+                      {t(TranslationKey.ACTION_PANEL_EDIT)}
+                    </MenuItem>
+                    <MenuItem onClick={handleDelete} disabled={disableDelete}>
+                      {t(TranslationKey.ACTION_PANEL_DELETE)}
+                    </MenuItem>
+                  </Menu>
+                </>
+              ) : (
+                <>
                   <Button
                     variant="contained"
                     color="info"
-                    onClick={onDetails}
-                    disabled={disableDetails}
-                    fullWidth
+                    onClick={onEdit}
+                    disabled={disableEdit}
                   >
-                    {t(TranslationKey.ACTION_PANEL_DETAILS)}
-                  </Button>
-                )}
-                <IconButton
-                  aria-label="more"
-                  onClick={openMenu}
-                  disabled={disableEdit && disableDelete}
-                  sx={{ alignSelf: "stretch" }}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-                <Menu
-                  anchorEl={menuAnchor}
-                  open={Boolean(menuAnchor)}
-                  onClose={closeMenu}
-                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                  transformOrigin={{ vertical: "top", horizontal: "right" }}
-                >
-                  <MenuItem onClick={handleEdit} disabled={disableEdit}>
                     {t(TranslationKey.ACTION_PANEL_EDIT)}
-                  </MenuItem>
-                  <MenuItem onClick={handleDelete} disabled={disableDelete}>
-                    {t(TranslationKey.ACTION_PANEL_DELETE)}
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="contained"
-                  color="info"
-                  onClick={onEdit}
-                  disabled={disableEdit}
-                >
-                  {t(TranslationKey.ACTION_PANEL_EDIT)}
-                </Button>
-                {showDetails && (
+                  </Button>
+                  {showDetails && (
+                    <Button
+                      variant="contained"
+                      color="info"
+                      onClick={onDetails}
+                      disabled={disableDetails}
+                    >
+                      {t(TranslationKey.ACTION_PANEL_DETAILS)}
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
-                    color="info"
-                    onClick={onDetails}
-                    disabled={disableDetails}
+                    color="error"
+                    onClick={onDelete}
+                    disabled={disableDelete}
                   >
-                    {t(TranslationKey.ACTION_PANEL_DETAILS)}
+                    {t(TranslationKey.ACTION_PANEL_DELETE)}
                   </Button>
-                )}
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={onDelete}
-                  disabled={disableDelete}
-                >
-                  {t(TranslationKey.ACTION_PANEL_DELETE)}
-                </Button>
-              </>
-            )}
-          </>
-        )}
-      </Box>
+                </>
+              )}
+            </>
+          )}
+        </Box>
+      )}
     </Box>
   )
 }

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace IPCheckr.Api.Controllers
 {
     [ApiController]
-    [Authorize(Policy = Roles.Admin)]
     [Route("api/appsettings")]
     public partial class AppSettingsController : ControllerBase
     {

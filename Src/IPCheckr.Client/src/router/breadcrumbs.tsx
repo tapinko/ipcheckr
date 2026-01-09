@@ -85,6 +85,12 @@ const routes: BreadcrumbsRoute[] = [
         {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT)} {match.params.ASSIGNMENT_ID}
       </Typography>
   },
+  {
+    path: Routes[RouteKeys.TEACHER_GNS3],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_GNS3)}
+      </Typography>
+  },
 
   {
     path: Routes[RouteKeys.STUDENT_ASSIGNMENTS],

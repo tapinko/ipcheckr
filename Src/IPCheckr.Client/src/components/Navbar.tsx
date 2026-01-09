@@ -51,7 +51,8 @@ const roleConfig: Record<UserRole, RoleConfig> = {
     items: [
       { labelKey: TranslationKey.TEACHER_NAVBAR_DASHBOARD, routeKey: RouteKeys.TEACHER_DASHBOARD },
       { labelKey: TranslationKey.TEACHER_NAVBAR_MY_CLASSES, routeKey: RouteKeys.TEACHER_MY_CLASSES },
-      { labelKey: TranslationKey.TEACHER_NAVBAR_ASSIGNMENT_GROUPS, routeKey: RouteKeys.TEACHER_ASSIGNMENT_GROUPS }
+      { labelKey: TranslationKey.TEACHER_NAVBAR_ASSIGNMENT_GROUPS, routeKey: RouteKeys.TEACHER_ASSIGNMENT_GROUPS },
+      { labelKey: TranslationKey.TEACHER_NAVBAR_GNS3, routeKey: RouteKeys.TEACHER_GNS3 }
     ]
   },
   [UserRole.STUDENT]: {

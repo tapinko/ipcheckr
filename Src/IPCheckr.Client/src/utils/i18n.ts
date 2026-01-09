@@ -113,6 +113,7 @@ export enum TranslationKey {
   BREADCRUMBS_TEACHER_ASSIGNMENT_GROUPS = "BREADCRUMBS_ADMIN_ASSIGNMENT_GROUPS",
   BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS = "BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS",
   BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT = "BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT",
+  BREADCRUMBS_TEACHER_GNS3 = "BREADCRUMBS_TEACHER_GNS3",
 
   BREADCRUMBS_STUDENT_ASSIGNMENTS = "BREADCRUMBS_STUDENT_ASSIGNMENTS",
   BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS = "BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS",
@@ -310,6 +311,15 @@ export enum TranslationKey {
   TEACHER_NAVBAR_DASHBOARD = "TEACHER_NAVBAR_DASHBOARD",
   TEACHER_NAVBAR_MY_CLASSES = "TEACHER_NAVBAR_MY_CLASSES",
   TEACHER_NAVBAR_ASSIGNMENT_GROUPS = "TEACHER_NAVBAR_ASSIGNMENT_GROUPS",
+  TEACHER_NAVBAR_GNS3 = "TEACHER_NAVBAR_GNS3",
+
+  // Teacher GNS3
+  TEACHER_GNS3_TITLE = "TEACHER_GNS3_TITLE",
+  TEACHER_GNS3_START = "TEACHER_GNS3_START",
+  TEACHER_GNS3_STOP = "TEACHER_GNS3_STOP",
+  TEACHER_GNS3_EXTEND = "TEACHER_GNS3_EXTEND",
+  TEACHER_GNS3_CLASS_FILTER = "TEACHER_GNS3_CLASS_FILTER",
+  TEACHER_GNS3_ALL_CLASSES = "TEACHER_GNS3_ALL_CLASSES",
 
   // TeacherDashboard
   TEACHER_DASHBOARD_TITLE = "TEACHER_DASHBOARD_TITLE",
@@ -663,6 +673,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUPS]: "Assignments",
   [TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS]: "Assignment details",
   [TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT]: "Assignment submit details",
+  [TranslationKey.BREADCRUMBS_TEACHER_GNS3]: "GNS3",
 
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENTS]: "Assignments",
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS]: "Assignment details",
@@ -859,6 +870,15 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_NAVBAR_DASHBOARD]: "Dashboard",
   [TranslationKey.TEACHER_NAVBAR_MY_CLASSES]: "My Classes",
   [TranslationKey.TEACHER_NAVBAR_ASSIGNMENT_GROUPS]: "Assignments",
+  [TranslationKey.TEACHER_NAVBAR_GNS3]: "GNS3",
+
+  // Teacher GNS3
+  [TranslationKey.TEACHER_GNS3_TITLE]: "GNS3 sessions",
+  [TranslationKey.TEACHER_GNS3_START]: "Successfully started session for student '{{value}}'.",
+  [TranslationKey.TEACHER_GNS3_STOP]: "Successfully stopped session for student '{{value}}'.",
+  [TranslationKey.TEACHER_GNS3_EXTEND]: "Successfully extended for student '{{value}}' by {{minutes}}min.",
+  [TranslationKey.TEACHER_GNS3_CLASS_FILTER]: "Class",
+  [TranslationKey.TEACHER_GNS3_ALL_CLASSES]: "All",
 
   // TeacherDashboard
   [TranslationKey.TEACHER_DASHBOARD_TITLE]: "Dashboard",
@@ -1211,6 +1231,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUPS]: "Zadania",
   [TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS]: "Detaily zadania",
   [TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT]: "Detaily odovzdania zadania",
+  [TranslationKey.BREADCRUMBS_TEACHER_GNS3]: "GNS3",
 
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENTS]: "Zadania",
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS]: "Detaily zadania",
@@ -1407,6 +1428,15 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_NAVBAR_DASHBOARD]: "Hlavný panel",
   [TranslationKey.TEACHER_NAVBAR_MY_CLASSES]: "Moje triedy",
   [TranslationKey.TEACHER_NAVBAR_ASSIGNMENT_GROUPS]: "Zadania",
+  [TranslationKey.TEACHER_NAVBAR_GNS3]: "GNS3",
+
+  // Teacher GNS3
+  [TranslationKey.TEACHER_GNS3_TITLE]: "GNS3 relácie",
+  [TranslationKey.TEACHER_GNS3_START]: "Úspešne spustená relácia pre študenta '{{value}}'.",
+  [TranslationKey.TEACHER_GNS3_STOP]: "Úspešne zastavená relácia pre študenta '{{value}}'.",
+  [TranslationKey.TEACHER_GNS3_EXTEND]: "Úspešne predĺžená relácia pre študenta '{{value}}' o {{minutes}} min.",
+  [TranslationKey.TEACHER_GNS3_CLASS_FILTER]: "Trieda",
+  [TranslationKey.TEACHER_GNS3_ALL_CLASSES]: "Všetky",
 
   // TeacherDashboard
   [TranslationKey.TEACHER_DASHBOARD_TITLE]: "Hlavný panel",

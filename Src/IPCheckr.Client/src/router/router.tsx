@@ -15,6 +15,7 @@ import TeacherClassDetails from "../pages/teacher/TeacherClassDetails"
 import TeacherAssignmentGroups from "../pages/teacher/TeacherAssignmentGroups"
 import TeacherAssignmentGroupDetails from "../pages/teacher/TeacherAssignmentGroupDetails"
 import TeacherAssignmentGroupDetailsSubmit from "../pages/teacher/TeacherAssignmentGroupDetailsSubmit"
+import TeacherGns3 from "../pages/teacher/TeacherGns3"
 
 import StudentLayout from "../layouts/StudentLayout"
 import StudentDashboard from "../pages/student/StudentDashboard"
@@ -54,6 +55,7 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS]: <TeacherAssignmentGroups />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS]: <TeacherAssignmentGroupDetails />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <TeacherAssignmentGroupDetailsSubmit />,
+  [RouteKeys.TEACHER_GNS3]: <TeacherGns3 />,
 
   [RouteKeys.STUDENT]: <Navigate to={Routes[RouteKeys.STUDENT_DASHBOARD]} />,
   [RouteKeys.STUDENT_DASHBOARD]: <StudentDashboard />,
@@ -123,6 +125,7 @@ const useAuthRouter = () => {
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
+          RouteKeys.TEACHER_GNS3,
         ].map(key => ({
           path: childPath(Routes[key], Routes[RouteKeys.TEACHER]),
           element: routeElements[key]!,

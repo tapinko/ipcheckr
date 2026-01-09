@@ -29,6 +29,10 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Používatel' neexistuje."
                 });
 
+            var accessResult = await Gns3AccessUtils.EnsureGns3AccessAsync(User, _db, user, ct);
+            if (accessResult != null)
+                return accessResult;
+
             var session = await _db.Gns3Sessions
                 .OrderByDescending(s => s.SessionStart)
                 .FirstOrDefaultAsync(s => s.UserId == user.Id, ct);
@@ -57,6 +61,10 @@ namespace IPCheckr.Api.Controllers
                     MessageEn = "User not found.",
                     MessageSk = "Používatel' neexistuje."
                 });
+
+            var accessResult = await Gns3AccessUtils.EnsureGns3AccessAsync(User, _db, user, ct);
+            if (accessResult != null)
+                return accessResult;
 
             var sessions = await _db.Gns3Sessions
                 .Where(s => s.UserId == user.Id)

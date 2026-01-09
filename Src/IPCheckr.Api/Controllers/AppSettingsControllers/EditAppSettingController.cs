@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AppSettings;
+using Microsoft.AspNetCore.Authorization;
+using IPCheckr.Api.Common.Constants;
 
 namespace IPCheckr.Api.Controllers
 {
     public partial class AppSettingsController : ControllerBase
     {
         [HttpPut("edit-app-setting")]
+        [Authorize(Policy = Roles.Admin)]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult> EditAppSetting([FromBody] EditAppSettinReq req)

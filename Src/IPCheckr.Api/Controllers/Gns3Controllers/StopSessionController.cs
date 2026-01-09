@@ -32,6 +32,10 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Používateľ neexistuje."
                 });
 
+            var accessResult = await Gns3AccessUtils.EnsureGns3AccessAsync(User, _db, user, ct);
+            if (accessResult != null)
+                return accessResult;
+
             if (string.Equals(user.Username, "admin", StringComparison.OrdinalIgnoreCase))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {

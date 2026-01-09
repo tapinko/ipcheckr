@@ -31,6 +31,10 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Používatel' neexistuje."
                 });
 
+            var accessResult = await Gns3AccessUtils.EnsureGns3AccessAsync(User, _db, user, ct);
+            if (accessResult != null)
+                return accessResult;
+
             var session = await _db.Gns3Sessions.FirstOrDefaultAsync(s => s.UserId == user.Id && s.Status == GNS3SessionStatus.RUNNING, ct);
             if (session == null)
                 return NotFound(new ApiProblemDetails
@@ -42,9 +46,7 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Relácia nie je spustená."
                 });
 
-            var minutes = req.Minutes.HasValue && req.Minutes.Value > 0
-                ? req.Minutes.Value
-                : await Gns3Config.GetExtensionMinutesAsync(HttpContext.RequestServices, ct);
+            var minutes = await Gns3Config.GetExtensionMinutesAsync(HttpContext.RequestServices, ct);
 
             session.ExtendedDuration += minutes * 60;
             await _db.SaveChangesAsync(ct);

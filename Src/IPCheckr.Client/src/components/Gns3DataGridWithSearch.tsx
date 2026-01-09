@@ -32,6 +32,13 @@ import type { Gns3StatusKey } from "../utils/getGns3StatusMap"
 import { getGns3StatusMap } from "../utils/getGns3StatusMap"
 import { gns3Api } from "../utils/apiClients"
 
+type DataGridFilter = {
+  label: string
+  value: string
+  setValue: (val: string) => void
+  options: { value: string; label: string }[]
+}
+
 type Gns3SessionWithDuration = Gns3SessionBase & {
   duration?: number
   extendedDuration?: number
@@ -83,6 +90,9 @@ interface IGns3DataGridWithSearchProps {
   onStopSession: (user: UserDto) => void
   onExtendSession: (user: UserDto) => void
   showRoleFilter?: boolean
+  showPortColumn?: boolean
+  filter1?: DataGridFilter
+  filter2?: DataGridFilter
 }
 
 const Gns3DataGridWithSearch = ({
@@ -103,6 +113,9 @@ const Gns3DataGridWithSearch = ({
   onStopSession,
   onExtendSession,
   showRoleFilter = true,
+  showPortColumn = true,
+  filter1,
+  filter2,
 }: IGns3DataGridWithSearchProps) => {
   const { t, i18n } = useTranslation()
   const statusMap = useMemo(() => getGns3StatusMap(t), [t])
@@ -135,6 +148,8 @@ const Gns3DataGridWithSearch = ({
     }
   }, [roleFilterValue, setRoleFilterValue, showRoleFilter, t])
 
+  const primaryFilter = useMemo(() => filter1 ?? (showRoleFilter ? roleFilter : undefined), [filter1, roleFilter, showRoleFilter])
+
   const displayUsers = useMemo(() => users ?? [], [users])
 
   const historyQuery = useQuery<{ sessions: Gns3SessionBase[] }>({
@@ -157,8 +172,8 @@ const Gns3DataGridWithSearch = ({
     return localized || payload?.detail || t(TranslationKey.ERROR_MESSAGE)
   })() : undefined
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const cols = [
       { label: t(TranslationKey.GNS3_DATA_GRID_USERNAME), key: "username", width: 130 },
       { label: t(TranslationKey.GNS3_DATA_GRID_ROLE), key: "role", width: 120, hideOnMobile: true },
       { label: t(TranslationKey.GNS3_DATA_GRID_STATUS), key: "status", width: 120 },
@@ -167,9 +182,10 @@ const Gns3DataGridWithSearch = ({
       { label: t(TranslationKey.GNS3_DATA_GRID_DURATION), key: "duration", width: 120 },
       { label: t(TranslationKey.GNS3_DATA_GRID_STOPPED_AT), key: "sessionEnd", width: 160, hideOnMobile: true },
       { label: "", key: "actions", width: 140, hideOnMobile: true },
-    ],
-    [t]
-  )
+    ]
+
+    return showPortColumn ? cols : cols.filter(c => c.key !== "port")
+  }, [showPortColumn, t])
 
   const minWidth = useMemo(() => columns.reduce((sum, c) => sum + (Number(c.width) || 0), 0), [columns])
 
@@ -372,7 +388,8 @@ const Gns3DataGridWithSearch = ({
   return (
     <>
       <DataGridWithSearch
-        filter1={roleFilter}
+        filter1={primaryFilter}
+        filter2={filter2}
         searchValue={searchValue}
         setSearchValue={setSearchValue}
         descending={descending}

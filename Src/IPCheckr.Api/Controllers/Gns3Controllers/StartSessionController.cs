@@ -34,6 +34,10 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Používateľ neexistuje."
                 });
 
+            var accessResult = await Gns3AccessUtils.EnsureGns3AccessAsync(User, _db, user, ct);
+            if (accessResult != null)
+                return accessResult;
+
             if (string.Equals(user.Username, "admin", StringComparison.OrdinalIgnoreCase))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
@@ -80,9 +84,7 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = $"Spúšťač nedostupný: {launcherResult.Response}"
                 });
 
-            var durationSeconds = req.Duration > 0
-                ? req.Duration
-                : await Gns3Config.GetDefaultDurationSecondsAsync(HttpContext.RequestServices, ct);
+            var durationSeconds = await Gns3Config.GetDefaultDurationSecondsAsync(HttpContext.RequestServices, ct);
 
             var session = new Gns3Session
             {
