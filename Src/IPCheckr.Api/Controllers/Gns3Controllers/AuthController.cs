@@ -1,10 +1,11 @@
 using IPCheckr.Api.Common.Constants;
+using IPCheckr.Api.Common.Enums;
+using IPCheckr.Api.Common.Utils;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.Gns3;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using IPCheckr.Api.Common.Enums;
-using Microsoft.AspNetCore.Authorization;
 
 namespace IPCheckr.Api.Controllers
 {
