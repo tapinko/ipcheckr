@@ -145,7 +145,12 @@ const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
       <Table sx={{ tableLayout: "fixed" }}>
         <TableHead>
           <TableRow>
-            {selectableRows && <TableCell />}
+            {selectableRows && (
+              <TableCell
+                padding="checkbox"
+                sx={{ width: 44, minWidth: 44, maxWidth: 48, p: 0.5 }}
+              />
+            )}
             {columns.map(col => (
               <TableCell
                 key={col.key}
@@ -178,7 +183,7 @@ const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
                   style={selectableRows ? { cursor: "pointer" } : undefined}
                 >
                   {selectableRows && (
-                    <TableCell padding="checkbox">
+                    <TableCell padding="checkbox" sx={{ width: 44, minWidth: 44, maxWidth: 48, p: 0.5 }}>
                       <Checkbox
                         checked={selectedRows.includes(row.id)}
                         onChange={() => handleRowSelect(row)}
