@@ -19,6 +19,19 @@ namespace IPCheckr.Api.Controllers
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult> Auth([FromBody] AuthReq? req = null)
         {
+            var enabled = await Gns3Config.IsEnabledAsync(HttpContext.RequestServices, HttpContext.RequestAborted);
+            if (!enabled)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, new ApiProblemDetails
+                {
+                    Title = "GNS3 disabled",
+                    Detail = "GNS3 integration is disabled.",
+                    Status = StatusCodes.Status503ServiceUnavailable,
+                    MessageEn = "GNS3 integration is disabled.",
+                    MessageSk = "GNS3 integrácia je vypnutá."
+                });
+            }
+
             var creds = req ?? new AuthReq { Username = string.Empty, Password = string.Empty };
             if (string.IsNullOrWhiteSpace(creds.Username) || string.IsNullOrWhiteSpace(creds.Password))
                 creds = ReadBasicAuthOrFallback();

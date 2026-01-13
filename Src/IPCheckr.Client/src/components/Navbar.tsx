@@ -22,6 +22,8 @@ import { useAuth } from "../contexts/AuthContext"
 import { RouteKeys, Routes } from "../router/routes"
 import UserRole from "../types/UserRole"
 import bg_w_cr_text from "../assets/bg_w_cr_text.svg"
+import { appSettingsApi } from "../utils/apiClients"
+import { useQuery } from "@tanstack/react-query"
 
 interface NavItem {
   labelKey: TranslationKey
@@ -81,7 +83,26 @@ const Navbar = ({ role }: NavbarProps) => {
   const [navMenuAnchor, setNavMenuAnchor] = useState<null | HTMLElement>(null)
   const [settingsMenuAnchor, setSettingsMenuAnchor] = useState<null | HTMLElement>(null)
 
+  const appSettingsQuery = useQuery({
+    queryKey: ["navbar-appsettings"],
+    queryFn: () => appSettingsApi.appSettingsQueryAppSettings(),
+    staleTime: 60_000,
+  })
+
+  const gns3Enabled = useMemo(() => {
+    const list = appSettingsQuery.data?.data?.appSettings ?? []
+    const setting = list.find(s => s.name === "Gns3_Enabled")
+    const raw = (setting?.value ?? "false").trim().toLowerCase()
+    return raw === "true" || raw === "1" || raw === "yes"
+  }, [appSettingsQuery.data])
+
   const cfg = roleConfig[role]
+
+  const navItems = useMemo(() => {
+    if (!cfg?.items) return []
+    const gns3Routes = new Set([RouteKeys.ADMIN_GNS3, RouteKeys.TEACHER_GNS3, RouteKeys.STUDENT_GNS3])
+    return cfg.items.filter(item => (gns3Routes.has(item.routeKey) ? gns3Enabled : true))
+  }, [cfg?.items, gns3Enabled])
 
   const closeMobileMenu = useCallback(() => {
     setNavMenuAnchor(null)
@@ -128,7 +149,7 @@ const Navbar = ({ role }: NavbarProps) => {
 
   const navButtons = useMemo(
     () =>
-      cfg?.items.map(item => (
+      navItems.map(item => (
         <Button
           key={item.routeKey}
             color="inherit"
@@ -137,7 +158,7 @@ const Navbar = ({ role }: NavbarProps) => {
           {t(item.labelKey)}
         </Button>
       )),
-    [cfg, handleNavigate, t]
+    [handleNavigate, navItems, t]
   )
 
   if (!cfg) return null
@@ -257,7 +278,7 @@ const Navbar = ({ role }: NavbarProps) => {
         onClose={closeMobileMenu}
         keepMounted
       >
-        {cfg.items.map(item => (
+        {navItems.map(item => (
           <MenuItem key={item.routeKey} onClick={() => handleNavigate(item.routeKey)}>
             {t(item.labelKey)}
           </MenuItem>

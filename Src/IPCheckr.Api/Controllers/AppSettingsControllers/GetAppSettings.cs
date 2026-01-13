@@ -24,6 +24,7 @@ namespace IPCheckr.Api.Controllers
             if (!isAdmin)
             {
                 var allowedNames = new[] {
+                    "Gns3_Enabled",
                     "Gns3_DefaultSessionMinutes",
                     "Gns3_ExtendedMinutes"
                 };

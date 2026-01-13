@@ -20,6 +20,19 @@ namespace IPCheckr.Api.Controllers
         public async Task<ActionResult<Gns3SessionBase>> StartSession([FromBody] StartSessionReq req, CancellationToken ct)
         {
             var logger = HttpContext.RequestServices.GetRequiredService<ILogger<Gns3Controller>>();
+            var enabled = await Gns3Config.IsEnabledAsync(HttpContext.RequestServices, ct);
+            if (!enabled)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, new ApiProblemDetails
+                {
+                    Title = "GNS3 disabled",
+                    Detail = "GNS3 integration is disabled.",
+                    Status = StatusCodes.Status503ServiceUnavailable,
+                    MessageEn = "GNS3 integration is disabled.",
+                    MessageSk = "GNS3 integrácia je vypnutá."
+                });
+            }
+
             if (!Gns3SessionHelpers.IsClientCertificateAllowed(HttpContext))
                 return Forbid();
 
