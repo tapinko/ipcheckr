@@ -2,52 +2,41 @@
 
 ![ipcheckr logo](Assets/github-images/bg_w_cr_text-h150.png)
 
-A minimal self-hosted application for teaching and testing subnetting and IP networking concepts.  
-Provides role-based management for administrators, teachers and students with a web client and .NET API.
+IPCheckr is a system for learning and testing subnetting. Students practice and get quick results, teachers manage classes, and sign-in can use your AD/LDAP. With GNS3 support, each user can launch their own lab safely.
 
-## Images
+## What it does
+- Subnetting drills and automated grading for students.
+- Multi-user classroom flows for teachers (assignments, submissions).
+- Admin workflows for managing org structure and users.
+- AD/LDAP authentication with role mapping.
+- Multi-user GNS3 integration (per-user server sessions with AD-backed access control).
 
-### Teacher's view
+## Screenshots
 
+### Teacher
 ![teacher dashboard zoomed out](Assets/github-images/teacher_dashboard.png)
 ![teacher submit details](Assets/github-images/teacher_submit_details.png)
 
-### Student's view
-
+### Student
 ![student submitting](Assets/github-images/student_submitting.png)
 
-### Admin's view
-
+### Admin
 ![admin classes](Assets/github-images/admin_classes.png)
 ![admin users](Assets/github-images/admin_users.png)
 
-## Quickstart (local, with Docker)
-0. Have Docker installed on your system.
-1. (Optional) Pull the latest image from Docker Hub:
-   `docker pull tapinko/ipcheckr:latest`
-2. Download the docker compose file (Docker/compose.yml)
-3. Start services (API + DB):
-   `docker compose -f Docker/compose.yml up -d`
-4. Open the app at: https://localhost:8081
-
 ## Authentication
-IPCheckr supports both local accounts and LDAP-backed sign-in.
+- **Local**: seeded admin `admin` / `admin` on first run (change immediately).
+- **AD/LDAP**: configurable host/port/SSL, bind or DN template, search base, username attribute, and group DNs for teacher/student role mapping. Switch auth mode in Admin -> Settings.
 
-- Local (default): user data lives in the MariaDB schema. On first run a default admin `admin`/`admin` is seeded — please change it after signing in.
-- LDAP: switch the auth type in the Admin → Settings page (stored in the `AuthType` app setting). LDAP connection details are managed through the `Ldap_*` app settings (host, port, SSL/StartTLS, bind mode or DN template, search base, username attribute, and optional student/teacher group DNs for role mapping). When LDAP is active, the Admin → Users flow searches your directory instead of requesting local passwords.
-- Docker image knobs: see `Docker/compose.yml` for `LDAP_HOST`, `LDAP_PORT`, `LDAP_USESSL`, `LDAP_STARTTLS`, `LDAP_FETCH_CERT`, `DNS_NAMESERVER`, and `DNS_SEARCH_DOMAIN`. `Docker/fetch-ldap-cert.sh` can pull and trust the LDAP server certificate on startup when `LDAP_FETCH_CERT=true`; set `extra_hosts` or your own DNS so the container can resolve the LDAP host.
+## GNS3 integration (multi-user)
+- Per-user GNS3 server sessions orchestrated by the backend; port/PID tracking stored in DB.
+- AD-authenticated users get their own GNS3 instance; files remain per-user under service ownership.
 
-## Development
-- Client: open [Src/IPCheckr.Client](Src/IPCheckr.Client) in your preferred code editor. Use Vite for local dev (`npm run dev` in Client directory).
-- API: open [Src/IPCheckr.Api](Src/IPCheckr.Api) in your preferred code editor. The API serves static client files from wwwroot in production. For development, deploy the [ipcheckr-mariadb-dev container](Dev/ipcheckr-mariadb-dev.yml) and run `dotnet watch` inside the API directory.
-
-### Contents
-- Server: ASP.NET Core API ([`IPCheckr.Api`](Src/IPCheckr.Api)) — [Src/IPCheckr.Api](Src/IPCheckr.Api)  
-- Client: React + Vite app ([`IPCheckr.Client`](Src/IPCheckr.Client/src/)) — [Src/IPCheckr.Client/src/](Src/IPCheckr.Client/src/)  
-- Client i18n: language enums and keys ([`Language`, `TranslationKey`](Src/IPCheckr.Client/src/utils/i18n.ts)) — [Src/IPCheckr.Client/src/utils/i18n.ts](Src/IPCheckr.Client/src/utils/i18n.ts)  
-- Client entry: [Src/IPCheckr.Client/index.html](Src/IPCheckr.Client/index.html)  
-- Docker: multi-stage build and compose files — [Docker/Dockerfile](Docker/Dockerfile), [Docker/compose.yml](Docker/compose.yml)
+## Quickstart (Docker for now)
+1. Install Docker / Docker Compose.
+2. (Optional) pull the image: `docker pull tapinko/ipcheckr:latest`.
+3. Run: `docker compose -f Docker/compose.yml up -d`
+4. Open https://localhost:8081 and log in as `admin` / `admin`.
 
 ## License
-
-This project is available under the MIT License — see the LICENSE file.
+MIT — see LICENSE.
