@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace IPCheckr.Api.Controllers
 {
     [ApiController]
-    [Authorize(Policy = Roles.Teacher)]
+    [Authorize(Policy = Roles.Student)]
     [Route("api/gns3")]
     public partial class Gns3Controller : ControllerBase
     {

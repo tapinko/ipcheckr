@@ -34,6 +34,7 @@ export enum RouteKeys {
   STUDENT_ASSIGNMENTS,
   STUDENT_ASSIGNMENT_SUBMISSION,
   STUDENT_ASSIGNMENT_DETAILS,
+  STUDENT_GNS3,
 }
 
 const LOGIN = "/login"
@@ -62,6 +63,7 @@ const STUDENT_DASHBOARD = `${STUDENT}/dashboard`
 const STUDENT_ASSIGNMENS = `${STUDENT}/assignments`
 const STUDENT_ASSIGNMENT_SUBMISSION = `${STUDENT_ASSIGNMENS}/submit/:${RouteParams.ASSIGNMENT_ID}`
 const STUDENT_ASSIGNMENT_DETAILS = `${STUDENT_ASSIGNMENS}/details/:${RouteParams.ASSIGNMENT_ID}/:${RouteParams.ATTEMPT}`
+const STUDENT_GNS3 = `${STUDENT}/gns3`
 
 /**
  * Generates a URL with parameters replaced with a provided values.
@@ -101,4 +103,5 @@ export const Routes: Record<RouteKeys, string> = {
   [RouteKeys.STUDENT_ASSIGNMENTS]: STUDENT_ASSIGNMENS,
   [RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION]: STUDENT_ASSIGNMENT_SUBMISSION,
   [RouteKeys.STUDENT_ASSIGNMENT_DETAILS]: STUDENT_ASSIGNMENT_DETAILS,
+  [RouteKeys.STUDENT_GNS3]: STUDENT_GNS3,
 }

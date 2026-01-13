@@ -118,6 +118,7 @@ export enum TranslationKey {
   BREADCRUMBS_STUDENT_ASSIGNMENTS = "BREADCRUMBS_STUDENT_ASSIGNMENTS",
   BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS = "BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS",
   BREADCRUMBS_STUDENT_ASSIGNMENT_SUBMISSION = "BREADCRUMBS_STUDENT_ASSIGNMENT_SUBMISSION",
+  BREADCRUMBS_STUDENT_GNS3 = "BREADCRUMBS_STUDENT_GNS3",
   
   // ||-------- ADMIN --------||
   // |                        |
@@ -507,6 +508,27 @@ export enum TranslationKey {
   // Student Navbar           |
   STUDENT_NAVBAR_DASHBOARD = "STUDENT_NAVBAR_DASHBOARD",
   STUDENT_NAVBAR_ASSIGNMENTS = "STUDENT_NAVBAR_ASSIGNMENTS",
+  STUDENT_NAVBAR_GNS3 = "STUDENT_NAVBAR_GNS3",
+
+  // Student GNS3
+  STUDENT_GNS3_TITLE = "STUDENT_GNS3_TITLE",
+  STUDENT_GNS3_LIVE_SESSION = "STUDENT_GNS3_LIVE_SESSION",
+  STUDENT_GNS3_STATUS = "STUDENT_GNS3_STATUS",
+  STUDENT_GNS3_STARTED_AT = "STUDENT_GNS3_STARTED_AT",
+  STUDENT_GNS3_REMAINING = "STUDENT_GNS3_REMAINING",
+  STUDENT_GNS3_DURATION = "STUDENT_GNS3_DURATION",
+  STUDENT_GNS3_PORT = "STUDENT_GNS3_PORT",
+  STUDENT_GNS3_START = "STUDENT_GNS3_START",
+  STUDENT_GNS3_STOP = "STUDENT_GNS3_STOP",
+  STUDENT_GNS3_EXTEND = "STUDENT_GNS3_EXTEND",
+  STUDENT_GNS3_START_SUCCESS = "STUDENT_GNS3_START_SUCCESS",
+  STUDENT_GNS3_STOP_SUCCESS = "STUDENT_GNS3_STOP_SUCCESS",
+  STUDENT_GNS3_EXTEND_SUCCESS = "STUDENT_GNS3_EXTEND_SUCCESS",
+  STUDENT_GNS3_ROWS_PER_PAGE = "STUDENT_GNS3_ROWS_PER_PAGE",
+  STUDENT_GNS3_PAGINATION_RANGE = "STUDENT_GNS3_PAGINATION_RANGE",
+  STUDENT_GNS3_HISTORY_TITLE = "STUDENT_GNS3_HISTORY_TITLE",
+  STUDENT_GNS3_HISTORY_EMPTY = "STUDENT_GNS3_HISTORY_EMPTY",
+  STUDENT_GNS3_STOPPED_AT = "STUDENT_GNS3_STOPPED_AT",
 
   // StudentDashboard
   STUDENT_DASHBOARD_TITLE = "STUDENT_DASHBOARD_TITLE",
@@ -678,6 +700,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENTS]: "Assignments",
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS]: "Assignment details",
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_SUBMISSION]: "Submit assignment",
+  [TranslationKey.BREADCRUMBS_STUDENT_GNS3]: "GNS3",
 
   // ||-------- ADMIN --------||
   // |                        |
@@ -1065,6 +1088,27 @@ const _EN: Record<TranslationKey, string> = {
   // Student Navbar           |
   [TranslationKey.STUDENT_NAVBAR_DASHBOARD]: "Dashboard",
   [TranslationKey.STUDENT_NAVBAR_ASSIGNMENTS]: "Assignments",
+  [TranslationKey.STUDENT_NAVBAR_GNS3]: "GNS3",
+
+  // Student GNS3
+  [TranslationKey.STUDENT_GNS3_TITLE]: "GNS3",
+  [TranslationKey.STUDENT_GNS3_LIVE_SESSION]: "Live session",
+  [TranslationKey.STUDENT_GNS3_STATUS]: "Status",
+  [TranslationKey.STUDENT_GNS3_STARTED_AT]: "Started at",
+  [TranslationKey.STUDENT_GNS3_REMAINING]: "Remaining",
+  [TranslationKey.STUDENT_GNS3_DURATION]: "Duration",
+  [TranslationKey.STUDENT_GNS3_PORT]: "Port",
+  [TranslationKey.STUDENT_GNS3_START]: "Start session",
+  [TranslationKey.STUDENT_GNS3_STOP]: "Stop session",
+  [TranslationKey.STUDENT_GNS3_EXTEND]: "Extend by {{minutes}} min",
+  [TranslationKey.STUDENT_GNS3_START_SUCCESS]: "Session started",
+  [TranslationKey.STUDENT_GNS3_STOP_SUCCESS]: "Session stopped",
+  [TranslationKey.STUDENT_GNS3_EXTEND_SUCCESS]: "Session extended by {{minutes}} min",
+  [TranslationKey.STUDENT_GNS3_ROWS_PER_PAGE]: "Rows per page",
+  [TranslationKey.STUDENT_GNS3_PAGINATION_RANGE]: "{{from}}–{{to}} of {{count}}",
+  [TranslationKey.STUDENT_GNS3_HISTORY_TITLE]: "Session history",
+  [TranslationKey.STUDENT_GNS3_HISTORY_EMPTY]: "No sessions yet.",
+  [TranslationKey.STUDENT_GNS3_STOPPED_AT]: "Stopped at",
 
   // StudentDashboard
   [TranslationKey.STUDENT_DASHBOARD_TITLE]: "Dashboard",
@@ -1236,6 +1280,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENTS]: "Zadania",
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS]: "Detaily zadania",
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_SUBMISSION]: "Odovzdať zadanie",
+  [TranslationKey.BREADCRUMBS_STUDENT_GNS3]: "GNS3",
 
   // ||-------- ADMIN --------||
   // |                        |
@@ -1623,6 +1668,27 @@ const _SK: Record<TranslationKey, string> = {
   // Student Navbar           |
   [TranslationKey.STUDENT_NAVBAR_DASHBOARD]: "Hlavný panel",
   [TranslationKey.STUDENT_NAVBAR_ASSIGNMENTS]: "Zadania",
+  [TranslationKey.STUDENT_NAVBAR_GNS3]: "GNS3",
+
+  // Student GNS3
+  [TranslationKey.STUDENT_GNS3_TITLE]: "GNS3",
+  [TranslationKey.STUDENT_GNS3_LIVE_SESSION]: "Aktívna relácia",
+  [TranslationKey.STUDENT_GNS3_STATUS]: "Stav",
+  [TranslationKey.STUDENT_GNS3_STARTED_AT]: "Spustené",
+  [TranslationKey.STUDENT_GNS3_REMAINING]: "Zostáva",
+  [TranslationKey.STUDENT_GNS3_DURATION]: "Dĺžka",
+  [TranslationKey.STUDENT_GNS3_PORT]: "Port",
+  [TranslationKey.STUDENT_GNS3_START]: "Spustiť reláciu",
+  [TranslationKey.STUDENT_GNS3_STOP]: "Zastaviť reláciu",
+  [TranslationKey.STUDENT_GNS3_EXTEND]: "Predĺžiť o {{minutes}} min",
+  [TranslationKey.STUDENT_GNS3_START_SUCCESS]: "Relácia bola spustená",
+  [TranslationKey.STUDENT_GNS3_STOP_SUCCESS]: "Relácia bola zastavená",
+  [TranslationKey.STUDENT_GNS3_EXTEND_SUCCESS]: "Relácia bola predĺžená o {{minutes}} min",
+  [TranslationKey.STUDENT_GNS3_ROWS_PER_PAGE]: "Riadkov na stránku",
+  [TranslationKey.STUDENT_GNS3_PAGINATION_RANGE]: "{{from}}–{{to}} z {{count}}",
+  [TranslationKey.STUDENT_GNS3_HISTORY_TITLE]: "História relácií",
+  [TranslationKey.STUDENT_GNS3_HISTORY_EMPTY]: "Zatiaľ nemáte žiadne relácie.",
+  [TranslationKey.STUDENT_GNS3_STOPPED_AT]: "Zastavené",
 
   // StudentDashboard
   [TranslationKey.STUDENT_DASHBOARD_TITLE]: "Hlavný panel",

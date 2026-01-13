@@ -59,7 +59,8 @@ const roleConfig: Record<UserRole, RoleConfig> = {
     titleKey: navbarTitle,
     items: [
       { labelKey: TranslationKey.STUDENT_NAVBAR_DASHBOARD, routeKey: RouteKeys.STUDENT_DASHBOARD },
-      { labelKey: TranslationKey.STUDENT_NAVBAR_ASSIGNMENTS, routeKey: RouteKeys.STUDENT_ASSIGNMENTS }
+      { labelKey: TranslationKey.STUDENT_NAVBAR_ASSIGNMENTS, routeKey: RouteKeys.STUDENT_ASSIGNMENTS },
+      { labelKey: TranslationKey.STUDENT_NAVBAR_GNS3, routeKey: RouteKeys.STUDENT_GNS3 }
     ]
   }
 }

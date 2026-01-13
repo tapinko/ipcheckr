@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using IPCheckr.Api;
@@ -17,8 +18,13 @@ namespace IPCheckr.Api.Common.Utils
     {
         public static (int CallerId, string? CallerRole) GetCallerInfo(ClaimsPrincipal user)
         {
-            var role = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            var idStr = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var role = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value
+                       ?? user.Claims.FirstOrDefault(c => string.Equals(c.Type, "role", StringComparison.OrdinalIgnoreCase))?.Value;
+
+            var idStr = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value
+                        ?? user.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value
+                        ?? user.Claims.FirstOrDefault(c => string.Equals(c.Type, "sub", StringComparison.OrdinalIgnoreCase))?.Value
+                        ?? user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             _ = int.TryParse(idStr, out var callerId);
             return (callerId, role);
         }
@@ -41,12 +47,19 @@ namespace IPCheckr.Api.Common.Utils
         public static async Task<ActionResult?> EnsureGns3AccessAsync(ClaimsPrincipal caller, ApiDbContext db, User targetUser, CancellationToken ct)
         {
             var (callerId, callerRole) = GetCallerInfo(caller);
+            var effectiveRole = callerRole;
 
-            if (string.Equals(callerRole, Roles.Admin, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(effectiveRole) && callerId == targetUser.Id)
+                effectiveRole = targetUser.Role;
+
+            if (string.Equals(effectiveRole, Roles.Admin, StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            if (string.Equals(callerRole, Roles.Teacher, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(effectiveRole, Roles.Teacher, StringComparison.OrdinalIgnoreCase))
             {
+                if (callerId == targetUser.Id)
+                    return null;
+
                 if (!string.Equals(targetUser.Role, Roles.Student, StringComparison.OrdinalIgnoreCase))
                 {
                     return ApiForbidden(
@@ -73,7 +86,7 @@ namespace IPCheckr.Api.Common.Utils
                 return null;
             }
 
-            if (string.Equals(callerRole, Roles.Student, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(effectiveRole, Roles.Student, StringComparison.OrdinalIgnoreCase))
             {
                 if (callerId != targetUser.Id)
                 {
