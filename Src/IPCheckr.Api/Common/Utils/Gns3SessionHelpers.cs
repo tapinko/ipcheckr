@@ -1,14 +1,13 @@
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
-using IPCheckr.Api.Common.Enums;
-using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.Gns3;
 using IPCheckr.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 
 namespace IPCheckr.Api.Common.Utils
 {
@@ -112,6 +111,10 @@ namespace IPCheckr.Api.Common.Utils
             var port = int.TryParse(portStr, out var p) ? p : 6769;
             var timeoutSec = int.TryParse(config["Gns3:LauncherTimeoutSeconds"], out var t) ? t : 5;
             var retries = int.TryParse(config["Gns3:LauncherRetries"], out var r) ? r : 2;
+            var useTls = config.GetValue("Gns3:UseTls", true);
+            var caPath = config["Gns3:LauncherCaPath"] ?? "/etc/ipcheckr/gns3/ca.crt";
+            var serverName = config["Gns3:LauncherServerName"] ?? host;
+            var allowNameMismatch = config.GetValue("Gns3:LauncherAllowNameMismatch", false);
 
             Exception? last = null;
             string? lastMessage = null;
@@ -125,7 +128,23 @@ namespace IPCheckr.Api.Common.Utils
                     using var client = new TcpClient();
                     await client.ConnectAsync(host, port, cts.Token);
 
-                    await using var stream = client.GetStream();
+                    Stream stream = client.GetStream();
+                    if (useTls)
+                    {
+                        var sslStream = new SslStream(stream, leaveInnerStreamOpen: false, (sender, cert, chain, errors) =>
+                            ValidateServerCertificate(cert, caPath, serverName, allowNameMismatch));
+
+                        var authOptions = new SslClientAuthenticationOptions
+                        {
+                            TargetHost = serverName,
+                            EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
+                            CertificateRevocationCheckMode = X509RevocationMode.NoCheck
+                        };
+
+                        await sslStream.AuthenticateAsClientAsync(authOptions, cts.Token);
+                        stream = sslStream;
+                    }
+
                     using var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true) { AutoFlush = true };
                     using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: false, leaveOpen: true);
 
@@ -134,6 +153,14 @@ namespace IPCheckr.Api.Common.Utils
 
                     var (success, parsedPort, parsedPid) = ParseLauncherResponse(line);
                     return new LauncherResult(success, parsedPort, parsedPid, line ?? string.Empty);
+                }
+                catch (AuthenticationException ex)
+                {
+                    last = ex;
+                    lastMessage = $"TLS handshake failed: {ex.Message}";
+                    if (attempt >= retries)
+                        break;
+                    await Task.Delay(TimeSpan.FromMilliseconds(200), ct);
                 }
                 catch (Exception ex)
                 {
@@ -162,6 +189,48 @@ namespace IPCheckr.Api.Common.Utils
             var pidMatch = Regex.Match(line, "PID=(?<pid>\\d+)", RegexOptions.IgnoreCase);
             int? pid = pidMatch.Success && int.TryParse(pidMatch.Groups["pid"].Value, out var pidVal) ? pidVal : null;
             return (success, port, pid);
+        }
+
+        private static bool ValidateServerCertificate(X509Certificate? certificate, string? caPath, string expectedName, bool allowNameMismatch)
+        {
+            if (certificate == null)
+                return false;
+
+            var serverCert = new X509Certificate2(certificate);
+
+            using var chain = new X509Chain
+            {
+                ChainPolicy =
+                {
+                    RevocationMode = X509RevocationMode.NoCheck,
+                    VerificationFlags = X509VerificationFlags.IgnoreEndRevocationUnknown | X509VerificationFlags.IgnoreCertificateAuthorityRevocationUnknown
+                }
+            };
+
+            if (!string.IsNullOrWhiteSpace(caPath) && File.Exists(caPath))
+            {
+                try
+                {
+                    var caCert = new X509Certificate2(caPath);
+                    chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+                    chain.ChainPolicy.CustomTrustStore.Add(caCert);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            var chainOk = chain.Build(serverCert);
+            if (!chainOk)
+                return false;
+
+            if (allowNameMismatch)
+                return true;
+
+            var dnsName = serverCert.GetNameInfo(X509NameType.DnsName, false);
+            return !string.IsNullOrWhiteSpace(dnsName) &&
+                   string.Equals(dnsName, expectedName, StringComparison.OrdinalIgnoreCase);
         }
 
         public record LauncherResult(bool Success, int? Port, int? Pid, string Response);
