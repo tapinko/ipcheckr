@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
@@ -228,9 +229,61 @@ namespace IPCheckr.Api.Common.Utils
             if (allowNameMismatch)
                 return true;
 
-            var dnsName = serverCert.GetNameInfo(X509NameType.DnsName, false);
-            return !string.IsNullOrWhiteSpace(dnsName) &&
-                   string.Equals(dnsName, expectedName, StringComparison.OrdinalIgnoreCase);
+            return CertificateNameMatches(serverCert, expectedName);
+        }
+
+        private static bool CertificateNameMatches(X509Certificate2 cert, string expected)
+        {
+            if (string.IsNullOrWhiteSpace(expected))
+                return true;
+
+            if (IPAddress.TryParse(expected, out var expectedIp))
+            {
+                var sanIps = GetSubjectAltNames(cert).IpAddresses;
+                return sanIps.Any(ip => ip.Equals(expectedIp));
+            }
+
+            var sanNames = GetSubjectAltNames(cert).DnsNames;
+            if (sanNames.Any(n => string.Equals(n, expected, StringComparison.OrdinalIgnoreCase)))
+                return true;
+
+            var dnsName = cert.GetNameInfo(X509NameType.DnsName, false);
+            return !string.IsNullOrWhiteSpace(dnsName) && string.Equals(dnsName, expected, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static (string[] DnsNames, IPAddress[] IpAddresses) GetSubjectAltNames(X509Certificate2 cert)
+        {
+            try
+            {
+                var ext = cert.Extensions["2.5.29.17"];
+                if (ext == null)
+                    return (Array.Empty<string>(), Array.Empty<IPAddress>());
+
+                var formatted = ext.Format(false);
+                var parts = formatted.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var dns = new List<string>();
+                var ips = new List<IPAddress>();
+
+                foreach (var part in parts)
+                {
+                    if (part.StartsWith("DNS Name=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        dns.Add(part.Substring("DNS Name=".Length));
+                    }
+                    else if (part.StartsWith("IP Address=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var raw = part.Substring("IP Address=".Length);
+                        if (IPAddress.TryParse(raw, out var ip))
+                            ips.Add(ip);
+                    }
+                }
+
+                return (dns.ToArray(), ips.ToArray());
+            }
+            catch
+            {
+                return (Array.Empty<string>(), Array.Empty<IPAddress>());
+            }
         }
 
         public record LauncherResult(bool Success, int? Port, int? Pid, string Response);
