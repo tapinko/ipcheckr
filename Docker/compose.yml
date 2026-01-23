@@ -1,49 +1,41 @@
 services:
   ipcheckr:
-    image: tapinko/ipcheckr:latest
-    container_name: ipcheckr
+    image: ${DOCKER_IMAGE}
+    container_name: ${CONTAINER_IPCHECKR}
     depends_on:
       - db
     environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_NAME=ipcheckr
-      - DB_USER=ipcheckr
-      - DB_PASSWORD=mystrongpassword # CHANGE
-      - TZ=Europe/Bratislava
-      - LDAP_HOST=server.ldap.example.local
-      - LDAP_PORT=636
-      - LDAP_STARTTLS=false
-      - LDAP_FETCH_CERT=true # set this to false if you don't plan to use LDAP authentication
-      - Gns3__LauncherHost=10.1.2.7
-      - Gns3__LauncherPort=6769
-      - Gns3__UseTls=true
-      - Gns3__LauncherCaPath=/etc/ipcheckr/gns3/ca.crt
-      - Gns3__LauncherServerName=ipcheckr.local
-      - Gns3__LauncherAllowNameMismatch=false
-      - Gns3__LauncherTimeoutSeconds=5
-      - Gns3__LauncherRetries=2
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - TZ=${TZ}
+      - LDAP_HOST=${LDAP_HOST}
+      - LDAP_PORT=${LDAP_PORT}
+      - LDAP_STARTTLS=${LDAP_STARTTLS}
+      - LDAP_FETCH_CERT=${LDAP_FETCH_CERT}
+      - Gns3__LauncherTimeoutSeconds=${GNS3_LAUNCHER_TIMEOUT}
+      - Gns3__LauncherRetries=${GNS3_LAUNCHER_RETRIES}
     ports:
-      - "8081:8080"
-    volumes:
-      - /etc/ipcheckr/gns3:/etc/ipcheckr/gns3:ro
+      - "${WEB_PORT}:8080"
     dns:
-      - ${DNS_NAMESERVER:-<IP_ADDRESS>}
+      - ${DNS_NAMESERVER}
     dns_search:
-      - ${DNS_SEARCH_DOMAIN:-ldap.example.local}
+      - ${DNS_SEARCH_DOMAIN}
     extra_hosts:
-      - "ldap.example.local:<IP_ADDRESS>"
-      - "server.ldap.example.local:<IP_ADDRESS>"
+      - "ldap.example.local:${DNS_NAMESERVER}"
+      - "server.ldap.example.local:${DNS_NAMESERVER}"
     restart: unless-stopped
 
   db:
-    image: mariadb:12.0.2
-    container_name: ipcheckr-db
+    image: ${MARIADB_IMAGE}
+    container_name: ${CONTAINER_DATABASE}
     environment:
-      - MYSQL_ROOT_PASSWORD=mystrongpassword # CHANGE
-      - MYSQL_DATABASE=ipcheckr
-      - MYSQL_USER=ipcheckr
-      - MYSQL_PASSWORD=mystrongpassword # CHANGE
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
     volumes:
       - ipcheckr_data:/var/lib/mysql
     restart: unless-stopped
