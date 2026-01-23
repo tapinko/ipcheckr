@@ -10,7 +10,7 @@ fi
 GNS3_VERSION="$1"
 DISTRO="$2"
 
-CONNECTOR_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/src/ipcheckr-gns3-connector.sh"
+CONNECTOR_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/ipcheckr-gns3-connector.sh"
 CONNECTOR_TMP="/tmp/ipcheckr-gns3-connector.sh"
 INSTALLER_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/scripts/gns3-install.sh"
 INSTALLER_TMP="/tmp/gns3-install.sh"
@@ -21,6 +21,10 @@ SOCKET_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launc
 SERVICE_PATH="/etc/systemd/system/ipcheckr-gns3.service"
 SOCKET_PATH="/etc/systemd/system/ipcheckr-gns3.socket"
 CONNECTOR_PATH="/usr/local/bin/ipcheckr-gns3-connector"
+ENV_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/systemd/connector.env.example"
+ENV_TMP="/tmp/connector.env"
+ENV_DIR="/etc/ipcheckr/gns3"
+ENV_PATH="${ENV_DIR}/connector.env"
 SERVICE_USER="gns3svc"
 SERVICE_HOME="/var/lib/gns3"
 
@@ -31,9 +35,18 @@ if ! id -u "$SERVICE_USER" >/dev/null 2>&1; then
 fi
 sudo mkdir -p "$SERVICE_HOME"
 sudo chown -R "$SERVICE_USER":"$SERVICE_USER" "$SERVICE_HOME"
+sudo mkdir -p "$ENV_DIR"
 
 curl -fsSL -o "$CONNECTOR_TMP" "$CONNECTOR_URL"
 sudo install -m 0755 "$CONNECTOR_TMP" "$CONNECTOR_PATH"
+
+if [ ! -f "$ENV_PATH" ]; then
+	curl -fsSL -o "$ENV_TMP" "$ENV_URL"
+	sudo install -m 0640 "$ENV_TMP" "$ENV_PATH"
+	sudo chown root:root "$ENV_PATH" 2>/dev/null || true
+else
+	echo "connector env already present at $ENV_PATH; leaving in place"
+fi
 
 curl -fsSL -o "$INSTALLER_TMP" "$INSTALLER_URL"
 chmod +x "$INSTALLER_TMP"

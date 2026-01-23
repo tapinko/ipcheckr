@@ -12,7 +12,7 @@ EnvironmentFile=-/var/lib/gns3/%i/env
 ExecStartPre=/bin/mkdir -p /var/lib/gns3/%i/projects
 ExecStartPre=/bin/chown -R gns3svc:gns3svc /var/lib/gns3/%i
 
-ExecStart=/bin/sh -c '/usr/bin/gns3server --port ${GNS3_PORT:-0}'
+ExecStart=/bin/sh -c '/usr/bin/gns3server --host 0.0.0.0 --port ${GNS3_PORT:-0}'
 
 Restart=on-failure
 RestartSec=2

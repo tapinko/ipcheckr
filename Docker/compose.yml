@@ -15,8 +15,18 @@ services:
       - LDAP_PORT=636
       - LDAP_STARTTLS=false
       - LDAP_FETCH_CERT=true # set this to false if you don't plan to use LDAP authentication
+      - Gns3__LauncherHost=10.1.2.7
+      - Gns3__LauncherPort=6769
+      - Gns3__UseTls=true
+      - Gns3__LauncherCaPath=/etc/ipcheckr/gns3/ca.crt
+      - Gns3__LauncherServerName=ipcheckr.local
+      - Gns3__LauncherAllowNameMismatch=false
+      - Gns3__LauncherTimeoutSeconds=5
+      - Gns3__LauncherRetries=2
     ports:
       - "8081:8080"
+    volumes:
+      - /etc/ipcheckr/gns3:/etc/ipcheckr/gns3:ro
     dns:
       - ${DNS_NAMESERVER:-<IP_ADDRESS>}
     dns_search:

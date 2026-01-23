@@ -8,6 +8,9 @@ KEY="${KEY:-/etc/ipcheckr/gns3/server.key}"
 CA="${CA:-/etc/ipcheckr/gns3/ca.crt}"
 GNS3_PORT="${GNS3_PORT:-3080}"
 USE_TLS="${USE_TLS:-1}"
+TLS_MIN_PROTO="${TLS_MIN_PROTO:-TLS1.3}"
+CIPHERSUITES="${CIPHERSUITES:-ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256}"
+VERIFY_CLIENT="${VERIFY_CLIENT:-0}"
 
 allocate_port() {
 	local port
@@ -95,5 +98,5 @@ fi
 if [ "${USE_TLS}" = "0" ]; then
 	socat -T 60 tcp-listen:"${PORT}",reuseaddr,fork SYSTEM:"$0 --handle"
 else
-	socat -T 60 openssl-listen:"${PORT}",reuseaddr,cert="${CERT}",key="${KEY}",cafile="${CA}",verify=1,fork SYSTEM:"$0 --handle"
+	socat -T 60 "openssl-listen:${PORT},reuseaddr,cert=${CERT},key=${KEY},cafile=${CA},verify=${VERIFY_CLIENT},openssl-min-proto-version=${TLS_MIN_PROTO},cipher=${CIPHERSUITES},fork" SYSTEM:"$0 --handle"
 fi

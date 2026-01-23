@@ -303,6 +303,11 @@ export enum TranslationKey {
   ADMIN_SETTINGS_GNS3_ENABLE = "ADMIN_SETTINGS_GNS3_ENABLE",
   ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN = "ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN",
   ADMIN_SETTINGS_GNS3_EXTENSION_MIN = "ADMIN_SETTINGS_GNS3_EXTENSION_MIN",
+  ADMIN_SETTINGS_GNS3_CA_TITLE = "ADMIN_SETTINGS_GNS3_CA_TITLE",
+  ADMIN_SETTINGS_GNS3_CA_DESC = "ADMIN_SETTINGS_GNS3_CA_DESC",
+  ADMIN_SETTINGS_GNS3_CA_STEP1 = "ADMIN_SETTINGS_GNS3_CA_STEP1",
+  ADMIN_SETTINGS_GNS3_CA_STEP2 = "ADMIN_SETTINGS_GNS3_CA_STEP2",
+  ADMIN_SETTINGS_GNS3_CA_RESTART = "ADMIN_SETTINGS_GNS3_CA_RESTART",
   // |                        |
   // ||-----------------------||
 
@@ -884,6 +889,11 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_GNS3_ENABLE]: "Enable GNS3 integration",
   [TranslationKey.ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN]: "Default session length (minutes)",
   [TranslationKey.ADMIN_SETTINGS_GNS3_EXTENSION_MIN]: "Extend button adds (minutes)",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_TITLE]: "GNS3 two-server deploy",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_DESC]: "If API and GNS3 launcher run on different servers, you must transfer the CA certificate from the API server to the GNS3 server. The certificate must be available on the GNS3 server as /etc/ipcheckr/gns3/ca.crt.",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_STEP1]: "Command on API server:",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_STEP2]: "Then on GNS3 server:",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_RESTART]: "After transfer, restart the API container/service to reload the new certificate.",
   // |                        |
   // ||-----------------------||
 
@@ -1296,7 +1306,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_GNS3_START]: "Úspešne spustená relácia pre používateľa '{{value}}'.",
   [TranslationKey.ADMIN_GNS3_STOP]: "Úspešne zastavená relácia pre používateľa '{{value}}'.",
   [TranslationKey.ADMIN_GNS3_EXTEND]: "Úspešne predĺžená relácia pre používateľa '{{value}}' o {{minutes}} min.",
-  [TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL]: "Vynútene zastaviť všetky session",
+  [TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL]: "Vynútene zastaviť všetky relácie",
   [TranslationKey.ADMIN_GNS3_FORCE_KILL_SUCCESS]: "Príkaz na zastavenie všetkých session odoslaný.",
 
   // AdminDashboard
@@ -1464,6 +1474,11 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_GNS3_ENABLE]: "Povoliť integráciu GNS3",
   [TranslationKey.ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN]: "Predvolená dĺžka session (minúty)",
   [TranslationKey.ADMIN_SETTINGS_GNS3_EXTENSION_MIN]: "Tlačidlo predĺži o (minúty)",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_TITLE]: "GNS3 dvoj-serverový režim",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_DESC]: "Ak API a GNS3 launcher bežia na rôznych serveroch, je potrebné preniesť CA certifikát z API servera na GNS3 server. Tento certifikát musí byť dostupný na GNS3 serveri ako /etc/ipcheckr/gns3/ca.crt.",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_STEP1]: "Príkaz na API serveri:",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_STEP2]: "Potom na GNS3 serveri:",
+  [TranslationKey.ADMIN_SETTINGS_GNS3_CA_RESTART]: "Po prenose reštartujte API kontajner/službu, aby načítal nový certifikát.",
   // |                        |
   // ||-----------------------||
 

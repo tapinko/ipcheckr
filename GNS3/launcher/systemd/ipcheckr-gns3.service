@@ -4,6 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
+EnvironmentFile=-/etc/ipcheckr/gns3/connector.env
 ExecStart=/usr/local/bin/ipcheckr-gns3-connector
 User=root
 Group=root

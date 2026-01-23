@@ -467,6 +467,30 @@ const AdminSettings = () => {
           </>
         )}
 
+
+
+        {gns3Enabled && (
+          <>
+            <Divider textAlign="left">{t(TranslationKey.ADMIN_SETTINGS_GNS3_CA_TITLE)}</Divider>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              {t(TranslationKey.ADMIN_SETTINGS_GNS3_CA_DESC)}<br/>
+              {t(TranslationKey.ADMIN_SETTINGS_GNS3_CA_STEP1)}
+            </Typography>
+            <Box component="pre" sx={{ background: (theme) => theme.palette.mode === 'dark' ? '#23272e' : '#f5f5f5', color: (theme) => theme.palette.text.primary, p: 1, borderRadius: 1, mb: 1, fontSize: '0.95em', overflowX: 'auto' }}>
+              {`scp /etc/ipcheckr/gns3/ca.crt user@gns3-server:/tmp/ipcheckr-ca.crt`}
+            </Box>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              {t(TranslationKey.ADMIN_SETTINGS_GNS3_CA_STEP2)}
+            </Typography>
+            <Box component="pre" sx={{ background: (theme) => theme.palette.mode === 'dark' ? '#23272e' : '#f5f5f5', color: (theme) => theme.palette.text.primary, p: 1, borderRadius: 1, mb: 1, fontSize: '0.95em', overflowX: 'auto' }}>
+              {`sudo mkdir -p /etc/ipcheckr/gns3 && sudo cp /tmp/ipcheckr-ca.crt /etc/ipcheckr/gns3/ca.crt && sudo chmod 640 /etc/ipcheckr/gns3/ca.crt && sudo chown root:root /etc/ipcheckr/gns3/ca.crt`}
+            </Box>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              {t(TranslationKey.ADMIN_SETTINGS_GNS3_CA_RESTART)}
+            </Typography>
+          </>
+        )}
+
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button variant="contained" color="success" onClick={handleSave} disabled={saveDisabled}>
           {t(TranslationKey.ADMIN_SETTINGS_SAVE)}
