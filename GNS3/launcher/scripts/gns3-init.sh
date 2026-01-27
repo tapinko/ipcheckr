@@ -2,26 +2,29 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 2 ]; then
-	echo "Usage: $0 <gns3-version> <distro>" >&2
+if [ "$#" -ne 3 ]; then
+	echo "Usage: $0 <gns3-version> <distro> <branch>" >&2
 	exit 1
 fi
 
 GNS3_VERSION="$1"
 DISTRO="$2"
+BRANCH="$3"
 
-CONNECTOR_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/ipcheckr-gns3-connector.sh"
+BASE_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/${BRANCH}/GNS3/launcher"
+CONNECTOR_URL="${BASE_URL}/ipcheckr-gns3-connector.sh"
+INSTALLER_URL="${BASE_URL}/scripts/gns3-install.sh"
+GNS3_UNIT_URL="${BASE_URL}/systemd/gns3@.service"
+SERVICE_URL="${BASE_URL}/systemd/ipcheckr-gns3.service"
+SOCKET_URL="${BASE_URL}/systemd/ipcheckr-gns3.socket"
+ENV_URL="${BASE_URL}/systemd/connector.env.example"
+
 CONNECTOR_TMP="/tmp/ipcheckr-gns3-connector.sh"
-INSTALLER_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/scripts/gns3-install.sh"
 INSTALLER_TMP="/tmp/gns3-install.sh"
-GNS3_UNIT_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/systemd/gns3@.service"
 GNS3_UNIT_PATH="/etc/systemd/system/gns3@.service"
-SERVICE_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/systemd/ipcheckr-gns3.service"
-SOCKET_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/systemd/ipcheckr-gns3.socket"
 SERVICE_PATH="/etc/systemd/system/ipcheckr-gns3.service"
 SOCKET_PATH="/etc/systemd/system/ipcheckr-gns3.socket"
 CONNECTOR_PATH="/usr/local/bin/ipcheckr-gns3-connector"
-ENV_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/launcher/systemd/connector.env.example"
 ENV_TMP="/tmp/connector.env"
 ENV_DIR="/etc/ipcheckr/gns3"
 ENV_PATH="${ENV_DIR}/connector.env"

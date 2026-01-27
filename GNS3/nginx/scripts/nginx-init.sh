@@ -2,14 +2,16 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 3 ]; then
 	exit 1
 fi
 
 NGINX_VERSION="$1"
 DISTRO="$2"
+BRANCH="$3"
 
-INSTALLER_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/master/GNS3/nginx/scripts/nginx-install.sh"
+BASE_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/${BRANCH}/GNS3/nginx"
+INSTALLER_URL="${BASE_URL}/scripts/nginx-install.sh"
 INSTALLER_TMP="/tmp/nginx-install.sh"
 
 generate_nginx_certs() {
