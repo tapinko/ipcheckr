@@ -25,8 +25,49 @@ SOCKET_PATH="/etc/systemd/system/ipcheckr-gns3.socket"
 CONNECTOR_PATH="/usr/local/bin/ipcheckr-gns3-connector"
 SERVICE_USER="gns3svc"
 SERVICE_HOME="/var/lib/gns3"
+CERT_DIR="/etc/ipcheckr/gns3"
 
-sudo apt-get update && sudo apt-get install -y socat
+generate_gns3_certs() {
+	local ca_key="${CERT_DIR}/ca.key"
+	local ca_crt="${CERT_DIR}/ca.crt"
+	local srv_key="${CERT_DIR}/server.key"
+	local srv_crt="${CERT_DIR}/server.crt"
+	local csr="${CERT_DIR}/server.csr"
+
+	sudo mkdir -p "$CERT_DIR"
+	if [ -f "$srv_key" ] && [ -f "$srv_crt" ] && [ -f "$ca_crt" ]; then
+		echo "GNS3 certs already present in $CERT_DIR"
+		return 0
+	fi
+
+	local tmp_conf
+	tmp_conf=$(mktemp)
+	cat >"$tmp_conf" <<'EOF'
+[req]
+distinguished_name = dn
+prompt = no
+
+[dn]
+CN = ipcheckr-gns3
+
+[ext]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+IP.1 = 127.0.0.1
+EOF
+
+	sudo openssl req -x509 -newkey rsa:4096 -sha384 -days 825 -nodes -keyout "$ca_key" -out "$ca_crt" -subj "/CN=ipcheckr-gns3 CA"
+	sudo openssl req -new -newkey rsa:4096 -sha384 -nodes -keyout "$srv_key" -out "$csr" -config "$tmp_conf"
+	sudo openssl x509 -req -in "$csr" -CA "$ca_crt" -CAkey "$ca_key" -CAcreateserial -out "$srv_crt" -days 397 -sha384 -extfile "$tmp_conf" -extensions ext
+	sudo rm -f "$csr"
+	sudo chmod 640 "$srv_key" "$srv_crt" "$ca_crt" "$ca_key" 2>/dev/null || true
+	sudo chown root:root "$srv_key" "$srv_crt" "$ca_crt" "$ca_key" 2>/dev/null || true
+	rm -f "$tmp_conf"
+}
+
+sudo apt-get update && sudo apt-get install -y socat openssl
 
 if ! id -u "$SERVICE_USER" >/dev/null 2>&1; then
 	sudo useradd --system --home "$SERVICE_HOME" --shell /usr/sbin/nologin "$SERVICE_USER"
@@ -44,6 +85,8 @@ curl -fsSL -o "$SERVICE_PATH" "$SERVICE_URL"
 curl -fsSL -o "$SOCKET_PATH" "$SOCKET_URL"
 curl -fsSL -o "$GNS3_UNIT_PATH" "$GNS3_UNIT_URL"
 sudo chmod 644 "$SERVICE_PATH" "$SOCKET_PATH" "$GNS3_UNIT_PATH"
+
+generate_gns3_certs
 
 sudo sed -i 's|/usr/local/bin/ipcheckr-gns3-launcher|/usr/local/bin/ipcheckr-gns3-connector|g' "$SERVICE_PATH"
 
