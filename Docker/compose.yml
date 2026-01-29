@@ -16,6 +16,9 @@ services:
       - LDAP_STARTTLS=${LDAP_STARTTLS}
       - LDAP_FETCH_CERT=${LDAP_FETCH_CERT}
       - Gns3__LauncherPort=${GNS3_LAUNCHER_PORT}
+      - Gns3__LauncherCaPath=/etc/ipcheckr/gns3/ca.crt
+      - Gns3__UseTls=${GNS3_USE_TLS}
+      - Gns3__LauncherHost=${GNS3_LAUNCHER_HOST}
       - Gns3__LauncherTimeoutSeconds=${GNS3_LAUNCHER_TIMEOUT}
       - Gns3__LauncherRetries=${GNS3_LAUNCHER_RETRIES}
     ports:
@@ -29,6 +32,7 @@ services:
     extra_hosts:
       - "ldap.example.local:${DNS_NAMESERVER}"
       - "server.ldap.example.local:${DNS_NAMESERVER}"
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
   db:
