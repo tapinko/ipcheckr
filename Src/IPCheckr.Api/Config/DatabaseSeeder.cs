@@ -2,6 +2,7 @@ using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.Common.Enums;
 using IPCheckr.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace IPCheckr.Api.Config
 {
@@ -11,6 +12,9 @@ namespace IPCheckr.Api.Config
         {
             using var scope = app.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+            var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+            var launcherPortDefault = config["Gns3:LauncherPort"] ?? "6769";
 
             await db.Database.MigrateAsync();
 
@@ -31,7 +35,7 @@ namespace IPCheckr.Api.Config
 
             await EnsureAppSettingAsync(db, "Gns3_Enabled", "false");
             await EnsureAppSettingAsync(db, "Gns3_RemoteServer", "127.0.0.1");
-            await EnsureAppSettingAsync(db, "Gns3_RemotePort", "6769");
+            await EnsureAppSettingAsync(db, "Gns3_RemotePort", launcherPortDefault);
             await EnsureAppSettingAsync(db, "Gns3_DefaultSessionMinutes", "120");
             await EnsureAppSettingAsync(db, "Gns3_ExtendedMinutes", "30");
 
