@@ -31,6 +31,10 @@ services:
   db:
     image: ${MARIADB_IMAGE}
     container_name: ${CONTAINER_DATABASE}
+    networks:
+      default:
+        aliases:
+          - ${DB_HOST}
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
