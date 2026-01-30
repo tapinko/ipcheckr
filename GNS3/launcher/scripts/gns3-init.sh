@@ -33,6 +33,11 @@ generate_gns3_certs() {
 	local srv_key="${CERT_DIR}/server.key"
 	local srv_crt="${CERT_DIR}/server.crt"
 	local csr="${CERT_DIR}/server.csr"
+	local host_fqdn
+	host_fqdn=$(hostname -f 2>/dev/null || hostname 2>/dev/null || echo "ipcheckr-gns3")
+	local host_ip
+	host_ip=$(hostname -I 2>/dev/null | awk '{print $1}' | tr -d ' \t' || true)
+	[ -z "$host_ip" ] && host_ip="127.0.0.1"
 
 	sudo mkdir -p "$CERT_DIR"
 	if [ -f "$srv_key" ] && [ -f "$srv_crt" ] && [ -f "$ca_crt" ]; then
@@ -55,7 +60,10 @@ subjectAltName = @alt_names
 
 [alt_names]
 DNS.1 = localhost
+DNS.2 = ${host_fqdn}
+DNS.3 = host.docker.internal
 IP.1 = 127.0.0.1
+IP.2 = ${host_ip}
 EOF
 
 	sudo openssl req -x509 -newkey rsa:4096 -sha384 -days 825 -nodes -keyout "$ca_key" -out "$ca_crt" -subj "/CN=ipcheckr-gns3 CA"
@@ -96,6 +104,5 @@ sudo sed -i "s|^Group=.*|Group=${SERVICE_USER}|g" "$GNS3_UNIT_PATH"
 sudo groupadd -f ipcheckr
 
 sudo systemctl daemon-reload
-sudo systemctl enable --now ipcheckr-gns3.socket
-sudo systemctl enable ipcheckr-gns3.service
-sudo systemctl restart ipcheckr-gns3.service
+sudo systemctl disable --now ipcheckr-gns3.socket 2>/dev/null || true
+sudo systemctl enable --now ipcheckr-gns3.service

@@ -19,6 +19,8 @@ services:
       - Gns3__LauncherCaPath=/etc/ipcheckr/gns3/ca.crt
       - Gns3__UseTls=${GNS3_USE_TLS}
       - Gns3__LauncherHost=${GNS3_LAUNCHER_HOST}
+      - Gns3__LauncherServerName=${GNS3_LAUNCHER_SERVERNAME}
+      - Gns3__LauncherAllowNameMismatch=${GNS3_LAUNCHER_ALLOW_NAME_MISMATCH}
       - Gns3__LauncherTimeoutSeconds=${GNS3_LAUNCHER_TIMEOUT}
       - Gns3__LauncherRetries=${GNS3_LAUNCHER_RETRIES}
     ports:
