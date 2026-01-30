@@ -47,7 +47,7 @@ generate_gns3_certs() {
 
 	local tmp_conf
 	tmp_conf=$(mktemp)
-	cat >"$tmp_conf" <<'EOF'
+	cat >"$tmp_conf" <<EOF
 [req]
 distinguished_name = dn
 prompt = no
