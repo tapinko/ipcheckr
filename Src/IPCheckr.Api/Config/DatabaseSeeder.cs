@@ -15,6 +15,8 @@ namespace IPCheckr.Api.Config
             var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
             var launcherPortDefault = config["Gns3:LauncherPort"] ?? "6769";
+            var launcherHostDefault = config["Gns3:LauncherHost"] ?? "host.docker.internal";
+            var gns3EnabledDefault = config["Gns3:Enabled"] ?? "false";
 
             await db.Database.MigrateAsync();
 
@@ -33,8 +35,8 @@ namespace IPCheckr.Api.Config
             await EnsureAppSettingAsync(db, "InstitutionName", "");
             await EnsureAppSettingAsync(db, "AuthType", AuthType.LOCAL.ToString());
 
-            await EnsureAppSettingAsync(db, "Gns3_Enabled", "false");
-            await EnsureAppSettingAsync(db, "Gns3_RemoteServer", "127.0.0.1");
+            await EnsureAppSettingAsync(db, "Gns3_Enabled", gns3EnabledDefault);
+            await EnsureAppSettingAsync(db, "Gns3_RemoteServer", launcherHostDefault);
             await EnsureAppSettingAsync(db, "Gns3_RemotePort", launcherPortDefault);
             await EnsureAppSettingAsync(db, "Gns3_DefaultSessionMinutes", "120");
             await EnsureAppSettingAsync(db, "Gns3_ExtendedMinutes", "30");
