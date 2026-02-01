@@ -33,8 +33,9 @@ generate_gns3_certs() {
 	local srv_key="${CERT_DIR}/server.key"
 	local srv_crt="${CERT_DIR}/server.crt"
 	local csr="${CERT_DIR}/server.csr"
-	local host_fqdn
+	local host_fqdn host_short
 	host_fqdn=$(hostname -f 2>/dev/null || hostname 2>/dev/null || echo "ipcheckr-gns3")
+	host_short=$(hostname -s 2>/dev/null || echo "$host_fqdn")
 	local host_ip
 	host_ip=$(hostname -I 2>/dev/null | awk '{print $1}' | tr -d ' \t' || true)
 	[ -z "$host_ip" ] && host_ip="127.0.0.1"
@@ -61,7 +62,8 @@ subjectAltName = @alt_names
 [alt_names]
 DNS.1 = localhost
 DNS.2 = ${host_fqdn}
-DNS.3 = host.docker.internal
+DNS.3 = ${host_short}
+DNS.4 = host.docker.internal
 IP.1 = 127.0.0.1
 IP.2 = ${host_ip}
 EOF
