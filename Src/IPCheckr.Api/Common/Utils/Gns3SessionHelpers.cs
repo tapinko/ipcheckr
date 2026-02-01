@@ -96,18 +96,18 @@ namespace IPCheckr.Api.Common.Utils
             var config = httpContext.RequestServices.GetRequiredService<IConfiguration>();
             var db = httpContext.RequestServices.GetRequiredService<ApiDbContext>();
 
-            var host = await db.AppSettings
-                .Where(a => a.Name == "Gns3_RemoteServer")
-                .Select(a => a.Value)
-                .FirstOrDefaultAsync(ct)
-                ?? config["Gns3:LauncherHost"]
+            var host = config["Gns3:LauncherHost"]
+                ?? await db.AppSettings
+                    .Where(a => a.Name == "Gns3_RemoteServer")
+                    .Select(a => a.Value)
+                    .FirstOrDefaultAsync(ct)
                 ?? "127.0.0.1";
 
-            var portStr = await db.AppSettings
-                .Where(a => a.Name == "Gns3_RemotePort")
-                .Select(a => a.Value)
-                .FirstOrDefaultAsync(ct)
-                ?? config["Gns3:LauncherPort"];
+            var portStr = config["Gns3:LauncherPort"]
+                ?? await db.AppSettings
+                    .Where(a => a.Name == "Gns3_RemotePort")
+                    .Select(a => a.Value)
+                    .FirstOrDefaultAsync(ct);
 
             var port = int.TryParse(portStr, out var p) ? p : 6769;
             var timeoutSec = int.TryParse(config["Gns3:LauncherTimeoutSeconds"], out var t) ? t : 5;

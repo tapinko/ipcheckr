@@ -41,6 +41,15 @@ namespace IPCheckr.Api.Config
             await EnsureAppSettingAsync(db, "Gns3_DefaultSessionMinutes", "120");
             await EnsureAppSettingAsync(db, "Gns3_ExtendedMinutes", "30");
 
+            await UpsertAppSettingAsync(db, "Gns3_RemoteServer", config["Gns3:LauncherHost"]);
+            await UpsertAppSettingAsync(db, "Gns3_RemotePort", config["Gns3:LauncherPort"]);
+            await UpsertAppSettingAsync(db, "Gns3_Enabled", config["Gns3:Enabled"]);
+
+            await UpsertAppSettingAsync(db, "Ldap_Host", config["LDAP_HOST"]);
+            await UpsertAppSettingAsync(db, "Ldap_Port", config["LDAP_PORT"]);
+            await UpsertAppSettingAsync(db, "Ldap_StartTls", config["LDAP_STARTTLS"]);
+            await UpsertAppSettingAsync(db, "Ldap_FetchCert", config["LDAP_FETCH_CERT"]);
+
             await EnsureAppSettingAsync(db, "Ldap_Enabled", "false");
             await EnsureAppSettingAsync(db, "Ldap_Host", "server.ldap.example.local");
             await EnsureAppSettingAsync(db, "Ldap_Port", "636");
@@ -69,6 +78,25 @@ namespace IPCheckr.Api.Config
                     Name = name,
                     Value = defaultValue
                 });
+                await db.SaveChangesAsync();
+            }
+        }
+
+        private static async Task UpsertAppSettingAsync(ApiDbContext db, string name, string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return;
+
+            var existing = await db.AppSettings.FirstOrDefaultAsync(a => a.Name == name);
+            if (existing == null)
+            {
+                db.AppSettings.Add(new AppSettings { Name = name, Value = value });
+                await db.SaveChangesAsync();
+                return;
+            }
+
+            if (!string.Equals(existing.Value, value, StringComparison.Ordinal))
+            {
+                existing.Value = value;
                 await db.SaveChangesAsync();
             }
         }

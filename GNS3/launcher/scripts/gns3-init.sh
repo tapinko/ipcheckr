@@ -107,4 +107,5 @@ sudo systemctl daemon-reload
 sudo systemctl stop ipcheckr-gns3.socket ipcheckr-gns3.service 2>/dev/null || true
 sudo systemctl disable --now ipcheckr-gns3.socket 2>/dev/null || true
 sudo systemctl mask ipcheckr-gns3.socket 2>/dev/null || true
+sudo rm -f /etc/systemd/system/sockets.target.wants/ipcheckr-gns3.socket 2>/dev/null || true
 sudo systemctl enable --now ipcheckr-gns3.service
