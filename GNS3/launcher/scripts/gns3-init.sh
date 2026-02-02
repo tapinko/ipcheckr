@@ -40,26 +40,50 @@ generate_gns3_certs() {
 	host_ip=$(hostname -I 2>/dev/null | awk '{print $1}' | tr -d ' \t' || true)
 	[ -z "$host_ip" ] && host_ip="127.0.0.1"
 
-	sudo mkdir -p "$CERT_DIR"
 	if [ -f "$srv_key" ] && [ -f "$srv_crt" ] && [ -f "$ca_crt" ]; then
-		echo "GNS3 certs already present in $CERT_DIR"
-		return 0
+		if openssl x509 -in "$srv_crt" -noout -text 2>/dev/null | grep -qi "host.docker.internal" \
+			&& openssl x509 -in "$srv_crt" -noout -text 2>/dev/null | grep -qi "$host_fqdn" \
+			&& openssl x509 -in "$srv_crt" -noout -text 2>/dev/null | grep -qi "$host_ip"; then
+			echo "GNS3 certs already present in $CERT_DIR (SANs OK)"
+			return 0
+		fi
+
+		echo "Existing GNS3 certs missing required SANs; regenerating..."
+		sudo rm -f "$srv_key" "$srv_crt" "$ca_key" "$ca_crt" 2>/dev/null || true
 	fi
+
+	sudo mkdir -p "$CERT_DIR"
 
 	local tmp_conf
 	tmp_conf=$(mktemp)
 	cat >"$tmp_conf" <<EOF
-[req]
+[ ca ]
+default_ca = ca_default
+
+[ ca_default ]
+default_md = sha384
+
+[ req ]
 distinguished_name = dn
 prompt = no
 
-[dn]
+[ dn ]
 CN = ipcheckr-gns3
 
-[ext]
+[ ca_ext ]
+basicConstraints = critical,CA:TRUE,pathlen:0
+keyUsage = critical,keyCertSign,cRLSign
+subjectKeyIdentifier = hash
+
+[ srv_ext ]
+basicConstraints = CA:FALSE
+keyUsage = critical,digitalSignature,keyEncipherment
+extendedKeyUsage = serverAuth
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
 subjectAltName = @alt_names
 
-[alt_names]
+[ alt_names ]
 DNS.1 = localhost
 DNS.2 = ${host_fqdn}
 DNS.3 = ${host_short}
@@ -68,9 +92,15 @@ IP.1 = 127.0.0.1
 IP.2 = ${host_ip}
 EOF
 
-	sudo openssl req -x509 -newkey rsa:4096 -sha384 -days 825 -nodes -keyout "$ca_key" -out "$ca_crt" -subj "/CN=ipcheckr-gns3 CA"
+	sudo openssl req -x509 -newkey rsa:4096 -sha384 -days 825 -nodes \
+		-keyout "$ca_key" -out "$ca_crt" -subj "/CN=ipcheckr-gns3 CA" \
+		-addext "basicConstraints=critical,CA:TRUE,pathlen:0" \
+		-addext "keyUsage=critical,keyCertSign,cRLSign" \
+		-addext "subjectKeyIdentifier=hash"
+
 	sudo openssl req -new -newkey rsa:4096 -sha384 -nodes -keyout "$srv_key" -out "$csr" -config "$tmp_conf"
-	sudo openssl x509 -req -in "$csr" -CA "$ca_crt" -CAkey "$ca_key" -CAcreateserial -out "$srv_crt" -days 397 -sha384 -extfile "$tmp_conf" -extensions ext
+	sudo openssl x509 -req -in "$csr" -CA "$ca_crt" -CAkey "$ca_key" -CAcreateserial -out "$srv_crt" -days 397 -sha384 \
+		-extfile "$tmp_conf" -extensions srv_ext
 	sudo rm -f "$csr"
 	sudo chmod 640 "$srv_key" "$srv_crt" "$ca_crt" "$ca_key" 2>/dev/null || true
 	sudo chown root:root "$srv_key" "$srv_crt" "$ca_crt" "$ca_key" 2>/dev/null || true
