@@ -227,7 +227,16 @@ namespace IPCheckr.Api.Common.Utils
 
             var chainOk = chain.Build(serverCert);
             if (!chainOk)
-                return false;
+            {
+                var tolerable = chain.ChainStatus.All(s =>
+                    s.Status == X509ChainStatusFlags.UntrustedRoot ||
+                    s.Status == X509ChainStatusFlags.PartialChain ||
+                    s.Status == X509ChainStatusFlags.RevocationStatusUnknown ||
+                    s.Status == X509ChainStatusFlags.OfflineRevocation);
+
+                if (!tolerable)
+                    return false;
+            }
 
             if (allowNameMismatch)
                 return true;
