@@ -32,11 +32,14 @@ IPCheckr is a system for learning and testing subnetting. Students practice and 
 - Per-user GNS3 server sessions orchestrated by the backend; port/PID tracking stored in DB.
 - AD-authenticated users get their own GNS3 instance; files remain per-user under service ownership.
 
-## Quickstart (Docker for now)
-1. Install Docker / Docker Compose.
-2. (Optional) pull the image: `docker pull tapinko/ipcheckr:latest`.
-3. Run: `docker compose -f Docker/compose.yml up -d`
-4. Open https://localhost:8081 and log in as `admin` / `admin`.
+## Quickstart (installer script)
+Run the installer:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tapinko/ipcheckr/master/Deploy/install.sh -o install.sh && sudo bash install.sh
+```
+
+The wizard installs prerequisites, collects your ports and secrets, sets up GNS3 (if you choose it), and starts the stack. Default login: `admin` / `admin`.
 
 ## License
 MIT — see LICENSE.
