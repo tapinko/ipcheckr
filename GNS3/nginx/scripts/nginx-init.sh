@@ -2,17 +2,21 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 3 ]; then
+if [ "$#" -ne 5 ]; then
 	exit 1
 fi
 
 NGINX_VERSION="$1"
 DISTRO="$2"
 BRANCH="$3"
+LISTEN_PORT="$4"
+WEB_PORT="$5"
 
 BASE_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/${BRANCH}/GNS3/nginx"
 INSTALLER_URL="${BASE_URL}/scripts/nginx-install.sh"
 INSTALLER_TMP="/tmp/nginx-install.sh"
+CONF_TMP="/tmp/ipcheckr-gns3.conf"
+CONF_TARGET="/etc/nginx/conf.d/ipcheckr-gns3.conf"
 
 generate_nginx_certs() {
 	local cert_dir="/etc/ipcheckr/nginx"
@@ -55,7 +59,19 @@ EOF
 	rm -f "$tmp_conf"
 }
 
+deploy_nginx_conf() {
+	curl -fsSL -o "$CONF_TMP" "${BASE_URL}/ipcheckr-gns3.conf"
+	sudo mkdir -p "$(dirname "$CONF_TARGET")"
+	sudo sed \
+		-e "s/__NGINX_PORT__/${LISTEN_PORT}/g" \
+		-e "s/__WEB_PORT__/${WEB_PORT}/g" \
+		"$CONF_TMP" | sudo tee "$CONF_TARGET" >/dev/null
+	sudo nginx -t
+	sudo systemctl restart nginx
+}
+
 curl -fsSL -o "$INSTALLER_TMP" "$INSTALLER_URL"
 chmod +x "$INSTALLER_TMP"
 "$INSTALLER_TMP" "$NGINX_VERSION" "$DISTRO"
 generate_nginx_certs
+deploy_nginx_conf
