@@ -95,6 +95,7 @@ namespace IPCheckr.Api.Common.Utils
         {
             var config = httpContext.RequestServices.GetRequiredService<IConfiguration>();
             var db = httpContext.RequestServices.GetRequiredService<ApiDbContext>();
+            var logger = httpContext.RequestServices.GetService<ILoggerFactory>()?.CreateLogger("Gns3SessionHelpers");
 
             var host = config["Gns3:LauncherHost"]
                 ?? await db.AppSettings
@@ -176,7 +177,9 @@ namespace IPCheckr.Api.Common.Utils
                 }
             }
 
-            return new LauncherResult(false, null, null, lastMessage ?? last?.Message ?? "Unknown launcher error");
+            var reason = lastMessage ?? last?.Message ?? "Unknown launcher error";
+            logger?.LogWarning("GNS3 launcher call failed after {Attempts} attempts: {Reason}", retries + 1, reason);
+            return new LauncherResult(false, null, null, reason);
         }
 
         private static (bool Success, int? Port, int? Pid) ParseLauncherResponse(string? line)
