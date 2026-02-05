@@ -49,15 +49,25 @@ namespace IPCheckr.Api.Controllers
             if (!parsed)
                 authTypeEnum = AuthType.LOCAL;
 
-            if (user != null && user.Role != Roles.Admin && BCrypt.Net.BCrypt.Verify(creds.Password ?? string.Empty, user.PasswordHash))
+            var canCheckLocal = user != null && user.Role != Roles.Admin && !string.IsNullOrWhiteSpace(user.PasswordHash);
+            if (canCheckLocal)
             {
-                var port = await GetActivePortAsync(user.Id);
-                if (port == null)
-                    return StatusCode(StatusCodes.Status401Unauthorized);
+                try
+                {
+                    if (BCrypt.Net.BCrypt.Verify(creds.Password ?? string.Empty, user.PasswordHash))
+                    {
+                        var port = await GetActivePortAsync(user.Id);
+                        if (port == null)
+                            return StatusCode(StatusCodes.Status401Unauthorized);
 
-                Response.Headers["X-Gns3-Port"] = port.Value.ToString();
-                Response.Headers["X-User"] = username;
-                return Ok();
+                        Response.Headers["X-Gns3-Port"] = port.Value.ToString();
+                        Response.Headers["X-User"] = username;
+                        return Ok();
+                    }
+                }
+                catch (BCrypt.Net.SaltParseException)
+                {
+                }
             }
 
             if (authTypeEnum == AuthType.LDAP || authTypeEnum == AuthType.LOCAL)
