@@ -51,7 +51,8 @@ declare -A DEFAULTS=(
     [CONTAINER_IPCHECKR]="ipcheckr"
     [CONTAINER_DATABASE]="ipcheckr-db"
     [MARIADB_IMAGE]="mariadb:12.0.2"
-    [GNS3_VERSION]="latest"
+    [GNS3_VERSION]="2.2.52"
+    [GNS3_INSTALL_METHOD]="pypi"
     [NGINX_VERSION]="latest"
     [BRANCH]="master"
     [INSTALL_GNS3]="true"
@@ -200,7 +201,8 @@ run_gns3_setup() {
     if [[ -z "$gns3_version_arg" || "$gns3_version_arg" == "latest" ]]; then
         gns3_version_arg="--no-version"
     fi
-    bash "$gns3_init_tmp" "$gns3_version_arg" "$DISTRO_ID" "$GITHUB_BRANCH"
+    local gns3_install_method="${CONFIG[GNS3_INSTALL_METHOD]:-pypi}"
+    bash "$gns3_init_tmp" "$gns3_version_arg" "$DISTRO_ID" "$GITHUB_BRANCH" "$gns3_install_method"
     log_success "GNS3 setup completed"
 }
 
@@ -355,6 +357,7 @@ GNS3_LAUNCHER_SERVERNAME=${CONFIG[GNS3_LAUNCHER_SERVERNAME]}
 GNS3_LAUNCHER_ALLOW_NAME_MISMATCH=${CONFIG[GNS3_LAUNCHER_ALLOW_NAME_MISMATCH]}
 NGINX_GNS3_PORT=${CONFIG[NGINX_GNS3_PORT]}
 GNS3_VERSION=${CONFIG[GNS3_VERSION]}
+GNS3_INSTALL_METHOD=${CONFIG[GNS3_INSTALL_METHOD]}
 NGINX_VERSION=${CONFIG[NGINX_VERSION]}
 DOCKER_IMAGE=${CONFIG[DOCKER_IMAGE]}
 CONTAINER_IPCHECKR=${CONFIG[CONTAINER_IPCHECKR]}
@@ -394,6 +397,8 @@ save_runtime_env() {
         echo "GNS3_USE_TLS=${CONFIG[GNS3_USE_TLS]}"
         echo "GNS3_LAUNCHER_SERVERNAME=${CONFIG[GNS3_LAUNCHER_SERVERNAME]}"
         echo "GNS3_LAUNCHER_ALLOW_NAME_MISMATCH=${CONFIG[GNS3_LAUNCHER_ALLOW_NAME_MISMATCH]}"
+        echo "GNS3_VERSION=${CONFIG[GNS3_VERSION]}"
+        echo "GNS3_INSTALL_METHOD=${CONFIG[GNS3_INSTALL_METHOD]}"
         echo "NGINX_GNS3_PORT=${CONFIG[NGINX_GNS3_PORT]}"
         echo "DOCKER_IMAGE=${CONFIG[DOCKER_IMAGE]}"
         echo "CONTAINER_IPCHECKR=${CONFIG[CONTAINER_IPCHECKR]}"
@@ -543,6 +548,32 @@ configure_basic() {
 
     if yes_no "Install GNS3" "Do you want to install and initialize GNS3 with the reverse proxy?"; then
         CONFIG[INSTALL_GNS3]="true"
+
+        local method
+        method=$(whiptail --title "GNS3 Install Method" \
+            --menu "Select how to install gns3-server" \
+            12 70 2 \
+            "pypi" "Install via PyPI (lets you pin version)" \
+            "repo" "Install via package manager (uses repo latest)" \
+            3>&1 1>&2 2>&3)
+
+        case "$method" in
+            pypi)
+                CONFIG[GNS3_INSTALL_METHOD]="pypi"
+                local gns3_ver
+                gns3_ver=$(input_text "GNS3 PyPI Version" \
+                    "Enter gns3-server version for PyPI install\n(default: ${CONFIG[GNS3_VERSION]})" \
+                    "${CONFIG[GNS3_VERSION]}")
+                CONFIG[GNS3_VERSION]="${gns3_ver:-${CONFIG[GNS3_VERSION]}}"
+                ;;
+            repo)
+                CONFIG[GNS3_INSTALL_METHOD]="repo"
+                CONFIG[GNS3_VERSION]="latest"
+                ;;
+            *)
+                log_warning "No method selected; keeping defaults (${CONFIG[GNS3_INSTALL_METHOD]})."
+                ;;
+        esac
     else
         CONFIG[INSTALL_GNS3]="false"
     fi
@@ -637,6 +668,11 @@ review_configuration() {
     review_text+="NGINX_GNS3_PORT: ${CONFIG[NGINX_GNS3_PORT]}\n"
     review_text+="DOCKER_IMAGE: ${CONFIG[DOCKER_IMAGE]}\n"
     review_text+="INSTALL_GNS3: ${CONFIG[INSTALL_GNS3]}\n"
+
+	if [[ "${CONFIG[INSTALL_GNS3]}" == "true" ]]; then
+		review_text+="GNS3_INSTALL_METHOD: ${CONFIG[GNS3_INSTALL_METHOD]}\n"
+		review_text+="GNS3_VERSION: ${CONFIG[GNS3_VERSION]}\n"
+	fi
     
     if ! whiptail --title "Review Configuration" \
         --yesno "$review_text\nIs this correct?" \

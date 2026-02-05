@@ -2,14 +2,15 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 3 ]; then
-	echo "Usage: $0 <gns3-version> <distro> <branch>" >&2
+if [ "$#" -ne 4 ]; then
+	echo "Usage: $0 <gns3-version> <distro> <branch> <install-method>" >&2
 	exit 1
 fi
 
 GNS3_VERSION="$1"
 DISTRO="$2"
 BRANCH="$3"
+INSTALL_METHOD="$4"
 
 BASE_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/${BRANCH}"
 LAUNCHER_URL="${BASE_URL}/GNS3/launcher"
@@ -44,7 +45,7 @@ sudo install -m 0755 "$CONNECTOR_TMP" "$CONNECTOR_PATH"
 
 curl -fsSL -o "$INSTALLER_TMP" "$INSTALLER_URL"
 chmod +x "$INSTALLER_TMP"
-"$INSTALLER_TMP" "$GNS3_VERSION" "$DISTRO"
+"$INSTALLER_TMP" "$GNS3_VERSION" "$DISTRO" "$INSTALL_METHOD"
 
 curl -fsSL -o "$SERVICE_PATH" "$SERVICE_URL"
 curl -fsSL -o "$SOCKET_PATH" "$SOCKET_URL"
