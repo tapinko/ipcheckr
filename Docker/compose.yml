@@ -32,8 +32,8 @@ services:
     dns_search:
       - ${DNS_SEARCH_DOMAIN}
     extra_hosts:
-      - "${LDAP_EXTRA_HOST}:${DNS_NAMESERVER}"
-      - "${LDAP_SERVER_EXTRA_HOST}:${DNS_NAMESERVER}"
+      - "${LDAP_HOST}:${DNS_NAMESERVER}"
+      - "${DNS_SEARCH_DOMAIN}:${DNS_NAMESERVER}"
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
