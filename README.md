@@ -41,5 +41,13 @@ curl -fsSL https://raw.githubusercontent.com/tapinko/ipcheckr/master/Deploy/inst
 
 The wizard installs prerequisites, collects your ports and secrets, sets up GNS3 (if you choose it), and starts the stack. Default login: `admin` / `admin`.
 
+### GNS3 version selection
+- Installer will ask whether to install GNS3; if yes, you must pick an install method:
+	- **PyPI**: lets you pin `gns3-server` (default 2.2.52); if your repo is missing a specific build, choose this.
+	- **Repo**: uses distro packages and forces version to `latest`.
+
+### Tested distributions
+- Ubuntu 25.04
+
 ## License
 MIT — see LICENSE.
