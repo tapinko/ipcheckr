@@ -422,9 +422,11 @@ show_mode_selection() {
     local choice
     choice=$(whiptail --title "Installation Mode" \
         --menu "Select installation mode:" \
-        12 60 2 \
+        16 70 4 \
         "1" "BASIC - Essential settings only" \
         "2" "ADVANCED - Full customization" \
+        "3" "GNS3 INIT ONLY - Just install & init GNS3" \
+        "4" "LDAP INIT ONLY - Configure LDAP/DNS" \
         3>&1 1>&2 2>&3)
     
     echo "$choice"
@@ -579,6 +581,41 @@ configure_basic() {
     fi
 }
 
+configure_ldap_only() {
+    log_info "Starting LDAP/DNS configuration only..."
+    CONFIG[INSTALL_GNS3]="false"
+
+    local db_pass
+    db_pass=$(input_password_required "Database Password" \
+        "Enter database password for user '${CONFIG[DB_USER]}'\n(used for both root and ipcheckr user)" )
+    CONFIG[DB_PASSWORD]="$db_pass"
+    CONFIG[DB_ROOT_PASSWORD]="$db_pass"
+
+    local dns_ns
+    dns_ns=$(input_text "DNS Nameserver" \
+        "Enter DNS nameserver IP\n(default: ${CONFIG[DNS_NAMESERVER]})" \
+        "${CONFIG[DNS_NAMESERVER]}" )
+    CONFIG[DNS_NAMESERVER]="${dns_ns:-${CONFIG[DNS_NAMESERVER]}}"
+
+    local dns_search
+    dns_search=$(input_text "DNS Search Domain" \
+        "Enter DNS search domain (for LDAP)\n(default: ${CONFIG[DNS_SEARCH_DOMAIN]})" \
+        "${CONFIG[DNS_SEARCH_DOMAIN]}" )
+    CONFIG[DNS_SEARCH_DOMAIN]="${dns_search:-${CONFIG[DNS_SEARCH_DOMAIN]}}"
+
+    local ldap_host
+    ldap_host=$(input_text "LDAP Server" \
+        "Enter LDAP server address\n(default: ${CONFIG[LDAP_HOST]})" \
+        "${CONFIG[LDAP_HOST]}" )
+    CONFIG[LDAP_HOST]="${ldap_host:-${CONFIG[LDAP_HOST]}}"
+
+    local ldap_port
+    ldap_port=$(input_text "LDAP Port" \
+        "Enter LDAP port\n(default: ${CONFIG[LDAP_PORT]})" \
+        "${CONFIG[LDAP_PORT]}" )
+    CONFIG[LDAP_PORT]="${ldap_port:-${CONFIG[LDAP_PORT]}}"
+}
+
 configure_advanced() {
     log_info "Starting ADVANCED configuration..."
     
@@ -682,6 +719,21 @@ review_configuration() {
     return 0
 }
 
+review_ldap_configuration() {
+    local review_text="Review LDAP/DNS configuration:\n\n"
+    review_text+="DNS_NAMESERVER: ${CONFIG[DNS_NAMESERVER]}\n"
+    review_text+="DNS_SEARCH_DOMAIN: ${CONFIG[DNS_SEARCH_DOMAIN]}\n"
+    review_text+="LDAP_HOST: ${CONFIG[LDAP_HOST]}\n"
+    review_text+="LDAP_PORT: ${CONFIG[LDAP_PORT]}\n"
+
+    if ! whiptail --title "Review Configuration" \
+        --yesno "$review_text\nIs this correct?" \
+        18 60; then
+        return 1
+    fi
+    return 0
+}
+
 setup_docker_compose() {
     log_info "Setting up Docker Compose environment..."
     download_from_github "Docker/compose.yml" "$DEPLOY_DIR/compose.yml"
@@ -697,8 +749,9 @@ start_docker_compose() {
         
         save_runtime_env
 
-        $dc_cmd --env-file "$ENV_RUNTIME" -f compose.yml up -d
-        log_success "Docker containers started"
+        log_info "Recreating containers to apply configuration changes..."
+        $dc_cmd --env-file "$ENV_RUNTIME" -f compose.yml up -d --force-recreate --remove-orphans
+        log_success "Docker containers started/refreshed"
         
         log_info "Waiting for containers to be ready..."
         sleep 10
@@ -729,9 +782,7 @@ main() {
     log_info "IPCheckr Installation Script starting..."
     
     detect_distro
-    
     check_whiptail
-    check_docker
     load_existing_env
     seed_config_defaults
     resolve_branch
@@ -747,6 +798,30 @@ main() {
             ;;
         2)
             configure_advanced
+            ;;
+        3)
+            log_info "GNS3 init-only mode selected. Skipping app config and Docker setup."
+            CONFIG[INSTALL_GNS3]="true"
+            ensure_connector_env
+            run_gns3_setup
+            update_gns3_port_config
+            run_nginx_setup
+            log_success "GNS3 init-only completed."
+            exit 0
+            ;;
+        4)
+            log_info "LDAP init-only mode selected."
+            configure_ldap_only
+            while ! review_ldap_configuration; do
+                configure_ldap_only
+            done
+            save_config_env
+            log_info "Refreshing containers to apply LDAP/DNS changes..."
+            check_docker
+            setup_docker_compose
+            start_docker_compose
+            log_success "LDAP init-only completed."
+            exit 0
             ;;
         *)
             log_error "Invalid selection"
@@ -765,6 +840,7 @@ main() {
     
     log_success "Proceeding with installation..."
     
+    check_docker
     ensure_connector_env
     setup_docker_compose
 

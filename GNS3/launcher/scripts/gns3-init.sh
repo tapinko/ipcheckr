@@ -34,6 +34,13 @@ generate_gns3_certs() {
 	local srv_key="${CERT_DIR}/server.key"
 	local srv_crt="${CERT_DIR}/server.crt"
 	local csr="${CERT_DIR}/server.csr"
+
+	for path in "$ca_key" "$ca_crt" "$srv_key" "$srv_crt" "$csr"; do
+		if [ -d "$path" ]; then
+			echo "Found directory at $path; removing so certs can be written"
+			sudo rm -rf "$path"
+		fi
+	done
 	local host_fqdn host_short
 	host_fqdn=$(hostname -f 2>/dev/null || hostname 2>/dev/null || echo "ipcheckr-gns3")
 	host_short=$(hostname -s 2>/dev/null || echo "$host_fqdn")
