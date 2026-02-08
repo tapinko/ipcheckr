@@ -584,6 +584,7 @@ configure_basic() {
 configure_ldap_only() {
     log_info "Starting LDAP/DNS configuration only..."
     CONFIG[INSTALL_GNS3]="false"
+    CONFIG[LDAP_FETCH_CERT]="true"
 
     local db_pass
     db_pass=$(input_password_required "Database Password" \
@@ -686,29 +687,29 @@ configure_advanced() {
 
 review_configuration() {
     local review_text="Review your configuration:\n\n"
-    review_text+="WEB PORT: ${CONFIG[WEB_PORT]}\n"
-    review_text+="TIMEZONE: ${CONFIG[TZ]}\n"
-    review_text+="DB_HOST: ${CONFIG[DB_HOST]}\n"
-    review_text+="DB_PORT: ${CONFIG[DB_PORT]}\n"
-    review_text+="DB_NAME: ${CONFIG[DB_NAME]}\n"
-    review_text+="DB_USER: ${CONFIG[DB_USER]}\n"
-    review_text+="DNS_NAMESERVER: ${CONFIG[DNS_NAMESERVER]}\n"
-    review_text+="LDAP_ENABLED: ${CONFIG[LDAP_FETCH_CERT]}\n"
+    review_text+="Web Port: ${CONFIG[WEB_PORT]}\n"
+    review_text+="Timezone: ${CONFIG[TZ]}\n"
+    review_text+="DB Host: ${CONFIG[DB_HOST]}\n"
+    review_text+="DB Port: ${CONFIG[DB_PORT]}\n"
+    review_text+="DB Name: ${CONFIG[DB_NAME]}\n"
+    review_text+="DB User: ${CONFIG[DB_USER]}\n"
+    review_text+="DNS Nameserver: ${CONFIG[DNS_NAMESERVER]}\n"
+    review_text+="LDAP Enabled: ${CONFIG[LDAP_FETCH_CERT]}\n"
     
     if [[ "${CONFIG[LDAP_FETCH_CERT]}" == "true" ]]; then
-        review_text+="LDAP_HOST: ${CONFIG[LDAP_HOST]}\n"
-        review_text+="LDAP_PORT: ${CONFIG[LDAP_PORT]}\n"
-        review_text+="DNS_SEARCH_DOMAIN: ${CONFIG[DNS_SEARCH_DOMAIN]}\n"
+        review_text+="LDAP Host: ${CONFIG[LDAP_HOST]}\n"
+        review_text+="LDAP Port: ${CONFIG[LDAP_PORT]}\n"
+        review_text+="DNS Search Domain: ${CONFIG[DNS_SEARCH_DOMAIN]}\n"
     fi
     
-    review_text+="GNS3_PORT: ${CONFIG[GNS3_LAUNCHER_PORT]} (TLS: ${CONFIG[GNS3_USE_TLS]}, SNI: ${CONFIG[GNS3_LAUNCHER_SERVERNAME]})\n"
-    review_text+="NGINX_GNS3_PORT: ${CONFIG[NGINX_GNS3_PORT]}\n"
-    review_text+="DOCKER_IMAGE: ${CONFIG[DOCKER_IMAGE]}\n"
-    review_text+="INSTALL_GNS3: ${CONFIG[INSTALL_GNS3]}\n"
+    review_text+="GNS3 Port: ${CONFIG[GNS3_LAUNCHER_PORT]} (TLS: ${CONFIG[GNS3_USE_TLS]}, SNI: ${CONFIG[GNS3_LAUNCHER_SERVERNAME]})\n"
+    review_text+="Nginx GNS3 Port: ${CONFIG[NGINX_GNS3_PORT]}\n"
+    review_text+="Docker Image: ${CONFIG[DOCKER_IMAGE]}\n"
+    review_text+="Install GNS3: ${CONFIG[INSTALL_GNS3]}\n"
 
 	if [[ "${CONFIG[INSTALL_GNS3]}" == "true" ]]; then
-		review_text+="GNS3_INSTALL_METHOD: ${CONFIG[GNS3_INSTALL_METHOD]}\n"
-		review_text+="GNS3_VERSION: ${CONFIG[GNS3_VERSION]}\n"
+		review_text+="GNS3 Install Method: ${CONFIG[GNS3_INSTALL_METHOD]}\n"
+		review_text+="GNS3 Version: ${CONFIG[GNS3_VERSION]}\n"
 	fi
     
     if ! whiptail --title "Review Configuration" \
@@ -721,10 +722,10 @@ review_configuration() {
 
 review_ldap_configuration() {
     local review_text="Review LDAP/DNS configuration:\n\n"
-    review_text+="DNS_NAMESERVER: ${CONFIG[DNS_NAMESERVER]}\n"
-    review_text+="DNS_SEARCH_DOMAIN: ${CONFIG[DNS_SEARCH_DOMAIN]}\n"
-    review_text+="LDAP_HOST: ${CONFIG[LDAP_HOST]}\n"
-    review_text+="LDAP_PORT: ${CONFIG[LDAP_PORT]}\n"
+    review_text+="DNS Nameserver: ${CONFIG[DNS_NAMESERVER]}\n"
+    review_text+="DNS Search Domain: ${CONFIG[DNS_SEARCH_DOMAIN]}\n"
+    review_text+="LDAP Host: ${CONFIG[LDAP_HOST]}\n"
+    review_text+="LDAP Port: ${CONFIG[LDAP_PORT]}\n"
 
     if ! whiptail --title "Review Configuration" \
         --yesno "$review_text\nIs this correct?" \
