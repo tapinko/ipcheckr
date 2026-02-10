@@ -3,14 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IPCheckr.Api.Models
 {
-    [Table("AssignmentAnswerKeys")]
-    public class AssignmentAnswerKey
+    [Table("SubnetAssignmentAnswerKeys")]
+    public class SubnetAssignmentAnswerKey : AssignmentAuditBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
-        public required Assignment Assignment { get; set; }
+        public required SubnetAssignment Assignment { get; set; }
 
         public required string[] Networks { get; set; }
 
@@ -19,8 +15,5 @@ namespace IPCheckr.Api.Models
         public required string[] LastUsables { get; set; }
 
         public required string[] Broadcasts { get; set; }
-
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
