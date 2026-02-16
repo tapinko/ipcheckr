@@ -13,8 +13,8 @@ namespace IPCheckr.Api.Models
 
         public int PossibleOctets { get; set; }
 
-        public bool TestWildcard { get; set; } = false;
+        public bool TestWildcard { get; set; }
 
-        public bool TestFirstLastBr { get; set; } = false;
+        public bool TestFirstLastBr { get; set; }
     }
 }

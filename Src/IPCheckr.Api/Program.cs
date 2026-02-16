@@ -9,6 +9,7 @@ using IPCheckr.Api.Services.Logging;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
+using System.Text.Json.Serialization;
 
 namespace IPCheckr.Api
 {
@@ -57,7 +58,11 @@ namespace IPCheckr.Api
             builder.Services.AddJwtAuthentication();
             builder.Services.AddLdapAuth(builder.Configuration);
             builder.Services.AddSwaggerDocumentation();
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
             builder.Services.AddCustomAuthorization();
             builder.Services.AddMemoryCache();
             builder.Services.AddHostedService<Gns3SessionCleanupService>();

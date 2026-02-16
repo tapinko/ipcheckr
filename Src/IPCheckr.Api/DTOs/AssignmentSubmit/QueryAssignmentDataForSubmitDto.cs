@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using IPCheckr.Api.Common.Enums;
 
 namespace IPCheckr.Api.DTOs.AssignmentSubmit
 {
@@ -11,10 +13,31 @@ namespace IPCheckr.Api.DTOs.AssignmentSubmit
     public class QueryAssignmentDataForSubmitRes
     {
         [Required]
-        public required int[] HostsPerNetwork { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public required AssignmentGroupType AssignmentGroupType { get; set; }
 
         [Required]
-        public required string Cidr { get; set; }
+        public int[]? HostsPerNetwork { get; set; }
+
+        public string? Cidr { get; set; }
+
+        public string[]? Cidrs { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AssignmentGroupIpCat AssignmentGroupIpCat { get; set; }
+
+        public bool TestWildcard { get; set; }
+
+        public bool TestFirstLastBr { get; set; }
+
+        public int? PossibleOctets { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AssignmentGroupStatus Status { get; set; }
+
+        public DateTime StartDate { get; set; }
+
+        public DateTime Deadline { get; set; }
 
         [Required]
         public required bool IsAvailableForSubmission { get; set; }

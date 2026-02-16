@@ -1,7 +1,7 @@
 import { AssignmentGroupStatus } from "../dtos"
 import { TranslationKey } from "./i18n"
 
-type StatusMapType = Record<AssignmentGroupStatus, { label: string; color: "success" | "default" }>
+type StatusMapType = Record<AssignmentGroupStatus, { label: string; color: "success" | "default" | "warning" }>
 
 /**
  * @param t - Translation function to get localized labels.
@@ -10,7 +10,8 @@ type StatusMapType = Record<AssignmentGroupStatus, { label: string; color: "succ
  */
 export function getStatusMap(t: (key: string) => string): StatusMapType {
   return {
-    [AssignmentGroupStatus.Completed]: { label: t(TranslationKey.STATUS_COMPLETED), color: "success" },
-    [AssignmentGroupStatus.NotCompleted]: { label: t(TranslationKey.STATUS_NOT_COMPLETED), color: "default" },
+    [AssignmentGroupStatus.Upcoming]: { label: t(TranslationKey.STATE_UPCOMING), color: "default" },
+    [AssignmentGroupStatus.InProgress]: { label: t(TranslationKey.STATE_IN_PROGRESS), color: "warning" },
+    [AssignmentGroupStatus.Ended]: { label: t(TranslationKey.STATE_ENDED), color: "success" }
   }
 }

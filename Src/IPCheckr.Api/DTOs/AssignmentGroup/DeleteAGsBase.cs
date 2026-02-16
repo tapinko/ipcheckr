@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace IPCheckr.Api.DTOs.AssignmentGroup
 {
-    public class DeleteAssignmentGroupsReq
+    public class DeleteAgsBaseReq
     {
         [Required(ErrorMessage = "Assignment Group IDs are required.")]
         [MinLength(1, ErrorMessage = "At least one Assignment Group ID is required.")]

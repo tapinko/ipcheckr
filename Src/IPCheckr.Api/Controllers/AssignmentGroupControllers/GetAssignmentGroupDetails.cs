@@ -9,179 +9,202 @@ namespace IPCheckr.Api.Controllers
 {
     public partial class AssignmentGroupController : ControllerBase
     {
-        [HttpGet("get-assignment-group-details")]
-        [ProducesResponseType(typeof(QueryAssignmentGroupDetailsRes), StatusCodes.Status200OK)]
+        [HttpGet("get-subnet-assignment-group-details")]
+        [ProducesResponseType(typeof(QuerySubnetAGDetailRes), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<QueryAssignmentGroupDetailsRes>> QueryAssignmentGroupDetails([FromQuery] QueryAssignmentGroupDetailsReq req)
+        public async Task<ActionResult<QuerySubnetAGDetailRes>> QuerySubnetAssignmentGroupDetails([FromQuery] QuerySubnetAGDetailReq req)
         {
-            var ag = await _db.AssignmentGroups
+            var subnetGroup = await _db.SubnetAGs
                 .Include(ag => ag.Class)
                 .ThenInclude(c => c.Students)
-                .FirstOrDefaultAsync(ag => ag.Id == req.AssignmentGroupId);
+                .FirstOrDefaultAsync(ag => ag.Id == req.Id);
 
-            if (ag == null)
+            if (subnetGroup == null)
                 return NotFound(new ApiProblemDetails
                 {
                     Title = "Not Found",
                     Detail = "Assignment group not found.",
                     Status = StatusCodes.Status404NotFound,
                     MessageEn = "Assignment group not found.",
-                    MessageSk = "Skupina úloh nebola nájdená."
+                    MessageSk = "Skupina zadania nebola nájdená."
                 });
 
-            AssignmentGroupState state = DateTime.UtcNow < ag.StartDate
-                ? AssignmentGroupState.UPCOMING
-                : DateTime.UtcNow <= ag.Deadline
-                    ? AssignmentGroupState.IN_PROGRESS
-                    : AssignmentGroupState.ENDED;
+            bool statusUpdated = false;
 
-            var assignmentGroupDto = new AssignmentGroupDto
-            {
-                AssignmentGroupId = ag.Id,
-                AssignmentGroupName = ag.Name,
-                AssignmentGroupDescription = ag.Description,
-                ClassId = ag.Class.Id,
-                ClassName = ag.Class.Name,
-                StartDate = ag.StartDate,
-                Deadline = ag.Deadline,
-                SubmissionStatus = AssignmentGroupStatus.NOT_COMPLETED,
-                SuccessRate = 0.0,
-                State = state,
-                Submitted = 0,
-                Total = 0
-            };
-
-            var assignments = await _db.Assignments
+            var assignments = await _db.SubnetAssignments
                 .Include(a => a.Student)
-                .Where(a => a.AssignmentGroup.Id == ag.Id)
+                .Where(a => a.AssignmentGroup.Id == subnetGroup.Id)
                 .ToListAsync();
 
             var assignmentIds = assignments.Select(a => a.Id).ToArray();
 
-            var submits = await _db.AssignmentSubmits
+            var submits = await _db.SubnetAssignmentSubmits
                 .Where(s => assignmentIds.Contains(s.Assignment.Id))
                 .ToListAsync();
 
-            var answerKeys = await _db.AssignmentAnswerKeys
+            var answerKeys = await _db.SubnetAssignmentAnswerKeys
                 .Where(ak => assignmentIds.Contains(ak.Assignment.Id))
                 .ToListAsync();
 
-            var assignmentStudentIds = assignments.Select(a => a.Student.Id).ToHashSet();
-            var classStudentIds = ag.Class.Students?.Select(s => s.Id).ToHashSet() ?? new HashSet<int>();
-            var newlyAddedStudentIds = classStudentIds.Except(assignmentStudentIds).ToArray();
-
-            var assignmentDetails = new List<AssignmentGroupSubmitDetailsDto>();
-            int totalAssignments = assignments.Count;
-
-            int totalStudents = assignmentStudentIds.Count;
+            var assignmentDetails = new List<SubnetAGSubmitDetailsDto>();
             int submittedStudents = submits.Select(s => s.Assignment.Student.Id).Distinct().Count();
-
-            double sumFirstAttemptPercentages = 0.0;
+            int totalStudents = assignments.Count;
+            double sumSuccessRates = 0.0;
 
             foreach (var assignment in assignments)
             {
-                var studentUsername = assignment.Student.Username;
-
-                var assignmentSubmits = submits
+                var submit = submits
                     .Where(s => s.Assignment.Id == assignment.Id)
-                    .OrderBy(s => s.Attempt)
-                    .ToList();
+                    .OrderByDescending(s => s.SubmittedAt)
+                    .FirstOrDefault();
 
                 var answerKey = answerKeys.FirstOrDefault(ak => ak.Assignment.Id == assignment.Id);
+                var successRate = AssignmentEvaluationUtils.CalculateSubnetSuccessRate(answerKey, submit);
+                sumSuccessRates += successRate;
 
-                DateTime? lastSubmit = null;
-                int attemptCount = assignmentSubmits.Count;
-
-                double firstAttemptSuccessRate = 0.0;
-                if (answerKey != null && assignmentSubmits.Any())
-                {
-                    var firstAttempt = assignmentSubmits.FirstOrDefault(s => s.Attempt == 1) ?? assignmentSubmits.First();
-
-                    if (firstAttempt != null)
-                    {
-                        int totalFields = 0;
-                        int correctFields = 0;
-
-                        string[][] answerArrays = {
-                            answerKey.Networks ?? Array.Empty<string>(),
-                            answerKey.FirstUsables ?? Array.Empty<string>(),
-                            answerKey.LastUsables ?? Array.Empty<string>(),
-                            answerKey.Broadcasts ?? Array.Empty<string>()
-                        };
-                        string[][] submitArrays = {
-                            firstAttempt.Networks ?? Array.Empty<string>(),
-                            firstAttempt.FirstUsables ?? Array.Empty<string>(),
-                            firstAttempt.LastUsables ?? Array.Empty<string>(),
-                            firstAttempt.Broadcasts ?? Array.Empty<string>()
-                        };
-
-                        totalFields = answerArrays.Sum(a => a.Length);
-                        if (totalFields > 0)
-                        {
-                            for (int i = 0; i < answerArrays.Length; i++)
-                            {
-                                var ansArr = answerArrays[i];
-                                var subArr = submitArrays[i];
-                                int len = Math.Min(ansArr.Length, subArr.Length);
-                                for (int j = 0; j < len; j++)
-                                {
-                                    if (ansArr[j] == subArr[j])
-                                        correctFields++;
-                                }
-                            }
-                            firstAttemptSuccessRate = (double)correctFields / totalFields * 100.0;
-                        }
-                    }
-
-                    var latestSubmit = assignmentSubmits.OrderByDescending(s => s.Attempt).First();
-                    lastSubmit = assignmentSubmits.First().SubmittedAt;
-                }
-
-                sumFirstAttemptPercentages += firstAttemptSuccessRate;
-
-                assignmentDetails.Add(new AssignmentGroupSubmitDetailsDto
+                assignmentDetails.Add(new SubnetAGSubmitDetailsDto
                 {
                     AssignmentId = assignment.Id,
                     StudentUsername = UsernameUtils.ToDisplay(assignment.Student.Username),
                     StudentId = assignment.Student.Id,
-                    SuccessRate = attemptCount > 0 ? firstAttemptSuccessRate : 0.0,
-                    AttemptCount = attemptCount,
-                    Status = assignment.IsCompleted ? AssignmentGroupStatus.COMPLETED : AssignmentGroupStatus.NOT_COMPLETED,
-                    LastSubmit = attemptCount > 0 ? lastSubmit : null,
-                    Students = newlyAddedStudentIds.Length > 0 ? newlyAddedStudentIds : null
+                    SuccessRate = submit != null ? successRate : 0.0,
+                    SubmittedAt = submit?.SubmittedAt
                 });
             }
 
-            assignmentGroupDto.SuccessRate = totalAssignments > 0
-                ? sumFirstAttemptPercentages / totalAssignments
-                : 0.0;
-
-            assignmentGroupDto.SubmissionStatus = assignments.Count == 0
-                ? AssignmentGroupStatus.NOT_COMPLETED
-                : assignments.All(a => a.IsCompleted) ? AssignmentGroupStatus.COMPLETED : AssignmentGroupStatus.NOT_COMPLETED;
-
-            assignmentGroupDto.Submitted = submittedStudents;
-            assignmentGroupDto.Total = totalStudents;
-
-            var res = new QueryAssignmentGroupDetailsRes
+            var status = AssignmentEvaluationUtils.ResolveStatus(subnetGroup.StartDate, subnetGroup.Deadline, subnetGroup.CompletedAt);
+            if (totalStudents > 0 && submittedStudents == totalStudents && status != AssignmentGroupStatus.ENDED)
             {
-                AssignmentGroupId = assignmentGroupDto.AssignmentGroupId,
-                AssignmentGroupName = assignmentGroupDto.AssignmentGroupName,
-                AssignmentGroupDescription = assignmentGroupDto.AssignmentGroupDescription,
-                ClassId = assignmentGroupDto.ClassId,
-                ClassName = assignmentGroupDto.ClassName,
-                StartDate = assignmentGroupDto.StartDate,
-                Deadline = assignmentGroupDto.Deadline,
-                SubmissionStatus = assignmentGroupDto.SubmissionStatus,
-                SuccessRate = assignmentGroupDto.SuccessRate,
-                State = assignmentGroupDto.State,
-                NumberOfRecords = ag.NumberOfRecords,
-                PossibleAttempts = ag.PossibleAttempts,
-                Assignments = assignmentDetails.ToArray(),
-                Submitted = assignmentGroupDto.Submitted,
-                Total = assignmentGroupDto.Total,
-                AssignmentGroupIpCat = ag.AssignmentIpCat
+                status = AssignmentGroupStatus.ENDED;
+                subnetGroup.CompletedAt ??= DateTime.UtcNow;
+                subnetGroup.Status = status;
+                statusUpdated = true;
+            }
+            else
+            {
+                subnetGroup.Status = status;
+            }
+
+            var res = new QuerySubnetAGDetailRes
+            {
+                AssignmentGroupId = subnetGroup.Id,
+                Name = subnetGroup.Name,
+                Description = subnetGroup.Description,
+                ClassId = subnetGroup.Class.Id,
+                ClassName = subnetGroup.Class.Name,
+                Submitted = submittedStudents,
+                Total = totalStudents,
+                StartDate = subnetGroup.StartDate,
+                Deadline = subnetGroup.Deadline,
+                SuccessRate = totalStudents > 0 ? sumSuccessRates / totalStudents : 0.0,
+                Status = status,
+                IpCat = subnetGroup.AssignmentIpCat,
+                Assignments = assignmentDetails.ToArray()
             };
+
+            if (statusUpdated)
+                await _db.SaveChangesAsync();
+
+            return Ok(res);
+        }
+
+        [HttpGet("get-idnet-assignment-group-details")]
+        [ProducesResponseType(typeof(QueryIDNetAGDetailRes), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<QueryIDNetAGDetailRes>> QueryIdNetAssignmentGroupDetails([FromQuery] QueryIDNetAGDetailReq req)
+        {
+            var idnetGroup = await _db.IDNetAGs
+                .Include(ag => ag.Class)
+                .ThenInclude(c => c.Students)
+                .FirstOrDefaultAsync(ag => ag.Id == req.Id);
+
+            if (idnetGroup == null)
+                return NotFound(new ApiProblemDetails
+                {
+                    Title = "Not Found",
+                    Detail = "Assignment group not found.",
+                    Status = StatusCodes.Status404NotFound,
+                    MessageEn = "Assignment group not found.",
+                    MessageSk = "Skupina zadania nebola nájdená."
+                });
+
+            bool statusUpdated = false;
+
+            var assignments = await _db.IDNetAssignments
+                .Include(a => a.Student)
+                .Where(a => a.AssignmentGroup.Id == idnetGroup.Id)
+                .ToListAsync();
+
+            var assignmentIds = assignments.Select(a => a.Id).ToArray();
+
+            var submits = await _db.IDNetAssignmentSubmits
+                .Where(s => assignmentIds.Contains(s.Assignment.Id))
+                .ToListAsync();
+
+            var answerKeys = await _db.IDNetAssignmentAnswerKeys
+                .Where(ak => assignmentIds.Contains(ak.Assignment.Id))
+                .ToListAsync();
+
+            var assignmentDetails = new List<IDNetAGSubmitDetailsDto>();
+            int submittedStudents = submits.Select(s => s.Assignment.Student.Id).Distinct().Count();
+            int totalStudents = assignments.Count;
+            double sumSuccessRates = 0.0;
+
+            foreach (var assignment in assignments)
+            {
+                var submit = submits
+                    .Where(s => s.Assignment.Id == assignment.Id)
+                    .OrderByDescending(s => s.SubmittedAt)
+                    .FirstOrDefault();
+
+                var answerKey = answerKeys.FirstOrDefault(ak => ak.Assignment.Id == assignment.Id);
+                var successRate = AssignmentEvaluationUtils.CalculateIdNetSuccessRate(answerKey, submit, idnetGroup.TestWildcard, idnetGroup.TestFirstLastBr);
+                sumSuccessRates += successRate;
+
+                assignmentDetails.Add(new IDNetAGSubmitDetailsDto
+                {
+                    AssignmentId = assignment.Id,
+                    StudentUsername = UsernameUtils.ToDisplay(assignment.Student.Username),
+                    StudentId = assignment.Student.Id,
+                    SuccessRate = submit != null ? successRate : 0.0,
+                    SubmittedAt = submit?.SubmittedAt
+                });
+            }
+
+            var status = AssignmentEvaluationUtils.ResolveStatus(idnetGroup.StartDate, idnetGroup.Deadline, idnetGroup.CompletedAt);
+            if (totalStudents > 0 && submittedStudents == totalStudents && status != AssignmentGroupStatus.ENDED)
+            {
+                status = AssignmentGroupStatus.ENDED;
+                idnetGroup.CompletedAt ??= DateTime.UtcNow;
+                idnetGroup.Status = status;
+                statusUpdated = true;
+            }
+            else
+            {
+                idnetGroup.Status = status;
+            }
+
+            var res = new QueryIDNetAGDetailRes
+            {
+                AssignmentGroupId = idnetGroup.Id,
+                Name = idnetGroup.Name,
+                Description = idnetGroup.Description,
+                ClassId = idnetGroup.Class.Id,
+                ClassName = idnetGroup.Class.Name,
+                Submitted = submittedStudents,
+                Total = totalStudents,
+                StartDate = idnetGroup.StartDate,
+                Deadline = idnetGroup.Deadline,
+                SuccessRate = totalStudents > 0 ? sumSuccessRates / totalStudents : 0.0,
+                Status = status,
+                IpCat = idnetGroup.AssignmentIpCat,
+                TestWildcard = idnetGroup.TestWildcard,
+                TestFirstLastBr = idnetGroup.TestFirstLastBr,
+                Assignments = assignmentDetails.ToArray()
+            };
+
+            if (statusUpdated)
+                await _db.SaveChangesAsync();
 
             return Ok(res);
         }

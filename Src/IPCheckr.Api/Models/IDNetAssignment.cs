@@ -10,6 +10,6 @@ namespace IPCheckr.Api.Models
 
         public required User Student { get; set; }
 
-        public required string[] Cidrs { get; set; }
+        public required string[] Addresses { get; set; }
     }
 }

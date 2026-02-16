@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using IPCheckr.Api.Common.Enums;
 
 namespace IPCheckr.Api.DTOs.AssignmentGroup
 {
-    public class QueryAssignmentGroupsReq
+    public class QueryAGsBaseReq
     {
-        public string? AssignmentGroupName { get; set; }
+        public string? Name { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Class ID must be a positive integer.")]
         public int? ClassId { get; set; }
@@ -14,27 +13,28 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         [Range(0, int.MaxValue, ErrorMessage = "Teacher IDs must be a non-negative integer array.")]
         public int? TeacherId { get; set; }
 
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public AssignmentGroupState State { get; set; }
+        [EnumDataType(typeof(AssignmentGroupStatus))]
+        public string? Status { get; set; }
+
+        [EnumDataType(typeof(AssignmentGroupType))]
+        public string? AssignmentGroupType { get; set; }
     }
 
-    public class QueryAssignmentGroupsRes
+    public class QueryAGsBaseRes
     {
-        [Required]
-        public required AssignmentGroupDto[] AssignmentGroups { get; set; }
-
         [Required]
         public int TotalCount { get; set; }
     }
-    public class AssignmentGroupDto
+
+    public class AGBaseDto
     {
         [Required]
         public int AssignmentGroupId { get; set; }
 
         [Required]
-        public required string AssignmentGroupName { get; set; }
+        public required string Name { get; set; }
 
-        public string? AssignmentGroupDescription { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         public int ClassId { get; set; }
@@ -55,14 +55,9 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         public required DateTime Deadline { get; set; }
 
         [Required]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public AssignmentGroupStatus SubmissionStatus { get; set; }
+        public AssignmentGroupStatus Status { get; set; }
 
         [Required]
-        public required double SuccessRate { get; set; }
-
-        [Required]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public AssignmentGroupState State { get; set; }
+        public AssignmentGroupType Type { get; set; }
     }
 }

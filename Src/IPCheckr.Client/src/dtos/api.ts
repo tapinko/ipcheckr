@@ -26,6 +26,118 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface AGBaseDto
+ */
+export interface AGBaseDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof AGBaseDto
+     */
+    'assignmentGroupId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGBaseDto
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGBaseDto
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof AGBaseDto
+     */
+    'classId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGBaseDto
+     */
+    'className': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AGBaseDto
+     */
+    'submitted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AGBaseDto
+     */
+    'total': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGBaseDto
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGBaseDto
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {AssignmentGroupStatus}
+     * @memberof AGBaseDto
+     */
+    'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof AGBaseDto
+     */
+    'type': AssignmentGroupType;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface AGSubmitDetailsBaseDto
+ */
+export interface AGSubmitDetailsBaseDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof AGSubmitDetailsBaseDto
+     */
+    'assignmentId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGSubmitDetailsBaseDto
+     */
+    'studentUsername': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AGSubmitDetailsBaseDto
+     */
+    'studentId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AGSubmitDetailsBaseDto
+     */
+    'successRate': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGSubmitDetailsBaseDto
+     */
+    'submittedAt'?: string | null;
+}
+/**
+ * 
+ * @export
  * @interface AddUserReq
  */
 export interface AddUserReq {
@@ -161,52 +273,28 @@ export interface AppSettingDto {
 export interface AssignmentDto {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof AssignmentDto
      */
-    'assignmentId': number;
+    'name': string;
     /**
      * 
      * @type {string}
      * @memberof AssignmentDto
      */
-    'studentUsername': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentDto
-     */
-    'studentId': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentDto
-     */
-    'successRate': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentDto
-     */
-    'attemptCount': number;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof AssignmentDto
-     */
-    'students'?: Array<number> | null;
-    /**
-     * 
-     * @type {AssignmentGroupStatus}
-     * @memberof AssignmentDto
-     */
-    'status': AssignmentGroupStatus;
+    'assignmentGroupDescription'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AssignmentDto
      */
-    'lastSubmit'?: string | null;
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignmentDto
+     */
+    'deadline': string;
     /**
      * 
      * @type {string}
@@ -221,127 +309,10 @@ export interface AssignmentDto {
     'className': string;
     /**
      * 
-     * @type {string}
-     * @memberof AssignmentDto
-     */
-    'assignmentGroupDescription'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentDto
-     */
-    'assignmentGroupName': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentDto
-     */
-    'maxSuccessRate'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentDto
-     */
-    'maxAttempts': number;
-    /**
-     * 
-     * @type {AssignmentGroupState}
-     * @memberof AssignmentDto
-     */
-    'state': AssignmentGroupState;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentDto
-     */
-    'startDate': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentDto
-     */
-    'deadline': string;
-}
-
-
-/**
- * 
- * @export
- * @interface AssignmentGroupDto
- */
-export interface AssignmentGroupDto {
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentGroupDto
-     */
-    'assignmentGroupId': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentGroupDto
-     */
-    'assignmentGroupName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentGroupDto
-     */
-    'assignmentGroupDescription'?: string | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentGroupDto
-     */
-    'classId': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentGroupDto
-     */
-    'className': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentGroupDto
-     */
-    'submitted': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentGroupDto
-     */
-    'total': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentGroupDto
-     */
-    'startDate': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentGroupDto
-     */
-    'deadline': string;
-    /**
-     * 
      * @type {AssignmentGroupStatus}
-     * @memberof AssignmentGroupDto
+     * @memberof AssignmentDto
      */
-    'submissionStatus': AssignmentGroupStatus;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentGroupDto
-     */
-    'successRate': number;
-    /**
-     * 
-     * @type {AssignmentGroupState}
-     * @memberof AssignmentGroupDto
-     */
-    'state': AssignmentGroupState;
+    'status': AssignmentGroupStatus;
 }
 
 
@@ -366,24 +337,10 @@ export type AssignmentGroupIpCat = typeof AssignmentGroupIpCat[keyof typeof Assi
  * @enum {string}
  */
 
-export const AssignmentGroupState = {
+export const AssignmentGroupStatus = {
     Upcoming: 'UPCOMING',
     InProgress: 'IN_PROGRESS',
     Ended: 'ENDED'
-} as const;
-
-export type AssignmentGroupState = typeof AssignmentGroupState[keyof typeof AssignmentGroupState];
-
-
-/**
- * 
- * @export
- * @enum {string}
- */
-
-export const AssignmentGroupStatus = {
-    Completed: 'COMPLETED',
-    NotCompleted: 'NOT_COMPLETED'
 } as const;
 
 export type AssignmentGroupStatus = typeof AssignmentGroupStatus[keyof typeof AssignmentGroupStatus];
@@ -392,58 +349,15 @@ export type AssignmentGroupStatus = typeof AssignmentGroupStatus[keyof typeof As
 /**
  * 
  * @export
- * @interface AssignmentGroupSubmitDetailsDto
+ * @enum {string}
  */
-export interface AssignmentGroupSubmitDetailsDto {
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentGroupSubmitDetailsDto
-     */
-    'assignmentId': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentGroupSubmitDetailsDto
-     */
-    'studentUsername': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentGroupSubmitDetailsDto
-     */
-    'studentId': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentGroupSubmitDetailsDto
-     */
-    'successRate': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentGroupSubmitDetailsDto
-     */
-    'attemptCount': number;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof AssignmentGroupSubmitDetailsDto
-     */
-    'students'?: Array<number> | null;
-    /**
-     * 
-     * @type {AssignmentGroupStatus}
-     * @memberof AssignmentGroupSubmitDetailsDto
-     */
-    'status': AssignmentGroupStatus;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignmentGroupSubmitDetailsDto
-     */
-    'lastSubmit'?: string | null;
-}
+
+export const AssignmentGroupType = {
+    Subnet: 'SUBNET',
+    Idnet: 'IDNET'
+} as const;
+
+export type AssignmentGroupType = typeof AssignmentGroupType[keyof typeof AssignmentGroupType];
 
 
 /**
@@ -613,76 +527,64 @@ export interface ClassDto {
 /**
  * 
  * @export
- * @interface CreateAssignmentGroupReq
+ * @interface CreateAGBaseReq
  */
-export interface CreateAssignmentGroupReq {
+export interface CreateAGBaseReq {
     /**
      * 
      * @type {string}
-     * @memberof CreateAssignmentGroupReq
+     * @memberof CreateAGBaseReq
      */
-    'assignmentGroupName': string;
+    'name': string;
     /**
      * 
      * @type {string}
-     * @memberof CreateAssignmentGroupReq
+     * @memberof CreateAGBaseReq
      */
     'description'?: string | null;
     /**
      * 
      * @type {number}
-     * @memberof CreateAssignmentGroupReq
-     */
-    'numberOfRecords': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof CreateAssignmentGroupReq
-     */
-    'possibleAttempts': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof CreateAssignmentGroupReq
+     * @memberof CreateAGBaseReq
      */
     'classId': number;
     /**
      * 
      * @type {Array<number>}
-     * @memberof CreateAssignmentGroupReq
+     * @memberof CreateAGBaseReq
      */
     'students'?: Array<number> | null;
     /**
      * 
+     * @type {AssignmentGroupType}
+     * @memberof CreateAGBaseReq
+     */
+    'type': AssignmentGroupType;
+    /**
+     * 
      * @type {string}
-     * @memberof CreateAssignmentGroupReq
+     * @memberof CreateAGBaseReq
      */
     'startDate': string;
     /**
      * 
      * @type {string}
-     * @memberof CreateAssignmentGroupReq
+     * @memberof CreateAGBaseReq
      */
     'deadline': string;
-    /**
-     * 
-     * @type {AssignmentGroupIpCat}
-     * @memberof CreateAssignmentGroupReq
-     */
-    'assignmentIpCat': AssignmentGroupIpCat;
 }
 
 
 /**
  * 
  * @export
- * @interface CreateAssignmentGroupRes
+ * @interface CreateAGBaseRes
  */
-export interface CreateAssignmentGroupRes {
+export interface CreateAGBaseRes {
     /**
      * 
      * @type {number}
-     * @memberof CreateAssignmentGroupRes
+     * @memberof CreateAGBaseRes
      */
     'assignmentGroupId': number;
 }
@@ -717,6 +619,176 @@ export interface CreateClassRes {
      * @memberof CreateClassRes
      */
     'classId': number;
+}
+/**
+ * 
+ * @export
+ * @interface CreateIDNetAGReq
+ */
+export interface CreateIDNetAGReq {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateIDNetAGReq
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateIDNetAGReq
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateIDNetAGReq
+     */
+    'classId': number;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof CreateIDNetAGReq
+     */
+    'students'?: Array<number> | null;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof CreateIDNetAGReq
+     */
+    'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateIDNetAGReq
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateIDNetAGReq
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateIDNetAGReq
+     */
+    'numberOfRecords': number;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof CreateIDNetAGReq
+     */
+    'ipCat': AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateIDNetAGReq
+     */
+    'possibleOctets'?: number | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateIDNetAGReq
+     */
+    'testWildcard'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateIDNetAGReq
+     */
+    'testFirstLastBr'?: boolean;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface CreateIDNetAGRes
+ */
+export interface CreateIDNetAGRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateIDNetAGRes
+     */
+    'assignmentGroupId': number;
+}
+/**
+ * 
+ * @export
+ * @interface CreateSubnetAGReq
+ */
+export interface CreateSubnetAGReq {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateSubnetAGReq
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateSubnetAGReq
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateSubnetAGReq
+     */
+    'classId': number;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof CreateSubnetAGReq
+     */
+    'students'?: Array<number> | null;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof CreateSubnetAGReq
+     */
+    'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateSubnetAGReq
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateSubnetAGReq
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateSubnetAGReq
+     */
+    'numberOfRecords': number;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof CreateSubnetAGReq
+     */
+    'ipCat': AssignmentGroupIpCat;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface CreateSubnetAGRes
+ */
+export interface CreateSubnetAGRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateSubnetAGRes
+     */
+    'assignmentGroupId': number;
 }
 /**
  * 
@@ -758,13 +830,13 @@ export interface DashboardResBase {
 /**
  * 
  * @export
- * @interface DeleteAssignmentGroupsReq
+ * @interface DeleteAgsBaseReq
  */
-export interface DeleteAssignmentGroupsReq {
+export interface DeleteAgsBaseReq {
     /**
      * 
      * @type {Array<number>}
-     * @memberof DeleteAssignmentGroupsReq
+     * @memberof DeleteAgsBaseReq
      */
     'assignmentGroupIds': Array<number>;
 }
@@ -784,6 +856,32 @@ export interface DeleteClassesReq {
 /**
  * 
  * @export
+ * @interface DeleteIDNetAGsReq
+ */
+export interface DeleteIDNetAGsReq {
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof DeleteIDNetAGsReq
+     */
+    'assignmentGroupIds': Array<number>;
+}
+/**
+ * 
+ * @export
+ * @interface DeleteSubnetAGsReq
+ */
+export interface DeleteSubnetAGsReq {
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof DeleteSubnetAGsReq
+     */
+    'assignmentGroupIds': Array<number>;
+}
+/**
+ * 
+ * @export
  * @interface DeleteUsersReq
  */
 export interface DeleteUsersReq {
@@ -793,6 +891,49 @@ export interface DeleteUsersReq {
      * @memberof DeleteUsersReq
      */
     'userIds': Array<number>;
+}
+/**
+ * 
+ * @export
+ * @interface EditAGBaseReq
+ */
+export interface EditAGBaseReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof EditAGBaseReq
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditAGBaseReq
+     */
+    'name'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditAGBaseReq
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof EditAGBaseReq
+     */
+    'students'?: Array<number> | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditAGBaseReq
+     */
+    'startDate'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditAGBaseReq
+     */
+    'deadline'?: string | null;
 }
 /**
  * 
@@ -822,55 +963,6 @@ export interface EditAppSettinReq {
 /**
  * 
  * @export
- * @interface EditAssignmentGroupsReq
- */
-export interface EditAssignmentGroupsReq {
-    /**
-     * 
-     * @type {number}
-     * @memberof EditAssignmentGroupsReq
-     */
-    'id': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof EditAssignmentGroupsReq
-     */
-    'assignmentGroupName'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof EditAssignmentGroupsReq
-     */
-    'description'?: string | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof EditAssignmentGroupsReq
-     */
-    'possibleAttempts'?: number | null;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof EditAssignmentGroupsReq
-     */
-    'students'?: Array<number> | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof EditAssignmentGroupsReq
-     */
-    'startDate'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof EditAssignmentGroupsReq
-     */
-    'deadline'?: string | null;
-}
-/**
- * 
- * @export
  * @interface EditClassReq
  */
 export interface EditClassReq {
@@ -892,6 +984,92 @@ export interface EditClassReq {
      * @memberof EditClassReq
      */
     'teachers'?: Array<number> | null;
+}
+/**
+ * 
+ * @export
+ * @interface EditIDNetAGReq
+ */
+export interface EditIDNetAGReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof EditIDNetAGReq
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditIDNetAGReq
+     */
+    'name'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditIDNetAGReq
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof EditIDNetAGReq
+     */
+    'students'?: Array<number> | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditIDNetAGReq
+     */
+    'startDate'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditIDNetAGReq
+     */
+    'deadline'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface EditSubnetAGReq
+ */
+export interface EditSubnetAGReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof EditSubnetAGReq
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditSubnetAGReq
+     */
+    'name'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditSubnetAGReq
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof EditSubnetAGReq
+     */
+    'students'?: Array<number> | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditSubnetAGReq
+     */
+    'startDate'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditSubnetAGReq
+     */
+    'deadline'?: string | null;
 }
 /**
  * 
@@ -1060,6 +1238,205 @@ export interface Gns3SessionBase {
 /**
  * 
  * @export
+ * @interface IDNetAGDto
+ */
+export interface IDNetAGDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAGDto
+     */
+    'assignmentGroupId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAGDto
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAGDto
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAGDto
+     */
+    'classId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAGDto
+     */
+    'className': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAGDto
+     */
+    'submitted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAGDto
+     */
+    'total': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAGDto
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAGDto
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {AssignmentGroupStatus}
+     * @memberof IDNetAGDto
+     */
+    'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof IDNetAGDto
+     */
+    'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAGDto
+     */
+    'successRate': number;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof IDNetAGDto
+     */
+    'ipCat'?: AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof IDNetAGDto
+     */
+    'testWildcard'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof IDNetAGDto
+     */
+    'testFirstLastBr'?: boolean;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface IDNetAGSubmitDetailsDto
+ */
+export interface IDNetAGSubmitDetailsDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAGSubmitDetailsDto
+     */
+    'assignmentId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAGSubmitDetailsDto
+     */
+    'studentUsername': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAGSubmitDetailsDto
+     */
+    'studentId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAGSubmitDetailsDto
+     */
+    'successRate': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAGSubmitDetailsDto
+     */
+    'submittedAt'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface IDNetAssignmentDto
+ */
+export interface IDNetAssignmentDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAssignmentDto
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAssignmentDto
+     */
+    'assignmentGroupDescription'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAssignmentDto
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAssignmentDto
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAssignmentDto
+     */
+    'teacherUsername': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IDNetAssignmentDto
+     */
+    'className': string;
+    /**
+     * 
+     * @type {AssignmentGroupStatus}
+     * @memberof IDNetAssignmentDto
+     */
+    'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof IDNetAssignmentDto
+     */
+    'ipCat': AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAssignmentDto
+     */
+    'successRate'?: number | null;
+}
+
+
+/**
+ * 
+ * @export
  * @interface IsLdapAuthRes
  */
 export interface IsLdapAuthRes {
@@ -1188,6 +1565,19 @@ export interface ProblemDetails {
 /**
  * 
  * @export
+ * @interface QueryAGsBaseRes
+ */
+export interface QueryAGsBaseRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAGsBaseRes
+     */
+    'totalCount': number;
+}
+/**
+ * 
+ * @export
  * @interface QueryAdminDashboardRes
  */
 export interface QueryAdminDashboardRes {
@@ -1274,281 +1664,71 @@ export interface QueryAppSettingRes {
 /**
  * 
  * @export
- * @interface QueryAssignmentDataForSubmitRes
+ * @interface QueryAssignmentDataForSubmitBaseRes
  */
-export interface QueryAssignmentDataForSubmitRes {
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof QueryAssignmentDataForSubmitRes
-     */
-    'hostsPerNetwork': Array<number>;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryAssignmentDataForSubmitRes
-     */
-    'cidr': string;
+export interface QueryAssignmentDataForSubmitBaseRes {
     /**
      * 
      * @type {boolean}
-     * @memberof QueryAssignmentDataForSubmitRes
+     * @memberof QueryAssignmentDataForSubmitBaseRes
      */
     'isAvailableForSubmission': boolean;
-}
-/**
- * 
- * @export
- * @interface QueryAssignmentGroupDetailsRes
- */
-export interface QueryAssignmentGroupDetailsRes {
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'assignmentGroupId': number;
     /**
      * 
      * @type {string}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'assignmentGroupName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'assignmentGroupDescription'?: string | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'classId': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'className': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'submitted': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'total': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'startDate': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryAssignmentGroupDetailsRes
+     * @memberof QueryAssignmentDataForSubmitBaseRes
      */
     'deadline': string;
-    /**
-     * 
-     * @type {AssignmentGroupStatus}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'submissionStatus': AssignmentGroupStatus;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'successRate': number;
-    /**
-     * 
-     * @type {AssignmentGroupState}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'state': AssignmentGroupState;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'numberOfRecords': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'possibleAttempts': number;
-    /**
-     * 
-     * @type {Array<AssignmentGroupSubmitDetailsDto>}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'assignments': Array<AssignmentGroupSubmitDetailsDto>;
-    /**
-     * 
-     * @type {AssignmentGroupIpCat}
-     * @memberof QueryAssignmentGroupDetailsRes
-     */
-    'assignmentGroupIpCat': AssignmentGroupIpCat;
-}
-
-
-/**
- * 
- * @export
- * @interface QueryAssignmentGroupsRes
- */
-export interface QueryAssignmentGroupsRes {
-    /**
-     * 
-     * @type {Array<AssignmentGroupDto>}
-     * @memberof QueryAssignmentGroupsRes
-     */
-    'assignmentGroups': Array<AssignmentGroupDto>;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentGroupsRes
-     */
-    'totalCount': number;
 }
 /**
  * 
  * @export
- * @interface QueryAssignmentSubmitDetailsFullAnswerField
+ * @interface QueryAssignmentSubmitDetailsFullBaseRes
  */
-export interface QueryAssignmentSubmitDetailsFullAnswerField {
+export interface QueryAssignmentSubmitDetailsFullBaseRes {
     /**
      * 
      * @type {string}
-     * @memberof QueryAssignmentSubmitDetailsFullAnswerField
+     * @memberof QueryAssignmentSubmitDetailsFullBaseRes
      */
-    'submitted'?: string | null;
+    'name': string;
     /**
      * 
      * @type {string}
-     * @memberof QueryAssignmentSubmitDetailsFullAnswerField
-     */
-    'correct': string;
-}
-/**
- * 
- * @export
- * @interface QueryAssignmentSubmitDetailsFullRecordField
- */
-export interface QueryAssignmentSubmitDetailsFullRecordField {
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentSubmitDetailsFullRecordField
-     */
-    'hosts': number;
-    /**
-     * 
-     * @type {QueryAssignmentSubmitDetailsFullAnswerField}
-     * @memberof QueryAssignmentSubmitDetailsFullRecordField
-     */
-    'network': QueryAssignmentSubmitDetailsFullAnswerField;
-    /**
-     * 
-     * @type {QueryAssignmentSubmitDetailsFullAnswerField}
-     * @memberof QueryAssignmentSubmitDetailsFullRecordField
-     */
-    'firstUsable': QueryAssignmentSubmitDetailsFullAnswerField;
-    /**
-     * 
-     * @type {QueryAssignmentSubmitDetailsFullAnswerField}
-     * @memberof QueryAssignmentSubmitDetailsFullRecordField
-     */
-    'lastUsable': QueryAssignmentSubmitDetailsFullAnswerField;
-    /**
-     * 
-     * @type {QueryAssignmentSubmitDetailsFullAnswerField}
-     * @memberof QueryAssignmentSubmitDetailsFullRecordField
-     */
-    'broadcast': QueryAssignmentSubmitDetailsFullAnswerField;
-}
-/**
- * 
- * @export
- * @interface QueryAssignmentSubmitDetailsFullRes
- */
-export interface QueryAssignmentSubmitDetailsFullRes {
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryAssignmentSubmitDetailsFullRes
-     */
-    'assignmentGroupName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof QueryAssignmentSubmitDetailsFullRes
+     * @memberof QueryAssignmentSubmitDetailsFullBaseRes
      */
     'description'?: string | null;
     /**
      * 
-     * @type {Array<QueryAssignmentSubmitDetailsFullRecordField>}
-     * @memberof QueryAssignmentSubmitDetailsFullRes
-     */
-    'results': Array<QueryAssignmentSubmitDetailsFullRecordField>;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentSubmitDetailsFullRes
-     */
-    'numberOfSubmits': number;
-    /**
-     * 
      * @type {string}
-     * @memberof QueryAssignmentSubmitDetailsFullRes
+     * @memberof QueryAssignmentSubmitDetailsFullBaseRes
      */
     'submittedAt': string;
     /**
      * 
      * @type {string}
-     * @memberof QueryAssignmentSubmitDetailsFullRes
+     * @memberof QueryAssignmentSubmitDetailsFullBaseRes
      */
     'studentName': string;
     /**
      * 
-     * @type {AssignmentGroupIpCat}
-     * @memberof QueryAssignmentSubmitDetailsFullRes
+     * @type {AssignmentGroupStatus}
+     * @memberof QueryAssignmentSubmitDetailsFullBaseRes
      */
-    'assignmentGroupIpCat': AssignmentGroupIpCat;
-    /**
-     * 
-     * @type {number}
-     * @memberof QueryAssignmentSubmitDetailsFullRes
-     */
-    'successRate': number;
+    'status': AssignmentGroupStatus;
 }
 
 
 /**
  * 
  * @export
- * @interface QueryAssignmentsRes
+ * @interface QueryAssignmentsBaseRes
  */
-export interface QueryAssignmentsRes {
-    /**
-     * 
-     * @type {Array<AssignmentDto>}
-     * @memberof QueryAssignmentsRes
-     */
-    'assignments'?: Array<AssignmentDto>;
+export interface QueryAssignmentsBaseRes {
     /**
      * 
      * @type {number}
-     * @memberof QueryAssignmentsRes
+     * @memberof QueryAssignmentsBaseRes
      */
     'totalCount': number;
 }
@@ -1679,6 +1859,305 @@ export interface QueryClassesRes {
      * @memberof QueryClassesRes
      */
     'totalCount': number;
+}
+/**
+ * 
+ * @export
+ * @interface QueryIDNetAGDetailRes
+ */
+export interface QueryIDNetAGDetailRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'assignmentGroupId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'classId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'className': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'submitted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'total': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {AssignmentGroupStatus}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'successRate': number;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'ipCat'?: AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'testWildcard'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'testFirstLastBr'?: boolean;
+    /**
+     * 
+     * @type {Array<IDNetAGSubmitDetailsDto>}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'assignments': Array<IDNetAGSubmitDetailsDto>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface QueryIDNetAGsRes
+ */
+export interface QueryIDNetAGsRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryIDNetAGsRes
+     */
+    'totalCount': number;
+    /**
+     * 
+     * @type {Array<IDNetAGDto>}
+     * @memberof QueryIDNetAGsRes
+     */
+    'assignmentGroups': Array<IDNetAGDto>;
+}
+/**
+ * 
+ * @export
+ * @interface QueryIDNetAssignmentDataForSubmitRes
+ */
+export interface QueryIDNetAssignmentDataForSubmitRes {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QueryIDNetAssignmentDataForSubmitRes
+     */
+    'isAvailableForSubmission': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentDataForSubmitRes
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof QueryIDNetAssignmentDataForSubmitRes
+     */
+    'addresses': Array<string>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QueryIDNetAssignmentDataForSubmitRes
+     */
+    'testWildcard': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QueryIDNetAssignmentDataForSubmitRes
+     */
+    'testFirstLastBr': boolean;
+}
+/**
+ * 
+ * @export
+ * @interface QueryIDNetAssignmentSubmitDetailsFullAnswerField
+ */
+export interface QueryIDNetAssignmentSubmitDetailsFullAnswerField {
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullAnswerField
+     */
+    'submitted'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullAnswerField
+     */
+    'correct': string;
+}
+/**
+ * 
+ * @export
+ * @interface QueryIDNetAssignmentSubmitDetailsFullRecordField
+ */
+export interface QueryIDNetAssignmentSubmitDetailsFullRecordField {
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRecordField
+     */
+    'address': string;
+    /**
+     * 
+     * @type {QueryIDNetAssignmentSubmitDetailsFullAnswerField}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRecordField
+     */
+    'idNet': QueryIDNetAssignmentSubmitDetailsFullAnswerField;
+    /**
+     * 
+     * @type {QueryIDNetAssignmentSubmitDetailsFullAnswerField}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRecordField
+     */
+    'wildcard': QueryIDNetAssignmentSubmitDetailsFullAnswerField;
+    /**
+     * 
+     * @type {QueryIDNetAssignmentSubmitDetailsFullAnswerField}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRecordField
+     */
+    'firstUsable': QueryIDNetAssignmentSubmitDetailsFullAnswerField;
+    /**
+     * 
+     * @type {QueryIDNetAssignmentSubmitDetailsFullAnswerField}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRecordField
+     */
+    'lastUsable': QueryIDNetAssignmentSubmitDetailsFullAnswerField;
+    /**
+     * 
+     * @type {QueryIDNetAssignmentSubmitDetailsFullAnswerField}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRecordField
+     */
+    'broadcast': QueryIDNetAssignmentSubmitDetailsFullAnswerField;
+}
+/**
+ * 
+ * @export
+ * @interface QueryIDNetAssignmentSubmitDetailsFullRes
+ */
+export interface QueryIDNetAssignmentSubmitDetailsFullRes {
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'submittedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'studentName': string;
+    /**
+     * 
+     * @type {AssignmentGroupStatus}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {Array<QueryIDNetAssignmentSubmitDetailsFullRecordField>}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'results': Array<QueryIDNetAssignmentSubmitDetailsFullRecordField>;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'ipCat': AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'successRate': number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface QueryIDNetAssignmentsRes
+ */
+export interface QueryIDNetAssignmentsRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryIDNetAssignmentsRes
+     */
+    'totalCount': number;
+    /**
+     * 
+     * @type {Array<IDNetAssignmentDto>}
+     * @memberof QueryIDNetAssignmentsRes
+     */
+    'assignments': Array<IDNetAssignmentDto>;
 }
 /**
  * 
@@ -1840,6 +2319,281 @@ export interface QueryStudentDashboardRes {
      * @memberof QueryStudentDashboardRes
      */
     'successRate': Array<StudentDashboardSuccessRateDto>;
+}
+/**
+ * 
+ * @export
+ * @interface QuerySubnetAGDetailRes
+ */
+export interface QuerySubnetAGDetailRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'assignmentGroupId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'classId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'className': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'submitted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'total': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {AssignmentGroupStatus}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'successRate': number;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'ipCat'?: AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {Array<SubnetAGSubmitDetailsDto>}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'assignments': Array<SubnetAGSubmitDetailsDto>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface QuerySubnetAGsRes
+ */
+export interface QuerySubnetAGsRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySubnetAGsRes
+     */
+    'totalCount': number;
+    /**
+     * 
+     * @type {Array<SubnetAGDto>}
+     * @memberof QuerySubnetAGsRes
+     */
+    'assignmentGroups': Array<SubnetAGDto>;
+}
+/**
+ * 
+ * @export
+ * @interface QuerySubnetAssignmentDataForSubmitRes
+ */
+export interface QuerySubnetAssignmentDataForSubmitRes {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QuerySubnetAssignmentDataForSubmitRes
+     */
+    'isAvailableForSubmission': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentDataForSubmitRes
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof QuerySubnetAssignmentDataForSubmitRes
+     */
+    'hostsPerNetwork': Array<number>;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentDataForSubmitRes
+     */
+    'cidr': string;
+}
+/**
+ * 
+ * @export
+ * @interface QuerySubnetAssignmentSubmitDetailsFullAnswerField
+ */
+export interface QuerySubnetAssignmentSubmitDetailsFullAnswerField {
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullAnswerField
+     */
+    'submitted'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullAnswerField
+     */
+    'correct': string;
+}
+/**
+ * 
+ * @export
+ * @interface QuerySubnetAssignmentSubmitDetailsFullRecordField
+ */
+export interface QuerySubnetAssignmentSubmitDetailsFullRecordField {
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRecordField
+     */
+    'hosts': number;
+    /**
+     * 
+     * @type {QuerySubnetAssignmentSubmitDetailsFullAnswerField}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRecordField
+     */
+    'network': QuerySubnetAssignmentSubmitDetailsFullAnswerField;
+    /**
+     * 
+     * @type {QuerySubnetAssignmentSubmitDetailsFullAnswerField}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRecordField
+     */
+    'firstUsable': QuerySubnetAssignmentSubmitDetailsFullAnswerField;
+    /**
+     * 
+     * @type {QuerySubnetAssignmentSubmitDetailsFullAnswerField}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRecordField
+     */
+    'lastUsable': QuerySubnetAssignmentSubmitDetailsFullAnswerField;
+    /**
+     * 
+     * @type {QuerySubnetAssignmentSubmitDetailsFullAnswerField}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRecordField
+     */
+    'broadcast': QuerySubnetAssignmentSubmitDetailsFullAnswerField;
+}
+/**
+ * 
+ * @export
+ * @interface QuerySubnetAssignmentSubmitDetailsFullRes
+ */
+export interface QuerySubnetAssignmentSubmitDetailsFullRes {
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'submittedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'studentName': string;
+    /**
+     * 
+     * @type {AssignmentGroupStatus}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {Array<QuerySubnetAssignmentSubmitDetailsFullRecordField>}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'results': Array<QuerySubnetAssignmentSubmitDetailsFullRecordField>;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'ipCat': AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'successRate': number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface QuerySubnetAssignmentsRes
+ */
+export interface QuerySubnetAssignmentsRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof QuerySubnetAssignmentsRes
+     */
+    'totalCount': number;
+    /**
+     * 
+     * @type {Array<SubnetAssignmentDto>}
+     * @memberof QuerySubnetAssignmentsRes
+     */
+    'assignments': Array<SubnetAssignmentDto>;
 }
 /**
  * 
@@ -2138,72 +2892,348 @@ export interface StudentDashboardSuccessRateDto {
 /**
  * 
  * @export
- * @interface SubmitAssignmentField
+ * @interface SubmitAssignmentBaseReq
  */
-export interface SubmitAssignmentField {
+export interface SubmitAssignmentBaseReq {
     /**
      * 
-     * @type {string}
-     * @memberof SubmitAssignmentField
+     * @type {number}
+     * @memberof SubmitAssignmentBaseReq
      */
-    'network'?: string | null;
+    'assignmentId': number;
+}
+/**
+ * 
+ * @export
+ * @interface SubmitAssignmentBaseRes
+ */
+export interface SubmitAssignmentBaseRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof SubmitAssignmentBaseRes
+     */
+    'assignmentSubmitId': number;
+}
+/**
+ * 
+ * @export
+ * @interface SubmitIDNetAssignmentField
+ */
+export interface SubmitIDNetAssignmentField {
     /**
      * 
      * @type {string}
-     * @memberof SubmitAssignmentField
+     * @memberof SubmitIDNetAssignmentField
+     */
+    'idNet'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmitIDNetAssignmentField
+     */
+    'wildcard'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmitIDNetAssignmentField
      */
     'firstUsable'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof SubmitAssignmentField
+     * @memberof SubmitIDNetAssignmentField
      */
     'lastUsable'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof SubmitAssignmentField
+     * @memberof SubmitIDNetAssignmentField
      */
     'broadcast'?: string | null;
 }
 /**
  * 
  * @export
- * @interface SubmitAssignmentReq
+ * @interface SubmitIDNetAssignmentReq
  */
-export interface SubmitAssignmentReq {
+export interface SubmitIDNetAssignmentReq {
     /**
      * 
      * @type {number}
-     * @memberof SubmitAssignmentReq
+     * @memberof SubmitIDNetAssignmentReq
      */
     'assignmentId': number;
     /**
      * 
-     * @type {Array<SubmitAssignmentField>}
-     * @memberof SubmitAssignmentReq
+     * @type {Array<SubmitIDNetAssignmentField>}
+     * @memberof SubmitIDNetAssignmentReq
      */
-    'data'?: Array<SubmitAssignmentField> | null;
+    'data'?: Array<SubmitIDNetAssignmentField> | null;
 }
 /**
  * 
  * @export
- * @interface SubmitAssignmentRes
+ * @interface SubmitIDNetAssignmentRes
  */
-export interface SubmitAssignmentRes {
+export interface SubmitIDNetAssignmentRes {
     /**
      * 
      * @type {number}
-     * @memberof SubmitAssignmentRes
+     * @memberof SubmitIDNetAssignmentRes
      */
     'assignmentSubmitId': number;
+}
+/**
+ * 
+ * @export
+ * @interface SubmitSubnetAssignmentField
+ */
+export interface SubmitSubnetAssignmentField {
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmitSubnetAssignmentField
+     */
+    'network'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmitSubnetAssignmentField
+     */
+    'firstUsable'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmitSubnetAssignmentField
+     */
+    'lastUsable'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmitSubnetAssignmentField
+     */
+    'broadcast'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface SubmitSubnetAssignmentReq
+ */
+export interface SubmitSubnetAssignmentReq {
     /**
      * 
      * @type {number}
-     * @memberof SubmitAssignmentRes
+     * @memberof SubmitSubnetAssignmentReq
      */
-    'attempt': number;
+    'assignmentId': number;
+    /**
+     * 
+     * @type {Array<SubmitSubnetAssignmentField>}
+     * @memberof SubmitSubnetAssignmentReq
+     */
+    'data'?: Array<SubmitSubnetAssignmentField> | null;
 }
+/**
+ * 
+ * @export
+ * @interface SubmitSubnetAssignmentRes
+ */
+export interface SubmitSubnetAssignmentRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof SubmitSubnetAssignmentRes
+     */
+    'assignmentSubmitId': number;
+}
+/**
+ * 
+ * @export
+ * @interface SubnetAGDto
+ */
+export interface SubnetAGDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAGDto
+     */
+    'assignmentGroupId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAGDto
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAGDto
+     */
+    'description'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAGDto
+     */
+    'classId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAGDto
+     */
+    'className': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAGDto
+     */
+    'submitted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAGDto
+     */
+    'total': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAGDto
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAGDto
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {AssignmentGroupStatus}
+     * @memberof SubnetAGDto
+     */
+    'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof SubnetAGDto
+     */
+    'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAGDto
+     */
+    'successRate': number;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof SubnetAGDto
+     */
+    'ipCat'?: AssignmentGroupIpCat;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface SubnetAGSubmitDetailsDto
+ */
+export interface SubnetAGSubmitDetailsDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAGSubmitDetailsDto
+     */
+    'assignmentId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAGSubmitDetailsDto
+     */
+    'studentUsername': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAGSubmitDetailsDto
+     */
+    'studentId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAGSubmitDetailsDto
+     */
+    'successRate': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAGSubmitDetailsDto
+     */
+    'submittedAt'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface SubnetAssignmentDto
+ */
+export interface SubnetAssignmentDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAssignmentDto
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAssignmentDto
+     */
+    'assignmentGroupDescription'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAssignmentDto
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAssignmentDto
+     */
+    'deadline': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAssignmentDto
+     */
+    'teacherUsername': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubnetAssignmentDto
+     */
+    'className': string;
+    /**
+     * 
+     * @type {AssignmentGroupStatus}
+     * @memberof SubnetAssignmentDto
+     */
+    'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof SubnetAssignmentDto
+     */
+    'ipCat': AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAssignmentDto
+     */
+    'successRate'?: number | null;
+}
+
+
 /**
  * 
  * @export
@@ -2522,12 +3552,11 @@ export const AssignmentApiAxiosParamCreator = function (configuration?: Configur
         /**
          * 
          * @param {number} [assignmentId] 
-         * @param {number} [attempt] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentQueryAssignmentSubmitDetailsFull: async (assignmentId?: number, attempt?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/assignment/get-assignment-submit-details-full`;
+        assignmentQueryIdNetAssignmentSubmitDetailsFull: async (assignmentId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment/get-idnet-assignment-submit-details-full`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2544,10 +3573,6 @@ export const AssignmentApiAxiosParamCreator = function (configuration?: Configur
 
             if (assignmentId !== undefined) {
                 localVarQueryParameter['AssignmentId'] = assignmentId;
-            }
-
-            if (attempt !== undefined) {
-                localVarQueryParameter['Attempt'] = attempt;
             }
 
 
@@ -2567,8 +3592,82 @@ export const AssignmentApiAxiosParamCreator = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentQueryAssignments: async (studentId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/assignment/get-assignments`;
+        assignmentQueryIdNetAssignments: async (studentId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment/get-idnet-assignments`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (studentId !== undefined) {
+                localVarQueryParameter['StudentId'] = studentId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} [assignmentId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentQuerySubnetAssignmentSubmitDetailsFull: async (assignmentId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment/get-subnet-assignment-submit-details-full`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (assignmentId !== undefined) {
+                localVarQueryParameter['AssignmentId'] = assignmentId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} [studentId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentQuerySubnetAssignments: async (studentId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment/get-subnet-assignments`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2611,14 +3710,13 @@ export const AssignmentApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {number} [assignmentId] 
-         * @param {number} [attempt] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentQueryAssignmentSubmitDetailsFull(assignmentId?: number, attempt?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryAssignmentSubmitDetailsFullRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentQueryAssignmentSubmitDetailsFull(assignmentId, attempt, options);
+        async assignmentQueryIdNetAssignmentSubmitDetailsFull(assignmentId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryIDNetAssignmentSubmitDetailsFullRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentQueryIdNetAssignmentSubmitDetailsFull(assignmentId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AssignmentApi.assignmentQueryAssignmentSubmitDetailsFull']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentApi.assignmentQueryIdNetAssignmentSubmitDetailsFull']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2627,10 +3725,34 @@ export const AssignmentApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentQueryAssignments(studentId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryAssignmentsRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentQueryAssignments(studentId, options);
+        async assignmentQueryIdNetAssignments(studentId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryIDNetAssignmentsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentQueryIdNetAssignments(studentId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AssignmentApi.assignmentQueryAssignments']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentApi.assignmentQueryIdNetAssignments']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} [assignmentId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentQuerySubnetAssignmentSubmitDetailsFull(assignmentId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuerySubnetAssignmentSubmitDetailsFullRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentQuerySubnetAssignmentSubmitDetailsFull(assignmentId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentApi.assignmentQuerySubnetAssignmentSubmitDetailsFull']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} [studentId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentQuerySubnetAssignments(studentId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuerySubnetAssignmentsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentQuerySubnetAssignments(studentId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentApi.assignmentQuerySubnetAssignments']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -2646,12 +3768,11 @@ export const AssignmentApiFactory = function (configuration?: Configuration, bas
         /**
          * 
          * @param {number} [assignmentId] 
-         * @param {number} [attempt] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentQueryAssignmentSubmitDetailsFull(assignmentId?: number, attempt?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryAssignmentSubmitDetailsFullRes> {
-            return localVarFp.assignmentQueryAssignmentSubmitDetailsFull(assignmentId, attempt, options).then((request) => request(axios, basePath));
+        assignmentQueryIdNetAssignmentSubmitDetailsFull(assignmentId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryIDNetAssignmentSubmitDetailsFullRes> {
+            return localVarFp.assignmentQueryIdNetAssignmentSubmitDetailsFull(assignmentId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2659,8 +3780,26 @@ export const AssignmentApiFactory = function (configuration?: Configuration, bas
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentQueryAssignments(studentId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryAssignmentsRes> {
-            return localVarFp.assignmentQueryAssignments(studentId, options).then((request) => request(axios, basePath));
+        assignmentQueryIdNetAssignments(studentId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryIDNetAssignmentsRes> {
+            return localVarFp.assignmentQueryIdNetAssignments(studentId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} [assignmentId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentQuerySubnetAssignmentSubmitDetailsFull(assignmentId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QuerySubnetAssignmentSubmitDetailsFullRes> {
+            return localVarFp.assignmentQuerySubnetAssignmentSubmitDetailsFull(assignmentId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} [studentId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentQuerySubnetAssignments(studentId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QuerySubnetAssignmentsRes> {
+            return localVarFp.assignmentQuerySubnetAssignments(studentId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2675,13 +3814,12 @@ export class AssignmentApi extends BaseAPI {
     /**
      * 
      * @param {number} [assignmentId] 
-     * @param {number} [attempt] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssignmentApi
      */
-    public assignmentQueryAssignmentSubmitDetailsFull(assignmentId?: number, attempt?: number, options?: RawAxiosRequestConfig) {
-        return AssignmentApiFp(this.configuration).assignmentQueryAssignmentSubmitDetailsFull(assignmentId, attempt, options).then((request) => request(this.axios, this.basePath));
+    public assignmentQueryIdNetAssignmentSubmitDetailsFull(assignmentId?: number, options?: RawAxiosRequestConfig) {
+        return AssignmentApiFp(this.configuration).assignmentQueryIdNetAssignmentSubmitDetailsFull(assignmentId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2691,8 +3829,30 @@ export class AssignmentApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof AssignmentApi
      */
-    public assignmentQueryAssignments(studentId?: number, options?: RawAxiosRequestConfig) {
-        return AssignmentApiFp(this.configuration).assignmentQueryAssignments(studentId, options).then((request) => request(this.axios, this.basePath));
+    public assignmentQueryIdNetAssignments(studentId?: number, options?: RawAxiosRequestConfig) {
+        return AssignmentApiFp(this.configuration).assignmentQueryIdNetAssignments(studentId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} [assignmentId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentApi
+     */
+    public assignmentQuerySubnetAssignmentSubmitDetailsFull(assignmentId?: number, options?: RawAxiosRequestConfig) {
+        return AssignmentApiFp(this.configuration).assignmentQuerySubnetAssignmentSubmitDetailsFull(assignmentId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} [studentId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentApi
+     */
+    public assignmentQuerySubnetAssignments(studentId?: number, options?: RawAxiosRequestConfig) {
+        return AssignmentApiFp(this.configuration).assignmentQuerySubnetAssignments(studentId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -2706,14 +3866,14 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
     return {
         /**
          * 
-         * @param {CreateAssignmentGroupReq} createAssignmentGroupReq 
+         * @param {CreateIDNetAGReq} createIDNetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupCreateAssignmentGroup: async (createAssignmentGroupReq: CreateAssignmentGroupReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createAssignmentGroupReq' is not null or undefined
-            assertParamExists('assignmentGroupCreateAssignmentGroup', 'createAssignmentGroupReq', createAssignmentGroupReq)
-            const localVarPath = `/api/assignment-group/create-assignment-group`;
+        assignmentGroupCreateIdNetAssignmentGroup: async (createIDNetAGReq: CreateIDNetAGReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createIDNetAGReq' is not null or undefined
+            assertParamExists('assignmentGroupCreateIdNetAssignmentGroup', 'createIDNetAGReq', createIDNetAGReq)
+            const localVarPath = `/api/assignment-group/create-idnet-assignment-group`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2735,7 +3895,7 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createAssignmentGroupReq, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(createIDNetAGReq, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2744,14 +3904,52 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {DeleteAssignmentGroupsReq} deleteAssignmentGroupsReq 
+         * @param {CreateSubnetAGReq} createSubnetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupDeleteAssignmentGroups: async (deleteAssignmentGroupsReq: DeleteAssignmentGroupsReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'deleteAssignmentGroupsReq' is not null or undefined
-            assertParamExists('assignmentGroupDeleteAssignmentGroups', 'deleteAssignmentGroupsReq', deleteAssignmentGroupsReq)
-            const localVarPath = `/api/assignment-group/delete-assignment-groups`;
+        assignmentGroupCreateSubnetAssignmentGroup: async (createSubnetAGReq: CreateSubnetAGReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createSubnetAGReq' is not null or undefined
+            assertParamExists('assignmentGroupCreateSubnetAssignmentGroup', 'createSubnetAGReq', createSubnetAGReq)
+            const localVarPath = `/api/assignment-group/create-subnet-assignment-group`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createSubnetAGReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {DeleteIDNetAGsReq} deleteIDNetAGsReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupDeleteIdNetAssignmentGroups: async (deleteIDNetAGsReq: DeleteIDNetAGsReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deleteIDNetAGsReq' is not null or undefined
+            assertParamExists('assignmentGroupDeleteIdNetAssignmentGroups', 'deleteIDNetAGsReq', deleteIDNetAGsReq)
+            const localVarPath = `/api/assignment-group/delete-idnet-assignment-groups`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2773,7 +3971,7 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(deleteAssignmentGroupsReq, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(deleteIDNetAGsReq, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2782,14 +3980,52 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {EditAssignmentGroupsReq} editAssignmentGroupsReq 
+         * @param {DeleteSubnetAGsReq} deleteSubnetAGsReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupEditAssignmentGroups: async (editAssignmentGroupsReq: EditAssignmentGroupsReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'editAssignmentGroupsReq' is not null or undefined
-            assertParamExists('assignmentGroupEditAssignmentGroups', 'editAssignmentGroupsReq', editAssignmentGroupsReq)
-            const localVarPath = `/api/assignment-group/edit-assignment-group`;
+        assignmentGroupDeleteSubnetAssignmentGroups: async (deleteSubnetAGsReq: DeleteSubnetAGsReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deleteSubnetAGsReq' is not null or undefined
+            assertParamExists('assignmentGroupDeleteSubnetAssignmentGroups', 'deleteSubnetAGsReq', deleteSubnetAGsReq)
+            const localVarPath = `/api/assignment-group/delete-subnet-assignment-groups`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deleteSubnetAGsReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {EditIDNetAGReq} editIDNetAGReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupEditIdNetAssignmentGroup: async (editIDNetAGReq: EditIDNetAGReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'editIDNetAGReq' is not null or undefined
+            assertParamExists('assignmentGroupEditIdNetAssignmentGroup', 'editIDNetAGReq', editIDNetAGReq)
+            const localVarPath = `/api/assignment-group/edit-idnet-assignment-group`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2811,7 +4047,7 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(editAssignmentGroupsReq, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(editIDNetAGReq, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2820,12 +4056,50 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {number} [assignmentGroupId] 
+         * @param {EditSubnetAGReq} editSubnetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupQueryAssignmentGroupDetails: async (assignmentGroupId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/assignment-group/get-assignment-group-details`;
+        assignmentGroupEditSubnetAssignmentGroup: async (editSubnetAGReq: EditSubnetAGReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'editSubnetAGReq' is not null or undefined
+            assertParamExists('assignmentGroupEditSubnetAssignmentGroup', 'editSubnetAGReq', editSubnetAGReq)
+            const localVarPath = `/api/assignment-group/edit-subnet-assignment-group`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(editSubnetAGReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} [id] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupQueryIdNetAssignmentGroupDetails: async (id?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment-group/get-idnet-assignment-group-details`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2840,8 +4114,8 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
             // authentication JWT required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
-            if (assignmentGroupId !== undefined) {
-                localVarQueryParameter['AssignmentGroupId'] = assignmentGroupId;
+            if (id !== undefined) {
+                localVarQueryParameter['Id'] = id;
             }
 
 
@@ -2857,15 +4131,16 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {string | null} [assignmentGroupName] 
+         * @param {string | null} [name] 
          * @param {number | null} [classId] 
          * @param {number | null} [teacherId] 
-         * @param {AssignmentGroupState} [state] 
+         * @param {string | null} [status] 
+         * @param {string | null} [assignmentGroupType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupQueryAssignmentGroups: async (assignmentGroupName?: string | null, classId?: number | null, teacherId?: number | null, state?: AssignmentGroupState, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/assignment-group/get-assignment-groups`;
+        assignmentGroupQueryIdNetAssignmentGroups: async (name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment-group/get-idnet-assignment-groups`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2880,8 +4155,8 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
             // authentication JWT required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
-            if (assignmentGroupName !== undefined) {
-                localVarQueryParameter['AssignmentGroupName'] = assignmentGroupName;
+            if (name !== undefined) {
+                localVarQueryParameter['Name'] = name;
             }
 
             if (classId !== undefined) {
@@ -2892,8 +4167,106 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
                 localVarQueryParameter['TeacherId'] = teacherId;
             }
 
-            if (state !== undefined) {
-                localVarQueryParameter['State'] = state;
+            if (status !== undefined) {
+                localVarQueryParameter['Status'] = status;
+            }
+
+            if (assignmentGroupType !== undefined) {
+                localVarQueryParameter['AssignmentGroupType'] = assignmentGroupType;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} [id] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupQuerySubnetAssignmentGroupDetails: async (id?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment-group/get-subnet-assignment-group-details`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (id !== undefined) {
+                localVarQueryParameter['Id'] = id;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string | null} [name] 
+         * @param {number | null} [classId] 
+         * @param {number | null} [teacherId] 
+         * @param {string | null} [status] 
+         * @param {string | null} [assignmentGroupType] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupQuerySubnetAssignmentGroups: async (name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment-group/get-subnet-assignment-groups`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (name !== undefined) {
+                localVarQueryParameter['Name'] = name;
+            }
+
+            if (classId !== undefined) {
+                localVarQueryParameter['ClassId'] = classId;
+            }
+
+            if (teacherId !== undefined) {
+                localVarQueryParameter['TeacherId'] = teacherId;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['Status'] = status;
+            }
+
+            if (assignmentGroupType !== undefined) {
+                localVarQueryParameter['AssignmentGroupType'] = assignmentGroupType;
             }
 
 
@@ -2919,65 +4292,130 @@ export const AssignmentGroupApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {CreateAssignmentGroupReq} createAssignmentGroupReq 
+         * @param {CreateIDNetAGReq} createIDNetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentGroupCreateAssignmentGroup(createAssignmentGroupReq: CreateAssignmentGroupReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateAssignmentGroupRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupCreateAssignmentGroup(createAssignmentGroupReq, options);
+        async assignmentGroupCreateIdNetAssignmentGroup(createIDNetAGReq: CreateIDNetAGReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateIDNetAGRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupCreateIdNetAssignmentGroup(createIDNetAGReq, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupCreateAssignmentGroup']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupCreateIdNetAssignmentGroup']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
-         * @param {DeleteAssignmentGroupsReq} deleteAssignmentGroupsReq 
+         * @param {CreateSubnetAGReq} createSubnetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentGroupDeleteAssignmentGroups(deleteAssignmentGroupsReq: DeleteAssignmentGroupsReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupDeleteAssignmentGroups(deleteAssignmentGroupsReq, options);
+        async assignmentGroupCreateSubnetAssignmentGroup(createSubnetAGReq: CreateSubnetAGReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateSubnetAGRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupCreateSubnetAssignmentGroup(createSubnetAGReq, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupDeleteAssignmentGroups']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupCreateSubnetAssignmentGroup']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
-         * @param {EditAssignmentGroupsReq} editAssignmentGroupsReq 
+         * @param {DeleteIDNetAGsReq} deleteIDNetAGsReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentGroupEditAssignmentGroups(editAssignmentGroupsReq: EditAssignmentGroupsReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupEditAssignmentGroups(editAssignmentGroupsReq, options);
+        async assignmentGroupDeleteIdNetAssignmentGroups(deleteIDNetAGsReq: DeleteIDNetAGsReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupDeleteIdNetAssignmentGroups(deleteIDNetAGsReq, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupEditAssignmentGroups']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupDeleteIdNetAssignmentGroups']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
-         * @param {number} [assignmentGroupId] 
+         * @param {DeleteSubnetAGsReq} deleteSubnetAGsReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentGroupQueryAssignmentGroupDetails(assignmentGroupId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryAssignmentGroupDetailsRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQueryAssignmentGroupDetails(assignmentGroupId, options);
+        async assignmentGroupDeleteSubnetAssignmentGroups(deleteSubnetAGsReq: DeleteSubnetAGsReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupDeleteSubnetAssignmentGroups(deleteSubnetAGsReq, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupQueryAssignmentGroupDetails']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupDeleteSubnetAssignmentGroups']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
-         * @param {string | null} [assignmentGroupName] 
+         * @param {EditIDNetAGReq} editIDNetAGReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentGroupEditIdNetAssignmentGroup(editIDNetAGReq: EditIDNetAGReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupEditIdNetAssignmentGroup(editIDNetAGReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupEditIdNetAssignmentGroup']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {EditSubnetAGReq} editSubnetAGReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentGroupEditSubnetAssignmentGroup(editSubnetAGReq: EditSubnetAGReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupEditSubnetAssignmentGroup(editSubnetAGReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupEditSubnetAssignmentGroup']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} [id] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentGroupQueryIdNetAssignmentGroupDetails(id?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryIDNetAGDetailRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQueryIdNetAssignmentGroupDetails(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupQueryIdNetAssignmentGroupDetails']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string | null} [name] 
          * @param {number | null} [classId] 
          * @param {number | null} [teacherId] 
-         * @param {AssignmentGroupState} [state] 
+         * @param {string | null} [status] 
+         * @param {string | null} [assignmentGroupType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentGroupQueryAssignmentGroups(assignmentGroupName?: string | null, classId?: number | null, teacherId?: number | null, state?: AssignmentGroupState, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryAssignmentGroupsRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQueryAssignmentGroups(assignmentGroupName, classId, teacherId, state, options);
+        async assignmentGroupQueryIdNetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryIDNetAGsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQueryIdNetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupQueryAssignmentGroups']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupQueryIdNetAssignmentGroups']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} [id] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentGroupQuerySubnetAssignmentGroupDetails(id?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuerySubnetAGDetailRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQuerySubnetAssignmentGroupDetails(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroupDetails']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string | null} [name] 
+         * @param {number | null} [classId] 
+         * @param {number | null} [teacherId] 
+         * @param {string | null} [status] 
+         * @param {string | null} [assignmentGroupType] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuerySubnetAGsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroups']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -2992,51 +4430,101 @@ export const AssignmentGroupApiFactory = function (configuration?: Configuration
     return {
         /**
          * 
-         * @param {CreateAssignmentGroupReq} createAssignmentGroupReq 
+         * @param {CreateIDNetAGReq} createIDNetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupCreateAssignmentGroup(createAssignmentGroupReq: CreateAssignmentGroupReq, options?: RawAxiosRequestConfig): AxiosPromise<CreateAssignmentGroupRes> {
-            return localVarFp.assignmentGroupCreateAssignmentGroup(createAssignmentGroupReq, options).then((request) => request(axios, basePath));
+        assignmentGroupCreateIdNetAssignmentGroup(createIDNetAGReq: CreateIDNetAGReq, options?: RawAxiosRequestConfig): AxiosPromise<CreateIDNetAGRes> {
+            return localVarFp.assignmentGroupCreateIdNetAssignmentGroup(createIDNetAGReq, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {DeleteAssignmentGroupsReq} deleteAssignmentGroupsReq 
+         * @param {CreateSubnetAGReq} createSubnetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupDeleteAssignmentGroups(deleteAssignmentGroupsReq: DeleteAssignmentGroupsReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.assignmentGroupDeleteAssignmentGroups(deleteAssignmentGroupsReq, options).then((request) => request(axios, basePath));
+        assignmentGroupCreateSubnetAssignmentGroup(createSubnetAGReq: CreateSubnetAGReq, options?: RawAxiosRequestConfig): AxiosPromise<CreateSubnetAGRes> {
+            return localVarFp.assignmentGroupCreateSubnetAssignmentGroup(createSubnetAGReq, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {EditAssignmentGroupsReq} editAssignmentGroupsReq 
+         * @param {DeleteIDNetAGsReq} deleteIDNetAGsReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupEditAssignmentGroups(editAssignmentGroupsReq: EditAssignmentGroupsReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.assignmentGroupEditAssignmentGroups(editAssignmentGroupsReq, options).then((request) => request(axios, basePath));
+        assignmentGroupDeleteIdNetAssignmentGroups(deleteIDNetAGsReq: DeleteIDNetAGsReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.assignmentGroupDeleteIdNetAssignmentGroups(deleteIDNetAGsReq, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {number} [assignmentGroupId] 
+         * @param {DeleteSubnetAGsReq} deleteSubnetAGsReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupQueryAssignmentGroupDetails(assignmentGroupId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryAssignmentGroupDetailsRes> {
-            return localVarFp.assignmentGroupQueryAssignmentGroupDetails(assignmentGroupId, options).then((request) => request(axios, basePath));
+        assignmentGroupDeleteSubnetAssignmentGroups(deleteSubnetAGsReq: DeleteSubnetAGsReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.assignmentGroupDeleteSubnetAssignmentGroups(deleteSubnetAGsReq, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {string | null} [assignmentGroupName] 
+         * @param {EditIDNetAGReq} editIDNetAGReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupEditIdNetAssignmentGroup(editIDNetAGReq: EditIDNetAGReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.assignmentGroupEditIdNetAssignmentGroup(editIDNetAGReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {EditSubnetAGReq} editSubnetAGReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupEditSubnetAssignmentGroup(editSubnetAGReq: EditSubnetAGReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.assignmentGroupEditSubnetAssignmentGroup(editSubnetAGReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} [id] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupQueryIdNetAssignmentGroupDetails(id?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryIDNetAGDetailRes> {
+            return localVarFp.assignmentGroupQueryIdNetAssignmentGroupDetails(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string | null} [name] 
          * @param {number | null} [classId] 
          * @param {number | null} [teacherId] 
-         * @param {AssignmentGroupState} [state] 
+         * @param {string | null} [status] 
+         * @param {string | null} [assignmentGroupType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupQueryAssignmentGroups(assignmentGroupName?: string | null, classId?: number | null, teacherId?: number | null, state?: AssignmentGroupState, options?: RawAxiosRequestConfig): AxiosPromise<QueryAssignmentGroupsRes> {
-            return localVarFp.assignmentGroupQueryAssignmentGroups(assignmentGroupName, classId, teacherId, state, options).then((request) => request(axios, basePath));
+        assignmentGroupQueryIdNetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<QueryIDNetAGsRes> {
+            return localVarFp.assignmentGroupQueryIdNetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} [id] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupQuerySubnetAssignmentGroupDetails(id?: number, options?: RawAxiosRequestConfig): AxiosPromise<QuerySubnetAGDetailRes> {
+            return localVarFp.assignmentGroupQuerySubnetAssignmentGroupDetails(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string | null} [name] 
+         * @param {number | null} [classId] 
+         * @param {number | null} [teacherId] 
+         * @param {string | null} [status] 
+         * @param {string | null} [assignmentGroupType] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<QuerySubnetAGsRes> {
+            return localVarFp.assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -3050,60 +4538,120 @@ export const AssignmentGroupApiFactory = function (configuration?: Configuration
 export class AssignmentGroupApi extends BaseAPI {
     /**
      * 
-     * @param {CreateAssignmentGroupReq} createAssignmentGroupReq 
+     * @param {CreateIDNetAGReq} createIDNetAGReq 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssignmentGroupApi
      */
-    public assignmentGroupCreateAssignmentGroup(createAssignmentGroupReq: CreateAssignmentGroupReq, options?: RawAxiosRequestConfig) {
-        return AssignmentGroupApiFp(this.configuration).assignmentGroupCreateAssignmentGroup(createAssignmentGroupReq, options).then((request) => request(this.axios, this.basePath));
+    public assignmentGroupCreateIdNetAssignmentGroup(createIDNetAGReq: CreateIDNetAGReq, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupCreateIdNetAssignmentGroup(createIDNetAGReq, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {DeleteAssignmentGroupsReq} deleteAssignmentGroupsReq 
+     * @param {CreateSubnetAGReq} createSubnetAGReq 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssignmentGroupApi
      */
-    public assignmentGroupDeleteAssignmentGroups(deleteAssignmentGroupsReq: DeleteAssignmentGroupsReq, options?: RawAxiosRequestConfig) {
-        return AssignmentGroupApiFp(this.configuration).assignmentGroupDeleteAssignmentGroups(deleteAssignmentGroupsReq, options).then((request) => request(this.axios, this.basePath));
+    public assignmentGroupCreateSubnetAssignmentGroup(createSubnetAGReq: CreateSubnetAGReq, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupCreateSubnetAssignmentGroup(createSubnetAGReq, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {EditAssignmentGroupsReq} editAssignmentGroupsReq 
+     * @param {DeleteIDNetAGsReq} deleteIDNetAGsReq 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssignmentGroupApi
      */
-    public assignmentGroupEditAssignmentGroups(editAssignmentGroupsReq: EditAssignmentGroupsReq, options?: RawAxiosRequestConfig) {
-        return AssignmentGroupApiFp(this.configuration).assignmentGroupEditAssignmentGroups(editAssignmentGroupsReq, options).then((request) => request(this.axios, this.basePath));
+    public assignmentGroupDeleteIdNetAssignmentGroups(deleteIDNetAGsReq: DeleteIDNetAGsReq, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupDeleteIdNetAssignmentGroups(deleteIDNetAGsReq, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {number} [assignmentGroupId] 
+     * @param {DeleteSubnetAGsReq} deleteSubnetAGsReq 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssignmentGroupApi
      */
-    public assignmentGroupQueryAssignmentGroupDetails(assignmentGroupId?: number, options?: RawAxiosRequestConfig) {
-        return AssignmentGroupApiFp(this.configuration).assignmentGroupQueryAssignmentGroupDetails(assignmentGroupId, options).then((request) => request(this.axios, this.basePath));
+    public assignmentGroupDeleteSubnetAssignmentGroups(deleteSubnetAGsReq: DeleteSubnetAGsReq, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupDeleteSubnetAssignmentGroups(deleteSubnetAGsReq, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {string | null} [assignmentGroupName] 
+     * @param {EditIDNetAGReq} editIDNetAGReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentGroupApi
+     */
+    public assignmentGroupEditIdNetAssignmentGroup(editIDNetAGReq: EditIDNetAGReq, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupEditIdNetAssignmentGroup(editIDNetAGReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {EditSubnetAGReq} editSubnetAGReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentGroupApi
+     */
+    public assignmentGroupEditSubnetAssignmentGroup(editSubnetAGReq: EditSubnetAGReq, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupEditSubnetAssignmentGroup(editSubnetAGReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} [id] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentGroupApi
+     */
+    public assignmentGroupQueryIdNetAssignmentGroupDetails(id?: number, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupQueryIdNetAssignmentGroupDetails(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string | null} [name] 
      * @param {number | null} [classId] 
      * @param {number | null} [teacherId] 
-     * @param {AssignmentGroupState} [state] 
+     * @param {string | null} [status] 
+     * @param {string | null} [assignmentGroupType] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssignmentGroupApi
      */
-    public assignmentGroupQueryAssignmentGroups(assignmentGroupName?: string | null, classId?: number | null, teacherId?: number | null, state?: AssignmentGroupState, options?: RawAxiosRequestConfig) {
-        return AssignmentGroupApiFp(this.configuration).assignmentGroupQueryAssignmentGroups(assignmentGroupName, classId, teacherId, state, options).then((request) => request(this.axios, this.basePath));
+    public assignmentGroupQueryIdNetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupQueryIdNetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} [id] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentGroupApi
+     */
+    public assignmentGroupQuerySubnetAssignmentGroupDetails(id?: number, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupQuerySubnetAssignmentGroupDetails(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string | null} [name] 
+     * @param {number | null} [classId] 
+     * @param {number | null} [teacherId] 
+     * @param {string | null} [status] 
+     * @param {string | null} [assignmentGroupType] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentGroupApi
+     */
+    public assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -3121,8 +4669,8 @@ export const AssignmentSubmitApiAxiosParamCreator = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentSubmitQueryAssignmentDataForSubmit: async (assignmentId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/assignment/get-assignment-data-for-submit`;
+        assignmentSubmitQueryIdNetAssignmentDataForSubmit: async (assignmentId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment/get-idnet-assignment-data-for-submit`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3154,14 +4702,51 @@ export const AssignmentSubmitApiAxiosParamCreator = function (configuration?: Co
         },
         /**
          * 
-         * @param {SubmitAssignmentReq} submitAssignmentReq 
+         * @param {number} [assignmentId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentSubmitSubmitAssignment: async (submitAssignmentReq: SubmitAssignmentReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'submitAssignmentReq' is not null or undefined
-            assertParamExists('assignmentSubmitSubmitAssignment', 'submitAssignmentReq', submitAssignmentReq)
-            const localVarPath = `/api/assignment/submit-assignment`;
+        assignmentSubmitQuerySubnetAssignmentDataForSubmit: async (assignmentId?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment/get-subnet-assignment-data-for-submit`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (assignmentId !== undefined) {
+                localVarQueryParameter['AssignmentId'] = assignmentId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {SubmitIDNetAssignmentReq} submitIDNetAssignmentReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitSubmitIdNetAssignment: async (submitIDNetAssignmentReq: SubmitIDNetAssignmentReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'submitIDNetAssignmentReq' is not null or undefined
+            assertParamExists('assignmentSubmitSubmitIdNetAssignment', 'submitIDNetAssignmentReq', submitIDNetAssignmentReq)
+            const localVarPath = `/api/assignment/submit-idnet-assignment`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3183,7 +4768,45 @@ export const AssignmentSubmitApiAxiosParamCreator = function (configuration?: Co
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(submitAssignmentReq, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(submitIDNetAssignmentReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {SubmitSubnetAssignmentReq} submitSubnetAssignmentReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitSubmitSubnetAssignment: async (submitSubnetAssignmentReq: SubmitSubnetAssignmentReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'submitSubnetAssignmentReq' is not null or undefined
+            assertParamExists('assignmentSubmitSubmitSubnetAssignment', 'submitSubnetAssignmentReq', submitSubnetAssignmentReq)
+            const localVarPath = `/api/assignment/submit-subnet-assignment`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(submitSubnetAssignmentReq, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3206,22 +4829,46 @@ export const AssignmentSubmitApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentSubmitQueryAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryAssignmentDataForSubmitRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitQueryAssignmentDataForSubmit(assignmentId, options);
+        async assignmentSubmitQueryIdNetAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryIDNetAssignmentDataForSubmitRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitQueryIdNetAssignmentDataForSubmit(assignmentId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitQueryAssignmentDataForSubmit']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitQueryIdNetAssignmentDataForSubmit']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
-         * @param {SubmitAssignmentReq} submitAssignmentReq 
+         * @param {number} [assignmentId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentSubmitSubmitAssignment(submitAssignmentReq: SubmitAssignmentReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubmitAssignmentRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitSubmitAssignment(submitAssignmentReq, options);
+        async assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuerySubnetAssignmentDataForSubmitRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitSubmitAssignment']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitQuerySubnetAssignmentDataForSubmit']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {SubmitIDNetAssignmentReq} submitIDNetAssignmentReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentSubmitSubmitIdNetAssignment(submitIDNetAssignmentReq: SubmitIDNetAssignmentReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubmitIDNetAssignmentRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitSubmitIdNetAssignment(submitIDNetAssignmentReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitSubmitIdNetAssignment']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {SubmitSubnetAssignmentReq} submitSubnetAssignmentReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentSubmitSubmitSubnetAssignment(submitSubnetAssignmentReq: SubmitSubnetAssignmentReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubmitSubnetAssignmentRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitSubmitSubnetAssignment(submitSubnetAssignmentReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitSubmitSubnetAssignment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -3240,17 +4887,35 @@ export const AssignmentSubmitApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentSubmitQueryAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryAssignmentDataForSubmitRes> {
-            return localVarFp.assignmentSubmitQueryAssignmentDataForSubmit(assignmentId, options).then((request) => request(axios, basePath));
+        assignmentSubmitQueryIdNetAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QueryIDNetAssignmentDataForSubmitRes> {
+            return localVarFp.assignmentSubmitQueryIdNetAssignmentDataForSubmit(assignmentId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {SubmitAssignmentReq} submitAssignmentReq 
+         * @param {number} [assignmentId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentSubmitSubmitAssignment(submitAssignmentReq: SubmitAssignmentReq, options?: RawAxiosRequestConfig): AxiosPromise<SubmitAssignmentRes> {
-            return localVarFp.assignmentSubmitSubmitAssignment(submitAssignmentReq, options).then((request) => request(axios, basePath));
+        assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QuerySubnetAssignmentDataForSubmitRes> {
+            return localVarFp.assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {SubmitIDNetAssignmentReq} submitIDNetAssignmentReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitSubmitIdNetAssignment(submitIDNetAssignmentReq: SubmitIDNetAssignmentReq, options?: RawAxiosRequestConfig): AxiosPromise<SubmitIDNetAssignmentRes> {
+            return localVarFp.assignmentSubmitSubmitIdNetAssignment(submitIDNetAssignmentReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {SubmitSubnetAssignmentReq} submitSubnetAssignmentReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitSubmitSubnetAssignment(submitSubnetAssignmentReq: SubmitSubnetAssignmentReq, options?: RawAxiosRequestConfig): AxiosPromise<SubmitSubnetAssignmentRes> {
+            return localVarFp.assignmentSubmitSubmitSubnetAssignment(submitSubnetAssignmentReq, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -3269,19 +4934,41 @@ export class AssignmentSubmitApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof AssignmentSubmitApi
      */
-    public assignmentSubmitQueryAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig) {
-        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitQueryAssignmentDataForSubmit(assignmentId, options).then((request) => request(this.axios, this.basePath));
+    public assignmentSubmitQueryIdNetAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig) {
+        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitQueryIdNetAssignmentDataForSubmit(assignmentId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {SubmitAssignmentReq} submitAssignmentReq 
+     * @param {number} [assignmentId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssignmentSubmitApi
      */
-    public assignmentSubmitSubmitAssignment(submitAssignmentReq: SubmitAssignmentReq, options?: RawAxiosRequestConfig) {
-        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitSubmitAssignment(submitAssignmentReq, options).then((request) => request(this.axios, this.basePath));
+    public assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig) {
+        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {SubmitIDNetAssignmentReq} submitIDNetAssignmentReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentSubmitApi
+     */
+    public assignmentSubmitSubmitIdNetAssignment(submitIDNetAssignmentReq: SubmitIDNetAssignmentReq, options?: RawAxiosRequestConfig) {
+        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitSubmitIdNetAssignment(submitIDNetAssignmentReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {SubmitSubnetAssignmentReq} submitSubnetAssignmentReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentSubmitApi
+     */
+    public assignmentSubmitSubmitSubnetAssignment(submitSubnetAssignmentReq: SubmitSubnetAssignmentReq, options?: RawAxiosRequestConfig) {
+        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitSubmitSubnetAssignment(submitSubnetAssignmentReq, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

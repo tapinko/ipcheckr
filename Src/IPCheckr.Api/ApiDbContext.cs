@@ -11,10 +11,17 @@ namespace IPCheckr.Api
 
         public DbSet<User> Users { get; set; }
         public DbSet<Class> Classes { get; set; }
-        public DbSet<AssignmentGroup> AssignmentGroups { get; set; }
-        public DbSet<Assignment> Assignments { get; set; }
-        public DbSet<AssignmentAnswerKey> AssignmentAnswerKeys { get; set; }
-        public DbSet<AssignmentSubmit> AssignmentSubmits { get; set; }
+        public DbSet<SubnetAG> SubnetAGs { get; set; }
+        public DbSet<IDNetAG> IDNetAGs { get; set; }
+
+        public DbSet<SubnetAssignment> SubnetAssignments { get; set; }
+        public DbSet<IDNetAssignment> IDNetAssignments { get; set; }
+
+        public DbSet<SubnetAssignmentAnswerKey> SubnetAssignmentAnswerKeys { get; set; }
+        public DbSet<IDNetAssignmentAnswerKey> IDNetAssignmentAnswerKeys { get; set; }
+
+        public DbSet<SubnetAssignmentSubmit> SubnetAssignmentSubmits { get; set; }
+        public DbSet<IDNetAssignmentSubmit> IDNetAssignmentSubmits { get; set; }
         public DbSet<AppSettings> AppSettings { get; set; }
         public DbSet<Gns3Session> Gns3Sessions { get; set; }
 
@@ -60,20 +67,60 @@ namespace IPCheckr.Api
                         j.HasKey("ClassId", "StudentId");
                     });
 
-            modelBuilder.Entity<Assignment>()
+            modelBuilder.Entity<SubnetAG>()
+                .Property(ag => ag.Status)
+                .HasConversion<string>()
+                .IsRequired();
+
+            modelBuilder.Entity<IDNetAG>()
+                .Property(ag => ag.Status)
+                .HasConversion<string>()
+                .IsRequired();
+
+            modelBuilder.Entity<SubnetAssignment>()
                 .HasOne(a => a.AssignmentGroup)
                 .WithMany()
                 .HasForeignKey("AssignmentGroupId")
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<AssignmentAnswerKey>()
+            modelBuilder.Entity<SubnetAssignment>()
+                .HasOne(a => a.Student)
+                .WithMany()
+                .HasForeignKey("StudentId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<IDNetAssignment>()
+                .HasOne(a => a.AssignmentGroup)
+                .WithMany()
+                .HasForeignKey("AssignmentGroupId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<IDNetAssignment>()
+                .HasOne(a => a.Student)
+                .WithMany()
+                .HasForeignKey("StudentId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SubnetAssignmentAnswerKey>()
                 .HasOne(aak => aak.Assignment)
                 .WithMany()
                 .HasForeignKey("AssignmentId")
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<AssignmentSubmit>()
-                .HasOne(asub => asub.Assignment)
+            modelBuilder.Entity<IDNetAssignmentAnswerKey>()
+                .HasOne(aak => aak.Assignment)
+                .WithMany()
+                .HasForeignKey("AssignmentId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SubnetAssignmentSubmit>()
+                .HasOne(sub => sub.Assignment)
+                .WithMany()
+                .HasForeignKey("AssignmentId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<IDNetAssignmentSubmit>()
+                .HasOne(sub => sub.Assignment)
                 .WithMany()
                 .HasForeignKey("AssignmentId")
                 .OnDelete(DeleteBehavior.Cascade);

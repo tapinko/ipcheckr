@@ -4,444 +4,432 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Checkbox,
   Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Divider,
   FormControl,
+  FormControlLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   InputLabel,
-  ListItemText,
   MenuItem,
-  OutlinedInput,
   Select,
+  Stack,
   TextField,
   Tooltip,
-  Typography
+  Typography,
+  Checkbox,
+  IconButton,
+  Pagination
 } from "@mui/material"
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  AssignmentGroupState,
-  AssignmentGroupIpCat,
-  type ApiProblemDetails,
-  type AssignmentGroupDto,
-  type ClassDto,
-  type CreateAssignmentGroupRes,
-  type UserDto
-} from "../../dtos"
-import { Language, TranslationKey } from "../../utils/i18n"
-import { assignmentGroupApi, classApi, userApi } from "../../utils/apiClients"
-import { useAuth } from "../../contexts/AuthContext"
-import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { assignmentGroupApi, classApi, userApi } from "../../utils/apiClients"
 import {
-  getParametrizedUrl,
-  RouteKeys,
-  RouteParams,
-  Routes
-} from "../../router/routes"
-import type ISelectedClass from "../../types/ISelectedClass"
-import ActionPanel from "../../components/ActionPanel"
-import SelectSearchField from "../../components/SelectSearchField"
-import DeleteDialog from "../../components/DeleteDialog"
-import UserRole from "../../types/UserRole"
-import {
-  LocalizationProvider,
-  renderTimeViewClock,
-  DateTimePicker
-} from "@mui/x-date-pickers"
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
-import { getStateMap } from "../../utils/getStateMap"
+  AssignmentGroupIpCat,
+  AssignmentGroupStatus,
+  AssignmentGroupType,
+  type ApiProblemDetails,
+  type ClassDto,
+  type CreateIDNetAGRes,
+  type CreateSubnetAGRes,
+  type IDNetAGDto,
+  type QueryIDNetAGDetailRes,
+  type QueryIDNetAGsRes,
+  type QuerySubnetAGDetailRes,
+  type QuerySubnetAGsRes,
+  type SubnetAGDto,
+  type UserDto,
+} from "../../dtos"
+import { useAuth } from "../../contexts/AuthContext"
+import CardsSkeleton from "../../components/CardsSkeleton"
+import ErrorLoading from "../../components/ErrorLoading"
+import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import { Language, TranslationKey } from "../../utils/i18n"
 import { Controller, useForm } from "react-hook-form"
 import FormRules from "../../utils/FormRules"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import ErrorLoading from "../../components/ErrorLoading"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import DeleteDialog from "../../components/DeleteDialog"
+import { LocalizationProvider, DateTimePicker, renderTimeViewClock } from "@mui/x-date-pickers"
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import type { AxiosError, AxiosResponse } from "axios"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
+import UserRole from "../../types/UserRole"
+import AGHeader from "../../components/AGHeader"
+import type { AGClassFilterValue, AGIpCatFilterValue, AGTypeFilterValue } from "../../components/AGHeader"
+import { getStatusMap } from "../../utils/getStatusMap"
 
-interface IAssignmentGroupCardProps {
+interface IAG {
   id: number
   name: string
-  successRate: number
+  description?: string | null
+  classId: number
+  className: string
   submitted: number
   total: number
-  state: AssignmentGroupState
   startDate: string
   deadline: string
-  selected: boolean
-  onSelect?: (selected: boolean) => void
-  className?: string
-  description?: string
+  status: AssignmentGroupStatus
+  successRate: number
+  type: AssignmentGroupType
+  ipCat?: AssignmentGroupIpCat
+  testWildcard?: boolean
+  testFirstLastBr?: boolean
 }
 
-const AssignmentGroupCard = ({
-  id,
-  name,
-  successRate,
-  submitted,
-  total,
-  state,
-  startDate,
-  deadline,
-  selected,
-  onSelect,
-  className,
-  description
-}: IAssignmentGroupCardProps) => {
-  const { t } = useTranslation()
-  const stateMap = getStateMap(t)
-  const navigate = useNavigate()
+type ClassFilterValue = AGClassFilterValue
+type TypeFilterValue = AGTypeFilterValue
+type IpCatFilterValue = AGIpCatFilterValue
 
-  return (
-    <Tooltip title={description ?? ""}>
-      <Card
-        variant="outlined"
-        sx={{
-          width: 320,
-          minWidth: 320,
-          maxWidth: 320,
-          borderColor: selected ? "primary.main" : "divider",
-            borderWidth: 2,
-          borderStyle: "solid",
-          cursor: onSelect ? "pointer" : "default",
-          boxShadow: selected ? 2 : 0,
-          transition: "box-shadow 0.2s, border-color 0.2s",
-          backgroundColor: selected ? "action.selected" : "background.paper"
-        }}
-        onClick={() => onSelect && onSelect(!selected)}
-      >
-        <CardHeader
-          title={
-            <Typography variant="h5" fontWeight="bold">
-              {name}
-            </Typography>
-          }
-          action={
-            <Chip
-              label={stateMap[state]?.label ?? t("unknown")}
-              color={
-                state === AssignmentGroupState.Ended
-                  ? "success"
-                  : state === AssignmentGroupState.InProgress
-                  ? "warning"
-                  : state === AssignmentGroupState.Upcoming
-                  ? "default"
-                  : "default"
-              }
-              variant="outlined"
-            />
-          }
-        />
-        <CardContent
-          sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
-        >
-          {className && (
-            <Typography variant="body2" color="textSecondary">
-              <strong>
-                {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_CLASS)}:
-              </strong>{" "}
-              {className}
-            </Typography>
-          )}
-          <Typography variant="body2" color="textSecondary">
-            <strong>
-              {t(
-                TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_SUBMITTED
-              )}
-              :
-            </strong>{" "}
-            {submitted}/{total}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            <strong>
-              {t(
-                TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_SUCCESS_RATE
-              )}
-              :
-            </strong>{" "}
-            {successRate}%
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            <strong>
-              {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_START_DATE)}:
-            </strong>{" "}
-            {startDate}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            <strong>
-              {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_DEADLINE)}:
-            </strong>{" "}
-            {deadline}
-          </Typography>
-          <Button
-            onClick={() =>
-              navigate(
-                getParametrizedUrl(
-                  RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
-                  {
-                    [RouteParams.ASSIGNMENT_GROUP_ID]: id.toString()
-                  }
-                )
-              )
-            }
-            variant="outlined"
-            color="primary"
-            fullWidth
-            sx={{ mt: 1 }}
-          >
-            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_DETAILS)}
-          </Button>
-        </CardContent>
-      </Card>
-    </Tooltip>
-  )
-}
-
-interface ISelectedAssignmentGroups {
-  assignmentGroupId: number
-  assignmentGroupName: string
-}
-
-type CreateAssignmentGroupFormValues = {
-  assignmentGroupName: string
+type CreateFormValues = {
+  name: string
   description: string
+  classId: number | null
+  type: AssignmentGroupType
   numberOfRecords: number
-  possibleAttempts: number
-  studentsIds: number[]
+  possibleOctets: number
+  ipCat: AssignmentGroupIpCat
+  testWildcard: boolean
+  testFirstLastBr: boolean
+  students: number[]
   startDate: string
   deadline: string
-  assignmentGroupIpCat: AssignmentGroupIpCat
 }
 
-type EditAssignmentGroupFormValues = {
-  assignmentGroupName: string
+type EditFormValues = {
+  name: string
   description: string
-  possibleAttempts: number
-  studentsIds: number[]
+  students: number[]
   startDate: string
   deadline: string
 }
+
+const formatDateTime = (value: string) => new Date(value).toLocaleString()
+
+const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
+  id: ag.assignmentGroupId,
+  name: ag.name,
+  description: ag.description,
+  classId: ag.classId,
+  className: ag.className,
+  submitted: ag.submitted,
+  total: ag.total,
+  startDate: ag.startDate,
+  deadline: ag.deadline,
+  status: ag.status,
+  successRate: ag.successRate,
+  type: AssignmentGroupType.Subnet,
+  ipCat: ag.ipCat
+})
+
+const normalizeIdNet = (ag: IDNetAGDto): IAG => ({
+  id: ag.assignmentGroupId,
+  name: ag.name,
+  description: ag.description,
+  classId: ag.classId,
+  className: ag.className,
+  submitted: ag.submitted,
+  total: ag.total,
+  startDate: ag.startDate,
+  deadline: ag.deadline,
+  status: ag.status,
+  successRate: ag.successRate,
+  type: AssignmentGroupType.Idnet,
+  ipCat: ag.ipCat,
+  testWildcard: ag.testWildcard,
+  testFirstLastBr: ag.testFirstLastBr
+})
 
 const TeacherAssignmentGroups = () => {
   const { t, i18n } = useTranslation()
   const { userId } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const [selectedStudentUsernames, setSelectedStudentUsernames] = useState<string[]>([]);
+  const statusMap = getStatusMap(t)
 
-  const [selectedClass, setSelectedClass] = useState<ISelectedClass | null>(null)
-  const [selectedAssignmentGroups, setSelectedAssignmentGroups] = useState<ISelectedAssignmentGroups[]>([])
-  const [
-    createAssignmentGroupDialogVis,
-    setCreateAssignmentGroupDialogVis
-  ] = useState(false)
-  const [
-    deleteAssignmentGroupsDialogVis,
-    setDeleteAssignmentGroupsDialogVis
-  ] = useState(false)
-  const [
-    editAssignmentGroupDialogVis,
-    setEditAssignmentGroupDialogVis
-  ] = useState(false)
+  const [search, setSearch] = useState("")
+  const [classFilter, setClassFilter] = useState<ClassFilterValue>(null)
+  const [typeFilter, setTypeFilter] = useState<TypeFilterValue>("ALL")
+  const [ipCatFilter, setIpCatFilter] = useState<IpCatFilterValue>("ALL_CAT")
+  const [endedPage, setEndedPage] = useState(1)
+  
+  const [createDialogVis, setCreateDialogVis] = useState(false)
+  const [editDialogVis, setEditDialogVis] = useState(false)
+  const [deleteDialogVis, setDeleteDialogVis] = useState(false)
+  const [editAG, setEditAG] = useState<IAG | null>(null)
+  const [deleteAG, setDeleteAG] = useState<IAG | null>(null)
+  const [alert, setAlert] = useState<CustomAlertState | null>(null)
 
-  const getCreateAssignmentGroupDefaults = (): CreateAssignmentGroupFormValues => ({
-    assignmentGroupName: "",
-    description: "",
-    numberOfRecords: 6,
-    possibleAttempts: 1,
-    studentsIds: [],
-    startDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
-    deadline: new Date(
-      new Date().setDate(new Date().getDate() + 7) // 7 days from now
-    ).toISOString(),
-    assignmentGroupIpCat: AssignmentGroupIpCat.Abc
+  const classesQuery = useQuery<ClassDto[], Error>({
+    queryKey: ["teacherClasses", userId],
+    enabled: !!userId,
+    queryFn: () => classApi.classQueryClasses(null, null, userId).then(r => r.data.classes)
   })
 
+  useEffect(() => {
+    if (classFilter === null && classesQuery.data) {
+      setClassFilter("ALL")
+    }
+  }, [classFilter, classesQuery.data])
+
+  const classFilterNormalized = classFilter === "ALL" || classFilter === null ? null : classFilter
+
+  const subnetAGsQuery = useQuery<QuerySubnetAGsRes, Error>({
+    queryKey: ["teacherSubnetAGs", userId, classFilterNormalized, search],
+    enabled: !!userId,
+    queryFn: () =>
+      assignmentGroupApi
+        .assignmentGroupQuerySubnetAssignmentGroups(
+          search.trim() ? search.trim() : null,
+          classFilterNormalized,
+          userId,
+          null,
+          AssignmentGroupType.Subnet
+        )
+        .then(r => r.data),
+    placeholderData: prev => prev
+  })
+
+  const idNetAGsQuery = useQuery<QueryIDNetAGsRes, Error>({
+    queryKey: ["teacherIdNetAGs", userId, classFilterNormalized, search],
+    enabled: !!userId,
+    queryFn: () =>
+      assignmentGroupApi
+        .assignmentGroupQueryIdNetAssignmentGroups(
+          search.trim() ? search.trim() : null,
+          classFilterNormalized,
+          userId,
+          null,
+          AssignmentGroupType.Idnet
+        )
+        .then(r => r.data),
+    placeholderData: prev => prev
+  })
+
+  const allAGs = [
+    ...(subnetAGsQuery.data?.assignmentGroups ?? []).map(normalizeSubnet),
+    ...(idNetAGsQuery.data?.assignmentGroups ?? []).map(normalizeIdNet)
+  ]
+
+  const filteredAGs = allAGs
+    .filter(ag => (typeFilter === "ALL" ? true : ag.type === typeFilter))
+    .filter(ag => (ipCatFilter === "ALL_CAT" ? true : ag.ipCat === ipCatFilter))
+    .filter(ag => (classFilterNormalized ? ag.classId === classFilterNormalized : true))
+    .filter(ag => {
+      const searchTerm = search.trim().toLowerCase()
+      return searchTerm
+        ? ag.name.toLowerCase().includes(searchTerm) ||
+            ag.className.toLowerCase().includes(searchTerm)
+        : true
+    })
+
+  const grouped: Record<AssignmentGroupStatus, IAG[]> = {
+    [AssignmentGroupStatus.Upcoming]: [],
+    [AssignmentGroupStatus.InProgress]: [],
+    [AssignmentGroupStatus.Ended]: []
+  }
+
+  filteredAGs.forEach(ag => {
+    grouped[ag.status]?.push(ag)
+  })
+
+  grouped[AssignmentGroupStatus.Upcoming].sort(
+    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  )
+  grouped[AssignmentGroupStatus.InProgress].sort(
+    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  )
+  grouped[AssignmentGroupStatus.Ended].sort(
+    (a, b) => new Date(b.deadline).getTime() - new Date(a.deadline).getTime()
+  )
+
+  const endedCount = grouped[AssignmentGroupStatus.Ended]?.length ?? 0
+  const endedPages = Math.max(1, Math.ceil(endedCount / 10) || 1)
+  const endedItems = grouped[AssignmentGroupStatus.Ended] ?? []
+  const endedSlice = endedItems.slice((endedPage - 1) * 10, endedPage * 10)
+
+  useEffect(() => {
+    if (endedPage > endedPages) {
+      setEndedPage(1)
+    }
+  }, [endedCount, endedPage, endedPages])
+
+  useEffect(() => {
+    setEndedPage(1)
+  }, [search, classFilter, typeFilter, ipCatFilter])
+
+  const isLoading =
+    classesQuery.isLoading || subnetAGsQuery.isLoading || idNetAGsQuery.isLoading
+  const hasError =
+    classesQuery.isError || subnetAGsQuery.isError || idNetAGsQuery.isError
+
+  useEffect(() => {
+    if (hasError) {
+      setAlert({ severity: "error", message: "Error loading data" })
+    }
+  }, [hasError])
+
+  const retry = () => {
+    queryClient.invalidateQueries({ queryKey: ["teacherClasses"] })
+    queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"] })
+    queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"] })
+  }
+
   const {
-    control: createAGControl,
-    handleSubmit: handleCreateAGSubmit,
-    reset: resetCreateAG,
-    watch: watchCreateAG,
-    getValues,
-    formState: { errors: createAGErrors }
-  } = useForm<CreateAssignmentGroupFormValues>({
-    defaultValues: getCreateAssignmentGroupDefaults(),
+    control: createControl,
+    handleSubmit: handleCreateSubmit,
+    reset: resetCreate,
+    watch: createWatch,
+    setValue: setCreateValue,
+    formState: { errors: createErrors }
+  } = useForm<CreateFormValues>({
+    defaultValues: {
+      name: "",
+      description: "",
+      classId: classFilterNormalized ?? null,
+      type: AssignmentGroupType.Idnet,
+      numberOfRecords: 6,
+      possibleOctets: 4,
+      ipCat: AssignmentGroupIpCat.Abc,
+      testWildcard: false,
+      testFirstLastBr: false,
+      students: [],
+      startDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+    },
     mode: "onBlur"
   })
 
   const {
-    control: editAGControl,
-    handleSubmit: handleEditAGSubmit,
-    reset: resetEditAG,
-    watch: watchEditAG,
-    formState: { errors: editAGErrors }
-  } = useForm<EditAssignmentGroupFormValues>({
+    control: editControl,
+    handleSubmit: handleEditSubmit,
+    reset: resetEdit,
+    formState: { errors: editErrors }
+  } = useForm<EditFormValues>({
     defaultValues: {
-      assignmentGroupName: "",
+      name: "",
       description: "",
-      possibleAttempts: 1,
-      studentsIds: [],
+      students: [],
       startDate: new Date().toISOString(),
       deadline: new Date().toISOString()
     },
     mode: "onBlur"
   })
 
-  const agWatch = watchCreateAG()
-  const editWatch = watchEditAG()
-
-  const skLocaleDateTime = {
-    cancelButtonLabel: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CANCEL),
-    okButtonLabel: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_OK),
-    todayButtonLabel: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TODAY),
-    clearButtonLabel: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CLEAR)
-  }
-
-  const [alert, setAlert] = useState<CustomAlertState | null>(null)
-
-  const classesQuery = useQuery<ClassDto[], Error>({
-    queryKey: ["teacherClasses", userId],
-    enabled: !!userId,
-    queryFn: () =>
-      classApi.classQueryClasses(null, null, userId).then(r => r.data.classes),
-    placeholderData: prev => prev
-  })
-
-  const classesWithAll: ISelectedClass[] = useMemo(() => {
-    if (!classesQuery.data) return []
-    return [
-      {
-        classId: 0,
-        className: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_CLASSES)
-      },
-      ...classesQuery.data.map(c => ({
-        classId: c.classId,
-        className: c.className
-      }))
-    ]
-  }, [classesQuery.data, t])
+  const createWatchValues = createWatch()
+  const isCreateIdnet = createWatchValues.type === AssignmentGroupType.Idnet
 
   useEffect(() => {
-    if (classesWithAll.length === 0) {
-      setSelectedClass(null)
-      return
+    if (createDialogVis) {
+      setCreateValue("classId", classFilterNormalized ?? null)
     }
-    if (!selectedClass) {
-      setSelectedClass(classesWithAll[0])
-      return
-    }
-    if (selectedClass.classId === 0) {
-      const all = classesWithAll[0]
-      if (all.className !== selectedClass.className) {
-        setSelectedClass(all)
-      }
-    }
-    if (
-      selectedClass.classId !== 0 &&
-      !classesWithAll.some(c => c.classId === selectedClass.classId)
-    ) {
-      setSelectedClass(classesWithAll[0])
-    }
-  }, [classesWithAll, selectedClass])
+  }, [createDialogVis, classFilterNormalized, setCreateValue])
 
-  const assignmentGroupsQuery = useQuery<AssignmentGroupDto[], Error>({
-    queryKey: [
-      "assignmentGroups",
-      userId,
-      selectedClass?.classId ?? null
-    ],
-    enabled: !!userId && !!selectedClass,
+  const editDetailQuery = useQuery<QueryIDNetAGDetailRes | QuerySubnetAGDetailRes, Error>({
+    queryKey: ["assignmentGroupDetail", editAG?.id, editAG?.type],
+    enabled: editDialogVis && !!editAG,
     queryFn: () =>
-      assignmentGroupApi
-        .assignmentGroupQueryAssignmentGroups(
-          null,
-          selectedClass?.classId === 0 ? null : selectedClass?.classId,
-          userId
-        )
-        .then(r => r.data.assignmentGroups ?? []),
+      editAG?.type === AssignmentGroupType.Idnet
+        ? assignmentGroupApi.assignmentGroupQueryIdNetAssignmentGroupDetails(editAG.id).then(r => r.data)
+        : assignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroupDetails(editAG!.id).then(r => r.data),
     placeholderData: prev => prev
   })
 
-  const selectedEditId =
-  editAssignmentGroupDialogVis && selectedAssignmentGroups.length === 1
-    ? selectedAssignmentGroups[0].assignmentGroupId
-    : null
+  useEffect(() => {
+    if (editDialogVis && editDetailQuery.data) {
+      const detail = editDetailQuery.data
+      const studentIds = detail.assignments?.map(a => a.studentId) ?? []
+      resetEdit({
+        name: detail.name,
+        description: detail.description ?? "",
+        students: studentIds,
+        startDate: detail.startDate,
+        deadline: detail.deadline
+      })
+    }
+  }, [editDetailQuery.data, editDialogVis, resetEdit])
 
-  const assignmentGroupDetailsQuery = useQuery({
-    queryKey: ["assignmentGroupDetails", selectedEditId],
-    enabled: !!selectedEditId,
-    queryFn: () =>
-      assignmentGroupApi
-        .assignmentGroupQueryAssignmentGroupDetails(selectedEditId!)
-        .then(r => r.data),
-    placeholderData: prev => prev
-  })
-
-  const studentsQueryClassId = useMemo(() => {
-    const editClassId = (assignmentGroupDetailsQuery.data as any)?.classId as number | undefined
-    if (editAssignmentGroupDialogVis && editClassId) return editClassId
-    const sc = selectedClass?.classId
-    return sc === 0 ? null : sc ?? null
-  }, [
-    assignmentGroupDetailsQuery.data,
-    editAssignmentGroupDialogVis,
-    selectedClass
-  ])
+  const studentsQueryClassId = editDialogVis && editAG ? editAG.classId : classFilterNormalized
 
   const studentsQuery = useQuery<UserDto[], Error>({
-    queryKey: [
-      "assignmentGroupStudents",
-      userId,
-      studentsQueryClassId
-    ],
-    enabled: !!userId && (studentsQueryClassId !== undefined),
+    queryKey: ["assignmentGroupStudents", userId, studentsQueryClassId],
+    enabled: !!userId && studentsQueryClassId !== undefined,
     queryFn: () =>
       userApi
-        .userQueryUsers(
-          null,
-          null,
-          UserRole.STUDENT,
-          studentsQueryClassId ?? null
-        )
-        .then(r => r.data.users ?? []),
-    placeholderData: prev => prev
+        .userQueryUsers(null, null, UserRole.STUDENT, studentsQueryClassId ?? null)
+        .then(r => r.data.users ?? [])
   })
 
-  const createAssignmentGroupMutation = useMutation<
-    AxiosResponse<CreateAssignmentGroupRes>,
+  const createMutation = useMutation<
+    AxiosResponse<CreateIDNetAGRes | CreateSubnetAGRes>,
     AxiosError<ApiProblemDetails>,
-    CreateAssignmentGroupFormValues
+    CreateFormValues
   >({
-    mutationFn: (data) =>
-      assignmentGroupApi.assignmentGroupCreateAssignmentGroup({
-        assignmentGroupName: data.assignmentGroupName,
-        description: data.description,
-        numberOfRecords: data.numberOfRecords,
-        possibleAttempts: data.possibleAttempts,
-        classId: selectedClass!.classId,
-        students: data.studentsIds.length === 0 ? null : data.studentsIds,
+    mutationFn: async data => {
+      if (!data.classId) {
+        throw new Error("Class is required")
+      }
+      if (data.type === AssignmentGroupType.Idnet) {
+        return assignmentGroupApi.assignmentGroupCreateIdNetAssignmentGroup({
+          name: data.name,
+          description: data.description || null,
+          classId: data.classId,
+          students: data.students.length ? data.students : null,
+          type: AssignmentGroupType.Idnet,
+          startDate: data.startDate,
+          deadline: data.deadline,
+          numberOfRecords: data.numberOfRecords,
+          ipCat: data.ipCat,
+          possibleOctets: data.possibleOctets,
+          testWildcard: data.testWildcard,
+          testFirstLastBr: data.testFirstLastBr
+        })
+      }
+      return assignmentGroupApi.assignmentGroupCreateSubnetAssignmentGroup({
+        name: data.name,
+        description: data.description || null,
+        classId: data.classId,
+        students: data.students.length ? data.students : null,
+        type: AssignmentGroupType.Subnet,
         startDate: data.startDate,
         deadline: data.deadline,
-        assignmentIpCat: data.assignmentGroupIpCat
-      }),
+        numberOfRecords: data.numberOfRecords,
+        ipCat: data.ipCat
+      })
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["assignmentGroups"] })
+      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"] })
+      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"] })
       setAlert({
         severity: "success",
         message: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE_SUCCESS, {
-          value: agWatch.assignmentGroupName
+          value: createWatchValues.name
         })
       })
+      setCreateDialogVis(false)
+      resetCreate({
+        name: "",
+        description: "",
+        classId: classFilterNormalized ?? null,
+        type: AssignmentGroupType.Idnet,
+        numberOfRecords: 6,
+        possibleOctets: 4,
+        ipCat: AssignmentGroupIpCat.Abc,
+        testWildcard: false,
+        testFirstLastBr: false,
+        students: [],
+        startDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      })
     },
-    onError: (error) => {
+    onError: error => {
       const details = error.response?.data
       const localMessage =
-        i18n.language === Language.EN
-          ? details?.messageEn
-          : details?.messageSk
+        i18n.language === Language.EN ? details?.messageEn : details?.messageSk
       setAlert({
         severity: "error",
         message: `${t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE_ERROR)}. ${localMessage ?? ""}`
@@ -449,35 +437,91 @@ const TeacherAssignmentGroups = () => {
     }
   })
 
-  const deleteAssignmentGroupsMutation = useMutation<
-    AxiosResponse,
-    AxiosError<ApiProblemDetails>,
-    ISelectedAssignmentGroups["assignmentGroupId"][]
-  >({
-    mutationFn: (ids) =>
-      assignmentGroupApi.assignmentGroupDeleteAssignmentGroups({
-        assignmentGroupIds: ids
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["assignmentGroups"] })
-      setAlert({
-        severity: "success",
-        message: t(
-          TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_SUCCESS,
-          {
-            value: selectedAssignmentGroups
-              .map(g => g.assignmentGroupName)
-              .join(", ")
-          }
-        )
+  const editMutation = useMutation<AxiosResponse<void>, AxiosError<ApiProblemDetails>, EditFormValues>({
+    mutationFn: async data => {
+      if (!editAG) throw new Error("No selection")
+      if (editAG.type === AssignmentGroupType.Idnet) {
+        return assignmentGroupApi.assignmentGroupEditIdNetAssignmentGroup({
+          id: editAG.id,
+          name: data.name,
+          description: data.description,
+          students: data.students.length ? data.students : null,
+          startDate: data.startDate,
+          deadline: data.deadline
+        })
+      }
+      return assignmentGroupApi.assignmentGroupEditSubnetAssignmentGroup({
+        id: editAG.id,
+        name: data.name,
+        description: data.description,
+        students: data.students.length ? data.students : null,
+        startDate: data.startDate,
+        deadline: data.deadline
       })
     },
-    onError: (error) => {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"] })
+      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"] })
+      if (editAG) {
+        queryClient.invalidateQueries({
+          queryKey: ["assignmentGroupDetail", editAG.id, editAG.type]
+        })
+      }
+      setAlert({
+        severity: "success",
+        message: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_SUCCESS, {
+          value: editAG?.name ?? ""
+        })
+      })
+      setEditDialogVis(false)
+      setEditAG(null)
+    },
+    onError: error => {
       const details = error.response?.data
       const localMessage =
-        i18n.language === Language.EN
-          ? details?.messageEn
-          : details?.messageSk
+        i18n.language === Language.EN ? details?.messageEn : details?.messageSk
+      setAlert({
+        severity: "error",
+        message: `${t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_ERROR)}. ${localMessage ?? ""}`
+      })
+    }
+  })
+
+  const deleteMutation = useMutation<void, AxiosError<ApiProblemDetails>, IAG[]>({
+    mutationFn: async ags => {
+      const idnetIds = ags.filter(a => a.type === AssignmentGroupType.Idnet).map(a => a.id)
+      const subnetIds = ags.filter(a => a.type === AssignmentGroupType.Subnet).map(a => a.id)
+      const calls: Promise<unknown>[] = []
+      if (idnetIds.length) {
+        calls.push(
+          assignmentGroupApi.assignmentGroupDeleteIdNetAssignmentGroups({
+            assignmentGroupIds: idnetIds
+          })
+        )
+      }
+      if (subnetIds.length) {
+        calls.push(
+          assignmentGroupApi.assignmentGroupDeleteSubnetAssignmentGroups({
+            assignmentGroupIds: subnetIds
+          })
+        )
+      }
+      await Promise.all(calls)
+    },
+    onSuccess: (_data) => {
+      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"] })
+      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"] })
+      setAlert({
+        severity: "success",
+        message: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_SUCCESS)
+      })
+      setDeleteDialogVis(false)
+      setDeleteAG(null)
+    },
+    onError: error => {
+      const details = error.response?.data
+      const localMessage =
+        i18n.language === Language.EN ? details?.messageEn : details?.messageSk
       setAlert({
         severity: "error",
         message: `${t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_ERROR)}. ${localMessage ?? ""}`
@@ -485,248 +529,636 @@ const TeacherAssignmentGroups = () => {
     }
   })
 
-  const editAssignmentGroupMutation = useMutation<
-    AxiosResponse,
-    AxiosError<ApiProblemDetails>,
-    EditAssignmentGroupFormValues
-  >({
-    mutationFn: (data) =>
-      assignmentGroupApi.assignmentGroupEditAssignmentGroups({
-        id: selectedEditId!,
-        assignmentGroupName: data.assignmentGroupName,
-        description: data.description,
-        possibleAttempts: data.possibleAttempts,
-        students:
-          data.studentsIds.length === 0 ? null : data.studentsIds,
-        startDate: data.startDate,
-        deadline: data.deadline
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["assignmentGroups"] })
-      if (selectedEditId) {
-        queryClient.invalidateQueries({
-          queryKey: ["assignmentGroupDetails", selectedEditId]
-        })
-      }
-      setAlert({
-        severity: "success",
-        message: t(
-          TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_SUCCESS,
-          { value: editWatch.assignmentGroupName }
-        )
-      })
-    },
-    onError: (error) => {
-      const details = error.response?.data
-      const localMessage =
-        i18n.language === Language.EN
-          ? details?.messageEn
-          : details?.messageSk
-      setAlert({
-        severity: "error",
-        message: `${t(
-          TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_ERROR
-        )}. ${localMessage ?? ""}`
-      })
+  const handleDelete = async () => {
+    if (deleteAG) {
+      await deleteMutation.mutateAsync([deleteAG])
     }
-  })
-
-  const handleCreateAssignmentGroup = async (
-    data: CreateAssignmentGroupFormValues
-  ) => {
-    if (!selectedClass) return
-    await createAssignmentGroupMutation.mutateAsync(data).catch(() => {})
-    setCreateAssignmentGroupDialogVis(false)
-    resetCreateAG(getCreateAssignmentGroupDefaults())
   }
 
-  const handleDeleteAssignmentGroups = async () => {
-    if (selectedAssignmentGroups.length === 0) return
-    await deleteAssignmentGroupsMutation
-      .mutateAsync(
-        selectedAssignmentGroups.map(g => g.assignmentGroupId)
-      )
-      .catch(() => {})
-    setSelectedAssignmentGroups([])
-    setDeleteAssignmentGroupsDialogVis(false)
+  const handleCreate = async (data: CreateFormValues) => {
+    await createMutation.mutateAsync(data)
   }
 
-  const handleEditAssignmentGroup = async (
-    data: EditAssignmentGroupFormValues
-  ) => {
-    if (!selectedEditId) return
-    await editAssignmentGroupMutation.mutateAsync(data).catch(() => {})
-    setEditAssignmentGroupDialogVis(false)
+  const handleEdit = async (data: EditFormValues) => {
+    await editMutation.mutateAsync(data)
   }
 
-  useEffect(() => {
-    if (
-      assignmentGroupDetailsQuery.isSuccess &&
-      editAssignmentGroupDialogVis
-    ) {
-      const detail = assignmentGroupDetailsQuery.data;
-  
-      // getting student IDs and usernames from assignments
-      const studentIds = detail.assignments?.map(
-        (assignment: any) => assignment.studentId
-      ) || [];
-      const studentUsernames = detail.assignments?.map(
-        (assignment: any) => assignment.studentUsername
-      ) || [];
-  
-      resetEditAG({
-        assignmentGroupName: detail.assignmentGroupName,
-        description: detail.assignmentGroupDescription || "",
-        possibleAttempts: detail.possibleAttempts,
-        studentsIds: studentIds,
-        startDate: detail.startDate,
-        deadline: detail.deadline
-      });
-  
-      setSelectedStudentUsernames(studentUsernames);
-    }
-  }, [
-    assignmentGroupDetailsQuery.data,
-    assignmentGroupDetailsQuery.isSuccess,
-    editAssignmentGroupDialogVis,
-    resetEditAG
-  ]);
+  const disableCreate =
+    !createWatchValues.name ||
+    !createWatchValues.classId ||
+    !createWatchValues.numberOfRecords ||
+    !createWatchValues.startDate ||
+    !createWatchValues.deadline ||
+    createMutation.isPending
 
-  const createAGDisabled =
-    !agWatch.assignmentGroupName ||
-    !agWatch.numberOfRecords ||
-    !agWatch.possibleAttempts ||
-    !agWatch.startDate ||
-    !agWatch.deadline ||
-    createAssignmentGroupMutation.isPending
+  const disableEdit = !editAG || editMutation.isPending || editDetailQuery.isLoading
 
-  const editAGDisabled =
-    !editWatch.assignmentGroupName ||
-    !editWatch.possibleAttempts ||
-    !editWatch.startDate ||
-    !editWatch.deadline ||
-    editAssignmentGroupMutation.isPending
-
-  const showMainUI = classesWithAll.length > 1
+  const getNumberOfRecordsTooltip = () => {
+    return isCreateIdnet
+      ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IDNET_NUMBER_OF_RECORDS_TOOLTIP)
+      : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS_TOOLTIP)
+  }
 
   return (
-    <>
-      {classesQuery.isLoading && !showMainUI ? (
-        <CardsSkeleton />
-      ) : classesQuery.isError ? (
-        <ErrorLoading
-          onRetry={() =>
-            queryClient.invalidateQueries({
-              queryKey: ["teacherClasses"]
-            })
-          }
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <AGHeader
+          t={t}
+          search={search}
+          onSearchChange={setSearch}
+          classValue={classFilter}
+          onClassChange={setClassFilter}
+          classOptions={classesQuery.data ?? []}
+          typeValue={typeFilter}
+          onTypeChange={setTypeFilter}
+          ipCatValue={ipCatFilter}
+          onIpCatChange={setIpCatFilter}
         />
-      ) : showMainUI ? (
-        <>
-          <SelectSearchField
-            label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CLASS)}
-            items={classesWithAll}
-            value={selectedClass?.classId}
-            onChange={item => setSelectedClass(item as ISelectedClass)}
-            valueKey="classId"
-            labelKey="className"
-            sx={{ width: { xs: "100%", md: "30vw" } }}
-          />
 
-          <Divider sx={{ my: 2 }} />
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => {
+            resetCreate({
+              name: "",
+              description: "",
+              classId: classFilterNormalized ?? null,
+              type: AssignmentGroupType.Idnet,
+              numberOfRecords: 6,
+              possibleOctets: 4,
+              ipCat: AssignmentGroupIpCat.Abc,
+              testWildcard: false,
+              testFirstLastBr: false,
+              students: [],
+              startDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+              deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+            })
+            setCreateDialogVis(true)
+          }}
+          disabled={!classFilterNormalized}
+          sx={{ alignSelf: "flex-start" }}
+        >
+          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE_ASSIGNMENT_GROUP)}
+        </Button>
+      </Box>
 
-          <ActionPanel
-            onAdd={() => {
-              resetCreateAG(getCreateAssignmentGroupDefaults())
-              setCreateAssignmentGroupDialogVis(true)
-            }}
-            onEdit={() => {
-              if (selectedAssignmentGroups.length === 1) {
-                setEditAssignmentGroupDialogVis(true)
-              }
-            }}
-            onDetails={() => {}}
-            onDelete={() => setDeleteAssignmentGroupsDialogVis(true)}
-            disableAdd={selectedClass?.classId === 0}
-            disableEdit={selectedAssignmentGroups.length !== 1}
-            disableDelete={selectedAssignmentGroups.length === 0}
-            showDetails={false}
-            addLabel={t(
-              TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE_ASSIGNMENT_GROUP
-            )}
-            title={t(
-              TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ASSIGNMENTS_IN_THIS_CLASS
-            )}
-          />
+      <Divider />
 
-          {assignmentGroupsQuery.isLoading ? (
-            <CardsSkeleton />
-          ) : assignmentGroupsQuery.isError ? (
-            <ErrorLoading
-              onRetry={() =>
-                queryClient.invalidateQueries({
-                  queryKey: ["assignmentGroups"]
-                })
-              }
-            />
-          ) : (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-              {assignmentGroupsQuery.data?.map(ag => (
-                <AssignmentGroupCard
-                  id={ag.assignmentGroupId}
-                  key={ag.assignmentGroupId}
-                  name={ag.assignmentGroupName}
-                  successRate={ag.successRate.toFixed(2) as unknown as number}
-                  submitted={ag.submitted}
-                  total={ag.total}
-                  state={ag.state}
-                  description={ag.assignmentGroupDescription || ""}
-                  className={
-                    selectedClass?.classId === 0 ? ag.className : undefined
-                  }
-                  startDate={new Date(ag.startDate).toLocaleString()}
-                  deadline={new Date(ag.deadline).toLocaleString()}
-                  selected={selectedAssignmentGroups.some(
-                    g => g.assignmentGroupId === ag.assignmentGroupId
-                  )}
-                  onSelect={selected => {
-                    setSelectedAssignmentGroups(prev =>
-                      selected
-                        ? [
-                            ...prev,
-                            {
-                              assignmentGroupId: ag.assignmentGroupId,
-                              assignmentGroupName: ag.assignmentGroupName
-                            }
-                          ]
-                        : prev.filter(
-                            g => g.assignmentGroupId !== ag.assignmentGroupId
-                          )
-                    )
+      {isLoading ? (
+        <CardsSkeleton />
+      ) : hasError ? (
+        <ErrorLoading onRetry={retry} />
+      ) : (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", lg: "repeat(3, minmax(0, 1fr))" },
+            gap: 3
+          }}
+        >
+          {[AssignmentGroupStatus.Upcoming, AssignmentGroupStatus.InProgress, AssignmentGroupStatus.Ended].map(
+            status => {
+              const totalItems = grouped[status]?.length ?? 0
+              const visibleItems =
+                status === AssignmentGroupStatus.Ended ? endedSlice : grouped[status] ?? []
+
+              return (
+                <Box
+                  key={status === AssignmentGroupStatus.Ended ? `${status}-${endedPage}` : status}
+                  sx={{
+                    backgroundColor: "background.paper",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 2,
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2
                   }}
-                />
-              ))}
-            </Box>
+                >
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Chip
+                      label={statusMap[status]?.label ?? status}
+                      color={
+                        status === AssignmentGroupStatus.Upcoming
+                          ? "primary"
+                          : status === AssignmentGroupStatus.InProgress
+                            ? "warning"
+                            : "success"
+                      }
+                    />
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {totalItems} {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ITEMS_LABEL)}
+                    </Typography>
+                  </Stack>
+                  <Divider />
+                  <Stack spacing={2}>
+                    {totalItems === 0 ? (
+                      <Typography variant="body2" color="text.secondary">
+                        {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NO_DATA)}
+                      </Typography>
+                    ) : (
+                      visibleItems.map(ag => (
+                        <Tooltip key={`${status}-${ag.id}`} title={ag.description ?? ""}>
+                          <Card
+                            variant="outlined"
+                            sx={{
+                              minWidth: 320,
+                              maxWidth: 360,
+                              width: "100%",
+                              border: "1px solid",
+                              borderColor: "action.disabled",
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 0.5,
+                              maxHeight: 220,
+                              overflow: "hidden",
+                              cursor: "pointer",
+                              "&:hover": {
+                                opacity: 0.9
+                              }
+                            }}
+                            onDoubleClick={() =>
+                              navigate(
+                                getParametrizedUrl(
+                                  RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
+                                  {
+                                    [RouteParams.ASSIGNMENT_GROUP_ID]: ag.id.toString()
+                                  }
+                                )
+                              )
+                            }
+                          >
+                            <CardHeader
+                              sx={{ py: 2, px: 2, "& .MuiCardHeader-title": { mb: 0.25 }, "& .MuiCardHeader-subheader": { mt: 0 } }}
+                              title={
+                                ag.name.length > 10 ? (
+                                  <Stack spacing={0.25}>
+                                    <Typography variant="subtitle2" fontWeight={700} noWrap>
+                                      {ag.name}
+                                    </Typography>
+                                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                                      <Chip
+                                        label={
+                                          ag.type === AssignmentGroupType.Subnet
+                                            ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET)
+                                            : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_IDNET)
+                                        }
+                                        color={ag.type === AssignmentGroupType.Subnet ? "primary" : "secondary"}
+                                        size="small"
+                                        variant="outlined"
+                                      />
+                                      {ag.ipCat && (
+                                        <Chip
+                                          label={ag.ipCat}
+                                          size="small"
+                                          sx={{ borderStyle: "dashed" }}
+                                          variant="outlined"
+                                        />
+                                      )}
+                                    </Stack>
+                                  </Stack>
+                                ) : (
+                                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                                    <Typography variant="subtitle2" fontWeight={700} noWrap>
+                                      {ag.name}
+                                    </Typography>
+                                    <Chip
+                                      label={
+                                        ag.type === AssignmentGroupType.Subnet
+                                          ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET)
+                                          : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_IDNET)
+                                      }
+                                      color={ag.type === AssignmentGroupType.Subnet ? "primary" : "secondary"}
+                                      size="small"
+                                      variant="outlined"
+                                    />
+                                    {ag.ipCat && (
+                                      <Chip
+                                        label={ag.ipCat}
+                                        size="small"
+                                        sx={{ borderStyle: "dashed" }}
+                                        variant="outlined"
+                                      />
+                                    )}
+                                  </Stack>
+                                )
+                              }
+                              action={
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      setEditAG(ag)
+                                      setEditDialogVis(true)
+                                    }}
+                                  >
+                                    <EditOutlinedIcon fontSize="small" />
+                                  </IconButton>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      setDeleteAG(ag)
+                                      setDeleteDialogVis(true)
+                                    }}
+                                  >
+                                    <DeleteOutlineOutlinedIcon fontSize="small" />
+                                  </IconButton>
+                                </Stack>
+                              }
+                              subheader={
+                                <Stack direction="row" spacing={0.5} alignItems="center">
+                                  {ag.testWildcard && (
+                                    <Chip
+                                      label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_WILDCARD)}
+                                      size="small"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  {ag.testFirstLastBr && (
+                                    <Chip
+                                      label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_FIRST_LAST_BR)}
+                                      size="small"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                </Stack>
+                              }
+                            />
+                            <Divider />
+                            <CardContent sx={{ display: "flex", flexDirection: "column", gap: 0.25, px: 2 }}>
+                              <Stack spacing={0.1}>
+                                <Typography variant="caption" color="text.secondary" noWrap>
+                                  <strong>{ag.className}</strong>
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" noWrap>
+                                  {ag.submitted}/{ag.total} • {ag.successRate.toFixed(0)}%
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" noWrap>
+                                  {formatDateTime(ag.startDate).split(" ")[1]} - {formatDateTime(ag.deadline).split(" ")[1]}
+                                </Typography>
+                              </Stack>
+                            </CardContent>
+                          </Card>
+                        </Tooltip>
+                      ))
+                    )}
+                  </Stack>
+                  {status === AssignmentGroupStatus.Ended && totalItems > 10 && (
+                    <Stack direction="row" justifyContent="center">
+                      <Pagination
+                        count={endedPages}
+                        page={endedPage}
+                        onChange={(_, page) => setEndedPage(page)}
+                        size="small"
+                        color="primary"
+                      />
+                    </Stack>
+                  )}
+                </Box>
+              )
+            }
           )}
+        </Box>
+      )}
 
-          <Dialog
-            open={createAssignmentGroupDialogVis}
-            onClose={() => setCreateAssignmentGroupDialogVis(false)}
-            fullWidth
-            maxWidth="md"
-          >
-            <form
-              onSubmit={handleCreateAGSubmit(handleCreateAssignmentGroup)}
-            >
-              <DialogTitle>
-                {t(
-                  TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE_ASSIGNMENT
+      <Dialog open={createDialogVis} onClose={() => setCreateDialogVis(false)} fullWidth maxWidth="md">
+        <form onSubmit={handleCreateSubmit(handleCreate)}>
+          <DialogTitle>{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE_ASSIGNMENT)}</DialogTitle>
+          <DialogContent>
+            <Controller
+              name="name"
+              control={createControl}
+              rules={{
+                ...FormRules.required(),
+                ...FormRules.minLengthShort(),
+                ...FormRules.maxLengthShort(),
+                ...FormRules.patternLettersNumbersSpaces()
+              }}
+              render={({ field }) => (
+                <TextField
+                  margin="dense"
+                  label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NAME)}
+                  fullWidth
+                  {...field}
+                  error={!!createErrors.name}
+                  helperText={createErrors.name ? t(createErrors.name.message as string) : ""}
+                />
+              )}
+            />
+            <Controller
+              name="description"
+              control={createControl}
+              rules={{
+                ...FormRules.maxLengthLong(),
+                ...FormRules.patternLettersNumbersSpecialSpaces()
+              }}
+              render={({ field }) => (
+                <TextField
+                  margin="dense"
+                  label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DESCRIPTION)}
+                  fullWidth
+                  {...field}
+                  error={!!createErrors.description}
+                  helperText={
+                    createErrors.description ? t(createErrors.description.message as string) : ""
+                  }
+                />
+              )}
+            />
+            <Controller
+              name="classId"
+              control={createControl}
+              rules={{ ...FormRules.required() }}
+              render={({ field }) => (
+                <FormControl fullWidth margin="dense">
+                  <InputLabel>{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CLASS)}</InputLabel>
+                  <Select
+                    label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CLASS)}
+                    value={field.value ?? ""}
+                    onChange={e => field.onChange(Number(e.target.value))}
+                  >
+                    {(classesQuery.data ?? []).map(cls => (
+                      <MenuItem key={cls.classId} value={cls.classId}>
+                        {cls.className}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            />
+            <Controller
+              name="type"
+              control={createControl}
+              render={({ field }) => (
+                <FormControl fullWidth margin="dense">
+                  <InputLabel>{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE)}</InputLabel>
+                  <Select
+                    label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE)}
+                    value={field.value}
+                    onChange={e => field.onChange(e.target.value as AssignmentGroupType)}
+                  >
+                    <MenuItem value={AssignmentGroupType.Idnet}>
+                      {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_IDNET)}
+                    </MenuItem>
+                    <MenuItem value={AssignmentGroupType.Subnet}>
+                      {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET)}
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              )}
+            />
+            <Controller
+              name="numberOfRecords"
+              control={createControl}
+              rules={{
+                ...FormRules.required(),
+                validate: v => v > 0 || t(TranslationKey.FORM_RULES_REQUIRED).toString()
+              }}
+              render={({ field }) => (
+                <Tooltip title={getNumberOfRecordsTooltip()}>
+                  <TextField
+                    margin="dense"
+                    label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS)}
+                    type="number"
+                    fullWidth
+                    {...field}
+                    onChange={e => field.onChange(Number(e.target.value))}
+                    error={!!createErrors.numberOfRecords}
+                    helperText={
+                      createErrors.numberOfRecords
+                        ? createErrors.numberOfRecords.message?.toString()
+                        : ""
+                    }
+                  />
+                </Tooltip>
+              )}
+            />
+            {isCreateIdnet && (
+              <Controller
+                name="possibleOctets"
+                control={createControl}
+                rules={{
+                  ...FormRules.required(),
+                  validate: v =>
+                    (v >= 1 && v <= 4) ||
+                    t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS_RANGE).toString()
+                }}
+                render={({ field }) => (
+                  <Tooltip title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS_TOOLTIP)}>
+                    <TextField
+                      select
+                      margin="dense"
+                      label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS)}
+                      fullWidth
+                      {...field}
+                      value={field.value ?? 4}
+                      onChange={e => field.onChange(Number(e.target.value))}
+                      error={!!createErrors.possibleOctets}
+                      helperText={
+                        createErrors.possibleOctets
+                          ? t(createErrors.possibleOctets.message as string)
+                          : ""
+                      }
+                    >
+                      {[1, 2, 3, 4].map(option => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Tooltip>
                 )}
-              </DialogTitle>
-              <DialogContent>
+              />
+            )}
+            <Controller
+              name="ipCat"
+              control={createControl}
+              render={({ field }) => (
+                <Tooltip title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY_TOOLTIP)}>
+                  <FormControl fullWidth margin="dense">
+                    <InputLabel>{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY)}</InputLabel>
+                    <Select
+                      value={field.value}
+                      label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY)}
+                      onChange={e => field.onChange(e.target.value as AssignmentGroupIpCat)}
+                    >
+                      <MenuItem value={AssignmentGroupIpCat.All}>{t(TranslationKey.IP_CATEGORY_ALL)}</MenuItem>
+                      <MenuItem value={AssignmentGroupIpCat.Abc}>{t(TranslationKey.IP_CATEGORY_ABC)}</MenuItem>
+                      <MenuItem value={AssignmentGroupIpCat.Local}>{t(TranslationKey.IP_CATEGORY_PRIVATE)}</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Tooltip>
+              )}
+            />
+            {isCreateIdnet && (
+              <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={createWatchValues.testWildcard}
+                      onChange={(_, checked) => setCreateValue("testWildcard", checked)}
+                    />
+                  }
+                  label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TEST_WILDCARD)}
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={createWatchValues.testFirstLastBr}
+                      onChange={(_, checked) => setCreateValue("testFirstLastBr", checked)}
+                    />
+                  }
+                  label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TEST_FIRST_LAST_BR)}
+                />
+              </Stack>
+            )}
+            <Controller
+              name="students"
+              control={createControl}
+              render={({ field }) => (
+                <Tooltip title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED_TOOLTIP)}>
+                  <FormControl fullWidth margin="dense">
+                    <InputLabel>{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS)}</InputLabel>
+                    <Select
+                      multiple
+                      value={field.value}
+                      onChange={e =>
+                        field.onChange(
+                          Array.isArray(e.target.value)
+                            ? e.target.value.map(Number)
+                            : []
+                        )
+                      }
+                      renderValue={selectedIds =>
+                        (studentsQuery.data ?? [])
+                          .filter(s => (selectedIds as (number | string)[]).includes(s.id))
+                          .map(s => s.username)
+                          .join(", ")
+                      }
+                    >
+                      {(studentsQuery.data ?? []).map(student => (
+                        <MenuItem key={student.id} value={student.id}>
+                          <Checkbox checked={field.value.includes(student.id)} />
+                          <Typography>{student.username}</Typography>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Tooltip>
+              )}
+            />
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <Controller
+                name="startDate"
+                control={createControl}
+                rules={{ ...FormRules.required() }}
+                render={({ field }) => (
+                  <DateTimePicker
+                    label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE)}
+                    value={field.value ? new Date(field.value) : null}
+                    onChange={date => field.onChange(date ? date.toISOString() : "")}
+                    slotProps={{
+                      textField: {
+                        margin: "dense",
+                        fullWidth: true,
+                        InputLabelProps: { shrink: true },
+                        error: !!createErrors.startDate,
+                        helperText: createErrors.startDate
+                          ? t(createErrors.startDate.message as string)
+                          : ""
+                      }
+                    }}
+                    orientation="landscape"
+                    format="dd/MM/yyyy HH:mm"
+                    ampm={false}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock
+                    }}
+                  />
+                )}
+              />
+              <Controller
+                name="deadline"
+                control={createControl}
+                rules={{ ...FormRules.required() }}
+                render={({ field }) => (
+                  <DateTimePicker
+                    label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DEADLINE)}
+                    value={field.value ? new Date(field.value) : null}
+                    onChange={date => field.onChange(date ? date.toISOString() : "")}
+                    slotProps={{
+                      textField: {
+                        margin: "dense",
+                        fullWidth: true,
+                        InputLabelProps: { shrink: true },
+                        error: !!createErrors.deadline,
+                        helperText: createErrors.deadline
+                          ? t(createErrors.deadline.message as string)
+                          : ""
+                      }
+                    }}
+                    orientation="landscape"
+                    format="dd/MM/yyyy HH:mm"
+                    ampm={false}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock
+                    }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setCreateDialogVis(false)}>
+              {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CANCEL)}
+            </Button>
+            <Button type="submit" variant="contained" color="success" disabled={disableCreate}>
+              {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE)}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+
+      <DeleteDialog
+        open={deleteDialogVis}
+        onClose={() => {
+          setDeleteDialogVis(false)
+          setDeleteAG(null)
+        }}
+        onConfirm={handleDelete}
+        question={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_CONFIRMATION_QUESTION)}
+        title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_CONFIRMATION_TITLE)}
+        label={deleteAG?.name ?? ""}
+      />
+
+      <Dialog
+        open={editDialogVis}
+        onClose={() => {
+          setEditDialogVis(false)
+          setEditAG(null)
+        }}
+        fullWidth
+        maxWidth="md"
+      >
+        <form onSubmit={handleEditSubmit(handleEdit)}>
+          <DialogTitle>{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_ASSIGNMENT_GROUP)}</DialogTitle>
+          <DialogContent>
+            {editDetailQuery.isLoading ? (
+              <Typography variant="body2">{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_LOADING)}</Typography>
+            ) : editDetailQuery.isError ? (
+              <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+                {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_ERROR)}
+              </Typography>
+            ) : (
+              <>
                 <Controller
-                  name="assignmentGroupName"
-                  control={createAGControl}
+                  name="name"
+                  control={editControl}
                   rules={{
                     ...FormRules.required(),
                     ...FormRules.minLengthShort(),
@@ -736,26 +1168,17 @@ const TeacherAssignmentGroups = () => {
                   render={({ field }) => (
                     <TextField
                       margin="dense"
-                      label={t(
-                        TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NAME
-                      )}
+                      label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NAME)}
                       fullWidth
                       {...field}
-                      error={!!createAGErrors.assignmentGroupName}
-                      helperText={
-                        createAGErrors.assignmentGroupName
-                          ? t(
-                              createAGErrors.assignmentGroupName
-                                .message as string
-                            )
-                          : ""
-                      }
+                      error={!!editErrors.name}
+                      helperText={editErrors.name ? t(editErrors.name.message as string) : ""}
                     />
                   )}
                 />
                 <Controller
                   name="description"
-                  control={createAGControl}
+                  control={editControl}
                   rules={{
                     ...FormRules.maxLengthLong(),
                     ...FormRules.patternLettersNumbersSpecialSpaces()
@@ -763,216 +1186,71 @@ const TeacherAssignmentGroups = () => {
                   render={({ field }) => (
                     <TextField
                       margin="dense"
-                      label={t(
-                        TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DESCRIPTION
-                      )}
+                      label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DESCRIPTION)}
                       fullWidth
                       {...field}
-                      error={!!createAGErrors.description}
+                      error={!!editErrors.description}
                       helperText={
-                        createAGErrors.description
-                          ? t(
-                              createAGErrors.description.message as string
-                            )
-                          : ""
+                        editErrors.description ? t(editErrors.description.message as string) : ""
                       }
                     />
                   )}
                 />
                 <Controller
-                  name="numberOfRecords"
-                  control={createAGControl}
-                  rules={{
-                    ...FormRules.required(),
-                    validate: v =>
-                      v > 0 ||
-                      t(TranslationKey.FORM_RULES_REQUIRED).toString()
-                  }}
+                  name="students"
+                  control={editControl}
                   render={({ field }) => (
-                    <Tooltip
-                      title={t(
-                        TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS_TOOLTIP
-                      )}
-                    >
-                      <TextField
-                        margin="dense"
-                        label={t(
-                          TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS
-                        )}
-                        type="number"
-                        fullWidth
-                        {...field}
+                    <FormControl fullWidth margin="dense">
+                      <InputLabel>{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS)}</InputLabel>
+                      <Select
+                        multiple
+                        value={field.value}
                         onChange={e =>
-                          field.onChange(Number(e.target.value))
+                          field.onChange(
+                            Array.isArray(e.target.value)
+                              ? e.target.value.map(Number)
+                              : []
+                          )
                         }
-                        error={!!createAGErrors.numberOfRecords}
-                        helperText={
-                          createAGErrors.numberOfRecords
-                            ? createAGErrors.numberOfRecords.message?.toString()
-                            : ""
+                        renderValue={selectedIds =>
+                          (studentsQuery.data ?? [])
+                            .filter(s => (selectedIds as (number | string)[]).includes(s.id))
+                            .map(s => s.username)
+                            .join(", ")
                         }
-                      />
-                    </Tooltip>
-                  )}
-                />
-                <Controller
-                  name="possibleAttempts"
-                  control={createAGControl}
-                  rules={{
-                    ...FormRules.required(),
-                    validate: v =>
-                      v > 0 ||
-                      t(TranslationKey.FORM_RULES_REQUIRED).toString()
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      margin="dense"
-                      label={t(
-                        TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_ATTEMPTS
-                      )}
-                      type="number"
-                      fullWidth
-                      {...field}
-                      onChange={e =>
-                        field.onChange(Number(e.target.value))
-                      }
-                      error={!!createAGErrors.possibleAttempts}
-                      helperText={
-                        createAGErrors.possibleAttempts
-                          ? createAGErrors.possibleAttempts.message?.toString()
-                          : ""
-                      }
-                    />
-                  )}
-                />
-                <Controller
-                  name="assignmentGroupIpCat"
-                  control={createAGControl}
-                  render={({ field }) => (
-                    <Tooltip
-                      title={t(
-                        TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY_TOOLTIP
-                      )}
-                    >
-                      <FormControl fullWidth margin="dense">
-                        <InputLabel>{t(
-                          TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY
-                        )}</InputLabel>
-                        <Select
-                          value={field.value}
-                          label={t(
-                            TranslationKey.TEACHER_ASSIGNMENT_GROUPS_IP_CATEGORY
-                          )}
-                          onChange={e =>
-                            field.onChange(e.target.value as AssignmentGroupIpCat)
-                          }
-                        >
-                          <MenuItem value={AssignmentGroupIpCat.All}>{t(TranslationKey.IP_CATEGORY_ALL)}</MenuItem>
-                          <MenuItem value={AssignmentGroupIpCat.Abc}>{t(TranslationKey.IP_CATEGORY_ABC)}</MenuItem>
-                          <MenuItem value={AssignmentGroupIpCat.Local}>{t(TranslationKey.IP_CATEGORY_PRIVATE)}</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Tooltip>
-                  )}
-                />
-                <Controller
-                  name="studentsIds"
-                  control={createAGControl}
-                  render={({ field }) => (
-                    <Tooltip
-                      title={t(
-                        TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_STUDENTS_INCLUDED_TOOLTIP
-                      )}
-                    >
-                      <FormControl fullWidth margin="dense">
-                        <InputLabel>
-                          {t(
-                            TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS
-                          )}
-                        </InputLabel>
-                        <Select
-                          multiple
-                          value={field.value}
-                          onChange={e =>
-                            field.onChange(
-                              Array.isArray(e.target.value)
-                                ? e.target.value.map(Number)
-                                : []
-                            )
-                          }
-                          input={
-                            <OutlinedInput
-                              label={t(
-                                TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS
-                              )}
-                            />
-                          }
-                          renderValue={selected =>
-                            (studentsQuery.data ?? [])
-                              .filter(c =>
-                                (selected as (number | string)[]).includes(
-                                  c.id
-                                )
-                              )
-                              .map(c => c.username)
-                              .join(", ")
-                          }
-                        >
-                          {(studentsQuery.data ?? []).map(_student => (
-                            <MenuItem key={_student.id} value={_student.id}>
-                              <Checkbox
-                                checked={
-                                  (field.value ?? []).indexOf(_student.id) >
-                                  -1
-                                }
-                              />
-                              <ListItemText primary={_student.username} />
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Tooltip>
+                      >
+                        {(studentsQuery.data ?? []).map(student => (
+                          <MenuItem key={student.id} value={student.id}>
+                            <Checkbox checked={field.value.includes(student.id)} />
+                            <Typography>{student.username}</Typography>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   )}
                 />
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <Controller
                     name="startDate"
-                    control={createAGControl}
-                    rules={{
-                      ...FormRules.required()
-                    }}
+                    control={editControl}
+                    rules={{ ...FormRules.required() }}
                     render={({ field }) => (
                       <DateTimePicker
-                        label={t(
-                          TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE
-                        )}
+                        label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE)}
                         value={field.value ? new Date(field.value) : null}
-                        onChange={date =>
-                          field.onChange(
-                            date ? date.toISOString() : ""
-                          )
-                        }
+                        onChange={date => field.onChange(date ? date.toISOString() : "")}
                         slotProps={{
                           textField: {
                             margin: "dense",
                             fullWidth: true,
                             InputLabelProps: { shrink: true },
-                            error: !!createAGErrors.startDate,
-                            helperText: createAGErrors.startDate
-                              ? t(
-                                  createAGErrors.startDate
-                                    .message as string
-                                )
+                            error: !!editErrors.startDate,
+                            helperText: editErrors.startDate
+                              ? t(editErrors.startDate.message as string)
                               : ""
                           }
                         }}
-                        localeText={
-                          i18n.language === Language.SK
-                            ? skLocaleDateTime
-                            : undefined
-                        }
                         orientation="landscape"
-                        disablePast
                         format="dd/MM/yyyy HH:mm"
                         ampm={false}
                         viewRenderers={{
@@ -985,50 +1263,24 @@ const TeacherAssignmentGroups = () => {
                   />
                   <Controller
                     name="deadline"
-                    control={createAGControl}
-                    rules={{
-                      ...FormRules.required(),
-                      validate: v => {
-                        const start = new Date(
-                          getValues("startDate")
-                        ).getTime()
-                        const end = new Date(v).getTime()
-                        return (
-                          end > start ||
-                          t(TranslationKey.FORM_RULES_REQUIRED).toString()
-                        )
-                      }
-                    }}
+                    control={editControl}
+                    rules={{ ...FormRules.required() }}
                     render={({ field }) => (
                       <DateTimePicker
-                        label={t(
-                          TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DEADLINE
-                        )}
+                        label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DEADLINE)}
                         value={field.value ? new Date(field.value) : null}
-                        onChange={date =>
-                          field.onChange(
-                            date ? date.toISOString() : ""
-                          )
-                        }
+                        onChange={date => field.onChange(date ? date.toISOString() : "")}
                         slotProps={{
                           textField: {
                             margin: "dense",
                             fullWidth: true,
                             InputLabelProps: { shrink: true },
-                            error: !!createAGErrors.deadline,
-                            helperText: createAGErrors.deadline
-                              ? t(
-                                  createAGErrors.deadline
-                                    .message as string
-                                )
+                            error: !!editErrors.deadline,
+                            helperText: editErrors.deadline
+                              ? t(editErrors.deadline.message as string)
                               : ""
                           }
                         }}
-                        localeText={
-                          i18n.language === Language.SK
-                            ? skLocaleDateTime
-                            : undefined
-                        }
                         orientation="landscape"
                         format="dd/MM/yyyy HH:mm"
                         ampm={false}
@@ -1041,361 +1293,19 @@ const TeacherAssignmentGroups = () => {
                     )}
                   />
                 </LocalizationProvider>
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  onClick={() => {
-                    setCreateAssignmentGroupDialogVis(false)
-                    resetCreateAG(getCreateAssignmentGroupDefaults())
-                  }}
-                >
-                  {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CANCEL)}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="success"
-                  disabled={createAGDisabled}
-                >
-                  {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE)}
-                </Button>
-              </DialogActions>
-            </form>
-          </Dialog>
-
-          <DeleteDialog
-            open={deleteAssignmentGroupsDialogVis}
-            onClose={() => setDeleteAssignmentGroupsDialogVis(false)}
-            onConfirm={handleDeleteAssignmentGroups}
-            question={t(
-              TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_CONFIRMATION_QUESTION
+              </>
             )}
-            title={t(
-              TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_CONFIRMATION_TITLE
-            )}
-            label={selectedAssignmentGroups
-              .map(g => g.assignmentGroupName)
-              .join(", ")}
-          />
-
-          <Dialog
-            open={editAssignmentGroupDialogVis}
-            onClose={() => {
-              setEditAssignmentGroupDialogVis(false)
-            }}
-            fullWidth
-            maxWidth="md"
-          >
-            <form
-              onSubmit={handleEditAGSubmit(handleEditAssignmentGroup)}
-            >
-              <DialogTitle>
-                {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_ASSIGNMENT_GROUP)}
-              </DialogTitle>
-              <DialogContent>
-                {assignmentGroupDetailsQuery.isLoading ? (
-                  <Typography variant="body2">
-                    {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_LOADING)}
-                  </Typography>
-                ) : assignmentGroupDetailsQuery.isError ? (
-                  <Typography
-                    variant="body2"
-                    color="error"
-                    sx={{ mb: 2 }}
-                  >
-                    {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_ERROR)}
-                  </Typography>
-                ) : (
-                  <>
-                    <Controller
-                      name="assignmentGroupName"
-                      control={editAGControl}
-                      rules={{
-                        ...FormRules.required(),
-                        ...FormRules.minLengthShort(),
-                        ...FormRules.maxLengthShort(),
-                        ...FormRules.patternLettersNumbersSpaces()
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          margin="dense"
-                          label={t(
-                            TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NAME
-                          )}
-                          fullWidth
-                          {...field}
-                          error={!!editAGErrors.assignmentGroupName}
-                          helperText={
-                            editAGErrors.assignmentGroupName
-                              ? t(
-                                  editAGErrors.assignmentGroupName
-                                    .message as string
-                                )
-                              : ""
-                          }
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="description"
-                      control={editAGControl}
-                      rules={{
-                        ...FormRules.maxLengthLong(),
-                        ...FormRules.patternLettersNumbersSpecialSpaces()
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          margin="dense"
-                          label={t(
-                            TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DESCRIPTION
-                          )}
-                          fullWidth
-                          {...field}
-                          error={!!editAGErrors.description}
-                          helperText={
-                            editAGErrors.description
-                              ? t(
-                                  editAGErrors.description
-                                    .message as string
-                                )
-                              : ""
-                          }
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="possibleAttempts"
-                      control={editAGControl}
-                      rules={{
-                        ...FormRules.required(),
-                        validate: v =>
-                          v > 0 ||
-                          t(TranslationKey.FORM_RULES_REQUIRED).toString()
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          margin="dense"
-                          type="number"
-                          label={t(
-                            TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_ATTEMPTS
-                          )}
-                          fullWidth
-                          {...field}
-                          onChange={e =>
-                            field.onChange(Number(e.target.value))
-                          }
-                          error={!!editAGErrors.possibleAttempts}
-                          helperText={
-                            editAGErrors.possibleAttempts
-                              ? editAGErrors.possibleAttempts.message?.toString()
-                              : ""
-                          }
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="studentsIds"
-                      control={editAGControl}
-                      render={({ field }) => (
-                        <FormControl fullWidth margin="dense">
-                          <InputLabel>
-                            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS)}
-                          </InputLabel>
-                          <Select
-                            multiple
-                            value={selectedStudentUsernames} // Display usernames
-                            onChange={e => {
-                              const selectedUsernames = e.target.value as string[];
-                              setSelectedStudentUsernames(selectedUsernames);
-
-                              // Map usernames back to IDs for submission
-                              const selectedIds = (studentsQuery.data ?? [])
-                                .filter(student => selectedUsernames.includes(student.username))
-                                .map(student => student.id);
-                              field.onChange(selectedIds);
-                            }}
-                            input={
-                              <OutlinedInput
-                                label={t(
-                                  TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS
-                                )}
-                              />
-                            }
-                            renderValue={selected => selected.join(", ")} // Display usernames
-                          >
-                            {(studentsQuery.data ?? []).map(student => (
-                              <MenuItem key={student.id} value={student.username}>
-                                <Checkbox
-                                  checked={selectedStudentUsernames.includes(student.username)}
-                                />
-                                <ListItemText primary={student.username} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      )}
-                    />
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                      <Controller
-                        name="startDate"
-                        control={editAGControl}
-                        rules={{ ...FormRules.required() }}
-                        render={({ field }) => (
-                          <DateTimePicker
-                            label={t(
-                              TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE
-                            )}
-                            value={
-                              field.value ? new Date(field.value) : null
-                            }
-                            onChange={date =>
-                              field.onChange(
-                                date ? date.toISOString() : ""
-                              )
-                            }
-                            slotProps={{
-                              textField: {
-                                margin: "dense",
-                                fullWidth: true,
-                                InputLabelProps: { shrink: true },
-                                error: !!editAGErrors.startDate,
-                                helperText: editAGErrors.startDate
-                                  ? t(
-                                      editAGErrors.startDate
-                                        .message as string
-                                    )
-                                  : ""
-                              }
-                            }}
-                            localeText={
-                              i18n.language === Language.SK
-                                ? skLocaleDateTime
-                                : undefined
-                            }
-                            orientation="landscape"
-                            format="dd/MM/yyyy HH:mm"
-                            ampm={false}
-                            viewRenderers={{
-                              hours: renderTimeViewClock,
-                              minutes: renderTimeViewClock,
-                              seconds: renderTimeViewClock
-                            }}
-                          />
-                        )}
-                      />
-                      <Controller
-                        name="deadline"
-                        control={editAGControl}
-                        rules={{
-                          ...FormRules.required(),
-                          validate: v => {
-                            const start = new Date(
-                              editWatch.startDate
-                            ).getTime()
-                            const end = new Date(v).getTime()
-                            return (
-                              end > start ||
-                              t(
-                                TranslationKey.FORM_RULES_REQUIRED
-                              ).toString()
-                            )
-                          }
-                        }}
-                        render={({ field }) => (
-                          <DateTimePicker
-                            label={t(
-                              TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DEADLINE
-                            )}
-                            value={
-                              field.value ? new Date(field.value) : null
-                            }
-                            onChange={date =>
-                              field.onChange(
-                                date ? date.toISOString() : ""
-                              )
-                            }
-                            slotProps={{
-                              textField: {
-                                margin: "dense",
-                                fullWidth: true,
-                                InputLabelProps: { shrink: true },
-                                error: !!editAGErrors.deadline,
-                                helperText: editAGErrors.deadline
-                                  ? t(
-                                      editAGErrors.deadline
-                                        .message as string
-                                    )
-                                  : ""
-                              }
-                            }}
-                            localeText={
-                              i18n.language === Language.SK
-                                ? skLocaleDateTime
-                                : undefined
-                            }
-                            orientation="landscape"
-                            format="dd/MM/yyyy HH:mm"
-                            ampm={false}
-                            viewRenderers={{
-                              hours: renderTimeViewClock,
-                              minutes: renderTimeViewClock,
-                              seconds: renderTimeViewClock
-                            }}
-                          />
-                        )}
-                      />
-                    </LocalizationProvider>
-                  </>
-                )}
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  onClick={() => {
-                    setEditAssignmentGroupDialogVis(false)
-                  }}
-                >
-                  {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CANCEL)}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="success"
-                  disabled={
-                    editAGDisabled ||
-                    assignmentGroupDetailsQuery.isLoading ||
-                    assignmentGroupDetailsQuery.isError
-                  }
-                >
-                  {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_SAVE)}
-                </Button>
-              </DialogActions>
-            </form>
-          </Dialog>
-        </>
-      ) : (
-        <>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between"
-            }}
-          >
-            <Typography variant="h6">
-              {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NOCLASS)}
-            </Typography>
-            <Button
-              variant="contained"
-              color="info"
-              onClick={() => navigate(Routes[RouteKeys.TEACHER_MY_CLASSES])}
-            >
-              {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NOCLASS_BUTTON)}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setEditDialogVis(false)}>
+              {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CANCEL)}
             </Button>
-          </Box>
-          <Divider sx={{ mt: 4 }} />
-        </>
-      )}
+            <Button type="submit" variant="contained" color="success" disabled={disableEdit}>
+              {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_SAVE)}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
 
       {alert && (
         <CustomAlert
@@ -1404,7 +1314,7 @@ const TeacherAssignmentGroups = () => {
           onClose={() => setAlert(null)}
         />
       )}
-    </>
+    </Box>
   )
 }
 
