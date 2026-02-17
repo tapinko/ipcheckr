@@ -21,8 +21,10 @@ import {
   Typography,
   Checkbox,
   IconButton,
-  Pagination
+  Pagination,
+  LinearProgress
 } from "@mui/material"
+import { alpha } from "@mui/material/styles"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined"
 import { useEffect, useState } from "react"
@@ -108,7 +110,8 @@ type EditFormValues = {
   deadline: string
 }
 
-const formatDateTime = (value: string) => new Date(value).toLocaleString()
+const formatDateTime = (value: string) =>
+  new Date(value).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })
 
 const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
   id: ag.assignmentGroupId,
@@ -785,17 +788,46 @@ const TeacherAssignmentGroups = () => {
                                 </Stack>
                               }
                             />
-                            <Divider />
-                            <CardContent sx={{ display: "flex", flexDirection: "column", gap: 0.25, px: 2 }}>
-                              <Stack spacing={0.1}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={ag.total ? Math.min((ag.submitted / ag.total) * 100, 100) : 0}
+                              sx={{
+                                height: 8,
+                                borderRadius: 999,
+                                mx: 2,
+                                mb: 1,
+                                backgroundColor: theme => {
+                                  const color =
+                                    status === AssignmentGroupStatus.Upcoming
+                                      ? theme.palette.primary.main
+                                      : status === AssignmentGroupStatus.InProgress
+                                        ? theme.palette.warning.main
+                                        : theme.palette.success.main
+                                  return alpha(color, 0.2)
+                                },
+                                "& .MuiLinearProgress-bar": {
+                                  backgroundColor: theme => {
+                                    if (status === AssignmentGroupStatus.Upcoming) {
+                                      return theme.palette.primary.main
+                                    }
+                                    if (status === AssignmentGroupStatus.InProgress) {
+                                      return theme.palette.warning.main
+                                    }
+                                    return theme.palette.success.main
+                                  }
+                                }
+                              }}
+                            />
+                            <CardContent sx={{ display: "flex", flexDirection: "column", gap: 0.4, px: 2 }}>
+                              <Stack spacing={0.2}>
                                 <Typography variant="caption" color="text.secondary" noWrap>
                                   <strong>{ag.className}</strong>
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary" noWrap>
                                   {ag.submitted}/{ag.total} • {ag.successRate.toFixed(0)}%
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary" noWrap>
-                                  {formatDateTime(ag.startDate).split(" ")[1]} - {formatDateTime(ag.deadline).split(" ")[1]}
+                                <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+                                  {formatDateTime(ag.startDate)} - {formatDateTime(ag.deadline)}
                                 </Typography>
                               </Stack>
                             </CardContent>
