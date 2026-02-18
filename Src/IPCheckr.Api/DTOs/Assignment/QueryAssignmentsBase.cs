@@ -21,6 +21,10 @@ namespace IPCheckr.Api.DTOs.Assignment
     public class AssignmentDto
     {
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Assignment ID must be a positive integer.")]
+        public int AssignmentId { get; set; }
+
+        [Required]
         public required string Name { get; set; }
 
         public string? AssignmentGroupDescription { get; set; }

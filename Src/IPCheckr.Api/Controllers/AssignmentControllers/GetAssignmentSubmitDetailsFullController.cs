@@ -44,7 +44,25 @@ namespace IPCheckr.Api.Controllers
                 .OrderByDescending(s => s.SubmittedAt)
                 .FirstOrDefaultAsync();
 
-            if (!(isTeacherInClass || (isStudentOwner && submit != null)))
+            var status = AssignmentEvaluationUtils.ResolveStatus(
+                assignment.AssignmentGroup.StartDate,
+                assignment.AssignmentGroup.Deadline,
+                assignment.AssignmentGroup.CompletedAt
+            );
+
+            if (isStudentOwner && submit == null)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = "Assignment has not been submitted.",
+                    Status = StatusCodes.Status403Forbidden,
+                    MessageEn = "You must submit the assignment before viewing full answers.",
+                    MessageSk = "Pred zobrazením správnych odpovedí musíte zadanie odovzdať."
+                });
+            }
+
+            if (!(isTeacherInClass || isStudentOwner))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
@@ -52,16 +70,6 @@ namespace IPCheckr.Api.Controllers
                     Status = StatusCodes.Status403Forbidden,
                     MessageEn = "You do not have permission to access this assignment submit details.",
                     MessageSk = "Nemáte oprávnenie na prístup k detailom odovzdania tohto zadania."
-                });
-
-            if (submit == null)
-                return NotFound(new ApiProblemDetails
-                {
-                    Title = "Not Found",
-                    Detail = "Submission not found for this assignment.",
-                    Status = StatusCodes.Status404NotFound,
-                    MessageEn = "Submission not found for this assignment.",
-                    MessageSk = "Pre toto zadanie nebolo nájdené žiadne odovzdanie."
                 });
 
             var answerKey = await _db.SubnetAssignmentAnswerKeys
@@ -87,36 +95,39 @@ namespace IPCheckr.Api.Controllers
                     Hosts = assignment.Hosts.ElementAtOrDefault(i),
                     Network = new QuerySubnetAssignmentSubmitDetailsFullAnswerField
                     {
-                        Submitted = submit.Networks?.ElementAtOrDefault(i),
+                        Submitted = submit?.Networks?.ElementAtOrDefault(i),
                         Correct = answerKey.Networks.ElementAtOrDefault(i) ?? string.Empty
                     },
                     FirstUsable = new QuerySubnetAssignmentSubmitDetailsFullAnswerField
                     {
-                        Submitted = submit.FirstUsables?.ElementAtOrDefault(i),
+                        Submitted = submit?.FirstUsables?.ElementAtOrDefault(i),
                         Correct = answerKey.FirstUsables.ElementAtOrDefault(i) ?? string.Empty
                     },
                     LastUsable = new QuerySubnetAssignmentSubmitDetailsFullAnswerField
                     {
-                        Submitted = submit.LastUsables?.ElementAtOrDefault(i),
+                        Submitted = submit?.LastUsables?.ElementAtOrDefault(i),
                         Correct = answerKey.LastUsables.ElementAtOrDefault(i) ?? string.Empty
                     },
                     Broadcast = new QuerySubnetAssignmentSubmitDetailsFullAnswerField
                     {
-                        Submitted = submit.Broadcasts?.ElementAtOrDefault(i),
+                        Submitted = submit?.Broadcasts?.ElementAtOrDefault(i),
                         Correct = answerKey.Broadcasts.ElementAtOrDefault(i) ?? string.Empty
                     }
                 });
             }
 
-            var successRate = AssignmentEvaluationUtils.CalculateSubnetSuccessRate(answerKey, submit);
-            var status = AssignmentEvaluationUtils.ResolveStatus(assignment.AssignmentGroup.StartDate, assignment.AssignmentGroup.Deadline, assignment.AssignmentGroup.CompletedAt);
+            var successRate = submit != null
+                ? AssignmentEvaluationUtils.CalculateSubnetSuccessRate(answerKey, submit)
+                : 0;
 
             return Ok(new QuerySubnetAssignmentSubmitDetailsFullRes
             {
                 Name = assignment.AssignmentGroup.Name,
                 Description = assignment.AssignmentGroup.Description,
                 Results = results.ToArray(),
-                SubmittedAt = submit.SubmittedAt,
+                SubmittedAt = submit?.SubmittedAt,
+                StartDate = assignment.AssignmentGroup.StartDate,
+                Deadline = assignment.AssignmentGroup.Deadline,
                 StudentName = UsernameUtils.ToDisplay(assignment.Student.Username),
                 SuccessRate = successRate,
                 IpCat = assignment.AssignmentGroup.AssignmentIpCat,
@@ -159,7 +170,25 @@ namespace IPCheckr.Api.Controllers
                 .OrderByDescending(s => s.SubmittedAt)
                 .FirstOrDefaultAsync();
 
-            if (!(isTeacherInClass || (isStudentOwner && submit != null)))
+            var status = AssignmentEvaluationUtils.ResolveStatus(
+                assignment.AssignmentGroup.StartDate,
+                assignment.AssignmentGroup.Deadline,
+                assignment.AssignmentGroup.CompletedAt
+            );
+
+            if (isStudentOwner && submit == null)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = "Assignment has not been submitted.",
+                    Status = StatusCodes.Status403Forbidden,
+                    MessageEn = "You must submit the assignment before viewing full answers.",
+                    MessageSk = "Pred zobrazením správnych odpovedí musíte zadanie odovzdať."
+                });
+            }
+
+            if (!(isTeacherInClass || isStudentOwner))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
@@ -167,16 +196,6 @@ namespace IPCheckr.Api.Controllers
                     Status = StatusCodes.Status403Forbidden,
                     MessageEn = "You do not have permission to access this assignment submit details.",
                     MessageSk = "Nemáte oprávnenie na prístup k detailom odovzdania tohto zadania."
-                });
-
-            if (submit == null)
-                return NotFound(new ApiProblemDetails
-                {
-                    Title = "Not Found",
-                    Detail = "Submission not found for this assignment.",
-                    Status = StatusCodes.Status404NotFound,
-                    MessageEn = "Submission not found for this assignment.",
-                    MessageSk = "Pre toto zadanie nebolo nájdené žiadne odovzdanie."
                 });
 
             var answerKey = await _db.IDNetAssignmentAnswerKeys
@@ -202,41 +221,46 @@ namespace IPCheckr.Api.Controllers
                     Address = assignment.Addresses.ElementAtOrDefault(i) ?? string.Empty,
                     IDNet = new QueryIDNetAssignmentSubmitDetailsFullAnswerField
                     {
-                        Submitted = submit.IDNet?.ElementAtOrDefault(i),
+                        Submitted = submit?.IDNet?.ElementAtOrDefault(i),
                         Correct = answerKey.IDNet.ElementAtOrDefault(i) ?? string.Empty
                     },
                     Wildcard = new QueryIDNetAssignmentSubmitDetailsFullAnswerField
                     {
-                        Submitted = submit.Wildcard?.ElementAtOrDefault(i),
+                        Submitted = submit?.Wildcard?.ElementAtOrDefault(i),
                         Correct = answerKey.Wildcards.ElementAtOrDefault(i) ?? string.Empty
                     },
                     FirstUsable = new QueryIDNetAssignmentSubmitDetailsFullAnswerField
                     {
-                        Submitted = submit.FirstUsables?.ElementAtOrDefault(i),
+                        Submitted = submit?.FirstUsables?.ElementAtOrDefault(i),
                         Correct = answerKey.FirstUsables.ElementAtOrDefault(i) ?? string.Empty
                     },
                     LastUsable = new QueryIDNetAssignmentSubmitDetailsFullAnswerField
                     {
-                        Submitted = submit.LastUsables?.ElementAtOrDefault(i),
+                        Submitted = submit?.LastUsables?.ElementAtOrDefault(i),
                         Correct = answerKey.LastUsables.ElementAtOrDefault(i) ?? string.Empty
                     },
                     Broadcast = new QueryIDNetAssignmentSubmitDetailsFullAnswerField
                     {
-                        Submitted = submit.Broadcasts?.ElementAtOrDefault(i),
+                        Submitted = submit?.Broadcasts?.ElementAtOrDefault(i),
                         Correct = answerKey.Broadcasts.ElementAtOrDefault(i) ?? string.Empty
                     }
                 });
             }
 
-            var successRate = AssignmentEvaluationUtils.CalculateIdNetSuccessRate(answerKey, submit, assignment.AssignmentGroup.TestWildcard, assignment.AssignmentGroup.TestFirstLastBr);
-            var status = AssignmentEvaluationUtils.ResolveStatus(assignment.AssignmentGroup.StartDate, assignment.AssignmentGroup.Deadline, assignment.AssignmentGroup.CompletedAt);
+            var successRate = submit != null
+                ? AssignmentEvaluationUtils.CalculateIdNetSuccessRate(answerKey, submit, assignment.AssignmentGroup.TestWildcard, assignment.AssignmentGroup.TestFirstLastBr)
+                : 0;
 
             return Ok(new QueryIDNetAssignmentSubmitDetailsFullRes
             {
                 Name = assignment.AssignmentGroup.Name,
                 Description = assignment.AssignmentGroup.Description,
                 Results = results.ToArray(),
-                SubmittedAt = submit.SubmittedAt,
+                TestWildcard = assignment.AssignmentGroup.TestWildcard,
+                TestFirstLastBr = assignment.AssignmentGroup.TestFirstLastBr,
+                SubmittedAt = submit?.SubmittedAt,
+                StartDate = assignment.AssignmentGroup.StartDate,
+                Deadline = assignment.AssignmentGroup.Deadline,
                 StudentName = UsernameUtils.ToDisplay(assignment.Student.Username),
                 SuccessRate = successRate,
                 IpCat = assignment.AssignmentGroup.AssignmentIpCat,

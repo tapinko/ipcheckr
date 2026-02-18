@@ -273,6 +273,12 @@ export interface AppSettingDto {
 export interface AssignmentDto {
     /**
      * 
+     * @type {number}
+     * @memberof AssignmentDto
+     */
+    'assignmentId': number;
+    /**
+     * 
      * @type {string}
      * @memberof AssignmentDto
      */
@@ -1379,6 +1385,12 @@ export interface IDNetAGSubmitDetailsDto {
 export interface IDNetAssignmentDto {
     /**
      * 
+     * @type {number}
+     * @memberof IDNetAssignmentDto
+     */
+    'assignmentId': number;
+    /**
+     * 
      * @type {string}
      * @memberof IDNetAssignmentDto
      */
@@ -1669,6 +1681,24 @@ export interface QueryAppSettingRes {
 export interface QueryAssignmentDataForSubmitBaseRes {
     /**
      * 
+     * @type {string}
+     * @memberof QueryAssignmentDataForSubmitBaseRes
+     */
+    'assignmentName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAssignmentDataForSubmitBaseRes
+     */
+    'teacherUsername': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAssignmentDataForSubmitBaseRes
+     */
+    'className': string;
+    /**
+     * 
      * @type {boolean}
      * @memberof QueryAssignmentDataForSubmitBaseRes
      */
@@ -1703,7 +1733,19 @@ export interface QueryAssignmentSubmitDetailsFullBaseRes {
      * @type {string}
      * @memberof QueryAssignmentSubmitDetailsFullBaseRes
      */
-    'submittedAt': string;
+    'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAssignmentSubmitDetailsFullBaseRes
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAssignmentSubmitDetailsFullBaseRes
+     */
+    'deadline': string;
     /**
      * 
      * @type {string}
@@ -1992,6 +2034,24 @@ export interface QueryIDNetAGsRes {
 export interface QueryIDNetAssignmentDataForSubmitRes {
     /**
      * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentDataForSubmitRes
+     */
+    'assignmentName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentDataForSubmitRes
+     */
+    'teacherUsername': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentDataForSubmitRes
+     */
+    'className': string;
+    /**
+     * 
      * @type {boolean}
      * @memberof QueryIDNetAssignmentDataForSubmitRes
      */
@@ -2106,7 +2166,19 @@ export interface QueryIDNetAssignmentSubmitDetailsFullRes {
      * @type {string}
      * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
      */
-    'submittedAt': string;
+    'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'deadline': string;
     /**
      * 
      * @type {string}
@@ -2440,6 +2512,24 @@ export interface QuerySubnetAGsRes {
 export interface QuerySubnetAssignmentDataForSubmitRes {
     /**
      * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentDataForSubmitRes
+     */
+    'assignmentName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentDataForSubmitRes
+     */
+    'teacherUsername': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentDataForSubmitRes
+     */
+    'className': string;
+    /**
+     * 
      * @type {boolean}
      * @memberof QuerySubnetAssignmentDataForSubmitRes
      */
@@ -2542,7 +2632,19 @@ export interface QuerySubnetAssignmentSubmitDetailsFullRes {
      * @type {string}
      * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
      */
-    'submittedAt': string;
+    'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'deadline': string;
     /**
      * 
      * @type {string}
@@ -3177,6 +3279,12 @@ export interface SubnetAGSubmitDetailsDto {
  * @interface SubnetAssignmentDto
  */
 export interface SubnetAssignmentDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAssignmentDto
+     */
+    'assignmentId': number;
     /**
      * 
      * @type {string}

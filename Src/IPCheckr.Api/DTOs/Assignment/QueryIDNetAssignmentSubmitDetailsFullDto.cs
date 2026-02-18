@@ -14,6 +14,12 @@ namespace IPCheckr.Api.DTOs.Assignment
         public required QueryIDNetAssignmentSubmitDetailsFullRecordField[] Results { get; set; }
 
         [Required]
+        public bool TestWildcard { get; set; }
+
+        [Required]
+        public bool TestFirstLastBr { get; set; }
+
+        [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public required AssignmentGroupIpCat IpCat { get; set; }
 

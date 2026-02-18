@@ -52,7 +52,9 @@ namespace IPCheckr.Api.Controllers
             if (req.StartDate.HasValue) subnetGroup.StartDate = req.StartDate.Value;
             if (req.Deadline.HasValue) subnetGroup.Deadline = req.Deadline.Value;
 
-            if (subnetGroup.StartDate > subnetGroup.Deadline)
+            var subnetStartLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(subnetGroup.StartDate);
+            var subnetDeadlineLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(subnetGroup.Deadline);
+            if (subnetStartLocal > subnetDeadlineLocal)
                 return BadRequest(new ApiProblemDetails
                 {
                     Title = "Bad Request",
@@ -178,7 +180,9 @@ namespace IPCheckr.Api.Controllers
             if (req.StartDate.HasValue) idnetGroup.StartDate = req.StartDate.Value;
             if (req.Deadline.HasValue) idnetGroup.Deadline = req.Deadline.Value;
 
-            if (idnetGroup.StartDate > idnetGroup.Deadline)
+            var idnetStartLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(idnetGroup.StartDate);
+            var idnetDeadlineLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(idnetGroup.Deadline);
+            if (idnetStartLocal > idnetDeadlineLocal)
                 return BadRequest(new ApiProblemDetails
                 {
                     Title = "Bad Request",

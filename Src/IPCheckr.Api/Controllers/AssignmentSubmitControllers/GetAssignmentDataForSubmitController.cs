@@ -3,7 +3,6 @@ using IPCheckr.Api.DTOs.AssignmentSubmit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IPCheckr.Api.Common.Utils;
-using IPCheckr.Api.Common.Enums;
 
 namespace IPCheckr.Api.Controllers
 {
@@ -28,6 +27,8 @@ namespace IPCheckr.Api.Controllers
 
             var assignment = await _db.SubnetAssignments
                 .Include(a => a.AssignmentGroup)
+                .ThenInclude(ag => ag.Class)
+                .ThenInclude(c => c.Teachers)
                 .Include(a => a.Student)
                 .FirstOrDefaultAsync(a => a.Id == req.AssignmentId);
 
@@ -51,14 +52,25 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Nemáte oprávnenie na prístup k tomuto zadaniu."
                 });
 
-            var status = AssignmentEvaluationUtils.ResolveStatus(assignment.AssignmentGroup.StartDate, assignment.AssignmentGroup.Deadline, assignment.AssignmentGroup.CompletedAt);
+            var now = DateTime.Now;
+            var startUtc = AssignmentEvaluationUtils.NormalizeToLocalComparison(assignment.AssignmentGroup.StartDate);
+            var deadlineUtc = AssignmentEvaluationUtils.NormalizeToLocalComparison(assignment.AssignmentGroup.Deadline);
+            var isInSubmissionWindow =
+                now >= startUtc &&
+                now <= deadlineUtc &&
+                assignment.AssignmentGroup.CompletedAt == null;
             var hasSubmit = await _db.SubnetAssignmentSubmits.AnyAsync(s => s.Assignment.Id == assignment.Id);
-            var isAvailable = status == AssignmentGroupStatus.IN_PROGRESS && !hasSubmit;
+            var isAvailable = isInSubmissionWindow && !hasSubmit;
+            var teacherUsernameRaw = assignment.AssignmentGroup.Class.Teachers?.FirstOrDefault()?.Username ?? "Unknown";
+            var teacherUsername = UsernameUtils.ToDisplay(teacherUsernameRaw);
 
             return Ok(new QuerySubnetAssignmentDataForSubmitRes
             {
                 HostsPerNetwork = assignment.Hosts,
                 Cidr = assignment.Cidr,
+                AssignmentName = assignment.AssignmentGroup.Name,
+                TeacherUsername = teacherUsername,
+                ClassName = assignment.AssignmentGroup.Class.Name,
                 IsAvailableForSubmission = isAvailable,
                 Deadline = assignment.AssignmentGroup.Deadline
             });
@@ -83,6 +95,8 @@ namespace IPCheckr.Api.Controllers
 
             var assignment = await _db.IDNetAssignments
                 .Include(a => a.AssignmentGroup)
+                .ThenInclude(ag => ag.Class)
+                .ThenInclude(c => c.Teachers)
                 .Include(a => a.Student)
                 .FirstOrDefaultAsync(a => a.Id == req.AssignmentId);
 
@@ -106,15 +120,26 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Nemáte oprávnenie na prístup k tomuto zadaniu."
                 });
 
-            var status = AssignmentEvaluationUtils.ResolveStatus(assignment.AssignmentGroup.StartDate, assignment.AssignmentGroup.Deadline, assignment.AssignmentGroup.CompletedAt);
+            var now = DateTime.Now;
+            var startUtc = AssignmentEvaluationUtils.NormalizeToLocalComparison(assignment.AssignmentGroup.StartDate);
+            var deadlineUtc = AssignmentEvaluationUtils.NormalizeToLocalComparison(assignment.AssignmentGroup.Deadline);
+            var isInSubmissionWindow =
+                now >= startUtc &&
+                now <= deadlineUtc &&
+                assignment.AssignmentGroup.CompletedAt == null;
             var hasSubmit = await _db.IDNetAssignmentSubmits.AnyAsync(s => s.Assignment.Id == assignment.Id);
-            var isAvailable = status == AssignmentGroupStatus.IN_PROGRESS && !hasSubmit;
+            var isAvailable = isInSubmissionWindow && !hasSubmit;
+            var teacherUsernameRaw = assignment.AssignmentGroup.Class.Teachers?.FirstOrDefault()?.Username ?? "Unknown";
+            var teacherUsername = UsernameUtils.ToDisplay(teacherUsernameRaw);
 
             return Ok(new QueryIDNetAssignmentDataForSubmitRes
             {
                 Addresses = assignment.Addresses,
                 TestWildcard = assignment.AssignmentGroup.TestWildcard,
                 TestFirstLastBr = assignment.AssignmentGroup.TestFirstLastBr,
+                AssignmentName = assignment.AssignmentGroup.Name,
+                TeacherUsername = teacherUsername,
+                ClassName = assignment.AssignmentGroup.Class.Name,
                 IsAvailableForSubmission = isAvailable,
                 Deadline = assignment.AssignmentGroup.Deadline
             });

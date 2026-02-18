@@ -313,23 +313,30 @@ namespace IPCheckr.Api.Controllers
             var lastUsables = new List<string>();
             var broadcasts = new List<string>();
 
-            int minPrefix = Math.Max(1, (possibleOctets - 1) * 8);
-            int maxPrefix = 32;
+            var normalizedPossibleOctets = Math.Clamp(possibleOctets, 1, 4);
+            int minPrefix = Math.Max(1, (normalizedPossibleOctets - 1) * 8);
+            int maxPrefix = 30;
 
             for (int i = 0; i < numberOfRecords; i++)
             {
                 int prefix = rand.Next(minPrefix, maxPrefix + 1);
-                uint ipUint = GenerateRandomIpUint(rand, ipCat);
                 uint mask = PrefixToMask(prefix);
-                uint network = ipUint & mask;
                 uint wildcard = ~mask;
-                uint broadcast = network | wildcard;
+                uint ipUint;
+                uint network;
+                uint broadcast;
+
+                do {
+                    ipUint = GenerateRandomHostIpUint(rand, ipCat);
+                    network = ipUint & mask;
+                    broadcast = network | wildcard;
+                } while (ipUint == network || ipUint == broadcast);
 
                 var first = prefix >= 31 ? network : network + 1;
                 var last = prefix >= 31 ? broadcast : broadcast - 1;
 
                 cidrs.Add($"{UintToIp(ipUint)}/{prefix}");
-                networks.Add($"{UintToIp(network)}/{prefix}");
+                networks.Add(UintToIp(network));
                 wildcards.Add(UintToIp(wildcard));
                 firstUsables.Add(UintToIp(first));
                 lastUsables.Add(UintToIp(last));
@@ -337,6 +344,13 @@ namespace IPCheckr.Api.Controllers
             }
 
             return (cidrs.ToArray(), networks.ToArray(), wildcards.ToArray(), firstUsables.ToArray(), lastUsables.ToArray(), broadcasts.ToArray());
+        }
+
+        private static uint GenerateRandomHostIpUint(Random rand, AssignmentGroupIpCat cat)
+        {
+            var baseIp = GenerateRandomIpUint(rand, cat);
+            var hostOctet = rand.Next(1, 255);
+            return (baseIp & 0xFFFFFF00u) | (uint)hostOctet;
         }
 
         private static uint PrefixToMask(int prefix)

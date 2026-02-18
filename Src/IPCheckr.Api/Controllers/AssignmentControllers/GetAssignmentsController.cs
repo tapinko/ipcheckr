@@ -70,6 +70,7 @@ namespace IPCheckr.Api.Controllers
 
                 assignmentDtos.Add(new SubnetAssignmentDto
                 {
+                    AssignmentId = assignment.Id,
                     Name = group.Name,
                     AssignmentGroupDescription = group.Description,
                     StartDate = group.StartDate,
@@ -149,6 +150,7 @@ namespace IPCheckr.Api.Controllers
 
                 assignmentDtos.Add(new IDNetAssignmentDto
                 {
+                    AssignmentId = assignment.Id,
                     Name = group.Name,
                     AssignmentGroupDescription = group.Description,
                     StartDate = group.StartDate,

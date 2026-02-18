@@ -98,6 +98,7 @@ namespace IPCheckr.Api.Controllers
                 Deadline = subnetGroup.Deadline,
                 SuccessRate = totalStudents > 0 ? sumSuccessRates / totalStudents : 0.0,
                 Status = status,
+                Type = AssignmentGroupType.SUBNET,
                 IpCat = subnetGroup.AssignmentIpCat,
                 Assignments = assignmentDetails.ToArray()
             };
@@ -197,6 +198,7 @@ namespace IPCheckr.Api.Controllers
                 Deadline = idnetGroup.Deadline,
                 SuccessRate = totalStudents > 0 ? sumSuccessRates / totalStudents : 0.0,
                 Status = status,
+                Type = AssignmentGroupType.IDNET,
                 IpCat = idnetGroup.AssignmentIpCat,
                 TestWildcard = idnetGroup.TestWildcard,
                 TestFirstLastBr = idnetGroup.TestFirstLastBr,

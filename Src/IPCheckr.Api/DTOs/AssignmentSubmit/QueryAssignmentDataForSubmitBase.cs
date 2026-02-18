@@ -11,6 +11,15 @@ namespace IPCheckr.Api.DTOs.AssignmentSubmit
     public class QueryAssignmentDataForSubmitBaseRes
     {
         [Required]
+        public required string AssignmentName { get; set; }
+
+        [Required]
+        public required string TeacherUsername { get; set; }
+
+        [Required]
+        public required string ClassName { get; set; }
+
+        [Required]
         public required bool IsAvailableForSubmission { get; set; }
 
         [Required]

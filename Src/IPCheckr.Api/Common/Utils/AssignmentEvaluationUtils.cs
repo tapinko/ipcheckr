@@ -5,15 +5,27 @@ namespace IPCheckr.Api.Common.Utils
 {
     public static class AssignmentEvaluationUtils
     {
+        public static DateTime NormalizeToLocalComparison(DateTime value)
+        {
+            return value.Kind switch
+            {
+                DateTimeKind.Utc => value.ToLocalTime(),
+                _ => value
+            };
+        }
+
         public static AssignmentGroupStatus ResolveStatus(DateTime startDate, DateTime deadline, DateTime? completedAt)
         {
             if (completedAt.HasValue)
                 return AssignmentGroupStatus.ENDED;
 
-            var now = DateTime.UtcNow;
-            if (now < startDate)
+            var now = DateTime.Now;
+            var startLocal = NormalizeToLocalComparison(startDate);
+            var deadlineLocal = NormalizeToLocalComparison(deadline);
+
+            if (now < startLocal)
                 return AssignmentGroupStatus.UPCOMING;
-            if (now <= deadline)
+            if (now <= deadlineLocal)
                 return AssignmentGroupStatus.IN_PROGRESS;
             return AssignmentGroupStatus.ENDED;
         }

@@ -13,7 +13,6 @@ import {
   AccessTime,
   Category,
   Class,
-  InsightsOutlined,
   Percent,
   PlaylistAddCheck,
   Quiz,
@@ -39,19 +38,22 @@ import CardsSkeleton from "../../components/CardsSkeleton"
 import TableSkeleton from "../../components/TableSkeleton"
 import InsightCard from "../../components/InsightCard"
 import InsightGrid from "../../components/InsightGrid"
+import { fromAssignmentTypeParam, toAssignmentTypeParam } from "../../utils/assignmentType"
 
 interface IAssignmentGroupSubmitDetailsCard {
   assignmentId: number
   studentUsername: string
   successRate: number
   submittedAt?: string | null
+  assignmentType?: AssignmentGroupType
 }
 
 const AssignmentGroupSubmitDetailsCard = ({
   assignmentId,
   studentUsername,
   successRate,
-  submittedAt
+  submittedAt,
+  assignmentType
 }: IAssignmentGroupSubmitDetailsCard) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -74,36 +76,36 @@ const AssignmentGroupSubmitDetailsCard = ({
         boxShadow: 0,
         transition: "box-shadow 0.2s, border-color 0.2s",
         backgroundColor: "background.paper",
-        opacity: submittedAt ? 1 : 0.8
+        opacity: submittedAt ? 1 : 0.8,
+        "&:hover .submit-student-name": submittedAt
+          ? {
+              textDecoration: "underline"
+            }
+          : undefined
       }}
-      onDoubleClick={() => {
+      onClick={() => {
         if (!submittedAt || !assignmentGroupId) return
+        const targetType = assignmentType
+        if (!targetType) return
         navigate(
           getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT, {
             [RouteParams.ASSIGNMENT_GROUP_ID]: assignmentGroupId,
             [RouteParams.ASSIGNMENT_ID]: assignmentId.toString(),
-            [RouteParams.ATTEMPT]: "1"
+            [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(targetType)
           })
         )
       }}
     >
       <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <Stack direction="row" alignItems="center" spacing={1} justifyContent="space-between">
-          <Stack spacing={0.25}>
-            <Typography variant="subtitle1" fontWeight={700} noWrap>
+        <Stack direction="row" alignItems="flex-start" spacing={1} justifyContent="space-between" flexWrap="wrap">
+          <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
+            <Typography variant="subtitle1" fontWeight={700} className="submit-student-name" sx={{ wordBreak: "break-word" }}>
               {studentUsername}
             </Typography>
-            <Typography variant="caption" color="text.secondary" noWrap>
+            <Typography variant="caption" color="text.secondary" sx={{ wordBreak: "break-word" }}>
               {submittedLabel}
             </Typography>
           </Stack>
-          <Chip
-            label={submittedLabel}
-            color={submittedAt ? "success" : "default"}
-            size="small"
-            variant="outlined"
-            sx={{ maxWidth: 180 }}
-          />
         </Stack>
 
         <Stack spacing={0.5}>
@@ -129,7 +131,11 @@ const AssignmentGroupSubmitDetailsCard = ({
 
 const TeacherAssignmentGroupDetails = () => {
   const { t } = useTranslation()
-  const { [RouteParams.ASSIGNMENT_GROUP_ID]: assignmentGroupId } = useParams()
+  const {
+    [RouteParams.ASSIGNMENT_GROUP_ID]: assignmentGroupId,
+    [RouteParams.ASSIGNMENT_GROUP_TYPE]: assignmentTypeParam
+  } = useParams()
+  const assignmentType = fromAssignmentTypeParam(assignmentTypeParam)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const statusMap = getStatusMap(t)
@@ -138,7 +144,7 @@ const TeacherAssignmentGroupDetails = () => {
 
   const subnetQuery = useQuery<QuerySubnetAGDetailRes, Error>({
     queryKey: ["assignmentGroupDetails", "subnet", assignmentGroupId],
-    enabled: !!assignmentGroupId,
+    enabled: !!assignmentGroupId && (!assignmentType || assignmentType === AssignmentGroupType.Subnet),
     queryFn: () =>
       assignmentGroupApi
         .assignmentGroupQuerySubnetAssignmentGroupDetails(Number(assignmentGroupId))
@@ -149,7 +155,9 @@ const TeacherAssignmentGroupDetails = () => {
 
   const idnetQuery = useQuery<QueryIDNetAGDetailRes, Error>({
     queryKey: ["assignmentGroupDetails", "idnet", assignmentGroupId],
-    enabled: !!assignmentGroupId && subnetQuery.isError,
+    enabled: !!assignmentGroupId && (
+      assignmentType === AssignmentGroupType.Idnet || (!assignmentType && subnetQuery.isError)
+    ),
     queryFn: () =>
       assignmentGroupApi
         .assignmentGroupQueryIdNetAssignmentGroupDetails(Number(assignmentGroupId))
@@ -159,13 +167,24 @@ const TeacherAssignmentGroupDetails = () => {
   })
 
   const data = useMemo(() => {
+    if (assignmentType === AssignmentGroupType.Subnet) return subnetQuery.data ?? null
+    if (assignmentType === AssignmentGroupType.Idnet) return idnetQuery.data ?? null
     if (subnetQuery.data) return subnetQuery.data
     if (idnetQuery.data) return idnetQuery.data
     return null
-  }, [subnetQuery.data, idnetQuery.data])
+  }, [assignmentType, subnetQuery.data, idnetQuery.data])
 
-  const isLoading = (!data && subnetQuery.isLoading) || (!data && idnetQuery.isLoading)
-  const hasError = subnetQuery.isError && idnetQuery.isError
+  const isLoading = (() => {
+    if (assignmentType === AssignmentGroupType.Subnet) return !data && subnetQuery.isLoading
+    if (assignmentType === AssignmentGroupType.Idnet) return !data && idnetQuery.isLoading
+    return (!data && subnetQuery.isLoading) || (!data && idnetQuery.isLoading)
+  })()
+
+  const hasError = (() => {
+    if (assignmentType === AssignmentGroupType.Subnet) return subnetQuery.isError
+    if (assignmentType === AssignmentGroupType.Idnet) return idnetQuery.isError
+    return subnetQuery.isError && idnetQuery.isError
+  })()
 
   const isIdNetDetail = (detail: QueryIDNetAGDetailRes | QuerySubnetAGDetailRes | null): detail is QueryIDNetAGDetailRes =>
     detail?.type === AssignmentGroupType.Idnet
@@ -227,7 +246,6 @@ const TeacherAssignmentGroupDetails = () => {
                       {data.name}
                     </Typography>
                     <Chip
-                      icon={<InsightsOutlined fontSize="small" />}
                       label={
                         data.type === AssignmentGroupType.Subnet
                           ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET)
@@ -288,7 +306,7 @@ const TeacherAssignmentGroupDetails = () => {
               dense
             />,
             <Box
-              onDoubleClick={() => {
+              onClick={() => {
                 if (!data?.classId) return
                 navigate(
                   getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_CLASS_DETAILS, {
@@ -296,11 +314,22 @@ const TeacherAssignmentGroupDetails = () => {
                   })
                 )
               }}
-              sx={{ cursor: data?.classId ? "pointer" : "default" }}
+              sx={{
+                cursor: data?.classId ? "pointer" : "default",
+                "&:hover .class-link-value": data?.classId
+                  ? {
+                      textDecoration: "underline"
+                    }
+                  : undefined
+              }}
             >
               <InsightCard
                 title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CLASS)}
-                value={data?.className ?? "-"}
+                value={
+                  <Box component="span" className="class-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                    {data?.className ?? "-"}
+                  </Box>
+                }
                 icon={<Class />}
                 tone="neutral"
                 dense
@@ -323,7 +352,7 @@ const TeacherAssignmentGroupDetails = () => {
             isIdNetData ? (
               <InsightCard
                 title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TEST_WILDCARD)}
-                value={data?.testWildcard ? t(TranslationKey.STATUS_COMPLETED) : t(TranslationKey.STATUS_NOT_COMPLETED)}
+                value={data?.testWildcard ? t(TranslationKey.STATUS_YES) : t(TranslationKey.STATUS_NO)}
                 icon={<PlaylistAddCheck />}
                 tone={data?.testWildcard ? "success" : "neutral"}
                 dense
@@ -332,7 +361,7 @@ const TeacherAssignmentGroupDetails = () => {
             isIdNetData ? (
               <InsightCard
                 title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TEST_FIRST_LAST_BR)}
-                value={data?.testFirstLastBr ? t(TranslationKey.STATUS_COMPLETED) : t(TranslationKey.STATUS_NOT_COMPLETED)}
+                value={data?.testFirstLastBr ? t(TranslationKey.STATUS_YES) : t(TranslationKey.STATUS_NO)}
                 icon={<PlaylistAddCheck />}
                 tone={data?.testFirstLastBr ? "success" : "neutral"}
                 dense
@@ -383,6 +412,7 @@ const TeacherAssignmentGroupDetails = () => {
               studentUsername={a.studentUsername}
               successRate={a.successRate}
               submittedAt={"submittedAt" in a ? a.submittedAt : undefined}
+              assignmentType={data?.type}
             />
           ))}
         </Box>

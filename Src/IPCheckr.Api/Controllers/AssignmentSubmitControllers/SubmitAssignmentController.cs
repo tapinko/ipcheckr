@@ -52,8 +52,14 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Nemáte oprávnenie na prístup k tomuto zadaniu."
                 });
 
-            var status = AssignmentEvaluationUtils.ResolveStatus(assignment.AssignmentGroup.StartDate, assignment.AssignmentGroup.Deadline, assignment.AssignmentGroup.CompletedAt);
-            if (status != AssignmentGroupStatus.IN_PROGRESS)
+            var now = DateTime.Now;
+            var startUtc = AssignmentEvaluationUtils.NormalizeToLocalComparison(assignment.AssignmentGroup.StartDate);
+            var deadlineUtc = AssignmentEvaluationUtils.NormalizeToLocalComparison(assignment.AssignmentGroup.Deadline);
+            var isInSubmissionWindow =
+                now >= startUtc &&
+                now <= deadlineUtc &&
+                assignment.AssignmentGroup.CompletedAt == null;
+            if (!isInSubmissionWindow)
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
@@ -118,13 +124,10 @@ namespace IPCheckr.Api.Controllers
                 .CountAsync(s => groupAssignmentIds.Contains(s.Assignment.Id));
 
             var totalAssignments = groupAssignmentIds.Count;
-            var finalStatus = AssignmentEvaluationUtils.ResolveStatus(assignment.AssignmentGroup.StartDate, assignment.AssignmentGroup.Deadline, assignment.AssignmentGroup.CompletedAt);
-
             if (totalAssignments > 0 && submittedCount >= totalAssignments)
             {
                 assignment.AssignmentGroup.CompletedAt = DateTime.UtcNow;
-                finalStatus = AssignmentGroupStatus.ENDED;
-                assignment.AssignmentGroup.Status = finalStatus;
+                assignment.AssignmentGroup.Status = AssignmentGroupStatus.ENDED;
                 await _db.SaveChangesAsync();
             }
 
@@ -176,8 +179,14 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Nemáte oprávnenie na prístup k tomuto zadaniu."
                 });
 
-            var status = AssignmentEvaluationUtils.ResolveStatus(assignment.AssignmentGroup.StartDate, assignment.AssignmentGroup.Deadline, assignment.AssignmentGroup.CompletedAt);
-            if (status != AssignmentGroupStatus.IN_PROGRESS)
+            var now = DateTime.Now;
+            var startUtc = AssignmentEvaluationUtils.NormalizeToLocalComparison(assignment.AssignmentGroup.StartDate);
+            var deadlineUtc = AssignmentEvaluationUtils.NormalizeToLocalComparison(assignment.AssignmentGroup.Deadline);
+            var isInSubmissionWindow =
+                now >= startUtc &&
+                now <= deadlineUtc &&
+                assignment.AssignmentGroup.CompletedAt == null;
+            if (!isInSubmissionWindow)
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
@@ -244,13 +253,10 @@ namespace IPCheckr.Api.Controllers
                 .CountAsync(s => groupAssignmentIds.Contains(s.Assignment.Id));
 
             var totalAssignments = groupAssignmentIds.Count;
-            var finalStatus = AssignmentEvaluationUtils.ResolveStatus(assignment.AssignmentGroup.StartDate, assignment.AssignmentGroup.Deadline, assignment.AssignmentGroup.CompletedAt);
-
             if (totalAssignments > 0 && submittedCount >= totalAssignments)
             {
                 assignment.AssignmentGroup.CompletedAt = DateTime.UtcNow;
-                finalStatus = AssignmentGroupStatus.ENDED;
-                assignment.AssignmentGroup.Status = finalStatus;
+                assignment.AssignmentGroup.Status = AssignmentGroupStatus.ENDED;
                 await _db.SaveChangesAsync();
             }
 

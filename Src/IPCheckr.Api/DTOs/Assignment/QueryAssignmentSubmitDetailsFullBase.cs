@@ -18,8 +18,13 @@ namespace IPCheckr.Api.DTOs.Assignment
 
         public string? Description { get; set; }
 
+        public DateTime? SubmittedAt { get; set; }
+
         [Required]
-        public DateTime SubmittedAt { get; set; }
+        public DateTime StartDate { get; set; }
+
+        [Required]
+        public DateTime Deadline { get; set; }
 
         [Required]
         public required string StudentName { get; set; }

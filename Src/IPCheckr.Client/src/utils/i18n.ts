@@ -90,6 +90,8 @@ export enum TranslationKey {
   // Status labels
   STATUS_COMPLETED = "STATUS_COMPLETED",
   STATUS_NOT_COMPLETED = "STATUS_NOT_COMPLETED",
+  STATUS_YES = "STATUS_YES",
+  STATUS_NO = "STATUS_NO",
 
   // Error messages
   ERROR_MESSAGE = "ERROR_MESSAGE",
@@ -687,6 +689,8 @@ const _EN: Record<TranslationKey, string> = {
   // Status labels
   [TranslationKey.STATUS_COMPLETED]: "Completed",
   [TranslationKey.STATUS_NOT_COMPLETED]: "Not completed",
+  [TranslationKey.STATUS_YES]: "Yes",
+  [TranslationKey.STATUS_NO]: "No",
 
   // Error messages
   [TranslationKey.ERROR_MESSAGE]: "An error occurred while loading data.",
@@ -1037,6 +1041,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_CLASS]: "Class",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_WILDCARD]: "Wildcard",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_FIRST_LAST_BR]: "First/Last/Br",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NOCLASS]: "You don't have any classes yet. Create one to get started.",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NOCLASS_BUTTON]: "Navigate to 'My classes'",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CLASS]: "Class",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_CLASSES]: "All classes",
@@ -1056,7 +1061,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_ATTEMPTS]: "Possible attempts",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS]: "Possible octets",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS_TOOLTIP]: "Generation varies starting from the chosen octet to the right (1 = leftmost, 4 = rightmost).",
-  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS_RANGE]: "Must be between 1 and 4",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS_RANGE]: "Must be between 1 and 3",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS]: "Assigned students",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE]: "Start date",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DEADLINE]: "Deadline",
@@ -1281,6 +1286,8 @@ const _SK: Record<TranslationKey, string> = {
   // Status labels
   [TranslationKey.STATUS_COMPLETED]: "Dokončené",
   [TranslationKey.STATUS_NOT_COMPLETED]: "Nedokončené",
+  [TranslationKey.STATUS_YES]: "Áno",
+  [TranslationKey.STATUS_NO]: "Nie",
 
   // Error messages
   [TranslationKey.ERROR_MESSAGE]: "Pri načítavaní sa vyskytla chyba.",
@@ -1631,6 +1638,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_CLASS]: "Trieda",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_WILDCARD]: "Wildcard",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_FIRST_LAST_BR]: "Prvá/Posledná/Broadcast",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NOCLASS]: "Zatiaľ nemáte žiadne triedy. Vytvorte jednu, aby ste mohli začať.",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NOCLASS_BUTTON]: "Prejsť na 'Moje triedy'",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CLASS]: "Trieda",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ALL_CLASSES]: "Všetky triedy",
@@ -1650,7 +1658,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_ATTEMPTS]: "Možné pokusy",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS]: "Možné oktety",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS_TOOLTIP]: "Generovanie sa mení od zvoleného oktetu doprava (1 = najľavejší, 4 = najpravší).",
-  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS_RANGE]: "Musí byť medzi 1 a 4",
+  [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_POSSIBLE_OCTETS_RANGE]: "Musí byť medzi 1 a 3",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_STUDENTS]: "Priradení študenti",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE]: "Dátum začiatku",
   [TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DEADLINE]: "Dátum ukončenia",

@@ -64,6 +64,7 @@ import UserRole from "../../types/UserRole"
 import AGHeader from "../../components/AGHeader"
 import type { AGClassFilterValue, AGIpCatFilterValue, AGTypeFilterValue } from "../../components/AGHeader"
 import { getStatusMap } from "../../utils/getStatusMap"
+import { toAssignmentTypeParam } from "../../utils/assignmentType"
 
 interface IAG {
   id: number
@@ -112,6 +113,16 @@ type EditFormValues = {
 
 const formatDateTime = (value: string) =>
   new Date(value).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })
+
+const toLocalDateTimeString = (date: Date) => {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  const h = String(date.getHours()).padStart(2, "0")
+  const min = String(date.getMinutes()).padStart(2, "0")
+  const s = String(date.getSeconds()).padStart(2, "0")
+  return `${y}-${m}-${d}T${h}:${min}:${s}`
+}
 
 const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
   id: ag.assignmentGroupId,
@@ -296,7 +307,7 @@ const TeacherAssignmentGroups = () => {
       classId: classFilterNormalized ?? null,
       type: AssignmentGroupType.Idnet,
       numberOfRecords: 6,
-      possibleOctets: 4,
+      possibleOctets: 3,
       ipCat: AssignmentGroupIpCat.Abc,
       testWildcard: false,
       testFirstLastBr: false,
@@ -420,7 +431,7 @@ const TeacherAssignmentGroups = () => {
         classId: classFilterNormalized ?? null,
         type: AssignmentGroupType.Idnet,
         numberOfRecords: 6,
-        possibleOctets: 4,
+        possibleOctets: 3,
         ipCat: AssignmentGroupIpCat.Abc,
         testWildcard: false,
         testFirstLastBr: false,
@@ -588,7 +599,7 @@ const TeacherAssignmentGroups = () => {
               classId: classFilterNormalized ?? null,
               type: AssignmentGroupType.Idnet,
               numberOfRecords: 6,
-              possibleOctets: 4,
+              possibleOctets: 3,
               ipCat: AssignmentGroupIpCat.Abc,
               testWildcard: false,
               testFirstLastBr: false,
@@ -632,7 +643,7 @@ const TeacherAssignmentGroups = () => {
                     backgroundColor: "background.paper",
                     border: "1px solid",
                     borderColor: "divider",
-                    borderRadius: 2,
+                    borderRadius: 1,
                     p: 2,
                     display: "flex",
                     flexDirection: "column",
@@ -671,6 +682,7 @@ const TeacherAssignmentGroups = () => {
                               width: "100%",
                               border: "1px solid",
                               borderColor: "action.disabled",
+                              borderRadius: 1,
                               display: "flex",
                               flexDirection: "column",
                               gap: 0.5,
@@ -679,14 +691,18 @@ const TeacherAssignmentGroups = () => {
                               cursor: "pointer",
                               "&:hover": {
                                 opacity: 0.9
+                              },
+                              "&:hover .ag-title-text": {
+                                textDecoration: "underline"
                               }
                             }}
-                            onDoubleClick={() =>
+                            onClick={() =>
                               navigate(
                                 getParametrizedUrl(
                                   RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
                                   {
-                                    [RouteParams.ASSIGNMENT_GROUP_ID]: ag.id.toString()
+                                    [RouteParams.ASSIGNMENT_GROUP_ID]: ag.id.toString(),
+                                    [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(ag.type)
                                   }
                                 )
                               )
@@ -697,7 +713,7 @@ const TeacherAssignmentGroups = () => {
                               title={
                                 ag.name.length > 10 ? (
                                   <Stack spacing={0.25}>
-                                    <Typography variant="subtitle2" fontWeight={700} noWrap>
+                                    <Typography variant="subtitle2" fontWeight={700} noWrap className="ag-title-text">
                                       {ag.name}
                                     </Typography>
                                     <Stack direction="row" alignItems="center" spacing={0.5}>
@@ -723,7 +739,7 @@ const TeacherAssignmentGroups = () => {
                                   </Stack>
                                 ) : (
                                   <Stack direction="row" alignItems="center" spacing={0.5}>
-                                    <Typography variant="subtitle2" fontWeight={700} noWrap>
+                                    <Typography variant="subtitle2" fontWeight={700} noWrap className="ag-title-text">
                                       {ag.name}
                                     </Typography>
                                     <Chip
@@ -751,7 +767,8 @@ const TeacherAssignmentGroups = () => {
                                 <Stack direction="row" spacing={1} alignItems="center">
                                   <IconButton
                                     size="small"
-                                    onClick={() => {
+                                    onClick={e => {
+                                      e.stopPropagation()
                                       setEditAG(ag)
                                       setEditDialogVis(true)
                                     }}
@@ -760,7 +777,8 @@ const TeacherAssignmentGroups = () => {
                                   </IconButton>
                                   <IconButton
                                     size="small"
-                                    onClick={() => {
+                                    onClick={e => {
+                                      e.stopPropagation()
                                       setDeleteAG(ag)
                                       setDeleteDialogVis(true)
                                     }}
@@ -1089,7 +1107,7 @@ const TeacherAssignmentGroups = () => {
                   <DateTimePicker
                     label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE)}
                     value={field.value ? new Date(field.value) : null}
-                    onChange={date => field.onChange(date ? date.toISOString() : "")}
+                    onChange={date => field.onChange(date ? toLocalDateTimeString(date) : "")}
                     slotProps={{
                       textField: {
                         margin: "dense",
@@ -1120,7 +1138,7 @@ const TeacherAssignmentGroups = () => {
                   <DateTimePicker
                     label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DEADLINE)}
                     value={field.value ? new Date(field.value) : null}
-                    onChange={date => field.onChange(date ? date.toISOString() : "")}
+                    onChange={date => field.onChange(date ? toLocalDateTimeString(date) : "")}
                     slotProps={{
                       textField: {
                         margin: "dense",
@@ -1270,7 +1288,7 @@ const TeacherAssignmentGroups = () => {
                       <DateTimePicker
                         label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_START_DATE)}
                         value={field.value ? new Date(field.value) : null}
-                        onChange={date => field.onChange(date ? date.toISOString() : "")}
+                        onChange={date => field.onChange(date ? toLocalDateTimeString(date) : "")}
                         slotProps={{
                           textField: {
                             margin: "dense",
@@ -1301,7 +1319,7 @@ const TeacherAssignmentGroups = () => {
                       <DateTimePicker
                         label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DEADLINE)}
                         value={field.value ? new Date(field.value) : null}
-                        onChange={date => field.onChange(date ? date.toISOString() : "")}
+                        onChange={date => field.onChange(date ? toLocalDateTimeString(date) : "")}
                         slotProps={{
                           textField: {
                             margin: "dense",

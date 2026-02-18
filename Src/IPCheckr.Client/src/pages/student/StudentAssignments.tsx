@@ -1,277 +1,473 @@
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  AssignmentGroupState,
-  AssignmentGroupStatus,
-  type AssignmentDto
-} from "../../dtos"
-import { getStateMap } from "../../utils/getStateMap"
 import { useNavigate } from "react-router-dom"
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Tooltip,
-  Typography
+	AssignmentGroupStatus,
+	AssignmentGroupType,
+	type ClassDto,
+	type IDNetAssignmentDto,
+	type SubnetAssignmentDto
+} from "../../dtos"
+import { assignmentApi } from "../../utils/apiClients"
+import {
+	Box,
+	Button,
+	Card,
+	CardContent,
+	CardHeader,
+	Chip,
+	Divider,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+	LinearProgress,
+	Stack,
+	Typography
 } from "@mui/material"
+import { alpha } from "@mui/material/styles"
 import { TranslationKey } from "../../utils/i18n"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
-import { assignmentApi } from "../../utils/apiClients"
 import { useAuth } from "../../contexts/AuthContext"
-import { useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import ErrorLoading from "../../components/ErrorLoading"
 import CardsSkeleton from "../../components/CardsSkeleton"
+import { getStatusMap } from "../../utils/getStatusMap"
+import AGHeader from "../../components/AGHeader"
+import type { AGClassFilterValue, AGIpCatFilterValue, AGTypeFilterValue } from "../../components/AGHeader"
+import { toAssignmentTypeParam } from "../../utils/assignmentType"
 
-interface IAssignmentGroupCardProps {
-  id: number
-  name: string
-  attemptCount: number
-  availableAttempts: number
-  state: AssignmentGroupState
-  status: AssignmentGroupStatus
-  startDate: string
-  deadline: string
-  maxSuccessRate?: string
-  className: string
-  description?: string
-  onSubmit: () => void
+type StudentAssignment = (IDNetAssignmentDto | SubnetAssignmentDto) & {
+	assignmentId: number
+	type: AssignmentGroupType
 }
 
-const AssignmentGroupCard = ({
-  id,
-  name,
-  attemptCount,
-  availableAttempts,
-  state,
-  status,
-  startDate,
-  deadline,
-  maxSuccessRate,
-  className,
-  description,
-  onSubmit
-}: IAssignmentGroupCardProps) => {
-  const { t } = useTranslation()
-  const stateMap = getStateMap(t)
-  const navigate = useNavigate()
+const resolveAssignmentId = (a: unknown): number => {
+	const raw = (a as any)?.assignmentId ?? (a as any)?.id
+	return typeof raw === "number" && raw > 0 ? raw : 0
+}
 
-  return (
-    <Tooltip title={description}>
-      <Card
-        variant="outlined"
-        sx={{
-          width: 320,
-          minWidth: 320,
-          maxWidth: 320,
-          borderColor: "divider",
-          borderWidth: 2,
-          borderStyle: "solid",
-          boxShadow: 0,
-          transition: "box-shadow 0.2s, border-color 0.2s",
-          backgroundColor: "background.paper"
-        }}
-      >
-        <CardHeader
-          title={
-            <Typography variant="h5" fontWeight="bold">
-              {name}
-            </Typography>
-          }
-          action={
-            <Chip
-              label={stateMap[state]?.label ?? t("unknown")}
-              color={
-                state === AssignmentGroupState.Ended
-                  ? "success"
-                  : state === AssignmentGroupState.InProgress
-                  ? "warning"
-                  : state === AssignmentGroupState.Upcoming
-                  ? "default"
-                  : "default"
-              }
-              variant="outlined"
-            />
-          }
-        />
-        <CardContent sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-          <Typography variant="body2" color="textSecondary">
-            <strong>{t(TranslationKey.STUDENT_ASSIGNMENTS_CARD_CLASS)}:</strong>{" "}
-            {className}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            <strong>
-              {t(TranslationKey.STUDENT_ASSIGNMENTS_CARD_AVAILABLE_ATTEMPTS)}:
-            </strong>{" "}
-            {availableAttempts}
-          </Typography>
-            {maxSuccessRate && (
-              <Typography variant="body2" color="textSecondary">
-                <strong>
-                  {t(
-                    TranslationKey.STUDENT_ASSIGNMENTS_CARD_MAX_SUCCESS_RATE
-                  )}
-                  :
-                </strong>{" "}
-                {maxSuccessRate}%
-              </Typography>
-            )}
-          <Typography variant="body2" color="textSecondary">
-            <strong>
-              {t(TranslationKey.STUDENT_ASSIGNMENTS_CARD_START_DATE)}:
-            </strong>{" "}
-            {startDate}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            <strong>
-              {t(TranslationKey.STUDENT_ASSIGNMENTS_CARD_DEADLINE)}:
-            </strong>{" "}
-            {deadline}
-          </Typography>
-          <Button
-            onClick={onSubmit}
-            disabled={
-              state === AssignmentGroupState.Ended ||
-              status === AssignmentGroupStatus.Completed
-            }
-            variant="outlined"
-            color="primary"
-            fullWidth
-            sx={{ mt: 1 }}
-          >
-            {t(TranslationKey.STUDENT_ASSIGNMENTS_CARD_SUBMIT)}
-          </Button>
-          <Button
-            onClick={() =>
-              navigate(
-                getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_DETAILS, {
-                  [RouteParams.ASSIGNMENT_ID]: id.toString(),
-                  [RouteParams.ATTEMPT]: "1"
-                })
-              )
-            }
-            disabled={attemptCount === 0}
-            variant="outlined"
-            color="primary"
-            fullWidth
-            sx={{ mt: 1 }}
-          >
-            {t(TranslationKey.STUDENT_ASSIGNMENTS_CARD_DETAILS)}
-          </Button>
-        </CardContent>
-      </Card>
-    </Tooltip>
-  )
+const formatDateTime = (value: string) =>
+	new Date(value).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })
+
+const normalizeSubnet = (a: SubnetAssignmentDto): StudentAssignment => ({
+	...a,
+	assignmentId: resolveAssignmentId(a),
+	type: AssignmentGroupType.Subnet
+})
+
+const normalizeIdNet = (a: IDNetAssignmentDto): StudentAssignment => ({
+	...a,
+	assignmentId: resolveAssignmentId(a),
+	type: AssignmentGroupType.Idnet
+})
+
+const statusColor = (status: AssignmentGroupStatus) => {
+	if (status === AssignmentGroupStatus.Upcoming) return "primary"
+	if (status === AssignmentGroupStatus.InProgress) return "warning"
+	return "default"
+}
+
+const resolveComputedStatus = (startDate: string, deadline: string, successRate?: number | null): AssignmentGroupStatus => {
+	if (successRate !== null && successRate !== undefined) return AssignmentGroupStatus.Ended
+
+	const now = Date.now()
+	const start = new Date(startDate).getTime()
+	const end = new Date(deadline).getTime()
+
+	if (now < start) return AssignmentGroupStatus.Upcoming
+	if (now > end) return AssignmentGroupStatus.Ended
+	return AssignmentGroupStatus.InProgress
 }
 
 const StudentAssignments = () => {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const { userId } = useAuth()
-  const queryClient = useQueryClient()
+	const { t } = useTranslation()
+	const navigate = useNavigate()
+	const { userId } = useAuth()
+	const queryClient = useQueryClient()
+	const statusMap = getStatusMap(t)
 
-  const [confirmDialogVis, setConfirmDialogVis] = useState(false)
-  const [selectedAssignmentId, setSelectedAssignmentId] = useState<number | null>(null)
+	const [confirmDialogVis, setConfirmDialogVis] = useState(false)
+	const [selectedAssignment, setSelectedAssignment] = useState<StudentAssignment | null>(null)
+	const [search, setSearch] = useState("")
+	const [classFilter, setClassFilter] = useState<AGClassFilterValue>("ALL")
+	const [typeFilter, setTypeFilter] = useState<AGTypeFilterValue>("ALL")
+	const [ipCatFilter, setIpCatFilter] = useState<AGIpCatFilterValue>("ALL_CAT")
 
-  const assignmentsQuery = useQuery<AssignmentDto[], Error>({
-    queryKey: ["studentAssignments", userId],
-    enabled: !!userId,
-    queryFn: () =>
-      assignmentApi
-        .assignmentQueryAssignments(userId!)
-        .then(r => r.data.assignments ?? []),
-    refetchInterval: 10_000,
-    placeholderData: prev => prev
-  })
+	const idNetQuery = useQuery({
+		queryKey: ["studentAssignments", "idnet", userId],
+		enabled: !!userId,
+		queryFn: () => assignmentApi.assignmentQueryIdNetAssignments(userId!).then(r => r.data.assignments ?? []),
+		placeholderData: prev => prev,
+		refetchInterval: 10_000
+	})
 
-  return (
-    <>
-      {assignmentsQuery.isLoading ? (
-        <CardsSkeleton />
-      ) : assignmentsQuery.isError ? (
-        <ErrorLoading
-          onRetry={() =>
-            queryClient.invalidateQueries({
-              queryKey: ["studentAssignments"]
-            })
-          }
-        />
-      ) : (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-          {(assignmentsQuery.data ?? []).length > 0 ? (
-            assignmentsQuery.data?.map(assignment => (
-              <AssignmentGroupCard
-                key={assignment.assignmentId}
-                id={assignment.assignmentId}
-                name={assignment.assignmentGroupName}
-                attemptCount={assignment.attemptCount}
-                availableAttempts={
-                  assignment.maxAttempts - assignment.attemptCount
-                }
-                state={assignment.state}
-                status={assignment.status}
-                startDate={new Date(assignment.startDate).toLocaleString()}
-                deadline={new Date(assignment.deadline).toLocaleString()}
-                maxSuccessRate={assignment.maxSuccessRate?.toString()}
-                className={assignment.className}
-                description={
-                  assignment.assignmentGroupDescription || undefined
-                }
-                onSubmit={() => {
-                  setSelectedAssignmentId(assignment.assignmentId)
-                  setConfirmDialogVis(true)
-                }}
-              />
-            ))
-          ) : (
-            <Typography variant="h6">
-              {t(TranslationKey.STUDENT_ASSIGNMENTS_NO_ASSIGNMENTS)}
-            </Typography>
-          )}
-        </Box>
-      )}
+	const subnetQuery = useQuery({
+		queryKey: ["studentAssignments", "subnet", userId],
+		enabled: !!userId,
+		queryFn: () => assignmentApi.assignmentQuerySubnetAssignments(userId!).then(r => r.data.assignments ?? []),
+		placeholderData: prev => prev,
+		refetchInterval: 10_000
+	})
 
-      <Dialog
-        open={confirmDialogVis}
-        onClose={() => setConfirmDialogVis(false)}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle>
-          {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMIT_DIALOG_TITLE)}
-        </DialogTitle>
-        <DialogContent>
-          {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMIT_DIALOG_QUESTION)}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialogVis(false)}>
-            {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMIT_DIALOG_CANCEL)}
-          </Button>
-          <Button
-            onClick={() => {
-              navigate(
-                getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION, {
-                  [RouteParams.ASSIGNMENT_ID]:
-                    selectedAssignmentId?.toString() || ""
-                })
-              )
-              setConfirmDialogVis(false)
-            }}
-            color="warning"
-            variant="contained"
-          >
-            {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMIT_DIALOG_CONFIRM)}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
-  )
+	const assignments = useMemo(() => {
+		const normalized = [
+			...(idNetQuery.data ?? []).map(normalizeIdNet),
+			...(subnetQuery.data ?? []).map(normalizeSubnet)
+		]
+		return normalized
+	}, [idNetQuery.data, subnetQuery.data])
+
+	const classOptions = useMemo<ClassDto[]>(() => {
+		const uniqueNames = Array.from(new Set(assignments.map(a => a.className))).sort((a, b) => a.localeCompare(b))
+		return uniqueNames.map((className, index) => ({
+			classId: index + 1,
+			className,
+			teachers: [],
+			teacherUsernames: []
+		}))
+	}, [assignments])
+
+	const selectedClassName = useMemo(
+		() => (classFilter === "ALL" || classFilter === null ? null : classOptions.find(c => c.classId === classFilter)?.className ?? null),
+		[classFilter, classOptions]
+	)
+
+	const filteredAssignments = useMemo(() => {
+		const term = search.trim().toLowerCase()
+		return assignments
+			.filter(a => (typeFilter === "ALL" ? true : a.type === typeFilter))
+			.filter(a => (ipCatFilter === "ALL_CAT" ? true : a.ipCat === ipCatFilter))
+			.filter(a => (selectedClassName ? a.className === selectedClassName : true))
+			.filter(a =>
+				term
+					? a.name.toLowerCase().includes(term) ||
+						a.className.toLowerCase().includes(term) ||
+						a.teacherUsername.toLowerCase().includes(term)
+					: true
+			)
+	}, [assignments, typeFilter, ipCatFilter, selectedClassName, search])
+
+	const inProgressAssignment = useMemo(() => {
+		const items = assignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.InProgress)
+		return items.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())[0]
+	}, [assignments])
+
+	const inProgressOthers = useMemo(
+		() => assignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.InProgress && a !== inProgressAssignment),
+		[assignments, inProgressAssignment]
+	)
+
+	const inProgressList = useMemo(
+		() => (inProgressAssignment ? [inProgressAssignment, ...inProgressOthers] : []),
+		[inProgressAssignment, inProgressOthers]
+	)
+
+	const grouped = useMemo(() => {
+		const remaining = filteredAssignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) !== AssignmentGroupStatus.InProgress)
+		const endedSorted = remaining
+			.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.Ended)
+			.sort((a, b) => new Date(b.deadline).getTime() - new Date(a.deadline).getTime())
+
+		return {
+			upcoming: remaining.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.Upcoming),
+			ended: endedSorted
+		}
+	}, [filteredAssignments])
+
+	const isLoading = (idNetQuery.isLoading || subnetQuery.isLoading) && assignments.length === 0
+	const hasError = idNetQuery.isError || subnetQuery.isError
+
+	const handleSubmitNavigate = (assignment: StudentAssignment) => {
+		if (!assignment.assignmentId) return
+		navigate(
+			getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION, {
+				[RouteParams.ASSIGNMENT_ID]: assignment.assignmentId.toString(),
+				[RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(assignment.type)
+			}),
+			{ state: { assignmentType: assignment.type } }
+		)
+	}
+
+	const handleDetailsNavigate = (assignment: StudentAssignment) => {
+		if (!assignment.assignmentId) return
+		navigate(
+			getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_DETAILS, {
+				[RouteParams.ASSIGNMENT_ID]: assignment.assignmentId.toString(),
+				[RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(assignment.type)
+			}),
+			{ state: { assignmentType: assignment.type } }
+		)
+	}
+
+	if (isLoading) {
+		return <CardsSkeleton />
+	}
+
+	if (hasError) {
+		return (
+			<ErrorLoading
+				onRetry={() => {
+					queryClient.invalidateQueries({ queryKey: ["studentAssignments"] })
+				}}
+			/>
+		)
+	}
+
+	const renderCard = (assignment: StudentAssignment, wide = false, allowSubmit = false) => {
+		const computedStatus = resolveComputedStatus(assignment.startDate, assignment.deadline, assignment.successRate)
+		const successRateValue = Number.isFinite(assignment.successRate)
+			? Math.min(Math.max(assignment.successRate as number, 0), 100)
+			: 0
+		const canViewDetails = computedStatus !== AssignmentGroupStatus.InProgress || (assignment.successRate !== null && assignment.successRate !== undefined)
+		const isInProgress = computedStatus === AssignmentGroupStatus.InProgress
+
+		return (
+		<Card
+			variant="outlined"
+			sx={{
+				position: "relative",
+				overflow: "hidden",
+				width: "100%",
+				minWidth: wide ? "100%" : 260,
+				maxWidth: "100%",
+				borderRadius: 1,
+				borderWidth: 2,
+				borderColor: statusColor(computedStatus),
+				backgroundColor:
+					computedStatus === AssignmentGroupStatus.InProgress
+						? theme => alpha(theme.palette.warning.main, 0.08)
+						: "background.paper",
+				cursor: assignment.assignmentId && !isInProgress ? "pointer" : "default",
+				boxShadow: 0,
+				"&::before":
+					computedStatus === AssignmentGroupStatus.InProgress
+						? {
+							content: '""',
+							position: "absolute",
+							inset: 0,
+							zIndex: 0,
+							background:
+								"linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent)",
+							transform: "translateX(-100%)",
+							animation: "inProgressShimmer 1.8s ease-in-out infinite"
+						}
+						: undefined,
+				"& > *": {
+					position: "relative",
+					zIndex: 1
+				},
+				"@keyframes inProgressShimmer": {
+					"100%": {
+						transform: "translateX(100%)"
+					}
+				},
+				"&:hover .assignment-title-link": assignment.assignmentId && !isInProgress
+					? {
+						textDecoration: "underline"
+					}
+					: undefined
+			}}
+			onClick={() => {
+				if (!assignment.assignmentId || !canViewDetails) return
+				handleDetailsNavigate(assignment)
+			}}
+		>
+			<CardHeader
+				title={
+					<Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
+						<Typography variant={wide ? "h5" : "h6"} fontWeight={700} className="assignment-title-link">
+							{assignment.name}
+						</Typography>
+						<Chip
+							label={assignment.type === AssignmentGroupType.Subnet ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET) : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_IDNET)}
+							size="small"
+							color={assignment.type === AssignmentGroupType.Subnet ? "primary" : "secondary"}
+							variant="outlined"
+						/>
+						<Chip
+							label={statusMap[computedStatus]?.label ?? computedStatus}
+							size="small"
+							color={statusColor(computedStatus)}
+							variant="outlined"
+						/>
+						{"ipCat" in assignment && assignment.ipCat ? (
+							<Chip
+								label={assignment.ipCat}
+								size="small"
+								variant="outlined"
+								sx={{ borderStyle: "dashed" }}
+							/>
+						) : null}
+						{assignment.successRate !== undefined && assignment.successRate !== null ? (
+							<Chip
+								label={`${assignment.successRate.toFixed(1)}%`}
+								size="small"
+								variant="filled"
+							/>
+						) : null}
+					</Stack>
+				}
+				subheader={null}
+			/>
+			<CardContent sx={{ display: "flex", flexDirection: "column", gap: 0.8 }}>
+				<Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+					<Stack direction="row" alignItems="center" spacing={1}>
+						<Typography variant="body2" color="text.secondary" noWrap>
+							{assignment.teacherUsername}
+						</Typography>
+						<Typography variant="body2" color="text.secondary" noWrap>
+							{assignment.className}
+						</Typography>
+					</Stack>
+					{allowSubmit ? (
+						<Button
+							variant="contained"
+							color="primary"
+							size="small"
+							onClick={e => {
+								e.stopPropagation()
+								setSelectedAssignment(assignment)
+								setConfirmDialogVis(true)
+							}}
+							disabled={computedStatus !== AssignmentGroupStatus.InProgress || !assignment.assignmentId}
+						>
+							{t(TranslationKey.STUDENT_ASSIGNMENTS_CARD_SUBMIT)}
+						</Button>
+					) : null}
+				</Stack>
+				<Typography variant="subtitle1" fontWeight={700} color="text.primary">
+					{formatDateTime(assignment.startDate)} - {formatDateTime(assignment.deadline)}
+				</Typography>
+				{computedStatus === AssignmentGroupStatus.Ended ? (
+					<Stack spacing={0.5}>
+						<Stack direction="row" alignItems="center" spacing={1}>
+							<Typography variant="h6" fontWeight={800}>
+								{successRateValue.toFixed(2)}%
+							</Typography>
+							<Typography variant="body2" color="text.secondary">
+								{t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE)}
+							</Typography>
+						</Stack>
+						<LinearProgress
+							variant="determinate"
+							value={successRateValue}
+							sx={{ height: 8, borderRadius: 999 }}
+						/>
+					</Stack>
+				) : null}
+			</CardContent>
+		</Card>
+		)
+	}
+
+	return (
+		<>
+			<Stack spacing={3}>
+				{inProgressList.length > 0 ? (
+          <>
+            <Stack spacing={1.5}>
+              {inProgressList.map(a => renderCard(a, true, true))}
+            </Stack>
+            <Divider />
+          </>
+				) : null}
+
+				<AGHeader
+					t={t}
+					search={search}
+					onSearchChange={setSearch}
+					classValue={classFilter}
+					onClassChange={setClassFilter}
+					classOptions={classOptions}
+					typeValue={typeFilter}
+					onTypeChange={setTypeFilter}
+					ipCatValue={ipCatFilter}
+					onIpCatChange={setIpCatFilter}
+				/>
+
+        <Divider />
+
+				<Box
+					sx={{
+						display: "grid",
+						gridTemplateColumns: {
+							xs: "1fr",
+							md: "repeat(2, minmax(0, 1fr))"
+						},
+						gap: 2
+					}}
+				>
+					{[
+						{
+							status: AssignmentGroupStatus.Upcoming,
+							items: grouped.upcoming
+						},
+						{
+							status: AssignmentGroupStatus.Ended,
+							items: grouped.ended
+						}
+					].map(section => (
+						<Box
+							key={section.status}
+							sx={{
+								backgroundColor: "background.paper",
+								border: "1px solid",
+								borderColor: "divider",
+								borderRadius: 1,
+								p: 2,
+								display: "flex",
+								flexDirection: "column",
+								gap: 2
+							}}
+						>
+							<Stack direction="row" alignItems="center" spacing={1}>
+								<Chip
+									label={statusMap[section.status]?.label ?? section.status}
+									color={section.status === AssignmentGroupStatus.Upcoming ? "primary" : "success"}
+								/>
+								<Typography variant="subtitle2" color="text.secondary">
+									{section.items.length} {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ITEMS_LABEL)}
+								</Typography>
+							</Stack>
+							<Divider />
+							<Stack spacing={1.5}>
+								{section.items.length === 0 ? (
+									<Typography variant="body2" color="text.secondary">
+										{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NO_DATA)}
+									</Typography>
+								) : (
+									section.items.map(a => renderCard(a, true))
+								)}
+							</Stack>
+						</Box>
+					))}
+				</Box>
+			</Stack>
+
+			<Dialog open={confirmDialogVis} onClose={() => setConfirmDialogVis(false)} fullWidth maxWidth="xs">
+				<DialogTitle>{t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMIT_DIALOG_TITLE)}</DialogTitle>
+				<DialogContent>{t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMIT_DIALOG_QUESTION)}</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setConfirmDialogVis(false)}>
+						{t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMIT_DIALOG_CANCEL)}
+					</Button>
+					<Button
+						onClick={() => {
+							if (!selectedAssignment?.assignmentId) return
+							handleSubmitNavigate(selectedAssignment)
+							setConfirmDialogVis(false)
+						}}
+						color="warning"
+						variant="contained"
+						disabled={!selectedAssignment?.assignmentId}
+					>
+						{t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMIT_DIALOG_CONFIRM)}
+					</Button>
+				</DialogActions>
+			</Dialog>
+		</>
+	)
 }
 
 export default StudentAssignments

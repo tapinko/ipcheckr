@@ -2,16 +2,28 @@ import { Stack, TextField, Typography } from "@mui/material"
 import { TranslationKey } from "../utils/i18n"
 import { useTranslation } from "react-i18next"
 
+type DetailTone = "success" | "error" | "info" | "neutral"
+
 interface ICardSingleDetailProps {
-    title: string
-    submitted: string
-    correct: string
-  }
-  
-const CardSingleDetail = ({ title, submitted, correct }: ICardSingleDetailProps) => {
+  title: string
+  submitted: string
+  correct: string
+  tone?: DetailTone
+}
+
+const CardSingleDetail = ({ title, submitted, correct, tone }: ICardSingleDetailProps) => {
   const { t } = useTranslation()
   const isAnswered = submitted !== ""
   const isCorrect = isAnswered && submitted === correct
+  const computedTone: DetailTone = tone ?? (isCorrect ? "success" : isAnswered ? "error" : "neutral")
+  const isError = computedTone === "error"
+  const textFieldColorMap: Record<DetailTone, "success" | "error" | "info" | undefined> = {
+    success: "success",
+    error: "error",
+    info: "info",
+    neutral: undefined
+  }
+  const textFieldColor = textFieldColorMap[computedTone]
 
   return (
     <Stack spacing={2}>
@@ -30,8 +42,8 @@ const CardSingleDetail = ({ title, submitted, correct }: ICardSingleDetailProps)
             size="small"
             variant="filled"
             slotProps={{ input: { readOnly: true } }}
-            color={isCorrect ? "success" : undefined}
-            error={isAnswered && !isCorrect}
+            color={textFieldColor}
+            error={isError}
             focused
             sx={{ "& .MuiInputBase-root": { pointerEvents: "none" } }}
           />
