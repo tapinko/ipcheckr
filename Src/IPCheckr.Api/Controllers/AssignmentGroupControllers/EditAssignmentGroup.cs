@@ -133,6 +133,9 @@ namespace IPCheckr.Api.Controllers
                 }
             }
 
+            var subnetResolvedStatus = AssignmentEvaluationUtils.ResolveStatus(subnetGroup.StartDate, subnetGroup.Deadline, subnetGroup.CompletedAt);
+            if (subnetResolvedStatus != AssignmentGroupStatus.ENDED)
+                subnetGroup.CompletedAt = null;
             subnetGroup.Status = AssignmentEvaluationUtils.ResolveStatus(subnetGroup.StartDate, subnetGroup.Deadline, subnetGroup.CompletedAt);
             await _db.SaveChangesAsync();
             return Ok();
@@ -248,6 +251,9 @@ namespace IPCheckr.Api.Controllers
                 }
             }
 
+            var idnetResolvedStatus = AssignmentEvaluationUtils.ResolveStatus(idnetGroup.StartDate, idnetGroup.Deadline, idnetGroup.CompletedAt);
+            if (idnetResolvedStatus != AssignmentGroupStatus.ENDED)
+                idnetGroup.CompletedAt = null;
             idnetGroup.Status = AssignmentEvaluationUtils.ResolveStatus(idnetGroup.StartDate, idnetGroup.Deadline, idnetGroup.CompletedAt);
             await _db.SaveChangesAsync();
             return Ok();

@@ -111,6 +111,14 @@ type EditFormValues = {
   deadline: string
 }
 
+type MovePlan = {
+  ag: IAG
+  fromStatus: AssignmentGroupStatus
+  toStatus: AssignmentGroupStatus
+  startDate: string
+  deadline: string
+}
+
 const formatDateTime = (value: string) =>
   new Date(value).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })
 
@@ -122,6 +130,69 @@ const toLocalDateTimeString = (date: Date) => {
   const min = String(date.getMinutes()).padStart(2, "0")
   const s = String(date.getSeconds()).padStart(2, "0")
   return `${y}-${m}-${d}T${h}:${min}:${s}`
+}
+
+const TEN_MINUTES_MS = 10 * 60 * 1000
+const TWENTY_MINUTES_MS = 20 * 60 * 1000
+
+const computeMoveDates = (
+  ag: IAG,
+  targetStatus: AssignmentGroupStatus,
+  now = new Date()
+): { startDate: string; deadline: string } | null => {
+  if (ag.status === targetStatus) return null
+
+  const nowMs = now.getTime()
+  const oldStart = new Date(ag.startDate)
+  const oldDeadline = new Date(ag.deadline)
+
+  let nextStart = new Date(oldStart)
+  let nextDeadline = new Date(oldDeadline)
+
+  if (ag.status === AssignmentGroupStatus.Upcoming && targetStatus === AssignmentGroupStatus.InProgress) {
+    nextStart = new Date(nowMs)
+    if (oldDeadline.getTime() <= nowMs + TEN_MINUTES_MS) {
+      nextDeadline = new Date(nowMs + TEN_MINUTES_MS)
+    }
+  }
+
+  if (ag.status === AssignmentGroupStatus.Upcoming && targetStatus === AssignmentGroupStatus.Ended) {
+    nextStart = new Date(nowMs)
+    nextDeadline = new Date(nowMs)
+  }
+
+  if (ag.status === AssignmentGroupStatus.InProgress && targetStatus === AssignmentGroupStatus.Upcoming) {
+    nextStart = new Date(nowMs + TEN_MINUTES_MS)
+    nextDeadline = new Date(nowMs + TWENTY_MINUTES_MS)
+  }
+
+  if (ag.status === AssignmentGroupStatus.InProgress && targetStatus === AssignmentGroupStatus.Ended) {
+    nextDeadline = new Date(nowMs)
+    if (nextStart.getTime() > nextDeadline.getTime()) {
+      nextStart = new Date(nowMs)
+    }
+  }
+
+  if (ag.status === AssignmentGroupStatus.Ended && targetStatus === AssignmentGroupStatus.Upcoming) {
+    nextStart = new Date(nowMs + TEN_MINUTES_MS)
+    nextDeadline = new Date(nowMs + TWENTY_MINUTES_MS)
+  }
+
+  if (ag.status === AssignmentGroupStatus.Ended && targetStatus === AssignmentGroupStatus.InProgress) {
+    nextDeadline = new Date(nowMs + TEN_MINUTES_MS)
+    const remainingMs = oldDeadline.getTime() - nowMs
+    if (remainingMs < TEN_MINUTES_MS) {
+      nextStart = new Date(nowMs)
+    }
+    if (nextStart.getTime() > nextDeadline.getTime()) {
+      nextStart = new Date(nowMs)
+    }
+  }
+
+  return {
+    startDate: toLocalDateTimeString(nextStart),
+    deadline: toLocalDateTimeString(nextDeadline)
+  }
 }
 
 const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
@@ -177,6 +248,9 @@ const TeacherAssignmentGroups = () => {
   const [editAG, setEditAG] = useState<IAG | null>(null)
   const [deleteAG, setDeleteAG] = useState<IAG | null>(null)
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
+  const [draggedAG, setDraggedAG] = useState<IAG | null>(null)
+  const [dragOverStatus, setDragOverStatus] = useState<AssignmentGroupStatus | null>(null)
+  const [movePlan, setMovePlan] = useState<MovePlan | null>(null)
 
   const classesQuery = useQuery<ClassDto[], Error>({
     queryKey: ["teacherClasses", userId],
@@ -543,6 +617,41 @@ const TeacherAssignmentGroups = () => {
     }
   })
 
+  const moveMutation = useMutation<AxiosResponse<void>, AxiosError<ApiProblemDetails>, MovePlan>({
+    mutationFn: async plan => {
+      if (plan.ag.type === AssignmentGroupType.Idnet) {
+        return assignmentGroupApi.assignmentGroupEditIdNetAssignmentGroup({
+          id: plan.ag.id,
+          startDate: plan.startDate,
+          deadline: plan.deadline
+        })
+      }
+      return assignmentGroupApi.assignmentGroupEditSubnetAssignmentGroup({
+        id: plan.ag.id,
+        startDate: plan.startDate,
+        deadline: plan.deadline
+      })
+    },
+    onSuccess: (_data, plan) => {
+      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"] })
+      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"] })
+      setAlert({
+        severity: "success",
+        message: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_MOVE_SUCCESS, { value: plan.ag.name })
+      })
+      setMovePlan(null)
+    },
+    onError: error => {
+      const details = error.response?.data
+      const localMessage =
+        i18n.language === Language.EN ? details?.messageEn : details?.messageSk
+      setAlert({
+        severity: "error",
+        message: `${t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_ERROR)}. ${localMessage ?? ""}`
+      })
+    }
+  })
+
   const handleDelete = async () => {
     if (deleteAG) {
       await deleteMutation.mutateAsync([deleteAG])
@@ -555,6 +664,26 @@ const TeacherAssignmentGroups = () => {
 
   const handleEdit = async (data: EditFormValues) => {
     await editMutation.mutateAsync(data)
+  }
+
+  const handleDropToStatus = (targetStatus: AssignmentGroupStatus) => {
+    if (!draggedAG || draggedAG.status === targetStatus) return
+    const moved = computeMoveDates(draggedAG, targetStatus)
+    if (!moved) return
+    setMovePlan({
+      ag: draggedAG,
+      fromStatus: draggedAG.status,
+      toStatus: targetStatus,
+      startDate: moved.startDate,
+      deadline: moved.deadline
+    })
+  }
+
+  const confirmMove = async () => {
+    if (!movePlan) return
+    await moveMutation.mutateAsync(movePlan)
+    setDraggedAG(null)
+    setDragOverStatus(null)
   }
 
   const disableCreate =
@@ -639,15 +768,36 @@ const TeacherAssignmentGroups = () => {
               return (
                 <Box
                   key={status === AssignmentGroupStatus.Ended ? `${status}-${endedPage}` : status}
+                  onDragOver={e => {
+                    if (!draggedAG || draggedAG.status === status || moveMutation.isPending) return
+                    e.preventDefault()
+                    if (dragOverStatus !== status) {
+                      setDragOverStatus(status)
+                    }
+                  }}
+                  onDragLeave={() => {
+                    if (dragOverStatus === status) {
+                      setDragOverStatus(null)
+                    }
+                  }}
+                  onDrop={e => {
+                    e.preventDefault()
+                    handleDropToStatus(status)
+                    setDragOverStatus(null)
+                  }}
                   sx={{
                     backgroundColor: "background.paper",
                     border: "1px solid",
-                    borderColor: "divider",
+                    borderColor:
+                      dragOverStatus === status && draggedAG?.status !== status
+                        ? "primary.main"
+                        : "divider",
                     borderRadius: 1,
                     p: 2,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 2
+                    gap: 2,
+                    transition: "border-color 120ms ease"
                   }}
                 >
                   <Stack direction="row" alignItems="center" spacing={1}>
@@ -675,6 +825,7 @@ const TeacherAssignmentGroups = () => {
                       visibleItems.map(ag => (
                         <Tooltip key={`${status}-${ag.id}`} title={ag.description ?? ""}>
                           <Card
+                            draggable={!moveMutation.isPending}
                             variant="outlined"
                             sx={{
                               minWidth: 320,
@@ -695,6 +846,15 @@ const TeacherAssignmentGroups = () => {
                               "&:hover .ag-title-text": {
                                 textDecoration: "underline"
                               }
+                            }}
+                            onDragStart={e => {
+                              e.stopPropagation()
+                              setDraggedAG(ag)
+                              e.dataTransfer.effectAllowed = "move"
+                            }}
+                            onDragEnd={() => {
+                              setDraggedAG(null)
+                              setDragOverStatus(null)
                             }}
                             onClick={() =>
                               navigate(
@@ -1185,6 +1345,53 @@ const TeacherAssignmentGroups = () => {
         title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_CONFIRMATION_TITLE)}
         label={deleteAG?.name ?? ""}
       />
+
+      <Dialog
+        open={!!movePlan}
+        onClose={() => {
+          if (moveMutation.isPending) return
+          setMovePlan(null)
+        }}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_MOVE_TITLE)}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            {movePlan
+              ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_MOVE_QUESTION, {
+                  value: movePlan.ag.name,
+                  from: statusMap[movePlan.fromStatus]?.label ?? movePlan.fromStatus,
+                  to: statusMap[movePlan.toStatus]?.label ?? movePlan.toStatus
+                })
+              : ""}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_MOVE_NEW_START)}: {movePlan ? formatDateTime(movePlan.startDate) : ""}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_MOVE_NEW_DEADLINE)}: {movePlan ? formatDateTime(movePlan.deadline) : ""}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              if (moveMutation.isPending) return
+              setMovePlan(null)
+            }}
+          >
+            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CANCEL)}
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={confirmMove}
+            disabled={moveMutation.isPending}
+          >
+            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_MOVE_CONFIRM)}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog
         open={editDialogVis}
