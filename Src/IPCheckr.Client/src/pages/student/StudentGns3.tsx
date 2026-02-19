@@ -20,7 +20,6 @@ import { useTranslation } from "react-i18next"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import axios, { type AxiosError } from "axios"
 import TableSkeleton from "../../components/TableSkeleton"
-import ActionPanel from "../../components/ActionPanel"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
 import { TranslationKey, Language } from "../../utils/i18n"
 import { appSettingsApi, gns3Api } from "../../utils/apiClients"
@@ -207,12 +206,8 @@ const StudentGns3 = () => {
     },
   })
 
-  if (!userId) {
-    return <TableSkeleton />
-  }
-
   const session = sessionQuery.data
-  const historyData = historyQuery.data as Gns3SessionBase[] | undefined
+  const historyData = historyQuery.data
   const statusMap = useMemo(() => getGns3StatusMap(t), [t])
   const statusKey: Gns3StatusKey = session?.status ?? "UNKNOWN"
   const statusMeta = statusMap[statusKey] ?? statusMap.UNKNOWN
@@ -258,6 +253,10 @@ const StudentGns3 = () => {
   const handleStopSession = () => stopSessionMutation.mutate()
   const handleExtendSession = () => extendSessionMutation.mutate()
 
+  if (!userId) {
+    return <TableSkeleton />
+  }
+
   return (
     <>
       {alert && (
@@ -279,8 +278,6 @@ const StudentGns3 = () => {
           onClose={() => setAlert(null)}
         />
       )}
-
-      <ActionPanel title={t(TranslationKey.STUDENT_GNS3_TITLE)} hideActions />
 
       {showSkeleton ? (
         <TableSkeleton />

@@ -5,6 +5,7 @@ import AdminUserDetails from "../pages/admin/AdminUserDetails"
 import AdminClasses from "../pages/admin/AdminClasses"
 import AdminClassDetails from "../pages/admin/AdminClassDetails"
 import AdminGns3 from "../pages/admin/AdminGns3"
+import AdminGns3AllSessions from "../pages/admin/AdminGnsAllSessions"
 import AdminSettings from "../pages/admin/AdminSettings"
 
 import TeacherLayout from "../layouts/TeacherLayout"
@@ -16,6 +17,7 @@ import TeacherAssignmentGroups from "../pages/teacher/TeacherAssignmentGroups"
 import TeacherAssignmentGroupDetails from "../pages/teacher/TeacherAssignmentGroupDetails"
 import TeacherAssignmentGroupDetailsSubmit from "../pages/teacher/TeacherAssignmentGroupDetailsSubmit"
 import TeacherGns3 from "../pages/teacher/TeacherGns3"
+import TeacherGns3AllSessions from "../pages/teacher/TeacherGns3AllSessions"
 
 import StudentLayout from "../layouts/StudentLayout"
 import StudentDashboard from "../pages/student/StudentDashboard"
@@ -46,6 +48,7 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.ADMIN_CLASSES]: <AdminClasses />,
   [RouteKeys.ADMIN_CLASS_DETAILS]: <AdminClassDetails />,
   [RouteKeys.ADMIN_GNS3]: <AdminGns3 />,
+  [RouteKeys.ADMIN_GNS3_ALL_SESSIONS]: <AdminGns3AllSessions />,
   [RouteKeys.ADMIN_SETTINGS]: <AdminSettings />,
 
   [RouteKeys.TEACHER]: <Navigate to={Routes[RouteKeys.TEACHER_DASHBOARD]} />,
@@ -57,6 +60,7 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS]: <TeacherAssignmentGroupDetails />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <TeacherAssignmentGroupDetailsSubmit />,
   [RouteKeys.TEACHER_GNS3]: <TeacherGns3 />,
+  [RouteKeys.TEACHER_GNS3_ALL_SESSIONS]: <TeacherGns3AllSessions />,
 
   [RouteKeys.STUDENT]: <Navigate to={Routes[RouteKeys.STUDENT_DASHBOARD]} />,
   [RouteKeys.STUDENT_DASHBOARD]: <StudentDashboard />,
@@ -107,6 +111,7 @@ const useAuthRouter = () => {
           RouteKeys.ADMIN_CLASSES,
           RouteKeys.ADMIN_CLASS_DETAILS,
           RouteKeys.ADMIN_GNS3,
+          RouteKeys.ADMIN_GNS3_ALL_SESSIONS,
           RouteKeys.ADMIN_SETTINGS,
         ].map(key => ({
           path: childPath(Routes[key], Routes[RouteKeys.ADMIN]),
@@ -128,6 +133,7 @@ const useAuthRouter = () => {
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
           RouteKeys.TEACHER_GNS3,
+          RouteKeys.TEACHER_GNS3_ALL_SESSIONS,
         ].map(key => ({
           path: childPath(Routes[key], Routes[RouteKeys.TEACHER]),
           element: routeElements[key]!,

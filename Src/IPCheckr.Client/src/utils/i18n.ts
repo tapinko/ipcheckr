@@ -133,15 +133,29 @@ export enum TranslationKey {
   ADMIN_NAVBAR_GNS3 = "ADMIN_NAVBAR_GNS3",
   ADMIN_NAVBAR_SETTINGS = "ADMIN_NAVBAR_SETTINGS",
 
-  // Admin GNS3
-  ADMIN_GNS3_TITLE = "ADMIN_GNS3_TITLE",
-  ADMIN_GNS3_START = "ADMIN_GNS3_START",
-  ADMIN_GNS3_STOP = "ADMIN_GNS3_STOP",
-  ADMIN_GNS3_EXTEND = "ADMIN_GNS3_EXTEND",
-  ADMIN_GNS3_FORCE_KILL_ALL = "ADMIN_GNS3_FORCE_KILL_ALL",
-  ADMIN_GNS3_FORCE_KILL_SUCCESS = "ADMIN_GNS3_FORCE_KILL_SUCCESS",
+  // AdminGNS3
+  ADMIN_GNS3_USER_HISTORY_TITLE = "ADMIN_GNS3_USER_HISTORY_TITLE",
+  ADMIN_GNS3_OPEN_ALL_SESSIONS = "ADMIN_GNS3_OPEN_ALL_SESSIONS",
+  ADMIN_GNS3_USERS_RECENT_EMPTY = "ADMIN_GNS3_USERS_RECENT_EMPTY",
+  ADMIN_GNS3_USERNAME = "ADMIN_GNS3_USERNAME",
+  ADMIN_GNS3_ROLE = "ADMIN_GNS3_ROLE",
+  ADMIN_GNS3_STARTED_AT = "ADMIN_GNS3_STARTED_AT",
+  ADMIN_GNS3_STOPPED_AT = "ADMIN_GNS3_STOPPED_AT",
+  ADMIN_GNS3_DURATION = "ADMIN_GNS3_DURATION",
+  ADMIN_GNS3_STATUS = "ADMIN_GNS3_STATUS",
+  ADMIN_GNS3_TEACHER = "ADMIN_GNS3_TEACHER",
+  ADMIN_GNS3_STUDENT = "ADMIN_GNS3_STUDENT",
+  ADMIN_GNS3_ROWS_PER_PAGE = "ADMIN_GNS3_ROWS_PER_PAGE",
+  ADMIN_GNS3_PAGINATION_RANGE = "ADMIN_GNS3_PAGINATION_RANGE",
 
-  // Admin Dashboard
+  // AdminGNS3AllSessions
+  ADMIN_GNS3_ALL_SESSIONS_START = "ADMIN_GNS3_ALL_SESSIONS_START",
+  ADMIN_GNS3_ALL_SESSIONS_STOP = "ADMIN_GNS3_ALL_SESSIONS_STOP",
+  ADMIN_GNS3_ALL_SESSIONS_EXTEND = "ADMIN_GNS3_ALL_SESSIONS_EXTEND",
+  ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_ALL = "ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_ALL",
+  ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_SUCCESS = "ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_SUCCESS",
+
+  // AdminDashboard
   ADMIN_DASHBOARD_TITLE = "ADMIN_DASHBOARD_TITLE",
   ADMIN_DASHBOARD_LAST_SUBMIT = "ADMIN_DASHBOARD_LAST_SUBMIT",
   ADMIN_DASHBOARD_INSTITUTION_NAME = "ADMIN_DASHBOARD_INSTITUTION_NAME",
@@ -172,7 +186,7 @@ export enum TranslationKey {
   ADMIN_DASHBOARD_LOGS_NO_LOGS = "ADMIN_DASHBOARD_LOGS_NO_LOGS",
 
 
-  // Admin Users
+  // AdminUsers
   ADMIN_USERS_TITLE = "ADMIN_USERS_TITLE",
   ADMIN_USERS_ADD_USER = "ADMIN_USERS_ADD_USER",
   ADMIN_USERS_EDIT_USER = "ADMIN_USERS_EDIT_USER",
@@ -224,7 +238,7 @@ export enum TranslationKey {
   ADMIN_USER_DETAILS_TOTAL_IN_PROGRESS = "ADMIN_USER_DETAILS_TOTAL_IN_PROGRESS",
   ADMIN_USER_DETAILS_TOTAL_ENDED = "ADMIN_USER_DETAILS_TOTAL_ENDED",
 
-  // Admin Classes
+  // AdminClasses
   ADMIN_CLASSES_TITLE = "ADMIN_CLASSES_TITLE",
   ADMIN_CLASSES_CREATE_CLASS = "ADMIN_CLASSES_CREATE_CLASS",
   ADMIN_CLASSES_EDIT_CLASS = "ADMIN_CLASSES_EDIT_CLASS",
@@ -318,13 +332,35 @@ export enum TranslationKey {
   TEACHER_NAVBAR_ASSIGNMENT_GROUPS = "TEACHER_NAVBAR_ASSIGNMENT_GROUPS",
   TEACHER_NAVBAR_GNS3 = "TEACHER_NAVBAR_GNS3",
 
-  // Teacher GNS3
-  TEACHER_GNS3_TITLE = "TEACHER_GNS3_TITLE",
-  TEACHER_GNS3_START = "TEACHER_GNS3_START",
+  // TeacherGNS3
+  TEACHER_GNS3_MY_HISTORY_TITLE = "TEACHER_GNS3_MY_HISTORY_TITLE",
+  TEACHER_GNS3_STUDENT_HISTORY_TITLE = "TEACHER_GNS3_STUDENT_HISTORY_TITLE",
+  TEACHER_GNS3_STUDENT_HISTORY_DESCRIPTION = "TEACHER_GNS3_STUDENT_HISTORY_DESCRIPTION",
+  TEACHER_GNS3_USERNAME = "TEACHER_GNS3_USERNAME",
+  TEACHER_GNS3_OPEN_ALL_SESSIONS = "TEACHER_GNS3_OPEN_ALL_SESSIONS",
+  TEACHER_GNS3_STUDENTS_RECENT_EMPTY = "TEACHER_GNS3_STUDENTS_RECENT_EMPTY",
+  TEACHER_GNS3_START_SUCCESS = "TEACHER_GNS3_START_SUCCESS",
+  TEACHER_GNS3_STOP_SUCCESS = "TEACHER_GNS3_STOP_SUCCESS",
+  TEACHER_GNS3_EXTEND_SUCCESS = "TEACHER_GNS3_EXTEND_SUCCESS",
+  TEACHER_GNS3_LIVE_SESSION = "TEACHER_GNS3_LIVE_SESSION",
+  TEACHER_GNS3_STATUS = "TEACHER_GNS3_STATUS",
   TEACHER_GNS3_STOP = "TEACHER_GNS3_STOP",
   TEACHER_GNS3_EXTEND = "TEACHER_GNS3_EXTEND",
-  TEACHER_GNS3_CLASS_FILTER = "TEACHER_GNS3_CLASS_FILTER",
-  TEACHER_GNS3_ALL_CLASSES = "TEACHER_GNS3_ALL_CLASSES",
+  TEACHER_GNS3_START = "TEACHER_GNS3_START",
+  TEACHER_GNS3_STARTED_AT = "TEACHER_GNS3_STARTED_AT",
+  TEACHER_GNS3_REMAINING = "TEACHER_GNS3_REMAINING",
+  TEACHER_GNS3_DURATION = "TEACHER_GNS3_DURATION",
+  TEACHER_GNS3_HISTORY_EMPTY = "TEACHER_GNS3_HISTORY_EMPTY",
+  TEACHER_GNS3_STOPPED_AT = "TEACHER_GNS3_STOPPED_AT",
+  TEACHER_GNS3_ROWS_PER_PAGE = "TEACHER_GNS3_ROWS_PER_PAGE",
+  TEACHER_GNS3_PAGINATION_RANGE = "TEACHER_GNS3_PAGINATION_RANGE",
+
+  // TeacherGNS3AllSessions
+  TEACHER_GNS3_ALL_SESSIONS_START = "TEACHER_GNS3_ALL_SESSIONS_START",
+  TEACHER_GNS3_ALL_SESSIONS_STOP = "TEACHER_GNS3_ALL_SESSIONS_STOP",
+  TEACHER_GNS3_ALL_SESSIONS_EXTEND = "TEACHER_GNS3_ALL_SESSIONS_EXTEND",
+  TEACHER_GNS3_ALL_SESSIONS_CLASS_FILTER = "TEACHER_GNS3_ALL_SESSIONS_CLASS_FILTER",
+  TEACHER_GNS3_ALL_SESSIONS_ALL_CLASSES = "TEACHER_GNS3_ALL_SESSIONS_ALL_CLASSES",
 
   // TeacherDashboard
   TEACHER_DASHBOARD_TITLE = "TEACHER_DASHBOARD_TITLE",
@@ -536,7 +572,6 @@ export enum TranslationKey {
   STUDENT_NAVBAR_GNS3 = "STUDENT_NAVBAR_GNS3",
 
   // Student GNS3
-  STUDENT_GNS3_TITLE = "STUDENT_GNS3_TITLE",
   STUDENT_GNS3_LIVE_SESSION = "STUDENT_GNS3_LIVE_SESSION",
   STUDENT_GNS3_STATUS = "STUDENT_GNS3_STATUS",
   STUDENT_GNS3_STARTED_AT = "STUDENT_GNS3_STARTED_AT",
@@ -733,22 +768,36 @@ const _EN: Record<TranslationKey, string> = {
 
   // ||-------- ADMIN --------||
   // |                        |
-  // Admin Navbar             |
+  // AdminNavbar             |
   [TranslationKey.ADMIN_NAVBAR_DASHBOARD]: "Dashboard",
   [TranslationKey.ADMIN_NAVBAR_USERS]: "Users",
   [TranslationKey.ADMIN_NAVBAR_CLASSES]: "Classes",
   [TranslationKey.ADMIN_NAVBAR_GNS3]: "GNS3",
   [TranslationKey.ADMIN_NAVBAR_SETTINGS]: "Settings",
 
-  // Admin GNS3
-  [TranslationKey.ADMIN_GNS3_TITLE]: "GNS3 sessions",
-  [TranslationKey.ADMIN_GNS3_START]: "Successfully started session for user '{{value}}'.",
-  [TranslationKey.ADMIN_GNS3_STOP]: "Successfully stopped session for user '{{value}}'.",
-  [TranslationKey.ADMIN_GNS3_EXTEND]: "Successfully extended for user '{{value}}' by {{minutes}}min.",
-  [TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL]: "Force stop all sessions",
-  [TranslationKey.ADMIN_GNS3_FORCE_KILL_SUCCESS]: "All sessions stop command sent.",
+  // AdminGNS3
+  [TranslationKey.ADMIN_GNS3_USER_HISTORY_TITLE]: "User history",
+  [TranslationKey.ADMIN_GNS3_OPEN_ALL_SESSIONS]: "Open all sessions",
+  [TranslationKey.ADMIN_GNS3_USERS_RECENT_EMPTY]: "No user sessions yet.",
+  [TranslationKey.ADMIN_GNS3_USERNAME]: "Username",
+  [TranslationKey.ADMIN_GNS3_ROLE]: "Role",
+  [TranslationKey.ADMIN_GNS3_STARTED_AT]: "Started at",
+  [TranslationKey.ADMIN_GNS3_STOPPED_AT]: "Stopped at",
+  [TranslationKey.ADMIN_GNS3_DURATION]: "Duration",
+  [TranslationKey.ADMIN_GNS3_STATUS]: "Status",
+  [TranslationKey.ADMIN_GNS3_TEACHER]: "Teacher",
+  [TranslationKey.ADMIN_GNS3_STUDENT]: "Student",
+  [TranslationKey.ADMIN_GNS3_ROWS_PER_PAGE]: "Rows per page",
+  [TranslationKey.ADMIN_GNS3_PAGINATION_RANGE]: "{{from}}-{{to}} of {{count}}",
 
-  // Admin Dashboard
+  // AdminGNS3AllSessions
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_START]: "Successfully started session for user '{{value}}'.",
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_STOP]: "Successfully stopped session for user '{{value}}'.",
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_EXTEND]: "Successfully extended for user '{{value}}' by {{minutes}}min.",
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_ALL]: "Force stop all sessions",
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_SUCCESS]: "All sessions stop command sent.",
+
+  // AdminDashboard
   [TranslationKey.ADMIN_DASHBOARD_TITLE]: "Dashboard",
   [TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT]: "Last submit",
   [TranslationKey.ADMIN_DASHBOARD_INSTITUTION_NAME]: "Institution name",
@@ -778,7 +827,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_DASHBOARD_LOGS_CLEAR]: "Clear",
   [TranslationKey.ADMIN_DASHBOARD_LOGS_NO_LOGS]: "No logs available",
 
-  // Admin Users
+  // AdminUsers
   [TranslationKey.ADMIN_USERS_TITLE]: "Users",
   [TranslationKey.ADMIN_USERS_ADD_USER]: "Add user",
   [TranslationKey.ADMIN_USERS_EDIT_USER]: "Edit user",
@@ -924,13 +973,35 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_NAVBAR_ASSIGNMENT_GROUPS]: "Assignments",
   [TranslationKey.TEACHER_NAVBAR_GNS3]: "GNS3",
 
-  // Teacher GNS3
-  [TranslationKey.TEACHER_GNS3_TITLE]: "GNS3 sessions",
-  [TranslationKey.TEACHER_GNS3_START]: "Successfully started session for student '{{value}}'.",
-  [TranslationKey.TEACHER_GNS3_STOP]: "Successfully stopped session for student '{{value}}'.",
-  [TranslationKey.TEACHER_GNS3_EXTEND]: "Successfully extended for student '{{value}}' by {{minutes}}min.",
-  [TranslationKey.TEACHER_GNS3_CLASS_FILTER]: "Class",
-  [TranslationKey.TEACHER_GNS3_ALL_CLASSES]: "All",
+  // TeacherGNS3
+  [TranslationKey.TEACHER_GNS3_MY_HISTORY_TITLE]: "My session history",
+  [TranslationKey.TEACHER_GNS3_STUDENT_HISTORY_TITLE]: "Student history",
+  [TranslationKey.TEACHER_GNS3_STUDENT_HISTORY_DESCRIPTION]: "Open all student sessions and history in one place.",
+  [TranslationKey.TEACHER_GNS3_OPEN_ALL_SESSIONS]: "Open all sessions",
+  [TranslationKey.TEACHER_GNS3_STUDENTS_RECENT_EMPTY]: "No student sessions yet.",
+  [TranslationKey.TEACHER_GNS3_USERNAME]: "Username",
+  [TranslationKey.TEACHER_GNS3_START_SUCCESS]: "Successfully started session.",
+  [TranslationKey.TEACHER_GNS3_STOP_SUCCESS]: "Successfully stopped session.",
+  [TranslationKey.TEACHER_GNS3_EXTEND_SUCCESS]: "Successfully extended session by {{minutes}}min.",
+  [TranslationKey.TEACHER_GNS3_LIVE_SESSION]: "Live session",
+  [TranslationKey.TEACHER_GNS3_STATUS]: "Status",
+  [TranslationKey.TEACHER_GNS3_STOP]: "Stop",
+  [TranslationKey.TEACHER_GNS3_EXTEND]: "Extend",
+  [TranslationKey.TEACHER_GNS3_START]: "Start",
+  [TranslationKey.TEACHER_GNS3_STARTED_AT]: "Started at",
+  [TranslationKey.TEACHER_GNS3_REMAINING]: "Remaining",
+  [TranslationKey.TEACHER_GNS3_DURATION]: "Duration",
+  [TranslationKey.TEACHER_GNS3_HISTORY_EMPTY]: "No sessions yet.",
+  [TranslationKey.TEACHER_GNS3_STOPPED_AT]: "Stopped at",
+  [TranslationKey.TEACHER_GNS3_ROWS_PER_PAGE]: "Rows per page",
+  [TranslationKey.TEACHER_GNS3_PAGINATION_RANGE]: "{{from}}-{{to}} of {{count}}",
+
+  // TeacherGNS3AllSessions
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_START]: "Successfully started session for student '{{value}}'.",
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_STOP]: "Successfully stopped session for student '{{value}}'.",
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_EXTEND]: "Successfully extended for student '{{value}}' by {{minutes}}min.",
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_CLASS_FILTER]: "Class",
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_ALL_CLASSES]: "All",
 
   // TeacherDashboard
   [TranslationKey.TEACHER_DASHBOARD_TITLE]: "Dashboard",
@@ -1140,8 +1211,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.STUDENT_NAVBAR_ASSIGNMENTS]: "Assignments",
   [TranslationKey.STUDENT_NAVBAR_GNS3]: "GNS3",
 
-  // Student GNS3
-  [TranslationKey.STUDENT_GNS3_TITLE]: "GNS3",
+  // StudentGNS3
   [TranslationKey.STUDENT_GNS3_LIVE_SESSION]: "Live session",
   [TranslationKey.STUDENT_GNS3_STATUS]: "Status",
   [TranslationKey.STUDENT_GNS3_STARTED_AT]: "Started at",
@@ -1345,13 +1415,27 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_NAVBAR_GNS3]: "GNS3",
   [TranslationKey.ADMIN_NAVBAR_SETTINGS]: "Nastavenia",
 
-  // Admin GNS3
-  [TranslationKey.ADMIN_GNS3_TITLE]: "GNS3 relácie",
-  [TranslationKey.ADMIN_GNS3_START]: "Úspešne spustená relácia pre používateľa '{{value}}'.",
-  [TranslationKey.ADMIN_GNS3_STOP]: "Úspešne zastavená relácia pre používateľa '{{value}}'.",
-  [TranslationKey.ADMIN_GNS3_EXTEND]: "Úspešne predĺžená relácia pre používateľa '{{value}}' o {{minutes}} min.",
-  [TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL]: "Vynútene zastaviť všetky relácie",
-  [TranslationKey.ADMIN_GNS3_FORCE_KILL_SUCCESS]: "Príkaz na zastavenie všetkých session odoslaný.",
+  // AdminGNS3
+  [TranslationKey.ADMIN_GNS3_USER_HISTORY_TITLE]: "História používateľov",
+  [TranslationKey.ADMIN_GNS3_OPEN_ALL_SESSIONS]: "Otvoriť všetky relácie",
+  [TranslationKey.ADMIN_GNS3_USERS_RECENT_EMPTY]: "Zatiaľ nie sú žiadne používateľské relácie.",
+  [TranslationKey.ADMIN_GNS3_USERNAME]: "Používateľské meno",
+  [TranslationKey.ADMIN_GNS3_ROLE]: "Rola",
+  [TranslationKey.ADMIN_GNS3_STARTED_AT]: "Začiatok relácie",
+  [TranslationKey.ADMIN_GNS3_STOPPED_AT]: "Koniec relácie",
+  [TranslationKey.ADMIN_GNS3_DURATION]: "Trvanie",
+  [TranslationKey.ADMIN_GNS3_STATUS]: "Stav",
+  [TranslationKey.ADMIN_GNS3_TEACHER]: "Učitel",
+  [TranslationKey.ADMIN_GNS3_STUDENT]: "Študent",
+  [TranslationKey.ADMIN_GNS3_ROWS_PER_PAGE]: "Riadkov na stránku",
+  [TranslationKey.ADMIN_GNS3_PAGINATION_RANGE]: "{{from}}-{{to}} z {{count}}",
+
+  // AdminGNS3AllSessions
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_START]: "Úspešne spustená relácia pre používateľa '{{value}}'.",
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_STOP]: "Úspešne zastavená relácia pre používateľa '{{value}}'.",
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_EXTEND]: "Úspešne predĺžená relácia pre používateľa '{{value}}' o {{minutes}} min.",
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_ALL]: "Vynútene zastaviť všetky relácie",
+  [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_SUCCESS]: "Príkaz na zastavenie všetkých session odoslaný.",
 
   // AdminDashboard
   [TranslationKey.ADMIN_DASHBOARD_TITLE]: "Hlavný panel",
@@ -1529,13 +1613,35 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_NAVBAR_ASSIGNMENT_GROUPS]: "Zadania",
   [TranslationKey.TEACHER_NAVBAR_GNS3]: "GNS3",
 
-  // Teacher GNS3
-  [TranslationKey.TEACHER_GNS3_TITLE]: "GNS3 relácie",
-  [TranslationKey.TEACHER_GNS3_START]: "Úspešne spustená relácia pre študenta '{{value}}'.",
-  [TranslationKey.TEACHER_GNS3_STOP]: "Úspešne zastavená relácia pre študenta '{{value}}'.",
-  [TranslationKey.TEACHER_GNS3_EXTEND]: "Úspešne predĺžená relácia pre študenta '{{value}}' o {{minutes}} min.",
-  [TranslationKey.TEACHER_GNS3_CLASS_FILTER]: "Trieda",
-  [TranslationKey.TEACHER_GNS3_ALL_CLASSES]: "Všetky",
+  // TeacherGNS3
+  [TranslationKey.TEACHER_GNS3_MY_HISTORY_TITLE]: "Moja história relácií",
+  [TranslationKey.TEACHER_GNS3_STUDENT_HISTORY_TITLE]: "História študentov",
+  [TranslationKey.TEACHER_GNS3_STUDENT_HISTORY_DESCRIPTION]: "Otvorte všetky študentské relácie a históriu na jednom mieste.",
+  [TranslationKey.TEACHER_GNS3_OPEN_ALL_SESSIONS]: "Otvoriť všetky relácie",
+  [TranslationKey.TEACHER_GNS3_STUDENTS_RECENT_EMPTY]: "Zatiaľ nie sú žiadne študentské relácie.",
+  [TranslationKey.TEACHER_GNS3_START_SUCCESS]: "Úspěšně spustená relácia.",
+  [TranslationKey.TEACHER_GNS3_STOP_SUCCESS]: "Úspěšně zastavená relácia.",
+  [TranslationKey.TEACHER_GNS3_EXTEND_SUCCESS]: "Úspešne predĺžená relácia.",
+  [TranslationKey.TEACHER_GNS3_LIVE_SESSION]: "Aktívna relácia",
+  [TranslationKey.TEACHER_GNS3_STATUS]: "Stav",
+  [TranslationKey.TEACHER_GNS3_STOP]: "Zastavit",
+  [TranslationKey.TEACHER_GNS3_EXTEND]: "Predĺžiť",
+  [TranslationKey.TEACHER_GNS3_START]: "Spustiť",
+  [TranslationKey.TEACHER_GNS3_STARTED_AT]: "Začiatok",
+  [TranslationKey.TEACHER_GNS3_REMAINING]: "Zostávajúci čas",
+  [TranslationKey.TEACHER_GNS3_DURATION]: "Trvanie",
+  [TranslationKey.TEACHER_GNS3_HISTORY_EMPTY]: "Zatiaľ žiadna história relácií.",
+  [TranslationKey.TEACHER_GNS3_STOPPED_AT]: "Koniec",
+  [TranslationKey.TEACHER_GNS3_ROWS_PER_PAGE]: "Riadkov na stránku",
+  [TranslationKey.TEACHER_GNS3_PAGINATION_RANGE]: "{{from}}-{{to}} z {{count}}",
+  [TranslationKey.TEACHER_GNS3_USERNAME]: "Používateľské meno",
+
+  // TeacherGNS3AllSessionsxs
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_START]: "Úspešne spustená relácia pre študenta '{{value}}'.",
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_STOP]: "Úspešne zastavená relácia pre študenta '{{value}}'.",
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_EXTEND]: "Úspešne predĺžená relácia pre študenta '{{value}}' o {{minutes}} min.",
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_CLASS_FILTER]: "Trieda",
+  [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_ALL_CLASSES]: "Všetky",
 
   // TeacherDashboard
   [TranslationKey.TEACHER_DASHBOARD_TITLE]: "Hlavný panel",
@@ -1745,8 +1851,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.STUDENT_NAVBAR_ASSIGNMENTS]: "Zadania",
   [TranslationKey.STUDENT_NAVBAR_GNS3]: "GNS3",
 
-  // Student GNS3
-  [TranslationKey.STUDENT_GNS3_TITLE]: "GNS3",
+  // StudentGNS3
   [TranslationKey.STUDENT_GNS3_LIVE_SESSION]: "Aktívna relácia",
   [TranslationKey.STUDENT_GNS3_STATUS]: "Stav",
   [TranslationKey.STUDENT_GNS3_STARTED_AT]: "Spustené",

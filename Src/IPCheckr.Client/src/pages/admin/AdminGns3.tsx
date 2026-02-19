@@ -1,28 +1,60 @@
 import { useMemo, useState } from "react"
-import { Button, Stack } from "@mui/material"
+import {
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Typography,
+} from "@mui/material"
+import { Link as RouterLink } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import axios, { type AxiosError } from "axios"
-import Gns3DataGridWithSearch from "../../components/Gns3DataGridWithSearch"
+import { useQuery } from "@tanstack/react-query"
+import { type AxiosError } from "axios"
 import TableSkeleton from "../../components/TableSkeleton"
-import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
-import ActionPanel from "../../components/ActionPanel"
-import { TranslationKey, Language } from "../../utils/i18n"
-import { appSettingsApi, gns3Api, userApi } from "../../utils/apiClients"
-import type { ApiProblemDetails, UserDto, Gns3SessionBase, StartSessionReq, StopSessionReq, ForceStopAllRes } from "../../dtos"
-import { GNS3SessionStatus } from "../../dtos"
+import { CustomAlert } from "../../components/CustomAlert"
+import { Language, TranslationKey } from "../../utils/i18n"
+import { gns3Api, userApi } from "../../utils/apiClients"
+import type { ApiProblemDetails, Gns3SessionBase, UserDto } from "../../dtos"
+import { type Gns3StatusKey, getGns3StatusMap } from "../../utils/getGns3StatusMap"
+import { RouteKeys, Routes } from "../../router/routes"
 import UserRole from "../../types/UserRole"
-import DeleteDialog from "../../components/DeleteDialog"
+
+const parseDateSafe = (value?: string | null) => {
+  if (!value) return null
+  const hasZone = /[zZ]|[+-]\d\d:\d\d$/.test(value)
+  return new Date(hasZone ? value : `${value}Z`)
+}
+
+const formatDateTime = (value?: string | null) => {
+  const date = parseDateSafe(value)
+  return date ? date.toLocaleString() : "-"
+}
+
+const formatDuration = (start?: string | null, end?: string | null) => {
+  const startDate = parseDateSafe(start)
+  const endDate = parseDateSafe(end)
+  if (!startDate || !endDate) return "-"
+  const diffSeconds = Math.max(0, Math.floor((endDate.getTime() - startDate.getTime()) / 1000))
+  const hours = Math.floor(diffSeconds / 3600)
+  const minutes = Math.floor((diffSeconds % 3600) / 60)
+  const seconds = diffSeconds % 60
+  const pad = (n: number) => n.toString().padStart(2, "0")
+  if (hours > 0) return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+  return `${pad(minutes)}:${pad(seconds)}`
+}
 
 const AdminGns3 = () => {
   const { t, i18n } = useTranslation()
-  const queryClient = useQueryClient()
-
-  const [searchValue, setSearchValue] = useState("")
-  const [roleFilterValue, setRoleFilterValue] = useState("")
-  const [descending, setDescending] = useState(false)
-  const [alert, setAlert] = useState<CustomAlertState | null>(null)
-  const [forceKillOpen, setForceKillOpen] = useState(false)
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(5)
+  const statusMap = useMemo(() => getGns3StatusMap(t), [t])
 
   const getApiMessage = (error: unknown) => {
     const apiErr = error as AxiosError<ApiProblemDetails>
@@ -31,240 +63,167 @@ const AdminGns3 = () => {
     return localized || payload?.detail || t(TranslationKey.ERROR_MESSAGE)
   }
 
-  const settingsQuery = useQuery({
-    queryKey: ["appsettings"],
-    queryFn: () => appSettingsApi.appSettingsQueryAppSettings(),
-  })
-
-  const gns3DefaultMinutes = useMemo(() => {
-    const list = settingsQuery.data?.data?.appSettings ?? []
-    const setting = list.find(s => s.name === "Gns3_DefaultSessionMinutes")
-    const value = parseInt((setting?.value ?? "").trim(), 10)
-    return Number.isFinite(value) && value > 0 ? value : 120
-  }, [settingsQuery.data])
-
-  const gns3ExtensionMinutes = useMemo(() => {
-    const list = settingsQuery.data?.data?.appSettings ?? []
-    const setting = list.find(s => s.name === "Gns3_ExtendedMinutes")
-    const value = parseInt((setting?.value ?? "").trim(), 10)
-    return Number.isFinite(value) && value > 0 ? value : 30
-  }, [settingsQuery.data])
-
   const usersQuery = useQuery<UserDto[]>({
-    queryKey: ["gns3-users", { searchValue, roleFilterValue, descending }],
-    queryFn: () =>
-      userApi
-        .userQueryUsers(null, searchValue || null, roleFilterValue || null, null, null, descending || null)
-        .then(r => r.data.users ?? []),
-    placeholderData: (prev) => prev,
-    refetchInterval: 10_000,
+    queryKey: ["admin-gns3-users"],
+    queryFn: () => userApi.userQueryUsers(null, null, null, null, null, null).then(r => r.data.users ?? []),
+    placeholderData: prev => prev,
+    refetchInterval: 20_000,
   })
 
-  const filteredUsers = useMemo(() => (usersQuery.data ?? []).filter(u => u.role !== UserRole.ADMIN), [usersQuery.data])
-  const sortedUsers = useMemo(() => {
-    const _arr = [...filteredUsers]
-    _arr.sort((a, b) => descending ? b.username.localeCompare(a.username) : a.username.localeCompare(b.username))
-    return _arr
-  }, [filteredUsers, descending])
-  const filteredUserIds = sortedUsers.map(u => u.id)
+  const nonAdminUsers = useMemo(() => (usersQuery.data ?? []).filter(u => u.role !== UserRole.ADMIN), [usersQuery.data])
 
-  const sessionsQuery = useQuery<Record<number, Gns3SessionBase>>({
-    queryKey: ["gns3-sessions", filteredUserIds],
-    enabled: filteredUserIds.length > 0,
+  const recentUsersQuery = useQuery<Array<{ userId: number; username: string; role: UserRole; session: Gns3SessionBase; lastStartMs: number }>>({
+    queryKey: ["admin-gns3-recent-users", nonAdminUsers.map(u => u.id)],
+    enabled: nonAdminUsers.length > 0,
     queryFn: async () => {
-      const users = sortedUsers
       const results = await Promise.all(
-        users.map(async user => {
+        nonAdminUsers.map(async user => {
           try {
-            const res = await gns3Api.gns3QuerySession(user.id)
-            return res.data
-          } catch (error) {
-            const base = {
+            const res = await gns3Api.gns3QuerySessionHistory(user.id)
+            const data = res.data as { sessions?: Gns3SessionBase[]; Sessions?: Gns3SessionBase[] }
+            const sessions = data.sessions ?? data.Sessions ?? []
+            const sorted = [...sessions].sort((a, b) => {
+              const aMs = parseDateSafe(a.sessionStart)?.getTime() ?? 0
+              const bMs = parseDateSafe(b.sessionStart)?.getTime() ?? 0
+              return bMs - aMs
+            })
+            const latest = sorted[0]
+            if (!latest?.sessionStart) return null
+            return {
               userId: user.id,
               username: user.username,
-              status: GNS3SessionStatus.Stopped,
-              port: 0,
-              sessionStart: null,
-              sessionEnd: null,
-              duration: 0,
-              extendedDuration: 0,
+              role: user.role,
+              session: latest,
+              lastStartMs: parseDateSafe(latest.sessionStart)?.getTime() ?? 0,
             }
-
-            if (axios.isAxiosError(error) && error.response?.status === 404) {
-              return { ...base, errorMessage: undefined }
-            }
-
-            return { ...base, errorMessage: getApiMessage(error) }
+          } catch {
+            return null
           }
         })
       )
 
-      return results.reduce<Record<number, Gns3SessionBase>>((account, session) => {
-        if (session.userId != null) {
-          account[session.userId] = session
-        }
-        return account
-      }, {})
+      return results
+        .filter((row): row is { userId: number; username: string; role: UserRole; session: Gns3SessionBase; lastStartMs: number } => row !== null)
+        .sort((a, b) => b.lastStartMs - a.lastStartMs)
     },
-    staleTime: 15_000,
-    refetchInterval: 10_000,
+    refetchInterval: 20_000,
     refetchIntervalInBackground: true,
+    placeholderData: prev => prev,
   })
 
-  const defaultDurationSeconds = useMemo(() => gns3DefaultMinutes * 60, [gns3DefaultMinutes])
+  const recentUsers = recentUsersQuery.data ?? []
+  const pagedRecentUsers = useMemo(() => {
+    const start = page * rowsPerPage
+    return recentUsers.slice(start, start + rowsPerPage)
+  }, [page, rowsPerPage, recentUsers])
 
-  const startSessionMutation = useMutation({
-    mutationFn: ({ userId }: { userId: number; username: string }) => {
-      const payload: StartSessionReq = { userId, duration: defaultDurationSeconds }
-      return gns3Api.gns3StartSession(payload)
-    },
-    onSuccess: (_res, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["gns3-sessions"] })
-      setAlert({ severity: "success", message: `${t(TranslationKey.ADMIN_GNS3_START, { value: variables.username })}` })
-    },
-    onError: (error, variables) => {
-      const message = getApiMessage(error)
-      setAlert({
-        severity: "error",
-        message: `${variables.username}: ${message}`,
-      })
-    },
-  })
+  const handleChangePage = (_: unknown, newPage: number) => setPage(newPage)
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value, 10)
+    setRowsPerPage(Number.isFinite(value) ? value : 5)
+    setPage(0)
+  }
 
-  const stopSessionMutation = useMutation({
-    mutationFn: ({ userId }: { userId: number; username: string }) => {
-      const payload: StopSessionReq = { userId }
-      return gns3Api.gns3StopSession(payload)
-    },
-    onSuccess: (_res, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["gns3-sessions"] })
-      setAlert({ severity: "success", message: `${t(TranslationKey.ADMIN_GNS3_STOP, { value: variables.username })}` })
-    },
-    onError: (error, variables) => {
-      const message = getApiMessage(error)
-      setAlert({
-        severity: "error",
-        message: `${variables.username}: ${message}`,
-      })
-    },
-  })
-
-  const extendSessionMutation = useMutation({
-    mutationFn: ({ userId, minutes }: { userId: number; username: string; minutes: number }) =>
-      gns3Api.gns3ExtendSession({ userId, minutes }),
-    onSuccess: (_res, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["gns3-sessions"] })
-      setAlert({
-        severity: "success",
-        message: `${t(TranslationKey.ADMIN_GNS3_EXTEND, { value: variables.username, minutes: variables.minutes })}`,
-      })
-    },
-    onError: (error, variables) => {
-      const message = getApiMessage(error)
-      setAlert({
-        severity: "error",
-        message: `${variables.username}: ${message}`,
-      })
-    },
-  })
-
-  const forceStopAllMutation = useMutation({
-    mutationFn: () => gns3Api.gns3ForceStopAll(),
-    onSuccess: (res) => {
-      const data = (res as unknown as { data?: ForceStopAllRes }).data
-      queryClient.invalidateQueries({ queryKey: ["gns3-sessions"] })
-      const stopped = data?.stoppedCount ?? 0
-      const failed = data?.failedCount ?? 0
-      setAlert({ severity: failed > 0 ? "warning" : "success", message: t(TranslationKey.ADMIN_GNS3_FORCE_KILL_SUCCESS, { stopped, failed }) })
-      setForceKillOpen(false)
-    },
-    onError: (error) => {
-      const message = getApiMessage(error)
-      setAlert({ severity: "error", message })
-      setForceKillOpen(false)
-    },
-  })
-
-  const sessionsByUser = sessionsQuery.data ?? {}
-
-  const handleStartSession = (user: UserDto) => startSessionMutation.mutate({ userId: user.id, username: user.username })
-  const handleStopSession = (user: UserDto) => stopSessionMutation.mutate({ userId: user.id, username: user.username })
-  const handleExtendSession = (user: UserDto) => extendSessionMutation.mutate({ userId: user.id, username: user.username, minutes: gns3ExtensionMinutes })
-  const handleForceKillConfirm = () => forceStopAllMutation.mutate()
-  const isForceKillBusy = sessionsQuery.isFetching || forceStopAllMutation.isPending
-
+  const showSkeleton = (usersQuery.isLoading && nonAdminUsers.length === 0) || (recentUsersQuery.isLoading && recentUsers.length === 0)
 
   return (
-    <Stack spacing={3}>
-      <ActionPanel
-        title={t(TranslationKey.ADMIN_GNS3_TITLE)}
-        customActions={(
-          <Stack direction={{ xs: "column", sm: "row" }} alignItems="center" justifyContent="flex-end" gap={1} sx={{ width: "100%" }}>
-            <Button
-              variant="outlined"
-              color="error"
-              size="small"
-              onClick={() => setForceKillOpen(true)}
-              disabled={isForceKillBusy}
-              fullWidth
-            >
-              {t(TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL)}
-            </Button>
-          </Stack>
-        )}
-      />
-
-      {alert && <CustomAlert severity={alert.severity} message={alert.message} onClose={() => setAlert(null)} />}
-
-      {usersQuery.isLoading ? (
-        <TableSkeleton />
-      ) : usersQuery.isError ? (
+    <>
+      {usersQuery.isError && (
         <CustomAlert
           severity="error"
           message={getApiMessage(usersQuery.error)}
-          onClose={() => setAlert(null)}
+          onClose={() => undefined}
         />
-      ) : (
-        <Stack spacing={2}>
-          {sessionsQuery.isError && (
-            <CustomAlert
-              severity="error"
-              message={getApiMessage(sessionsQuery.error)}
-              onClose={() => setAlert(null)}
-            />
-          )}
-
-          <Gns3DataGridWithSearch
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-            descending={descending}
-            setDescending={setDescending}
-            roleFilterValue={roleFilterValue}
-            setRoleFilterValue={setRoleFilterValue}
-            users={sortedUsers}
-            sessionsByUser={sessionsByUser}
-            gns3ExtensionMinutes={gns3ExtensionMinutes}
-            isUsersFetching={usersQuery.isFetching}
-            startPendingUserId={startSessionMutation.isPending ? startSessionMutation.variables?.userId ?? null : null}
-            stopPendingUserId={stopSessionMutation.isPending ? stopSessionMutation.variables?.userId ?? null : null}
-            extendPending={extendSessionMutation.isPending}
-            onStartSession={handleStartSession}
-            onStopSession={handleStopSession}
-            onExtendSession={handleExtendSession}
-          />
-        </Stack>
       )}
 
-      <DeleteDialog
-        open={forceKillOpen}
-        onClose={() => setForceKillOpen(false)}
-        onConfirm={handleForceKillConfirm}
-        title={t(TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL)}
-        question={t(TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL)}
-        confirmLabel={TranslationKey.ADMIN_GNS3_FORCE_KILL_ALL}
-        color="error"
-      />
-    </Stack>
+      {recentUsersQuery.isError && (
+        <CustomAlert
+          severity="error"
+          message={getApiMessage(recentUsersQuery.error)}
+          onClose={() => undefined}
+        />
+      )}
+
+      {showSkeleton ? (
+        <TableSkeleton />
+      ) : (
+        <Stack spacing={2}>
+          <Card variant="outlined">
+            <CardContent>
+              <Stack spacing={2}>
+                <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} gap={1}>
+                  <Typography variant="h6">{t(TranslationKey.ADMIN_GNS3_USER_HISTORY_TITLE)}</Typography>
+                  <Button
+                    component={RouterLink}
+                    to={Routes[RouteKeys.ADMIN_GNS3_ALL_SESSIONS]}
+                    variant="contained"
+                    size="small"
+                  >
+                    {t(TranslationKey.ADMIN_GNS3_OPEN_ALL_SESSIONS)}
+                  </Button>
+                </Stack>
+
+                {recentUsers.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    {t(TranslationKey.ADMIN_GNS3_USERS_RECENT_EMPTY)}
+                  </Typography>
+                ) : (
+                  <>
+                    <Table size="medium">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>{t(TranslationKey.ADMIN_GNS3_USERNAME)}</TableCell>
+                          <TableCell>{t(TranslationKey.ADMIN_GNS3_ROLE)}</TableCell>
+                          <TableCell>{t(TranslationKey.ADMIN_GNS3_STARTED_AT)}</TableCell>
+                          <TableCell>{t(TranslationKey.ADMIN_GNS3_STOPPED_AT)}</TableCell>
+                          <TableCell>{t(TranslationKey.ADMIN_GNS3_DURATION)}</TableCell>
+                          <TableCell>{t(TranslationKey.ADMIN_GNS3_STATUS)}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {pagedRecentUsers.map(row => {
+                          const meta = statusMap[(row.session.status as Gns3StatusKey) ?? "UNKNOWN"] ?? statusMap.UNKNOWN
+                          const roleLabel = row.role === UserRole.TEACHER
+                            ? t(TranslationKey.ADMIN_GNS3_TEACHER)
+                            : t(TranslationKey.ADMIN_GNS3_STUDENT)
+
+                          return (
+                            <TableRow key={`${row.userId}-${row.session.sessionStart ?? "-"}`}>
+                              <TableCell>{row.username}</TableCell>
+                              <TableCell>{roleLabel}</TableCell>
+                              <TableCell>{formatDateTime(row.session.sessionStart)}</TableCell>
+                              <TableCell>{formatDateTime(row.session.sessionEnd)}</TableCell>
+                              <TableCell>{formatDuration(row.session.sessionStart, row.session.sessionEnd ?? null)}</TableCell>
+                              <TableCell>
+                                <Chip label={meta.label} color={meta.color} size="small" />
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                    <TablePagination
+                      component="div"
+                      count={recentUsers.length}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      rowsPerPage={rowsPerPage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      rowsPerPageOptions={[5, 10, 25]}
+                      labelRowsPerPage={t(TranslationKey.ADMIN_GNS3_ROWS_PER_PAGE)}
+                      labelDisplayedRows={({ from, to, count }) => {
+                        const numericCount = count === -1 ? to : count
+                        return t(TranslationKey.ADMIN_GNS3_PAGINATION_RANGE, { from, to, count: numericCount })
+                      }}
+                    />
+                  </>
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
+        </Stack>
+      )}
+    </>
   )
 }
 

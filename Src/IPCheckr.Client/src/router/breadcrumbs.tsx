@@ -48,6 +48,12 @@ const routes: BreadcrumbsRoute[] = [
         {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_GNS3)}
       </Typography>
   },
+  {
+    path: Routes[RouteKeys.ADMIN_GNS3_ALL_SESSIONS],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_GNS3_ALL_SESSIONS)}
+      </Typography>
+  },
 
   {
     path: Routes[RouteKeys.TEACHER_MY_CLASSES],
@@ -89,6 +95,12 @@ const routes: BreadcrumbsRoute[] = [
     path: Routes[RouteKeys.TEACHER_GNS3],
     breadcrumb: () => <Typography variant="body2" component="span">
         {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_GNS3)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.TEACHER_GNS3_ALL_SESSIONS],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_GNS3_ALL_SESSIONS)}
       </Typography>
   },
 
