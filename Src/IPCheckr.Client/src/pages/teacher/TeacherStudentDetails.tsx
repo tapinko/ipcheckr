@@ -2,6 +2,7 @@ import {
   Box,
   Card,
   CardContent,
+  Link,
   Stack,
   Tooltip,
   Typography
@@ -39,6 +40,7 @@ const TeacherStudentDetails = () => {
   const avgFirst = detailsQuery.data?.averageFirst ?? 0
   const avgLast = detailsQuery.data?.averageLast ?? 0
   const avgBroadcast = detailsQuery.data?.averageBroadcast ?? 0
+  const studentClasses = detailsQuery.data?.classes ?? []
   const hasAnyAverage =
     [
       detailsQuery.data?.averageNetwork,
@@ -51,6 +53,14 @@ const TeacherStudentDetails = () => {
   const hasLastSubmitTarget =
     !!detailsQuery.data?.lastSubmitGroupId &&
     !!detailsQuery.data?.lastSubmitAssignmentId
+
+  const handleClassNavigate = (classId: number) => {
+    navigate(
+      getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_CLASS_DETAILS, {
+        [RouteParams.CLASS_ID]: classId.toString()
+      })
+    )
+  }
 
   const handleLastSubmitNavigate = async () => {
     if (!detailsQuery.data?.lastSubmitGroupId || !detailsQuery.data?.lastSubmitAssignmentId) return
@@ -160,9 +170,25 @@ const TeacherStudentDetails = () => {
             </Tooltip>,
             <InsightCard
               title={t(TranslationKey.TEACHER_STUDENT_DETAILS_CLASSES)}
-              value={detailsQuery.data?.classes
-                && detailsQuery.data.classes.length
-                > 0 ? detailsQuery.data.classes.map(c => c.name).join(", ") : "-"}
+              value={studentClasses.length > 0 ? (
+                <Box component="span">
+                  {studentClasses.map((c, index) => (
+                    <Box key={c.id} component="span">
+                      <Link
+                        component="button"
+                        type="button"
+                        underline="hover"
+                        color="inherit"
+                        onClick={() => handleClassNavigate(c.id)}
+                        sx={{ fontWeight: "inherit", fontSize: "inherit", verticalAlign: "baseline" }}
+                      >
+                        {c.name}
+                      </Link>
+                      {index < studentClasses.length - 1 ? ", " : null}
+                    </Box>
+                  ))}
+                </Box>
+              ) : "-"}
               icon={<Class />}
               dense
             />,
