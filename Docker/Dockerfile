@@ -19,7 +19,7 @@ RUN dotnet publish -c Release -o /app/publish -p:UseAppHost=false -p:DebugType=N
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-ENV ASPNETCORE_URLS=http://0.0.0.0:8080 \
+ENV ASPNETCORE_URLS=https://0.0.0.0:8081 \
     ASPNETCORE_ENVIRONMENT=Production \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
@@ -30,5 +30,5 @@ RUN apt-get update \
 COPY --from=api-build /app/publish .
 COPY Docker/fetch-ldap-cert.sh /app/fetch-ldap-cert.sh
 RUN chmod +x /app/fetch-ldap-cert.sh
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["/app/fetch-ldap-cert.sh"]

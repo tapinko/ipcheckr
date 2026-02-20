@@ -10,6 +10,10 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.Text.Json.Serialization;
+using System.IO;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace IPCheckr.Api
 {
@@ -18,36 +22,14 @@ namespace IPCheckr.Api
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var env = builder.Environment;
+            var config = builder.Configuration;
 
-            // HTTPS + self-signed certificate (Production only)
-            if (!builder.Environment.IsDevelopment())
+            if (!env.IsDevelopment())
             {
                 builder.WebHost.ConfigureKestrel((ctx, kestrel) =>
                 {
-                    static X509Certificate2 CreateEphemeralCert()
-                    {
-                        using var rsa = RSA.Create(2048);
-                        var cn = "CN=ipcheckr-" + Guid.NewGuid().ToString("N").Substring(0, 12);
-                        var req = new CertificateRequest(cn, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-                        var san = new SubjectAlternativeNameBuilder();
-                        san.AddDnsName("localhost");
-                        san.AddDnsName("ipcheckr.local");
-                        san.AddDnsName(Environment.MachineName);
-                        san.AddIpAddress(IPAddress.Loopback);
-                        san.AddIpAddress(IPAddress.IPv6Loopback);
-                        req.CertificateExtensions.Add(san.Build());
-                        req.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, false));
-                        req.CertificateExtensions.Add(new X509KeyUsageExtension(
-                            X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment, false));
-                        req.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(req.PublicKey, false));
-
-                        var notBefore = DateTimeOffset.UtcNow.AddMinutes(-5);
-                        var notAfter = notBefore.AddDays(90);
-                        return req.CreateSelfSigned(notBefore, notAfter);
-                    }
-
-                    var cert = CreateEphemeralCert();
+                    var cert = LoadOrCreateCertificate(ctx.Configuration);
                     kestrel.ListenAnyIP(8081, o => o.UseHttps(cert));
                 });
             }
@@ -55,7 +37,7 @@ namespace IPCheckr.Api
             // service registrations
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddDatabase(builder.Configuration);
-            builder.Services.AddJwtAuthentication();
+            builder.Services.AddJwtAuthentication(config);
             builder.Services.AddLdapAuth(builder.Configuration);
             builder.Services.AddSwaggerDocumentation();
             builder.Services.AddControllers()
@@ -94,11 +76,26 @@ namespace IPCheckr.Api
                 builder.Services.AddCustomCors();
             }
 
+            builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
             var app = builder.Build();
 
             // middlewares
+            app.UseForwardedHeaders();
             app.UseStaticFiles();
             app.UseRouting();
+
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
 
             if (app.Environment.IsDevelopment())
             {
@@ -109,9 +106,6 @@ namespace IPCheckr.Api
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseOpenApi();
-
-            // app.UseHttpsRedirection();
-            // app.UseHsts();
 
             app.MapControllers();
             app.MapFallbackToFile("index.html");
@@ -143,6 +137,72 @@ namespace IPCheckr.Api
             });
 
             app.Run();
+        }
+
+        private static X509Certificate2 LoadOrCreateCertificate(IConfiguration configuration)
+        {
+            var path = "/etc/ipcheckr/tls/ipcheckr.pfx";
+            var password = configuration["Tls:CertificatePassword"] ?? string.Empty;
+
+            if (File.Exists(path))
+            {
+                return new X509Certificate2(path, password, X509KeyStorageFlags.MachineKeySet);
+            }
+
+            var subject = configuration["Tls:Subject"] ?? "CN=ipcheckr";
+            var altNamesRaw = configuration["Tls:SubjectAltNames"];
+            var altNames = (altNamesRaw ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(n => !string.IsNullOrWhiteSpace(n))
+                .ToList();
+
+            if (altNames.Count == 0)
+            {
+                altNames.AddRange(new[] { "localhost", "ipcheckr.local", Environment.MachineName });
+            }
+
+            using var rsa = RSA.Create(2048);
+            var req = new CertificateRequest(subject, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+
+            var san = new SubjectAlternativeNameBuilder();
+            foreach (var name in altNames.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                san.AddDnsName(name);
+            }
+            san.AddIpAddress(IPAddress.Loopback);
+            san.AddIpAddress(IPAddress.IPv6Loopback);
+
+            req.CertificateExtensions.Add(san.Build());
+            req.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, false));
+            req.CertificateExtensions.Add(new X509KeyUsageExtension(
+                X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment, false));
+            req.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(req.PublicKey, false));
+
+            var notBefore = DateTimeOffset.UtcNow.AddMinutes(-5);
+            var validDays = configuration.GetValue<int>("Tls:ValidDays", 365);
+            var notAfter = notBefore.AddDays(validDays);
+            var cert = req.CreateSelfSigned(notBefore, notAfter);
+
+            var pfxBytes = cert.Export(X509ContentType.Pfx, password);
+            var dir = Path.GetDirectoryName(path);
+            if (!string.IsNullOrWhiteSpace(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            File.WriteAllBytes(path, pfxBytes);
+
+            if ((OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()) && File.Exists(path))
+            {
+                try
+                {
+                    File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+                }
+                catch
+                {
+                }
+            }
+
+            return new X509Certificate2(pfxBytes, password, X509KeyStorageFlags.MachineKeySet);
         }
     }
 }

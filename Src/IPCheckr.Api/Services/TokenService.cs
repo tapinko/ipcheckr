@@ -2,6 +2,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace IPCheckr.Api.Services
 {
@@ -13,28 +16,23 @@ namespace IPCheckr.Api.Services
 
     public class TokenService : ITokenService
     {
-        private readonly string _secretKey;
+        private readonly SymmetricSecurityKey _signingKey;
         private readonly string _issuer;
         private readonly string _audience;
         private readonly int _tokenLifetimeMinutes;
 
         public TokenService(IConfiguration configuration)
         {
-            // var jwtSettings = configuration.GetSection("JwtSettings");
-            // _secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? jwtSettings["SecretKey"];
-            // _issuer = jwtSettings["Issuer"];
-            // _audience = jwtSettings["Audience"];
-            // _tokenLifetimeMinutes = int.Parse(jwtSettings["TokenLifetimeMinutes"]);
-            _secretKey = "ciscociscociscociscociscociscocisco";
-            _issuer = "sak_ja";
-            _audience = "sak_ty";
-            _tokenLifetimeMinutes = 120;
+            var jwtSection = configuration.GetSection("Jwt");
+            _issuer = jwtSection["Issuer"] ?? "ipcheckr";
+            _audience = jwtSection["Audience"] ?? _issuer;
+            _tokenLifetimeMinutes = jwtSection.GetValue<int>("LifetimeMinutes", 120);
+            _signingKey = CreateOrLoadSigningKey(jwtSection);
         }
 
         public string GenerateToken(string userId, string username, IList<string> roles)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var creds = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
             {
@@ -59,16 +57,15 @@ namespace IPCheckr.Api.Services
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_secretKey);
-
                 principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
                     ValidIssuer = _issuer,
                     ValidAudience = _audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = _signingKey,
                     ClockSkew = TimeSpan.Zero
                 }, out _);
 
@@ -79,6 +76,91 @@ namespace IPCheckr.Api.Services
                 principal = null!;
                 return false;
             }
+        }
+
+        private static SymmetricSecurityKey CreateOrLoadSigningKey(IConfigurationSection jwtSection)
+        {
+            var configuredKey = jwtSection["Key"];
+            var keyFilePath = jwtSection["KeyFile"] ?? "/etc/ipcheckr/jwt.key";
+
+            if (string.IsNullOrWhiteSpace(configuredKey))
+            {
+                configuredKey = TryReadFromFile(keyFilePath);
+            }
+
+            if (string.IsNullOrWhiteSpace(configuredKey))
+            {
+                configuredKey = GenerateAndPersistKey(keyFilePath);
+            }
+
+            var keyBytes = DecodeKey(configuredKey!);
+            if (keyBytes.Length < 32)
+            {
+                throw new InvalidOperationException("JWT signing key must be at least 256 bits long.");
+            }
+
+            return new SymmetricSecurityKey(keyBytes);
+        }
+
+        private static byte[] DecodeKey(string raw)
+        {
+            raw = raw.Trim();
+            try
+            {
+                return Convert.FromBase64String(raw);
+            }
+            catch
+            {
+                return Encoding.UTF8.GetBytes(raw);
+            }
+        }
+
+        private static string? TryReadFromFile(string path)
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    return File.ReadAllText(path).Trim();
+                }
+            }
+            catch
+            {
+            }
+            return null;
+        }
+
+        private static string GenerateAndPersistKey(string path)
+        {
+            var keyBytes = RandomNumberGenerator.GetBytes(32);
+            var key = Convert.ToBase64String(keyBytes);
+
+            try
+            {
+                var dir = Path.GetDirectoryName(path);
+                if (!string.IsNullOrWhiteSpace(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                File.WriteAllText(path, key);
+
+                if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+                {
+                    try
+                    {
+                        File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return key;
         }
     }
 }
