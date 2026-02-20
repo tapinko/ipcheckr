@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System.Security.Cryptography;
 using System.IO;
 
@@ -21,13 +22,14 @@ namespace IPCheckr.Api.Services
         private readonly string _audience;
         private readonly int _tokenLifetimeMinutes;
 
-        public TokenService(IConfiguration configuration)
+        public TokenService(IConfiguration configuration, IHostEnvironment environment)
         {
             var jwtSection = configuration.GetSection("Jwt");
+            var isDevelopment = environment.IsDevelopment();
             _issuer = jwtSection["Issuer"] ?? "ipcheckr";
             _audience = jwtSection["Audience"] ?? _issuer;
             _tokenLifetimeMinutes = jwtSection.GetValue<int>("LifetimeMinutes", 120);
-            _signingKey = CreateOrLoadSigningKey(jwtSection);
+            _signingKey = CreateOrLoadSigningKey(jwtSection, isDevelopment);
         }
 
         public string GenerateToken(string userId, string username, IList<string> roles)
@@ -78,10 +80,12 @@ namespace IPCheckr.Api.Services
             }
         }
 
-        private static SymmetricSecurityKey CreateOrLoadSigningKey(IConfigurationSection jwtSection)
+        private static SymmetricSecurityKey CreateOrLoadSigningKey(IConfigurationSection jwtSection, bool isDevelopment)
         {
             var configuredKey = jwtSection["Key"];
-            var keyFilePath = jwtSection["KeyFile"] ?? "/etc/ipcheckr/jwt.key";
+            var keyFilePath = jwtSection["KeyFile"] ?? (isDevelopment
+                ? Path.Combine(Path.GetTempPath(), "ipcheckr-jwt.key")
+                : "/etc/ipcheckr/jwt.key");
 
             if (string.IsNullOrWhiteSpace(configuredKey))
             {

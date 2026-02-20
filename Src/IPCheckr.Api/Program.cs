@@ -37,7 +37,7 @@ namespace IPCheckr.Api
             // service registrations
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddDatabase(builder.Configuration);
-            builder.Services.AddJwtAuthentication(config);
+            builder.Services.AddJwtAuthentication(config, env);
             builder.Services.AddLdapAuth(builder.Configuration);
             builder.Services.AddSwaggerDocumentation();
             builder.Services.AddControllers()

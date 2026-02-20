@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Hosting;
 using System.Security.Cryptography;
 using System.Text;
 using System.IO;
@@ -10,13 +11,13 @@ namespace IPCheckr.Api.Config
 {
     public static class AuthenticationConfig
     {
-        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
         {
             var jwtSection = configuration.GetSection("Jwt");
             var issuer = jwtSection["Issuer"] ?? "ipcheckr";
             var audience = jwtSection["Audience"] ?? issuer;
-            var signingKey = CreateOrLoadSigningKey(jwtSection);
-            var isDevelopment = string.Equals(configuration["ASPNETCORE_ENVIRONMENT"], "Development", StringComparison.OrdinalIgnoreCase);
+            var isDevelopment = environment.IsDevelopment();
+            var signingKey = CreateOrLoadSigningKey(jwtSection, isDevelopment);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -37,10 +38,12 @@ namespace IPCheckr.Api.Config
             return services;
         }
 
-        private static SymmetricSecurityKey CreateOrLoadSigningKey(IConfigurationSection jwtSection)
+        private static SymmetricSecurityKey CreateOrLoadSigningKey(IConfigurationSection jwtSection, bool isDevelopment)
         {
             var configuredKey = jwtSection["Key"];
-            var keyFilePath = jwtSection["KeyFile"] ?? "/etc/ipcheckr/jwt.key";
+            var keyFilePath = jwtSection["KeyFile"] ?? (isDevelopment
+                ? Path.Combine(Path.GetTempPath(), "ipcheckr-jwt.key")
+                : "/etc/ipcheckr/jwt.key");
 
             if (string.IsNullOrWhiteSpace(configuredKey))
             {
