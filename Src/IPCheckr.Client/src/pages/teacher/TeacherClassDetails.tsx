@@ -1,9 +1,7 @@
 import {
   Box,
-  Button,
   Card,
   CardContent,
-  Chip,
   Stack,
   Tooltip,
   Typography,
@@ -15,10 +13,9 @@ import { BarChart, LineChart } from "@mui/x-charts"
 import TableSkeleton from "../../components/TableSkeleton"
 import CardsSkeleton from "../../components/CardsSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
-import StatsCard from "../../components/StatsCard"
 import { TranslationKey } from "../../utils/i18n"
 import { classApi } from "../../utils/apiClients"
-import type { QueryClassDetailsRes } from "../../dtos"
+import { AssignmentGroupType, type QueryClassDetailsRes } from "../../dtos"
 import {
   AccessTime,
   Class,
@@ -28,7 +25,10 @@ import {
   TaskAlt,
 } from "@mui/icons-material"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
-import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
+import InsightCard from "../../components/InsightCard"
+import InsightGrid from "../../components/InsightGrid"
+import { assignmentGroupApi } from "../../utils/apiClients"
+import { toAssignmentTypeParam } from "../../utils/assignmentType"
 
 const TeacherClassDetails = () => {
   const { t } = useTranslation()
@@ -65,108 +65,127 @@ const TeacherClassDetails = () => {
   const avgStudents = detailsQuery.data?.averageSuccessRateInStudents ?? []
   const avgGroups = detailsQuery.data?.averageSuccessRateInAssignmentGroups ?? []
 
+  const hasLastSubmitTarget =
+    !!detailsQuery.data?.lastSubmitGroupId &&
+    !!detailsQuery.data?.lastSubmitId &&
+    !!detailsQuery.data?.lastSubmitUsername
+
+  const handleLastSubmitNavigate = async () => {
+    if (!detailsQuery.data?.lastSubmitGroupId || !detailsQuery.data?.lastSubmitId) return
+
+    let resolvedType: AssignmentGroupType | null = null
+    try {
+      await assignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroupDetails(detailsQuery.data.lastSubmitGroupId)
+      resolvedType = AssignmentGroupType.Subnet
+    } catch {
+      try {
+        await assignmentGroupApi.assignmentGroupQueryIdNetAssignmentGroupDetails(detailsQuery.data.lastSubmitGroupId)
+        resolvedType = AssignmentGroupType.Idnet
+      } catch {
+        return
+      }
+    }
+
+    navigate(
+      getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT, {
+        [RouteParams.ASSIGNMENT_GROUP_ID]: detailsQuery.data.lastSubmitGroupId.toString(),
+        [RouteParams.ASSIGNMENT_ID]: detailsQuery.data.lastSubmitId.toString(),
+        [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(resolvedType)
+      })
+    )
+  }
+
   return (
     <>
       <Stack spacing={2}>
-        <ResponsiveStatsSection
-          highlight={
-            <StatsCard
+       <InsightGrid
+          spacing={1.25}
+          columnsMax={3}
+          items={[
+            <InsightCard
               title={t(TranslationKey.TEACHER_CLASS_DETAILS_CLASS_NAME)}
-              value={detailsQuery.data?.className}
+              value={detailsQuery.data?.className ?? "-"}
               icon={<Class />}
-            />
-          }
-          leftColumn={[
-            <StatsCard
+              tone="info"
+              dense
+            />,
+            <InsightCard
               title={t(TranslationKey.TEACHER_CLASS_DETAILS_TEACHERS)}
-              value={
-                detailsQuery.data?.teachers
-                  && detailsQuery.data?.teachers.map(t => t.username).join(", ")
-              }
+              value={detailsQuery.data?.teachers
+                && detailsQuery.data?.teachers.map(t => t.username).join(", ")}
               icon={<Groups />}
+              dense
             />,
             <Tooltip
               title={t(TranslationKey.TEACHER_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}
             >
               <Box>
-                <StatsCard
+                <InsightCard
                   title={t(TranslationKey.TEACHER_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
-                  value={`${detailsQuery.data?.averageSuccessRate ?? 0}%`}
+                  value={`${(detailsQuery.data?.averageSuccessRate ?? 0).toFixed(2)}%`}
                   icon={<Percent />}
+                  tone="success"
+                  dense
                 />
               </Box>
             </Tooltip>,
-            <StatsCard
-              title={t(TranslationKey.TEACHER_DASHBOARD_LAST_SUBMIT)}
-              value={
-                detailsQuery.data?.lastSubmitUsername ? (
-                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                    <span>{detailsQuery.data.lastSubmitUsername}</span>
-                    {detailsQuery.data.lastSubmitAt && (
-                      <Chip
-                        size="small"
-                        icon={<AccessTime />}
-                        label={new Date(detailsQuery.data.lastSubmitAt).toLocaleString()}
-                        variant="outlined"
-                      />
-                    )}
-                  </Stack>
-                ) : ("-")
-              }
-              icon={<AccessTime />}
-              actions={
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    navigate(
-                      getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT, {
-                        [RouteParams.ASSIGNMENT_GROUP_ID]:
-                          detailsQuery.data?.lastSubmitGroupId!.toString(),
-                        [RouteParams.ASSIGNMENT_ID]:
-                          detailsQuery.data?.lastSubmitId!.toString(),
-                        [RouteParams.ATTEMPT]: "1"
-                      })
-                    )}
-                  disabled={
-                    !detailsQuery.data?.lastSubmitGroupId ||
-                    !detailsQuery.data?.lastSubmitId ||
-                    !detailsQuery.data?.lastSubmitAt ||
-                    !detailsQuery.data?.lastSubmitUsername
-                  }
-                >
-                  {t(TranslationKey.TEACHER_CLASS_DETAILS_SHOW_DETAILS)}
-                </Button>
-              }
-            />,
-            <StatsCard
+            <Box
+              onClick={() => {
+                void handleLastSubmitNavigate()
+              }}
+              sx={{
+                cursor: hasLastSubmitTarget ? "pointer" : "default",
+                "&:hover .last-submit-link-value":
+                  hasLastSubmitTarget
+                    ? {
+                        textDecoration: "underline"
+                      }
+                    : undefined
+              }}
+            >
+              <InsightCard
+                title={t(TranslationKey.TEACHER_CLASS_DETAILS_LAST_SUBMIT)}
+                value={
+                  <Box component="span" className="last-submit-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                    {detailsQuery.data?.lastSubmitUsername ?? "-"}
+                  </Box>
+                }
+                icon={<AccessTime />}
+                dense
+              />
+            </Box>,
+            <InsightCard
               title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_SUBMITS)}
-              value={detailsQuery.data?.totalSubmits}
+              value={detailsQuery.data?.totalSubmits ?? "-"}
               icon={<TaskAlt />}
-            />
-          ]}
-          rightColumn={[
-            <StatsCard
+              tone="info"
+              dense
+            />,
+            <InsightCard
               title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
-              value={detailsQuery.data?.totalAssignmentGroups}
+              value={detailsQuery.data?.totalAssignmentGroups ?? "-"}
               icon={<Quiz />}
+              dense
             />,
-            <StatsCard
+            <InsightCard
               title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_UPCOMING)}
-              value={detailsQuery.data?.totalUpcoming}
+              value={detailsQuery.data?.totalUpcoming ?? "-"}
               icon={<AccessTime />}
-              color="default"
+              dense
             />,
-            <StatsCard
+            <InsightCard
               title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_IN_PROGRESS)}
-              value={detailsQuery.data?.totalInProgress}
+              value={detailsQuery.data?.totalInProgress ?? "-"}
               icon={<AccessTime />}
-              color="warning"
+              tone="warning"
+              dense
             />,
-            <StatsCard
+            <InsightCard
               title={t(TranslationKey.TEACHER_CLASS_DETAILS_TOTAL_ENDED)}
-              value={detailsQuery.data?.totalEnded}
+              value={detailsQuery.data?.totalEnded ?? "-"}
               icon={<AccessTime />}
-              color="success"
+              tone="success"
+              dense
             />
           ]}
         />
@@ -189,23 +208,19 @@ const TeacherClassDetails = () => {
                       sx={{
                         border: theme => `1px solid ${theme.palette.divider}`,
                         borderRadius: 1,
-                        p: 1
+                        p: 1,
+                        cursor: "pointer",
+                        "&:hover .student-link-value": { textDecoration: "underline" }
                       }}
+                      onClick={() =>
+                        navigate(
+                          getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS, {
+                            [RouteParams.STUDENT_ID]: s.studentId.toString()
+                          })
+                        )
+                      }
                     >
-                      <Typography variant="body2">{s.username}</Typography>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          navigate(
-                            getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS, {
-                              [RouteParams.STUDENT_ID]: s.studentId.toString()
-                            })
-                          )
-                        }
-                      >
-                        {t(TranslationKey.TEACHER_CLASS_DETAILS_SHOW_DETAILS)}
-                      </Button>
+                      <Typography variant="body2" className="student-link-value">{s.username}</Typography>
                     </Stack>
                   ))}
                 </Stack>

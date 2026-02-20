@@ -1,4 +1,5 @@
 using IPCheckr.Api.Common.Constants;
+using IPCheckr.Api.Common.Enums;
 using IPCheckr.Api.Common.Utils;
 using IPCheckr.Api.DTOs.Dashboard;
 using Microsoft.AspNetCore.Authorization;
@@ -27,100 +28,88 @@ namespace IPCheckr.Api.Controllers
 
             var now = DateTime.UtcNow;
 
-            var totalAssignmentGroups = await _db.AssignmentGroups
-                .Where(ag => classIds.Contains(ag.Class.Id))
-                .CountAsync();
+            var subnetGroups = await _db.SubnetAGs.Where(ag => classIds.Contains(ag.Class.Id)).ToListAsync();
+            var idnetGroups = await _db.IDNetAGs.Where(ag => classIds.Contains(ag.Class.Id)).ToListAsync();
 
-            var totalUpcoming = await _db.AssignmentGroups
-                .Where(ag => classIds.Contains(ag.Class.Id) && ag.StartDate > now)
-                .CountAsync();
-
-            var totalInProgress = await _db.AssignmentGroups
-                .Where(ag => classIds.Contains(ag.Class.Id) && ag.StartDate <= now && ag.Deadline >= now)
-                .CountAsync();
-
-            var totalEnded = await _db.AssignmentGroups
-                .Where(ag => classIds.Contains(ag.Class.Id) && ag.Deadline <= now)
-                .CountAsync();
+            var totalAssignmentGroups = subnetGroups.Count + idnetGroups.Count;
+            var totalUpcoming = subnetGroups.Count(ag => AssignmentEvaluationUtils.ResolveStatus(ag.StartDate, ag.Deadline, ag.CompletedAt) == AssignmentGroupStatus.UPCOMING)
+                + idnetGroups.Count(ag => AssignmentEvaluationUtils.ResolveStatus(ag.StartDate, ag.Deadline, ag.CompletedAt) == AssignmentGroupStatus.UPCOMING);
+            var totalInProgress = subnetGroups.Count(ag => AssignmentEvaluationUtils.ResolveStatus(ag.StartDate, ag.Deadline, ag.CompletedAt) == AssignmentGroupStatus.IN_PROGRESS)
+                + idnetGroups.Count(ag => AssignmentEvaluationUtils.ResolveStatus(ag.StartDate, ag.Deadline, ag.CompletedAt) == AssignmentGroupStatus.IN_PROGRESS);
+            var totalEnded = subnetGroups.Count(ag => AssignmentEvaluationUtils.ResolveStatus(ag.StartDate, ag.Deadline, ag.CompletedAt) == AssignmentGroupStatus.ENDED)
+                + idnetGroups.Count(ag => AssignmentEvaluationUtils.ResolveStatus(ag.StartDate, ag.Deadline, ag.CompletedAt) == AssignmentGroupStatus.ENDED);
 
             var institution = await _db.AppSettings.FirstOrDefaultAsync(a => a.Name == "InstitutionName");
             var institutionName = institution?.Value;
 
-            var studentSubmits = await _db.AssignmentSubmits
+            var subnetSubmits = await _db.SubnetAssignmentSubmits
                 .Include(s => s.Assignment)
                     .ThenInclude(a => a.AssignmentGroup)
                         .ThenInclude(ag => ag.Class)
                 .Include(s => s.Assignment)
                     .ThenInclude(a => a.Student)
                 .Where(s => s.Assignment.Student.Id == callerId)
-                .OrderBy(s => s.SubmittedAt)
-                .ThenBy(s => s.Id)
                 .ToListAsync();
 
-            var assignmentIds = studentSubmits.Select(s => s.Assignment.Id).Distinct().ToArray();
+            var idnetSubmits = await _db.IDNetAssignmentSubmits
+                .Include(s => s.Assignment)
+                    .ThenInclude(a => a.AssignmentGroup)
+                        .ThenInclude(ag => ag.Class)
+                .Include(s => s.Assignment)
+                    .ThenInclude(a => a.Student)
+                .Where(s => s.Assignment.Student.Id == callerId)
+                .ToListAsync();
 
-            var answerKeys = await _db.AssignmentAnswerKeys
+            var subnetAssignmentIds = subnetSubmits.Select(s => s.Assignment.Id).Distinct().ToArray();
+            var idnetAssignmentIds = idnetSubmits.Select(s => s.Assignment.Id).Distinct().ToArray();
+
+            var subnetAnswerKeys = await _db.SubnetAssignmentAnswerKeys
                 .Include(k => k.Assignment)
-                .Where(k => assignmentIds.Contains(k.Assignment.Id))
+                .Where(k => subnetAssignmentIds.Contains(k.Assignment.Id))
                 .ToListAsync();
 
-            var answerKeyByAssignment = answerKeys.ToDictionary(k => k.Assignment.Id, k => k);
+            var idnetAnswerKeys = await _db.IDNetAssignmentAnswerKeys
+                .Include(k => k.Assignment)
+                .Where(k => idnetAssignmentIds.Contains(k.Assignment.Id))
+                .ToListAsync();
 
-            double ComputeSubmitPercent(Models.AssignmentAnswerKey answerKey, Models.AssignmentSubmit submit)
+            var subnetAnswerKeyByAssignment = subnetAnswerKeys.ToDictionary(k => k.Assignment.Id, k => k);
+            var idnetAnswerKeyByAssignment = idnetAnswerKeys.ToDictionary(k => k.Assignment.Id, k => k);
+
+            var combinedSubmits = new List<(DateTime submittedAt, int id, int assignmentId, int groupId, double percentage)>();
+
+            foreach (var submit in subnetSubmits)
             {
-                string[][] _answer = {
-                    answerKey.Networks ?? Array.Empty<string>(),
-                    answerKey.FirstUsables ?? Array.Empty<string>(),
-                    answerKey.LastUsables ?? Array.Empty<string>(),
-                    answerKey.Broadcasts ?? Array.Empty<string>()
-                };
-                string[][] _submit = {
-                    submit.Networks ?? Array.Empty<string>(),
-                    submit.FirstUsables ?? Array.Empty<string>(),
-                    submit.LastUsables ?? Array.Empty<string>(),
-                    submit.Broadcasts ?? Array.Empty<string>()
-                };
-
-                int total = _answer.Sum(a => a.Length);
-                if (total == 0) return 0.0;
-
-                int correct = 0;
-                for (int i = 0; i < _answer.Length; i++)
-                {
-                    var answerArray = _answer[i];
-                    var submitArray = _submit[i];
-                    int len = Math.Min(answerArray.Length, submitArray.Length);
-                    for (int j = 0; j < len; j++)
-                    {
-                        if (answerArray[j] == submitArray[j]) correct++;
-                    }
-                }
-
-                return (double)correct / total * 100.0;
+                subnetAnswerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key);
+                double pct = AssignmentEvaluationUtils.CalculateSubnetSuccessRate(key, submit);
+                combinedSubmits.Add((submit.SubmittedAt, submit.Id, submit.Assignment.Id, submit.Assignment.AssignmentGroup.Id, pct));
             }
 
-            var successRate = new List<StudentDashboardSuccessRateDto>();
-            foreach (var submit in studentSubmits)
+            foreach (var submit in idnetSubmits)
             {
-                if (!answerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key))
-                    continue;
-
-                var percentage = ComputeSubmitPercent(key, submit);
-                successRate.Add(new StudentDashboardSuccessRateDto
-                {
-                    Date = submit.SubmittedAt.ToString("yyyy-MM-dd"),
-                    Percentage = percentage
-                });
+                idnetAnswerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key);
+                double pct = AssignmentEvaluationUtils.CalculateIdNetSuccessRate(key, submit, submit.Assignment.AssignmentGroup.TestWildcard, submit.Assignment.AssignmentGroup.TestFirstLastBr);
+                combinedSubmits.Add((submit.SubmittedAt, submit.Id, submit.Assignment.Id, submit.Assignment.AssignmentGroup.Id, pct));
             }
 
-            var lastSubmit = studentSubmits
-                .OrderByDescending(s => s.SubmittedAt)
-                .ThenByDescending(s => s.Id)
+            var successRate = combinedSubmits
+                .OrderBy(s => s.submittedAt)
+                .ThenBy(s => s.id)
+                .Select(s => new StudentDashboardSuccessRateDto
+                {
+                    Date = s.submittedAt.ToString("yyyy-MM-dd"),
+                    Percentage = s.percentage
+                })
+                .ToArray();
+
+            var lastSubmit = combinedSubmits
+                .OrderByDescending(s => s.submittedAt)
+                .ThenByDescending(s => s.id)
                 .FirstOrDefault();
 
-            var lastSubmitAt = lastSubmit?.SubmittedAt;
-            var lastSubmitId = lastSubmit?.Assignment.Id;
-            var lastSubmitGroupId = lastSubmit?.Assignment.AssignmentGroup.Id;
+            var lastSubmitAt = combinedSubmits.Count > 0 ? lastSubmit.submittedAt : (DateTime?)null;
+            var lastSubmitId = combinedSubmits.Count > 0 ? lastSubmit.assignmentId : (int?)null;
+            var lastSubmitGroupId = combinedSubmits.Count > 0 ? lastSubmit.groupId : (int?)null;
 
             var classesStr = string.Join(", ", classes.Select(c => c.Name).OrderBy(n => n));
             var teachersStr = string.Join(", ",
@@ -142,8 +131,8 @@ namespace IPCheckr.Api.Controllers
                 LastSubmitAt = lastSubmitAt,
                 LastSubmitId = lastSubmitId,
                 LastSubmitGroupId = lastSubmitGroupId,
-                TotalSubmits = studentSubmits.Count,
-                SuccessRate = successRate.ToArray()
+                TotalSubmits = combinedSubmits.Count,
+                SuccessRate = successRate
             };
 
             return Ok(res);

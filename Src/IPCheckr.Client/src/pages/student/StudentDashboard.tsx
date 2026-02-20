@@ -1,7 +1,5 @@
 import {
   Box,
-  Button,
-  Divider,
   Stack,
   Typography,
   Card,
@@ -12,16 +10,16 @@ import { useTranslation } from "react-i18next"
 import TableSkeleton from "../../components/TableSkeleton"
 import CardsSkeleton from "../../components/CardsSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
-import StatsCard from "../../components/StatsCard"
 import { AccessTime, Class, Groups, School, TaskAlt, Quiz } from "@mui/icons-material"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { dashboardApi } from "../../utils/apiClients"
-import type { QueryStudentDashboardRes } from "../../dtos"
+import { assignmentApi, dashboardApi } from "../../utils/apiClients"
+import { AssignmentGroupType, type QueryStudentDashboardRes } from "../../dtos"
 import { useAuth } from "../../contexts/AuthContext"
 import { LineChart } from "@mui/x-charts"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { useNavigate } from "react-router-dom"
-import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
+import { fromAssignmentTypeParam, toAssignmentTypeParam } from "../../utils/assignmentType"
+import InsightCard from "../../components/InsightCard"
 
 const StudentDashboard = () => {
   const { t } = useTranslation()
@@ -36,14 +34,37 @@ const StudentDashboard = () => {
     placeholderData: prev => prev,
   })
 
+  const hasLastSubmitTarget = !!dashboardQuery.data?.lastSubmitId
+
+  const handleLastSubmitNavigate = async () => {
+    if (!dashboardQuery.data?.lastSubmitId) return
+
+    let resolvedType = fromAssignmentTypeParam((dashboardQuery.data as any)?.lastSubmitType as string | undefined)
+
+    if (!resolvedType) {
+      try {
+        await assignmentApi.assignmentQuerySubnetAssignmentSubmitDetailsFull(dashboardQuery.data.lastSubmitId)
+        resolvedType = AssignmentGroupType.Subnet
+      } catch {
+        try {
+          await assignmentApi.assignmentQueryIdNetAssignmentSubmitDetailsFull(dashboardQuery.data.lastSubmitId)
+          resolvedType = AssignmentGroupType.Idnet
+        } catch {
+          return
+        }
+      }
+    }
+
+    navigate(
+      getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_DETAILS, {
+        [RouteParams.ASSIGNMENT_ID]: dashboardQuery.data.lastSubmitId.toString(),
+        [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(resolvedType)
+      })
+    )
+  }
+
   return (
     <>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-        <Typography variant="h5">{t(TranslationKey.STUDENT_DASHBOARD_TITLE)}</Typography>
-      </Box>
-
-      <Divider sx={{ my: 2 }} />
-
       {dashboardQuery.isLoading ? (
         <>
           <TableSkeleton />
@@ -56,85 +77,108 @@ const StudentDashboard = () => {
           }
         />
       ) : (<Stack spacing={2}>
-        <ResponsiveStatsSection
-          highlight={
-            <StatsCard
-              title={t(TranslationKey.STUDENT_DASHBOARD_INSTITUTION_NAME)}
-              value={dashboardQuery.data?.institutionName ?? "-"}
-              icon={<School />}
+        <Card variant="outlined" sx={{ borderColor: "divider", backgroundColor: "background.paper" }}>
+          <CardContent>
+            <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+              <School fontSize="small" color="action" />
+              <Typography variant="h6" fontWeight={800}>
+                {dashboardQuery.data?.institutionName ?? "-"}
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <Box
+          sx={{
+            display: "grid",
+            gap: theme => theme.spacing(1.25),
+            gridTemplateColumns: {
+              xs: "1fr",
+              md: "repeat(3, minmax(0, 1fr))"
+            }
+          }}
+        >
+          <Stack spacing={1.25}>
+            <InsightCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_UPCOMING)}
+              value={dashboardQuery.data?.totalUpcoming ?? "-"}
+              icon={<AccessTime />}
+              dense
             />
-          }
-          leftColumn={[
-            <StatsCard
+            <InsightCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_IN_PROGRESS)}
+              value={dashboardQuery.data?.totalInProgress ?? "-"}
+              icon={<AccessTime />}
+              tone="warning"
+              dense
+            />
+            <InsightCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_ENDED)}
+              value={dashboardQuery.data?.totalEnded ?? "-"}
+              icon={<AccessTime />}
+              tone="success"
+              dense
+            />
+          </Stack>
+
+          <Stack spacing={1.25}>
+            <InsightCard
+              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
+              value={dashboardQuery.data?.totalAssignmentGroups ?? "-"}
+              icon={<Quiz />}
+              dense
+            />
+            <InsightCard
               title={t(TranslationKey.STUDENT_DASHBOARD_CLASSES)}
               value={dashboardQuery.data?.classes ? dashboardQuery.data.classes : "-"}
               icon={<Class />}
-            />,
-            <StatsCard
+              dense
+            />
+            <InsightCard
               title={t(TranslationKey.STUDENT_DASHBOARD_TEACHERS)}
               value={dashboardQuery.data?.teachers ? dashboardQuery.data.teachers : "-"}
               icon={<Groups />}
-            />,
-            <StatsCard
+              dense
+            />
+          </Stack>
+
+          <Stack spacing={1.25}>
+            <InsightCard
               title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_SUBMITS)}
-              value={dashboardQuery.data?.totalSubmits}
+              value={dashboardQuery.data?.totalSubmits ?? "-"}
               icon={<TaskAlt />}
-            />,
-            <StatsCard
-              title={t(TranslationKey.STUDENT_DASHBOARD_LAST_SUBMIT)}
-              value={
-                dashboardQuery.data?.lastSubmitAt ? (
-                  new Date(dashboardQuery.data.lastSubmitAt).toLocaleString()
-                ) : ("-")
-              }
-              icon={<AccessTime />}
-              actions={
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    navigate(
-                      getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_DETAILS, {
-                        [RouteParams.ASSIGNMENT_ID]: dashboardQuery.data?.lastSubmitId!.toString(),
-                        [RouteParams.ATTEMPT]: "1"
-                      })
-                    )}
-                  disabled={
-                    !dashboardQuery.data?.lastSubmitGroupId ||
-                    !dashboardQuery.data?.lastSubmitId ||
-                    !dashboardQuery.data?.lastSubmitAt
-                  }
-                >
-                  {t(TranslationKey.STUDENT_DASHBOARD_SHOW_DETAILS)}
-                </Button>
-              }
+              tone="info"
+              dense
             />
-          ]}
-          rightColumn={[
-            <StatsCard
-              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
-              value={dashboardQuery.data?.totalAssignmentGroups}
-              icon={<Quiz />}
-            />,
-            <StatsCard
-              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_UPCOMING)}
-              value={dashboardQuery.data?.totalUpcoming}
-              icon={<AccessTime />}
-              color="default"
-            />,
-            <StatsCard
-              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_IN_PROGRESS)}
-              value={dashboardQuery.data?.totalInProgress}
-              icon={<AccessTime />}
-              color="warning"
-            />,
-            <StatsCard
-              title={t(TranslationKey.STUDENT_DASHBOARD_TOTAL_ENDED)}
-              value={dashboardQuery.data?.totalEnded}
-              icon={<AccessTime />}
-              color="success"
-            />
-          ]}
-        />
+            <Box
+              onClick={() => {
+                void handleLastSubmitNavigate()
+              }}
+              sx={{
+                cursor: hasLastSubmitTarget ? "pointer" : "default",
+                "&:hover .last-submit-link-value":
+                  hasLastSubmitTarget
+                    ? {
+                        textDecoration: "underline"
+                      }
+                    : undefined
+              }}
+            >
+              <InsightCard
+                title={t(TranslationKey.STUDENT_DASHBOARD_LAST_SUBMIT)}
+                value={
+                  <Box component="span" className="last-submit-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                    {dashboardQuery.data?.lastSubmitAt
+                      ? new Date(dashboardQuery.data.lastSubmitAt).toLocaleString()
+                      : "-"}
+                  </Box>
+                }
+                icon={<AccessTime />}
+                dense
+              />
+            </Box>
+          </Stack>
+        </Box>
 
         <Box>
           <Card variant="outlined">

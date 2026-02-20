@@ -1,7 +1,5 @@
 import {
   Box,
-  Chip,
-  Divider,
   Stack,
   Typography,
   Button,
@@ -17,15 +15,16 @@ import { useTranslation } from "react-i18next"
 import TableSkeleton from "../../components/TableSkeleton"
 import CardsSkeleton from "../../components/CardsSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
-import StatsCard from "../../components/StatsCard"
 import { AccessTime, Class, Groups, Quiz, School, TaskAlt } from "@mui/icons-material"
 import { PlayArrow, Stop, Refresh } from "@mui/icons-material"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { dashboardApi } from "../../utils/apiClients"
+import { dashboardApi, userApi } from "../../utils/apiClients"
 import type { QueryAdminDashboardRes } from "../../dtos"
 import { useEffect, useMemo, useRef, useState } from "react"
 import getApiBase from "../../utils/getApiBase"
-import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
+import InsightCard from "../../components/InsightCard"
+import { getParametrizedUrl, RouteKeys, RouteParams, Routes } from "../../router/routes"
+import { useNavigate } from "react-router-dom"
 
 type LogLevel = "Trace" | "Debug" | "Information" | "Warning" | "Error" | "Critical"
 type StreamLogEntry = {
@@ -39,6 +38,7 @@ type StreamLogEntry = {
 
 const AdminDashboard = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const dashboardQuery = useQuery<QueryAdminDashboardRes, Error>({
@@ -55,6 +55,8 @@ const AdminDashboard = () => {
   const [isConnecting, setIsConnecting] = useState(false)
   const [logs, setLogs] = useState<StreamLogEntry[]>([])
   const [autoScroll, setAutoScroll] = useState(true)
+
+  const hasLastSubmitTarget = !!dashboardQuery.data?.lastSubmitUsername
 
   const controllerRef = useRef<AbortController | null>(null)
   const bufferRef = useRef<string>("")
@@ -225,14 +227,25 @@ const AdminDashboard = () => {
     connect(true)
   }
 
+  const handleLastSubmitNavigate = async () => {
+    const username = dashboardQuery.data?.lastSubmitUsername
+    if (!username) return
+
+    const usersRes = await userApi.userQueryUsers(null, username, null, null, null, null)
+    const users = usersRes.data.users ?? []
+    const exactMatch = users.find(u => u.username.toLowerCase() === username.toLowerCase())
+    const targetUser = exactMatch ?? users[0]
+    if (!targetUser?.id) return
+
+    navigate(
+      getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
+        [RouteParams.USER_ID]: targetUser.id.toString()
+      })
+    )
+  }
+
   return (
     <>
-      <Box sx={{ display: "flex", alignItems: "center",mb: 2 }}>
-        <Typography variant="h5">{t(TranslationKey.ADMIN_DASHBOARD_TITLE)}</Typography>
-      </Box>
-
-      <Divider sx={{ my: 2 }} />
-
       {dashboardQuery.isLoading ? (
         <>
           <TableSkeleton />
@@ -245,76 +258,134 @@ const AdminDashboard = () => {
           }
         />
       ) : (<Stack spacing={2}>
-        <ResponsiveStatsSection
-          highlight={
-            <StatsCard
-              title={t(TranslationKey.ADMIN_DASHBOARD_INSTITUTION_NAME)}
-              value={dashboardQuery.data?.institutionName ?? "-"}
-              icon={<School />}
-            />
-          }
-          leftColumn={[
-            <StatsCard
-              title={t(TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT)}
-              value={
-                dashboardQuery.data?.lastSubmitUsername ? (
-                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                    <span>{dashboardQuery.data.lastSubmitUsername}</span>
-                    {dashboardQuery.data.lastSubmitAt && (
-                      <Chip
-                        size="small"
-                        icon={<AccessTime />}
-                        label={new Date(dashboardQuery.data.lastSubmitAt).toLocaleString()}
-                        variant="outlined"
-                      />
-                    )}
-                  </Stack>
-                ) : ("-")
-              }
-              icon={<AccessTime />}
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_SUBMITS)}
-              value={dashboardQuery.data?.totalSubmits}
-              icon={<TaskAlt />}
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_DASHBOARD_CLASSES)}
-              value={dashboardQuery.data?.totalClasses}
-              icon={<Class />}
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_DASHBOARD_STUDENTS)}
-              value={dashboardQuery.data?.totalStudents}
-              icon={<Groups />}
-            />
-          ]}
-          rightColumn={[
-            <StatsCard
-              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
-              value={dashboardQuery.data?.totalAssignmentGroups}
-              icon={<Quiz />}
-            />,
-            <StatsCard
+        <Paper variant="outlined" sx={{ borderColor: "divider", backgroundColor: "background.paper" }}>
+          <Box sx={{ p: 2 }}>
+            <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+              <School fontSize="small" color="action" />
+              <Typography variant="h6" fontWeight={800}>
+                {dashboardQuery.data?.institutionName ?? "-"}
+              </Typography>
+            </Stack>
+          </Box>
+        </Paper>
+
+        <Box
+          sx={{
+            display: "grid",
+            gap: theme => theme.spacing(1.25),
+            gridTemplateColumns: {
+              xs: "1fr",
+              md: "repeat(3, minmax(0, 1fr))"
+            }
+          }}
+        >
+          <Stack spacing={1.25}>
+            <InsightCard
               title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_UPCOMING)}
-              value={dashboardQuery.data?.totalUpcoming}
+              value={dashboardQuery.data?.totalUpcoming ?? "-"}
               icon={<AccessTime />}
-              color="default"
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_IN_PROGRESS)}
-              value={dashboardQuery.data?.totalInProgress}
-              icon={<AccessTime />}
-              color="warning"
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ENDED)}
-              value={dashboardQuery.data?.totalEnded}
-              icon={<AccessTime />}
-              color="success"
+              dense
             />
-          ]}
-        />
+            <InsightCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_IN_PROGRESS)}
+              value={dashboardQuery.data?.totalInProgress ?? "-"}
+              icon={<AccessTime />}
+              tone="warning"
+              dense
+            />
+            <InsightCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ENDED)}
+              value={dashboardQuery.data?.totalEnded ?? "-"}
+              icon={<AccessTime />}
+              tone="success"
+              dense
+            />
+          </Stack>
+
+          <Stack spacing={1.25}>
+            <InsightCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
+              value={dashboardQuery.data?.totalAssignmentGroups ?? "-"}
+              icon={<Quiz />}
+              dense
+            />
+            <Box
+              onClick={() => navigate(Routes[RouteKeys.ADMIN_CLASSES])}
+              sx={{
+                cursor: "pointer",
+                "&:hover .admin-classes-link-value": {
+                  textDecoration: "underline"
+                }
+              }}
+            >
+              <InsightCard
+                title={t(TranslationKey.ADMIN_DASHBOARD_CLASSES)}
+                value={
+                  <Box component="span" className="admin-classes-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                    {dashboardQuery.data?.totalClasses ?? "-"}
+                  </Box>
+                }
+                icon={<Class />}
+                dense
+              />
+            </Box>
+            <Box
+              onClick={() => navigate(Routes[RouteKeys.ADMIN_USERS])}
+              sx={{
+                cursor: "pointer",
+                "&:hover .admin-users-link-value": {
+                  textDecoration: "underline"
+                }
+              }}
+            >
+              <InsightCard
+                title={t(TranslationKey.ADMIN_DASHBOARD_STUDENTS)}
+                value={
+                  <Box component="span" className="admin-users-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                    {dashboardQuery.data?.totalStudents ?? "-"}
+                  </Box>
+                }
+                icon={<Groups />}
+                dense
+              />
+            </Box>
+          </Stack>
+
+          <Stack spacing={1.25}>
+            <InsightCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_SUBMITS)}
+              value={dashboardQuery.data?.totalSubmits ?? "-"}
+              icon={<TaskAlt />}
+              tone="info"
+              dense
+            />
+            <Box
+              onClick={() => {
+                void handleLastSubmitNavigate()
+              }}
+              sx={{
+                cursor: hasLastSubmitTarget ? "pointer" : "default",
+                "&:hover .last-submit-link-value":
+                  hasLastSubmitTarget
+                    ? {
+                        textDecoration: "underline"
+                      }
+                    : undefined
+              }}
+            >
+              <InsightCard
+                title={t(TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT)}
+                value={
+                  <Box component="span" className="last-submit-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                    {dashboardQuery.data?.lastSubmitUsername ?? "-"}
+                  </Box>
+                }
+                icon={<AccessTime />}
+                dense
+              />
+            </Box>
+          </Stack>
+        </Box>
 
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Stack direction="row" spacing={2} alignItems="flex-end" flexWrap="wrap">

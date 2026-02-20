@@ -156,7 +156,6 @@ export enum TranslationKey {
   ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_SUCCESS = "ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_SUCCESS",
 
   // AdminDashboard
-  ADMIN_DASHBOARD_TITLE = "ADMIN_DASHBOARD_TITLE",
   ADMIN_DASHBOARD_LAST_SUBMIT = "ADMIN_DASHBOARD_LAST_SUBMIT",
   ADMIN_DASHBOARD_INSTITUTION_NAME = "ADMIN_DASHBOARD_INSTITUTION_NAME",
   ADMIN_DASHBOARD_CLASSES = "ADMIN_DASHBOARD_CLASSES",
@@ -363,7 +362,6 @@ export enum TranslationKey {
   TEACHER_GNS3_ALL_SESSIONS_ALL_CLASSES = "TEACHER_GNS3_ALL_SESSIONS_ALL_CLASSES",
 
   // TeacherDashboard
-  TEACHER_DASHBOARD_TITLE = "TEACHER_DASHBOARD_TITLE",
   TEACHER_DASHBOARD_BAR_LENGTH = "TEACHER_DASHBOARD_BAR_LENGTH",
   TEACHER_DASHBOARD_INSTITUTION_NAME = "TEACHER_DASHBOARD_INSTITUTION_NAME",
   TEACHER_DASHBOARD_MOST_SUCCESSFUL_CLASS = "TEACHER_DASHBOARD_MOST_SUCCESSFUL_CLASS",
@@ -591,7 +589,6 @@ export enum TranslationKey {
   STUDENT_GNS3_STOPPED_AT = "STUDENT_GNS3_STOPPED_AT",
 
   // StudentDashboard
-  STUDENT_DASHBOARD_TITLE = "STUDENT_DASHBOARD_TITLE",
   STUDENT_DASHBOARD_INSTITUTION_NAME = "STUDENT_DASHBOARD_INSTITUTION_NAME",
   STUDENT_DASHBOARD_CLASSES = "STUDENT_DASHBOARD_CLASSES",
   STUDENT_DASHBOARD_TEACHERS = "STUDENT_DASHBOARD_STUDENTS",
@@ -798,7 +795,6 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_SUCCESS]: "All sessions stop command sent.",
 
   // AdminDashboard
-  [TranslationKey.ADMIN_DASHBOARD_TITLE]: "Dashboard",
   [TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT]: "Last submit",
   [TranslationKey.ADMIN_DASHBOARD_INSTITUTION_NAME]: "Institution name",
   [TranslationKey.ADMIN_DASHBOARD_CLASSES]: "Classes",
@@ -1004,7 +1000,6 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_ALL_CLASSES]: "All",
 
   // TeacherDashboard
-  [TranslationKey.TEACHER_DASHBOARD_TITLE]: "Dashboard",
   [TranslationKey.TEACHER_DASHBOARD_BAR_LENGTH]: "Graph length",
   [TranslationKey.TEACHER_DASHBOARD_INSTITUTION_NAME]: "Institution name",
   [TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_CLASS]: "Most successful class",
@@ -1231,7 +1226,6 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.STUDENT_GNS3_STOPPED_AT]: "Stopped at",
 
   // StudentDashboard
-  [TranslationKey.STUDENT_DASHBOARD_TITLE]: "Dashboard",
   [TranslationKey.STUDENT_DASHBOARD_INSTITUTION_NAME]: "Institution name",
   [TranslationKey.STUDENT_DASHBOARD_CLASSES]: "Classes",
   [TranslationKey.STUDENT_DASHBOARD_TEACHERS]: "Teachers",
@@ -1438,7 +1432,6 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_GNS3_ALL_SESSIONS_FORCE_KILL_SUCCESS]: "Príkaz na zastavenie všetkých session odoslaný.",
 
   // AdminDashboard
-  [TranslationKey.ADMIN_DASHBOARD_TITLE]: "Hlavný panel",
   [TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT]: "Posledné odovzdanie",
   [TranslationKey.ADMIN_DASHBOARD_INSTITUTION_NAME]: "Názov inštitúcie",
   [TranslationKey.ADMIN_DASHBOARD_CLASSES]: "Triedy",
@@ -1644,7 +1637,6 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_GNS3_ALL_SESSIONS_ALL_CLASSES]: "Všetky",
 
   // TeacherDashboard
-  [TranslationKey.TEACHER_DASHBOARD_TITLE]: "Hlavný panel",
   [TranslationKey.TEACHER_DASHBOARD_BAR_LENGTH]: "Dĺžka grafu",
   [TranslationKey.TEACHER_DASHBOARD_INSTITUTION_NAME]: "Názov inštitúcie",
   [TranslationKey.TEACHER_DASHBOARD_MOST_SUCCESSFUL_CLASS]: "Najúspešnejšia trieda",
@@ -1871,7 +1863,6 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.STUDENT_GNS3_STOPPED_AT]: "Zastavené",
 
   // StudentDashboard
-  [TranslationKey.STUDENT_DASHBOARD_TITLE]: "Hlavný panel",
   [TranslationKey.STUDENT_DASHBOARD_INSTITUTION_NAME]: "Názov inštitúcie",
   [TranslationKey.STUDENT_DASHBOARD_CLASSES]: "Triedy",
   [TranslationKey.STUDENT_DASHBOARD_TEACHERS]: "Učitelia",

@@ -1,9 +1,7 @@
 import {
   Box,
-  Button,
   Card,
   CardContent,
-  Chip,
   Stack,
   Tooltip,
   Typography,
@@ -15,7 +13,6 @@ import { BarChart, LineChart } from "@mui/x-charts"
 import TableSkeleton from "../../components/TableSkeleton"
 import CardsSkeleton from "../../components/CardsSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
-import StatsCard from "../../components/StatsCard"
 import { TranslationKey } from "../../utils/i18n"
 import { classApi } from "../../utils/apiClients"
 import type { QueryClassDetailsRes } from "../../dtos"
@@ -28,7 +25,8 @@ import {
   TaskAlt,
 } from "@mui/icons-material"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
-import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
+import InsightCard from "../../components/InsightCard"
+import InsightGrid from "../../components/InsightGrid"
 
 const AdminClassDetails = () => {
   const { t } = useTranslation()
@@ -68,79 +66,76 @@ const AdminClassDetails = () => {
   return (
     <>
       <Stack spacing={2}>
-        <ResponsiveStatsSection
-          highlight={
-            <StatsCard
-              title={t(TranslationKey.ADMIN_CLASS_DETAILS_CLASS_NAME)}
-              value={detailsQuery.data?.className}
-              icon={<Class />}
-            />
-          }
-          leftColumn={[
-            <StatsCard
-              title={t(TranslationKey.ADMIN_CLASS_DETAILS_CREATED_AT)}
-              value={new Date(detailsQuery.data?.createdAt ?? "").toLocaleString()}
-              icon={<Groups />}
+        <Card variant="outlined" sx={{ borderColor: "divider", backgroundColor: "background.paper" }}>
+          <CardContent>
+            <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+              <Class fontSize="small" color="action" />
+              <Typography variant="h6" fontWeight={800}>
+                {detailsQuery.data?.className ?? "-"}
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <InsightGrid
+          spacing={1.25}
+          columnsMax={3}
+          items={[
+            <InsightCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
+              value={detailsQuery.data?.totalAssignmentGroups ?? "-"}
+              icon={<Quiz />}
+              dense
             />,
-            <Tooltip
-              title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}
-            >
+            <InsightCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_UPCOMING)}
+              value={detailsQuery.data?.totalUpcoming ?? "-"}
+              icon={<AccessTime />}
+              dense
+            />,
+            <InsightCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_IN_PROGRESS)}
+              value={detailsQuery.data?.totalInProgress ?? "-"}
+              icon={<AccessTime />}
+              tone="warning"
+              dense
+            />,
+            <InsightCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ENDED)}
+              value={detailsQuery.data?.totalEnded ?? "-"}
+              icon={<AccessTime />}
+              tone="success"
+              dense
+            />,
+            <InsightCard
+              title={t(TranslationKey.ADMIN_CLASS_DETAILS_CREATED_AT)}
+              value={detailsQuery.data?.createdAt ? new Date(detailsQuery.data.createdAt).toLocaleString() : "-"}
+              icon={<Groups />}
+              dense
+            />,
+            <Tooltip title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}>
               <Box>
-                <StatsCard
+                <InsightCard
                   title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
-                  value={`${detailsQuery.data?.averageSuccessRate.toFixed(2)}%`}
+                  value={`${(detailsQuery.data?.averageSuccessRate ?? 0).toFixed(2)}%`}
                   icon={<Percent />}
+                  tone="success"
+                  dense
                 />
               </Box>
             </Tooltip>,
-            <StatsCard
+            <InsightCard
               title={t(TranslationKey.ADMIN_CLASS_DETAILS_LAST_SUBMIT)}
-              value={
-                detailsQuery.data?.lastSubmitUsername ? (
-                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                    <span>{detailsQuery.data.lastSubmitUsername}</span>
-                    {detailsQuery.data.lastSubmitAt && (
-                      <Chip
-                        size="small"
-                        icon={<AccessTime />}
-                        label={new Date(detailsQuery.data.lastSubmitAt).toLocaleString()}
-                        variant="outlined"
-                      />
-                    )}
-                  </Stack>
-                ) : ("-")
-              }
+              value={detailsQuery.data?.lastSubmitUsername ?? "-"}
               icon={<AccessTime />}
+              dense
             />,
-            <StatsCard
+            <InsightCard
               title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_SUBMITS)}
-              value={detailsQuery.data?.totalSubmits}
+              value={detailsQuery.data?.totalSubmits ?? "-"}
               icon={<TaskAlt />}
-            />
-          ]}
-          rightColumn={[
-            <StatsCard
-              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
-              value={detailsQuery.data?.totalAssignmentGroups}
-              icon={<Quiz />}
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_UPCOMING)}
-              value={detailsQuery.data?.totalUpcoming}
-              icon={<AccessTime />}
-              color="default"
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_IN_PROGRESS)}
-              value={detailsQuery.data?.totalInProgress}
-              icon={<AccessTime />}
-              color="warning"
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_CLASS_DETAILS_TOTAL_ENDED)}
-              value={detailsQuery.data?.totalEnded}
-              icon={<AccessTime />}
-              color="success"
+              tone="info"
+              dense
             />
           ]}
         />
@@ -164,23 +159,19 @@ const AdminClassDetails = () => {
                         sx={{
                           border: theme => `1px solid ${theme.palette.divider}`,
                           borderRadius: 1,
-                          p: 1
+                          p: 1,
+                          cursor: "pointer",
+                          "&:hover .admin-student-link": { textDecoration: "underline" }
                         }}
+                        onClick={() =>
+                          navigate(
+                            getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
+                              [RouteParams.USER_ID]: s.studentId.toString()
+                            })
+                          )
+                        }
                       >
-                        <Typography variant="body2">{s.username}</Typography>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() =>
-                            navigate(
-                              getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
-                                [RouteParams.USER_ID]: s.studentId.toString()
-                              })
-                            )
-                          }
-                        >
-                          {t(TranslationKey.ADMIN_CLASS_DETAILS_SHOW_DETAILS)}
-                        </Button>
+                        <Typography variant="body2" className="admin-student-link">{s.username}</Typography>
                       </Stack>
                     ))}
                   </Stack>
@@ -211,23 +202,19 @@ const AdminClassDetails = () => {
                         sx={{
                           border: theme => `1px solid ${theme.palette.divider}`,
                           borderRadius: 1,
-                          p: 1
+                          p: 1,
+                          cursor: "pointer",
+                          "&:hover .admin-teacher-link": { textDecoration: "underline" }
                         }}
+                        onClick={() =>
+                          navigate(
+                            getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
+                              [RouteParams.USER_ID]: te.teacherId.toString()
+                            })
+                          )
+                        }
                       >
-                        <Typography variant="body2">{te.username}</Typography>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() =>
-                            navigate(
-                              getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
-                                [RouteParams.USER_ID]: te.teacherId.toString()
-                              })
-                            )
-                          }
-                        >
-                          {t(TranslationKey.ADMIN_CLASS_DETAILS_SHOW_DETAILS)}
-                        </Button>
+                        <Typography variant="body2" className="admin-teacher-link">{te.username}</Typography>
                       </Stack>
                     ))}
                   </Stack>

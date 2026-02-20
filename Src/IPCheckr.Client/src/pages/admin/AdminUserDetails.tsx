@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Card,
   CardContent,
   Stack,
@@ -15,13 +14,13 @@ import { AccessTime, MoreTime, Percent, Person, Quiz, TaskAlt } from "@mui/icons
 import TableSkeleton from "../../components/TableSkeleton"
 import CardsSkeleton from "../../components/CardsSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
-import StatsCard from "../../components/StatsCard"
 import { TranslationKey } from "../../utils/i18n"
 import type { QueryUserDetailsRes, QueryUsersRes } from "../../dtos"
 import { userApi } from "../../utils/apiClients"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import UserRole from "../../types/UserRole"
-import ResponsiveStatsSection from "../../components/ResponsiveStatsSection"
+import InsightCard from "../../components/InsightCard"
+import InsightGrid from "../../components/InsightGrid"
 
 const AdminUserDetails = () => {
   const { t } = useTranslation()
@@ -83,39 +82,46 @@ const AdminUserDetails = () => {
     return (
       <>
         <Stack spacing={2}>
-          <ResponsiveStatsSection
-            highlight={
-              <StatsCard
-                title={t(TranslationKey.ADMIN_USER_DETAILS_USERNAME)}
-                value={detailsQuery.data?.username}
-                icon={<Person />}
-              />
-            }
-            leftColumn={[
-              <StatsCard
+          <Card variant="outlined" sx={{ borderColor: "divider", backgroundColor: "background.paper" }}>
+            <CardContent>
+              <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+                <Person fontSize="small" color="action" />
+                <Typography variant="h6" fontWeight={800}>
+                  {detailsQuery.data?.username ?? "-"}
+                </Typography>
+              </Stack>
+            </CardContent>
+          </Card>
+
+          <InsightGrid
+            spacing={1.25}
+            columnsMax={3}
+            items={[
+              <InsightCard
                 title={t(TranslationKey.ADMIN_USER_DETAILS_CREATED_AT)}
-                value={new Date(detailsQuery.data?.createdAt ?? "").toLocaleDateString()}
+                value={detailsQuery.data?.createdAt ? new Date(detailsQuery.data.createdAt).toLocaleDateString() : "-"}
                 icon={<MoreTime />}
+                dense
               />,
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_UPCOMING)}
-                value={detailsQuery.data?.totalUpcoming}
+              <InsightCard
+                title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_UPCOMING)}
+                value={detailsQuery.data?.totalUpcoming ?? "-"}
                 icon={<AccessTime />}
-                color="default"
-              />
-            ]}
-            rightColumn={[
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_IN_PROGRESS)}
-                value={detailsQuery.data?.totalInProgress}
-                icon={<AccessTime />}
-                color="warning"
+                dense
               />,
-              <StatsCard
-                title={t(TranslationKey.TEACHER_DASHBOARD_TOTAL_ENDED)}
-                value={detailsQuery.data?.totalEnded}
+              <InsightCard
+                title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_IN_PROGRESS)}
+                value={detailsQuery.data?.totalInProgress ?? "-"}
                 icon={<AccessTime />}
-                color="success"
+                tone="warning"
+                dense
+              />,
+              <InsightCard
+                title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_ENDED)}
+                value={detailsQuery.data?.totalEnded ?? "-"}
+                icon={<AccessTime />}
+                tone="success"
+                dense
               />
             ]}
           />
@@ -139,23 +145,19 @@ const AdminUserDetails = () => {
                         sx={{
                           border: theme => `1px solid ${theme.palette.divider}`,
                           borderRadius: 1,
-                          p: 1
+                          p: 1,
+                          cursor: "pointer",
+                          "&:hover .admin-user-class-link": { textDecoration: "underline" }
                         }}
+                        onClick={() =>
+                          navigate(
+                            getParametrizedUrl(RouteKeys.ADMIN_CLASS_DETAILS, {
+                              [RouteParams.CLASS_ID]: c.id.toString()
+                            })
+                          )
+                        }
                       >
-                        <Typography variant="body2">{c.name}</Typography>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() =>
-                            navigate(
-                              getParametrizedUrl(RouteKeys.ADMIN_CLASS_DETAILS, {
-                                [RouteParams.CLASS_ID]: c.id.toString()
-                              })
-                            )
-                          }
-                        >
-                          {t(TranslationKey.ADMIN_USER_DETAILS_SHOW_DETAILS)}
-                        </Button>
+                        <Typography variant="body2" className="admin-user-class-link">{c.name}</Typography>
                       </Stack>
                     ))}
                   </Stack>
@@ -175,70 +177,77 @@ const AdminUserDetails = () => {
   return (
     <>
       <Stack spacing={2}>
-        <ResponsiveStatsSection
-          highlight={
-            <StatsCard
-              title={t(TranslationKey.ADMIN_USER_DETAILS_USERNAME)}
-              value={detailsQuery.data?.username}
-              icon={<Person />}
-            />
-          }
-          leftColumn={[
-            <StatsCard
-              title={t(TranslationKey.ADMIN_USER_DETAILS_CREATED_AT)}
-              value={new Date(detailsQuery.data?.createdAt ?? "").toLocaleDateString()}
-              icon={<MoreTime />}
+        <Card variant="outlined" sx={{ borderColor: "divider", backgroundColor: "background.paper" }}>
+          <CardContent>
+            <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+              <Person fontSize="small" color="action" />
+              <Typography variant="h6" fontWeight={800}>
+                {detailsQuery.data?.username ?? "-"}
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <InsightGrid
+          spacing={1.25}
+          columnsMax={3}
+          items={[
+            <InsightCard
+              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
+              value={detailsQuery.data?.totalAssignmentGroups ?? "-"}
+              icon={<Quiz />}
+              dense
             />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_SUBMITS)}
-              value={detailsQuery.data?.totalSubmits}
-              icon={<TaskAlt />}
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_USER_DETAILS_LAST_SUBMIT)}
-              value={
-                detailsQuery.data?.lastSubmitAt ? (
-                  new Date(detailsQuery.data.lastSubmitAt).toLocaleString()
-                ) : ("-")
-              }
+            <InsightCard
+              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_UPCOMING)}
+              value={detailsQuery.data?.totalUpcoming ?? "-"}
               icon={<AccessTime />}
+              dense
             />,
-            <Tooltip
-               title={t(TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}
-            >
+            <InsightCard
+              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_IN_PROGRESS)}
+              value={detailsQuery.data?.totalInProgress ?? "-"}
+              icon={<AccessTime />}
+              tone="warning"
+              dense
+            />,
+            <InsightCard
+              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_ENDED)}
+              value={detailsQuery.data?.totalEnded ?? "-"}
+              icon={<AccessTime />}
+              tone="success"
+              dense
+            />,
+            <InsightCard
+              title={t(TranslationKey.ADMIN_USER_DETAILS_CREATED_AT)}
+              value={detailsQuery.data?.createdAt ? new Date(detailsQuery.data.createdAt).toLocaleDateString() : "-"}
+              icon={<MoreTime />}
+              dense
+            />,
+            <InsightCard
+              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_SUBMITS)}
+              value={detailsQuery.data?.totalSubmits ?? "-"}
+              icon={<TaskAlt />}
+              tone="info"
+              dense
+            />,
+            <InsightCard
+              title={t(TranslationKey.ADMIN_USER_DETAILS_LAST_SUBMIT)}
+              value={detailsQuery.data?.lastSubmitAt ? new Date(detailsQuery.data.lastSubmitAt).toLocaleString() : "-"}
+              icon={<AccessTime />}
+              dense
+            />,
+            <Tooltip title={t(TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE_TOOLTIP)}>
               <Box>
-                <StatsCard
+                <InsightCard
                   title={t(TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE)}
-                  value={`${detailsQuery.data?.averageTotal.toFixed(2)}%`}
+                  value={`${(detailsQuery.data?.averageTotal ?? 0).toFixed(2)}%`}
                   icon={<Percent />}
+                  tone="success"
+                  dense
                 />
               </Box>
             </Tooltip>
-          ]}
-          rightColumn={[
-            <StatsCard
-              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_ASSIGNMENT_GROUPS)}
-              value={detailsQuery.data?.totalAssignmentGroups}
-              icon={<Quiz />}
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_UPCOMING)}
-              value={detailsQuery.data?.totalUpcoming}
-              icon={<AccessTime />}
-              color="default"
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_IN_PROGRESS)}
-              value={detailsQuery.data?.totalInProgress}
-              icon={<AccessTime />}
-              color="warning"
-            />,
-            <StatsCard
-              title={t(TranslationKey.ADMIN_USER_DETAILS_TOTAL_ENDED)}
-              value={detailsQuery.data?.totalEnded}
-              icon={<AccessTime />}
-              color="success"
-            />
           ]}
         />
 
@@ -260,23 +269,19 @@ const AdminUserDetails = () => {
                       sx={{
                         border: theme => `1px solid ${theme.palette.divider}`,
                         borderRadius: 1,
-                        p: 1
+                        p: 1,
+                        cursor: "pointer",
+                        "&:hover .admin-user-class-link": { textDecoration: "underline" }
                       }}
+                      onClick={() =>
+                        navigate(
+                          getParametrizedUrl(RouteKeys.ADMIN_CLASS_DETAILS, {
+                            [RouteParams.CLASS_ID]: c.id.toString()
+                          })
+                        )
+                      }
                     >
-                      <Typography variant="body2">{c.name}</Typography>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() =>
-                          navigate(
-                            getParametrizedUrl(RouteKeys.ADMIN_CLASS_DETAILS, {
-                              [RouteParams.CLASS_ID]: c.id.toString()
-                            })
-                          )
-                        }
-                      >
-                        {t(TranslationKey.ADMIN_USER_DETAILS_SHOW_DETAILS)}
-                      </Button>
+                      <Typography variant="body2" className="admin-user-class-link">{c.name}</Typography>
                     </Stack>
                   ))}
                 </Stack>
