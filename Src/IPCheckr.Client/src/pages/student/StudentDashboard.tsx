@@ -7,8 +7,7 @@ import {
 } from "@mui/material"
 import { TranslationKey } from "../../utils/i18n"
 import { useTranslation } from "react-i18next"
-import TableSkeleton from "../../components/TableSkeleton"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { AccessTime, Class, Groups, School, TaskAlt, Quiz } from "@mui/icons-material"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -66,10 +65,7 @@ const StudentDashboard = () => {
   return (
     <>
       {dashboardQuery.isLoading ? (
-        <>
-          <TableSkeleton />
-          <CardsSkeleton />
-        </>
+        <InsightGridSkeleton count={8} columnsMax={3} />
       ) : dashboardQuery.isError ? (
         <ErrorLoading
           onRetry={() =>

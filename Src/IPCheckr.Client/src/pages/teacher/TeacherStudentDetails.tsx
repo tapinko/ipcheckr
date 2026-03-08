@@ -12,8 +12,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { LineChart, RadarChart } from "@mui/x-charts"
 import { AccessTime, Class, Percent, Person, Quiz, TaskAlt } from "@mui/icons-material"
-import TableSkeleton from "../../components/TableSkeleton"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
 import { AssignmentGroupType, type QueryUserDetailsRes } from "../../dtos"
@@ -91,12 +90,7 @@ const TeacherStudentDetails = () => {
   }
 
   if (detailsQuery.isLoading && !detailsQuery.data) {
-    return (
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <TableSkeleton />
-        <CardsSkeleton />
-      </Box>
-    )
+    return <InsightGridSkeleton count={9} columnsMax={3} />
   }
 
   if (detailsQuery.isError) {

@@ -11,8 +11,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { LineChart, RadarChart } from "@mui/x-charts"
 import { AccessTime, MoreTime, Percent, Person, Quiz, TaskAlt } from "@mui/icons-material"
-import TableSkeleton from "../../components/TableSkeleton"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
 import type { QueryUserDetailsRes, QueryUsersRes } from "../../dtos"
@@ -59,12 +58,7 @@ const AdminUserDetails = () => {
       .some(v => typeof v === "number")
 
   if ((detailsQuery.isLoading || roleQuery.isLoading) && !detailsQuery.data) {
-    return (
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <TableSkeleton />
-        <CardsSkeleton />
-      </Box>
-    )
+    return <InsightGridSkeleton count={8} columnsMax={3} />
   }
 
   if (detailsQuery.isError || roleQuery.isError) {

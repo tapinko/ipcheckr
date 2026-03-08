@@ -34,8 +34,7 @@ import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { assignmentGroupApi } from "../../utils/apiClients"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import ErrorLoading from "../../components/ErrorLoading"
-import CardsSkeleton from "../../components/CardsSkeleton"
-import TableSkeleton from "../../components/TableSkeleton"
+import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import InsightCard from "../../components/InsightCard"
 import InsightGrid from "../../components/InsightGrid"
 import { fromAssignmentTypeParam, toAssignmentTypeParam } from "../../utils/assignmentType"
@@ -211,13 +210,7 @@ const TeacherAssignmentGroupDetails = () => {
   }, [data?.assignments, sortDir, sortField])
 
   if (isLoading && !data) {
-    return (
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <TableSkeleton />
-        <CardsSkeleton />
-      </Box>
-      
-    )
+    return <InsightGridSkeleton count={8} columnsMax={3} />
   }
 
   if (hasError) {

@@ -17,11 +17,10 @@ import { useAuth } from "../../contexts/AuthContext"
 import { assignmentGroupApi, classApi, dashboardApi, userApi } from "../../utils/apiClients"
 import { AssignmentGroupType, type QueryTeacherDashboardRes } from "../../dtos"
 import ErrorLoading from "../../components/ErrorLoading"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import { TranslationKey } from "../../utils/i18n"
 import { AccessTime, Class, EmojiEvents, Groups, Quiz, School, TaskAlt } from "@mui/icons-material"
 import { BarChart } from "@mui/x-charts"
-import TableSkeleton from "../../components/TableSkeleton"
 import { useNavigate } from "react-router-dom"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { fromAssignmentTypeParam, toAssignmentTypeParam } from "../../utils/assignmentType"
@@ -122,10 +121,7 @@ const TeacherDashboard = () => {
   return (
     <>
       {dashboardQuery.isLoading ? (
-        <>
-          <TableSkeleton />
-          <CardsSkeleton />
-        </>
+        <InsightGridSkeleton count={10} columnsMax={3} />
       ) : dashboardQuery.isError ? (
         <ErrorLoading
           onRetry={() =>

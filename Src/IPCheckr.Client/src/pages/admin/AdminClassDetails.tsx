@@ -10,8 +10,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { BarChart, LineChart } from "@mui/x-charts"
-import TableSkeleton from "../../components/TableSkeleton"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
 import { classApi } from "../../utils/apiClients"
@@ -42,12 +41,7 @@ const AdminClassDetails = () => {
   })
 
   if (detailsQuery.isLoading && !detailsQuery.data) {
-    return (
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <TableSkeleton />
-        <CardsSkeleton />
-      </Box>
-    )
+    return <InsightGridSkeleton count={8} columnsMax={3} />
   }
 
   if (detailsQuery.isError) {
