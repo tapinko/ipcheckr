@@ -799,7 +799,6 @@ const TeacherMyClasses = () => {
                 rules={{
                   ...FormRules.required(),
                   ...FormRules.minLengthShort(),
-                  ...FormRules.maxLengthShort(),
                   ...FormRules.patternLettersNumbersDots()
                 }}
                 render={({ field }) => (
@@ -1044,7 +1043,6 @@ const TeacherMyClasses = () => {
               rules={{
                 ...FormRules.required(),
                 ...FormRules.minLengthShort(),
-                ...FormRules.maxLengthShort(),
                 ...FormRules.patternLettersNumbersDots()
               }}
               render={({ field }) => (

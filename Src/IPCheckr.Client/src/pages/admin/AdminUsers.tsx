@@ -437,7 +437,6 @@ const AdminUsers = () => {
                 rules={{
                   ...FormRules.required(),
                   ...FormRules.minLengthShort(),
-                  ...FormRules.maxLengthShort(),
                   ...FormRules.patternLettersNumbersDots()
                 }}
                 render={({ field }) => (
@@ -600,7 +599,6 @@ const AdminUsers = () => {
               rules={{
                 ...FormRules.required(),
                 ...FormRules.minLengthShort(),
-                ...FormRules.maxLengthShort(),
                 ...FormRules.patternLettersNumbersDots()
               }}
               render={({ field }) => (

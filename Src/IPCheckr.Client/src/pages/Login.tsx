@@ -140,7 +140,6 @@ const Login = () => {
                 rules={{
                   ...FormRules.required(),
                   ...FormRules.minLengthShort(),
-                  ...FormRules.maxLengthShort(),
                   ...FormRules.patternLettersNumbersDots(),
                 }}
                 render={({ field }) => (

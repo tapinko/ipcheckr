@@ -4,6 +4,8 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPCheckr.Api", "IPCheckr.Api.csproj", "{4654EBB6-CF91-1069-04CA-6FE5702D37FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPCheckr.Api.Tests", "../IPCheckr.Api.Tests/IPCheckr.Api.Tests.csproj", "{A63D64F9-5355-4B1D-ADCC-10A9378D2B11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +16,10 @@ Global
 		{4654EBB6-CF91-1069-04CA-6FE5702D37FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4654EBB6-CF91-1069-04CA-6FE5702D37FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4654EBB6-CF91-1069-04CA-6FE5702D37FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A63D64F9-5355-4B1D-ADCC-10A9378D2B11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A63D64F9-5355-4B1D-ADCC-10A9378D2B11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A63D64F9-5355-4B1D-ADCC-10A9378D2B11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A63D64F9-5355-4B1D-ADCC-10A9378D2B11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

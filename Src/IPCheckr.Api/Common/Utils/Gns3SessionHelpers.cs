@@ -70,7 +70,7 @@ namespace IPCheckr.Api.Common.Utils
 
         public static bool IsUsernameValid(string username)
         {
-            var regex = new Regex("^[A-Za-z0-9._-]{3,64}(@[A-Za-z0-9.-]+)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+            var regex = new Regex("^[A-Za-z0-9._-]{3,}(@[A-Za-z0-9.-]+)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
             return regex.IsMatch(username ?? string.Empty);
         }
 
