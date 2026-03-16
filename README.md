@@ -2,49 +2,48 @@
 
 ![ipcheckr logo](Assets/github-images/bg_w_cr_text-h150.png)
 
-IPCheckr is a system for learning and testing subnetting. Students practice and get quick results, teachers manage classes, and sign-in can use your AD/LDAP. With GNS3 support, each user can launch their own lab safely.
+IPCheckr is an open-source learning platform for IPv4 subnetting practice in school environments. It combines automatic assignment generation, instant grading, role-based dashboards, and per-user GNS3 instances in one system.
 
-## What it does
-- Subnetting drills and automated grading for students.
-- Multi-user classroom flows for teachers (assignments, submissions).
-- Admin workflows for managing org structure and users.
-- AD/LDAP authentication with role mapping.
-- Multi-user GNS3 integration (per-user server sessions with AD-backed access control).
+## Project at a glance
+- Built for subnetting and IDNet exercises with automatic evaluation.
+- Designed for classrooms: student, teacher, and admin workflows.
+- Supports local accounts and AD/LDAP authentication.
+- Includes optional isolated GNS3 sessions for each user.
+- Ready for self-hosted deployment with Docker and installer scripts.
 
-## Screenshots
-
-### Teacher
-![teacher dashboard zoomed out](Assets/github-images/teacher_dashboard.png)
-![teacher submit details](Assets/github-images/teacher_submit_details.png)
+## Sneakpeaks
 
 ### Student
+
 ![student submitting](Assets/github-images/student_submitting.png)
 
+### Teacher
+
+![teacher dashboard](Assets/github-images/teacher_assignment_groups.png)
+
 ### Admin
-![admin classes](Assets/github-images/admin_classes.png)
-![admin users](Assets/github-images/admin_users.png)
 
-## Authentication
-- **Local**: seeded admin `admin` / `admin` on first run (change immediately).
-- **AD/LDAP**: configurable host/port/SSL, bind or DN template, search base, username attribute, and group DNs for teacher/student role mapping. Switch auth mode in Admin -> Settings.
+![admin users](Assets/github-images/admin_dashboard.png)
 
-## GNS3 integration (multi-user)
-- Per-user GNS3 server sessions orchestrated by the backend; port/PID tracking stored in DB.
-- AD-authenticated users get their own GNS3 instance; files remain per-user under service ownership.
+## Core capabilities
+- Automatic generation of subnetting/IDNet assignments per student.
+- LDAP/AD integration with role mapping.
+- GNS3 session orchestration with per-user isolation.
 
-## Quickstart (installer script)
+## Quick start
 Run the installer:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/tapinko/ipcheckr/master/Deploy/install.sh -o install.sh && sudo bash install.sh
 ```
 
-The wizard installs prerequisites, collects your ports and secrets, sets up GNS3 (if you choose it), and starts the stack. Default login: `admin` / `admin`.
+The installer guides setup, writes configuration, and starts the stack. Default login after first run: `admin` / `admin` (change immediately).
 
-### GNS3 version selection
-- Installer will ask whether to install GNS3; if yes, you must pick an install method:
-	- **PyPI**: lets you pin `gns3-server` (default 2.2.52); if your repo is missing a specific build, choose this.
-	- **Repo**: uses distro packages and forces version to `latest`.
+## Tech stack
+- Frontend: React + Vite + MUI
+- Backend: ASP.NET Core (.NET 8)
+- Database: MariaDB
+- Deployment: Docker / Docker Compose
 
 ### Tested distributions
 - Ubuntu 25.04
