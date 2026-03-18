@@ -55,6 +55,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .finally(() => setLoading(false))
   }, [])
 
+  // Prečítať token z URL hash (pre cross-tab login z PLTG)
+  useEffect(() => {
+    const hash = window.location.hash.substring(1) // odstráň #
+    if (hash) {
+      const params = new URLSearchParams(hash)
+      const tokenFromUrl = params.get('token')
+      const roleFromUrl = params.get('role')
+      
+      if (tokenFromUrl && roleFromUrl) {
+        sessionStorage.setItem('token', tokenFromUrl)
+        sessionStorage.setItem('role', roleFromUrl)
+        // Vyčisti URL hash
+        window.history.replaceState(null, '', window.location.pathname)
+      }
+    }
+  }, [])
+
   useEffect(() => {
     refreshAuth()
   }, [])
