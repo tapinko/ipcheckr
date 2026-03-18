@@ -15,7 +15,7 @@ COPY Src/IPCheckr.Api/ Src/IPCheckr.Api/
 RUN mkdir -p Src/IPCheckr.Api/wwwroot
 COPY --from=client-build /client/dist/ Src/IPCheckr.Api/wwwroot/
 WORKDIR /src/Src/IPCheckr.Api
-RUN dotnet publish -c Release -o /app/publish -p:UseAppHost=false -p:DebugType=None -p:SkipCopyingSymbols=true
+RUN dotnet publish IPCheckr.Api.csproj -c Release -o /app/publish -p:UseAppHost=false -p:DebugType=None -p:SkipCopyingSymbols=true
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
