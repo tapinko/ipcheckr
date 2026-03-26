@@ -8,4 +8,5 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(packageJson.version)
   },
   plugins: [react()],
+  logLevel: "info",
 })

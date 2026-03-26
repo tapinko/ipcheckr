@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react"
 import { authApi } from "../utils/apiClients"
 import UserRole from "../types/UserRole"
+import { isDemoMode } from "../config/demoMode"
+import { demoValidateToken } from "../demo/auth"
 
 type AuthContextType = {
   isAuthenticated: boolean
@@ -9,6 +11,7 @@ type AuthContextType = {
   username: string | null
   loading: boolean
   refreshAuth: () => void
+  logout: () => void
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +21,7 @@ const AuthContext = createContext<AuthContextType>({
   userId: null,
   username: null,
   refreshAuth: () => {},
+  logout: () => {},
 })
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -38,6 +42,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return
     }
     setLoading(true)
+
+    if (isDemoMode) {
+      demoValidateToken(token)
+        .then(res => {
+          setIsAuthenticated(res.isValid)
+          setUserRole(res.role)
+          setUsername(res.username)
+          setUserId(res.userId)
+        })
+        .catch(() => {
+          setIsAuthenticated(false)
+          setUserRole(null)
+          setUserId(null)
+          setUsername(null)
+        })
+        .finally(() => setLoading(false))
+      return
+    }
+
     authApi.authValidateToken({ token })
       .then(res => {
         setIsAuthenticated(res.data.isValid)
@@ -56,28 +79,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   // Prečítať token z URL hash (pre cross-tab login z PLTG)
-  useEffect(() => {
-    const hash = window.location.hash.substring(1) // odstráň #
-    if (hash) {
-      const params = new URLSearchParams(hash)
-      const tokenFromUrl = params.get('token')
-      const roleFromUrl = params.get('role')
+  // useEffect(() => {
+  //   const hash = window.location.hash.substring(1) // odstráň #
+  //   if (hash) {
+  //     const params = new URLSearchParams(hash)
+  //     const tokenFromUrl = params.get('token')
+  //     const roleFromUrl = params.get('role')
       
-      if (tokenFromUrl && roleFromUrl) {
-        sessionStorage.setItem('token', tokenFromUrl)
-        sessionStorage.setItem('role', roleFromUrl)
-        // Vyčisti URL hash
-        window.history.replaceState(null, '', window.location.pathname)
-      }
-    }
-  }, [])
+  //     if (tokenFromUrl && roleFromUrl) {
+  //       sessionStorage.setItem('token', tokenFromUrl)
+  //       sessionStorage.setItem('role', roleFromUrl)
+  //       window.history.replaceState(null, '', window.location.pathname)
+  //     }
+  //   }
+  // }, [])
 
   useEffect(() => {
     refreshAuth()
   }, [])
 
+  const logout = useCallback(() => {
+    sessionStorage.clear()
+    setIsAuthenticated(false)
+    setUserRole(null)
+    setUserId(null)
+    setUsername(null)
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userRole, userId, username, loading, refreshAuth }}>
+    <AuthContext.Provider value={{ isAuthenticated, userRole, userId, username, loading, refreshAuth, logout }}>
       {children}
     </AuthContext.Provider>
   )

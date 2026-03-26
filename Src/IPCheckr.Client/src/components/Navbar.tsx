@@ -24,6 +24,7 @@ import UserRole from "../types/UserRole"
 import bg_w_cr_text from "../assets/bg_w_cr_text.svg"
 import { appSettingsApi } from "../utils/apiClients"
 import { useQuery } from "@tanstack/react-query"
+import { isDemoMode } from "../config/demoMode"
 
 interface NavItem {
   labelKey: TranslationKey
@@ -87,6 +88,7 @@ const Navbar = ({ role }: NavbarProps) => {
     queryKey: ["navbar-appsettings"],
     queryFn: () => appSettingsApi.appSettingsQueryAppSettings(),
     staleTime: 60_000,
+    enabled: !isDemoMode,
   })
 
   const gns3Enabled = useMemo(() => {
@@ -100,9 +102,40 @@ const Navbar = ({ role }: NavbarProps) => {
 
   const navItems = useMemo(() => {
     if (!cfg?.items) return []
+
+    if (isDemoMode) return cfg.items
+
     const gns3Routes = new Set([RouteKeys.ADMIN_GNS3, RouteKeys.TEACHER_GNS3, RouteKeys.STUDENT_GNS3])
     return cfg.items.filter(item => (gns3Routes.has(item.routeKey) ? gns3Enabled : true))
   }, [cfg?.items, gns3Enabled])
+
+  const isItemDisabled = useCallback(
+    (routeKey: RouteKeys) => {
+      if (!isDemoMode) return false
+
+      const allowedByRole = new Map<UserRole, Set<RouteKeys>>([
+        [
+          UserRole.TEACHER,
+          new Set([
+            RouteKeys.TEACHER_DASHBOARD,
+            RouteKeys.TEACHER_MY_CLASSES,
+            RouteKeys.TEACHER_ASSIGNMENT_GROUPS,
+          ]),
+        ],
+        [
+          UserRole.STUDENT,
+          new Set([
+            RouteKeys.STUDENT_DASHBOARD,
+            RouteKeys.STUDENT_ASSIGNMENTS,
+          ]),
+        ],
+      ])
+
+      const allowed = allowedByRole.get(role) ?? new Set()
+      return !allowed.has(routeKey)
+    },
+    [role],
+  )
 
   const closeMobileMenu = useCallback(() => {
     setNavMenuAnchor(null)
@@ -152,13 +185,14 @@ const Navbar = ({ role }: NavbarProps) => {
       navItems.map(item => (
         <Button
           key={item.routeKey}
-            color="inherit"
+          color="inherit"
+          disabled={isItemDisabled(item.routeKey)}
           onClick={() => handleNavigate(item.routeKey)}
         >
           {t(item.labelKey)}
         </Button>
       )),
-    [handleNavigate, navItems, t]
+    [handleNavigate, isItemDisabled, navItems, t]
   )
 
   if (!cfg) return null
@@ -279,7 +313,11 @@ const Navbar = ({ role }: NavbarProps) => {
         keepMounted
       >
         {navItems.map(item => (
-          <MenuItem key={item.routeKey} onClick={() => handleNavigate(item.routeKey)}>
+          <MenuItem
+            key={item.routeKey}
+            disabled={isItemDisabled(item.routeKey)}
+            onClick={() => handleNavigate(item.routeKey)}
+          >
             {t(item.labelKey)}
           </MenuItem>
         ))}

@@ -226,6 +226,19 @@ const StudentAssignmentSubmission = () => {
   const submitting = submitAssignmentMutation.isPending
   const isAvailable = subnetData?.isAvailableForSubmission ?? idNetData?.isAvailableForSubmission
   const assignmentMeta = subnetData ?? idNetData ?? null
+  const networkValue = useMemo(() => {
+    if (assignmentType === AssignmentGroupTypeValues.Subnet) {
+      return subnetData?.cidr ?? "-"
+    }
+
+    if (assignmentType === AssignmentGroupTypeValues.Idnet) {
+      const idNetNetwork = (idNetData as any)?.cidr
+      if (typeof idNetNetwork === "string" && idNetNetwork.trim()) return idNetNetwork
+      return idNetData?.addresses?.[0] ?? "-"
+    }
+
+    return "-"
+  }, [assignmentType, subnetData?.cidr, idNetData?.addresses])
 
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 1000)
@@ -635,8 +648,8 @@ const StudentAssignmentSubmission = () => {
                     <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1.2 }}>
                       {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMISSION_NETWORK)}
                     </Typography>
-                    <Typography variant="body1" fontWeight={600} noWrap title={assignmentType === AssignmentGroupTypeValues.Subnet ? subnetData?.cidr ?? "" : ""}>
-                      {assignmentType === AssignmentGroupTypeValues.Subnet ? subnetData?.cidr ?? "-" : "-"}
+                    <Typography variant="body1" fontWeight={600} noWrap title={networkValue === "-" ? "" : networkValue}>
+                      {networkValue}
                     </Typography>
                   </Box>
 

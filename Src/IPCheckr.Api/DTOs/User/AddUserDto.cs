@@ -8,7 +8,6 @@ namespace IPCheckr.Api.DTOs.User
         [MinLength(1, ErrorMessage = "Username is required.")]
         public required string Username { get; set; }
 
-        // [MinLength(5, ErrorMessage = "Password must be at least 5 characters long.")] // yep, because password "cisco" is 5 characters long
         [MaxLength(32, ErrorMessage = "Password cannot exceed 32 characters.")]
         public string? Password { get; set; }
 

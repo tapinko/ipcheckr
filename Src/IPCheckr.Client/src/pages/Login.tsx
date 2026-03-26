@@ -5,14 +5,14 @@ import { Box, Button, Divider, Paper, Stack, TextField, Typography } from "@mui/
 import { RouteKeys, Routes } from "../router/routes"
 import UserRole from "../types/UserRole"
 import { useAuth } from "../contexts/AuthContext"
-import i18n, { Language, TranslationKey } from "../utils/i18n"
+import { TranslationKey } from "../utils/i18n"
 import { Controller, useForm } from "react-hook-form"
 import FormRules from "../utils/FormRules"
 import { useMutation } from "@tanstack/react-query"
-import type { AxiosError, AxiosResponse } from "axios"
-import type { ApiProblemDetails } from "../dtos"
 import bg_w_cr_text from "../assets/bg_w_cr_text.svg"
 import { GitHub } from "@mui/icons-material"
+import { isDemoMode } from "../config/demoMode"
+import { demoLogin } from "../demo/auth"
 
 type LoginFormValues = {
   username: string
@@ -38,15 +38,22 @@ const Login = () => {
     isPending: loading,
     error
   } = useMutation<
-    AxiosResponse<{ token?: string; role?: string }>,
-    AxiosError<ApiProblemDetails>,
+    { token?: string; role?: string },
+    Error,
     LoginFormValues
   >({
-    mutationFn: ({ username, password }) =>
-      authApi.authLogin({ username, password }),
+    mutationFn: async ({ username, password }) => {
+      if (isDemoMode) {
+        const demoResult = await demoLogin(username, password)
+        return { token: demoResult.token, role: demoResult.role }
+      }
+
+      const response = await authApi.authLogin({ username, password })
+      return response.data
+    },
     onSuccess: res => {
-      const role = res.data.role || ""
-      sessionStorage.setItem("token", res.data.token || "")
+      const role = res.role || ""
+      sessionStorage.setItem("token", res.token || "")
       sessionStorage.setItem("role", role || "")
       refreshAuth()
 
@@ -56,16 +63,13 @@ const Login = () => {
         navigate(Routes[RouteKeys.TEACHER_DASHBOARD], { replace: true })
       } else if (role === UserRole.STUDENT) {
         navigate(Routes[RouteKeys.STUDENT_DASHBOARD], { replace: true })
-      } 
+      }
     }
   })
 
   const serverErrorMessage = (() => {
     if (!error) return null
-    const details = error.response?.data
-    return i18n.language === Language.EN
-        ? details?.messageEn
-        : details?.messageSk
+    return error.message
   })()
 
   const onSubmit = (values: LoginFormValues) => {
@@ -133,6 +137,7 @@ const Login = () => {
             <Typography variant="h5" mb={2} align="center">
               {t(TranslationKey.LOGIN_TITLE)}
             </Typography>
+
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <Controller
                 name="username"

@@ -490,8 +490,8 @@ const TeacherAssignmentGroups = () => {
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"] })
-      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"] })
+      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"], exact: false })
+      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"], exact: false })
       setAlert({
         severity: "success",
         message: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE_SUCCESS, {
@@ -548,8 +548,8 @@ const TeacherAssignmentGroups = () => {
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"] })
-      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"] })
+      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"], exact: false })
+      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"], exact: false })
       if (editAG) {
         queryClient.invalidateQueries({
           queryKey: ["assignmentGroupDetail", editAG.id, editAG.type]
@@ -597,8 +597,8 @@ const TeacherAssignmentGroups = () => {
       await Promise.all(calls)
     },
     onSuccess: (_data) => {
-      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"] })
-      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"] })
+      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"], exact: false })
+      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"], exact: false })
       setAlert({
         severity: "success",
         message: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_DELETE_SUCCESS)
@@ -633,8 +633,8 @@ const TeacherAssignmentGroups = () => {
       })
     },
     onSuccess: (_data, plan) => {
-      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"] })
-      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"] })
+      queryClient.invalidateQueries({ queryKey: ["teacherSubnetAGs"], exact: false })
+      queryClient.invalidateQueries({ queryKey: ["teacherIdNetAGs"], exact: false })
       setAlert({
         severity: "success",
         message: t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_MOVE_SUCCESS, { value: plan.ag.name })
