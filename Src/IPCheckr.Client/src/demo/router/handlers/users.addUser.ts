@@ -1,4 +1,4 @@
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 import { parseBody, demoResponse } from "./_http"
 import { addUser } from "./users.utils"
 

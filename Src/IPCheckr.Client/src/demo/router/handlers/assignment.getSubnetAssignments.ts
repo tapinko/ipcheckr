@@ -1,5 +1,5 @@
 import { AssignmentGroupType } from "../../../dtos"
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 import { parseQueryFromConfig, demoResponse, resolveUser } from "./_http"
 import { buildAssignmentRowsByType } from "./assignment.utils"
 

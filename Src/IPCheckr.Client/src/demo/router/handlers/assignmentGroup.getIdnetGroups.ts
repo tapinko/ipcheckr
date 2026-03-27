@@ -2,7 +2,7 @@ import { AssignmentGroupType } from "../../../dtos"
 import { readDemoState } from "../../db"
 import { demoResponse, parseQueryFromConfig } from "./_http"
 import { makeIdNetAgDto } from "./assignmentGroup.utils"
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 
 export const getIdnetAssignmentGroupsHandler: DemoEndpointHandler = async ({ config, path, method }) => {
   if (path !== "/api/assignment-group/get-idnet-assignment-groups") return null

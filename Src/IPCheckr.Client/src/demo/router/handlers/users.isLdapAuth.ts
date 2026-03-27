@@ -1,4 +1,4 @@
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 import { demoResponse } from "./_http"
 
 export const isLdapAuthHandler: DemoEndpointHandler = async ({ config, path, method }) => {

@@ -29,7 +29,7 @@ import { editUserHandler } from "./users.editUser"
 import { getUserDetailsHandler } from "./users.getUserDetails"
 import { getUsersHandler } from "./users.getUsers"
 import { isLdapAuthHandler } from "./users.isLdapAuth"
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 
 export const demoEndpointHandlers: DemoEndpointHandler[] = [
   getStudentDashboardHandler,

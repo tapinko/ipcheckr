@@ -1,7 +1,7 @@
 import { readDemoState, writeDemoState } from "../../db"
 import { demoResponse, parseBody } from "./_http"
 import { getGroupVariants } from "./assignmentGroup.utils"
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 
 export const deleteSubnetAssignmentGroupsHandler: DemoEndpointHandler = async ({ config, path, method }) => {
   if (path !== "/api/assignment-group/delete-subnet-assignment-groups") return null

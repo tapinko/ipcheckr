@@ -2,7 +2,7 @@ import { AssignmentGroupType } from "../../../dtos"
 import { readDemoState } from "../../db"
 import { demoResponse, parseQueryFromConfig } from "./_http"
 import { makeSubnetAgDto } from "./assignmentGroup.utils"
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 
 export const getSubnetAssignmentGroupsHandler: DemoEndpointHandler = async ({ config, path, method }) => {
   if (path !== "/api/assignment-group/get-subnet-assignment-groups") return null

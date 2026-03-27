@@ -8,7 +8,7 @@ import {
   normalizeIpCat,
   tryGenerateSubnetData,
 } from "./assignmentGroup.utils"
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 
 export const createSubnetAssignmentGroupHandler: DemoEndpointHandler = async ({ config, path, method }) => {
   if (path !== "/api/assignment-group/create-subnet-assignment-group") return null

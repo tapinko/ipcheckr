@@ -1,6 +1,6 @@
 import { AssignmentGroupType } from "../../../dtos"
 import UserRole from "../../../types/UserRole"
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 import { parseQueryFromConfig, demoResponse, resolveUser } from "./_http"
 import { readDemoState } from "../../db"
 import { resolveStatus } from "./assignmentGroup.utils"

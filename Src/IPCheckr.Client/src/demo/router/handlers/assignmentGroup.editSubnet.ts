@@ -1,7 +1,7 @@
 import { AssignmentGroupType } from "../../../dtos"
 import { readDemoState, writeDemoState } from "../../db"
 import { demoResponse, parseBody } from "./_http"
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 
 export const editSubnetAssignmentGroupHandler: DemoEndpointHandler = async ({ config, path, method }) => {
   if (path !== "/api/assignment-group/edit-subnet-assignment-group") return null

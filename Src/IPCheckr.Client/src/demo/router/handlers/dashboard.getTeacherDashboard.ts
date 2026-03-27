@@ -1,4 +1,4 @@
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 import { parseQueryFromConfig, demoResponse } from "./_http"
 import { buildTeacherDashboard } from "./dashboard.utils"
 

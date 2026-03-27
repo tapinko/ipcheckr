@@ -3,7 +3,7 @@ import UserRole from "../../../types/UserRole"
 import { readDemoState, writeDemoState } from "../../db"
 import { demoResponse, parseBody } from "./_http"
 import { generateIdNetData, getGroupVariants, normalizeIpCat } from "./assignmentGroup.utils"
-import type { DemoEndpointHandler } from "../types"
+import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
 
 export const createIdnetAssignmentGroupHandler: DemoEndpointHandler = async ({ config, path, method }) => {
   if (path !== "/api/assignment-group/create-idnet-assignment-group") return null
