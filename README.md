@@ -4,6 +4,13 @@
 
 IPCheckr is an open-source learning platform for IPv4 subnetting practice in school environments. It combines automatic assignment generation, instant grading, role-based dashboards, and per-user GNS3 instances in one system.
 
+## Demo
+[Open demo app (client only)](https://demo.ipcheckr.tapusik.sk)
+
+Default demo login:
+- `teacher` : `cisco`
+- `student` : `cisco`
+
 ## Project at a glance
 - Built for subnetting and IDNet exercises with automatic evaluation.
 - Designed for classrooms: student, teacher, and admin workflows.
