@@ -34,3 +34,21 @@ export const resolveUser = (role: string | null) => {
   const normalizedRole = (role as UserRole | null) ?? null
   return users.find(user => user.role === normalizedRole) ?? users[0] ?? null
 }
+
+export const extractUserIdFromToken = (config: AxiosRequestConfig): number | null => {
+  const authHeaderRaw = (config.headers as any)?.Authorization ?? (config.headers as any)?.authorization
+  const authHeader = typeof authHeaderRaw === "string" ? authHeaderRaw : null
+  if (!authHeader?.startsWith("Bearer ")) return null
+
+  const token = authHeader.slice("Bearer ".length)
+  if (!token.startsWith("demo.")) return null
+
+  const tokenPart = token.slice("demo.".length)
+  try {
+    const decoded = window.atob(tokenPart)
+    const payload = JSON.parse(decoded) as any
+    return typeof payload.userId === "number" ? payload.userId : null
+  } catch {
+    return null
+  }
+}

@@ -30,8 +30,8 @@ export const createSubnetAssignmentGroupHandler: DemoEndpointHandler = async ({ 
   if (!classObj) return demoResponse(config, { messageEn: "Class not found" }, 400)
 
   const classStudents = state.users.filter(user => user.role === UserRole.STUDENT && user.classIds.includes(classObj.classId))
-  const targetStudents = (body?.students ?? []).length
-    ? classStudents.filter(student => (body?.students ?? []).includes(student.id))
+  const targetStudents = body?.students && body.students.length > 0
+    ? classStudents.filter(student => body.students!.includes(student.id))
     : classStudents
   if (!targetStudents.length) return demoResponse(config, { messageEn: "No students found for assignment group" }, 400)
 
@@ -68,6 +68,11 @@ export const createSubnetAssignmentGroupHandler: DemoEndpointHandler = async ({ 
     })
   }
 
+  const now = Date.now()
+  const requestedStartDate = body?.startDate ? new Date(body.startDate).getTime() : now
+  const startDate = Math.min(requestedStartDate, now)
+  const deadline = body?.deadline ? body.deadline : new Date(now + 24 * 60 * 60 * 1000).toISOString()
+
   const assignment = {
     id,
     type: AssignmentGroupType.Subnet,
@@ -76,8 +81,8 @@ export const createSubnetAssignmentGroupHandler: DemoEndpointHandler = async ({ 
     className: classObj.className,
     teacherUsername: classObj.teacherUsernames[0] ?? "teacher",
     ipCat,
-    startDate: body?.startDate ?? new Date().toISOString(),
-    deadline: body?.deadline ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    startDate: new Date(startDate).toISOString(),
+    deadline: deadline,
     completedAt: null,
     expectedRows: (studentAssignments[0]?.rows ?? []).map(row => ({
       address: row.network,

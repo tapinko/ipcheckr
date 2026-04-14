@@ -110,7 +110,9 @@ export const buildTeacherDashboard = async (barChartLength: number) => {
   const totalUpcoming = assignments.filter(item => resolveStatus(item.startDate, item.deadline, item.completedAt ?? null) === AssignmentGroupStatus.Upcoming).length
   const totalInProgress = assignments.filter(item => resolveStatus(item.startDate, item.deadline, item.completedAt ?? null) === AssignmentGroupStatus.InProgress).length
   const totalEnded = assignments.filter(item => resolveStatus(item.startDate, item.deadline, item.completedAt ?? null) === AssignmentGroupStatus.Ended).length
-  const totalClasses = new Set(assignments.map(item => item.className)).size
+
+  const allClasses = new Set(state.classes.map(c => c.className))
+  const totalClasses = allClasses.size
 
   return {
     institutionName: `IPCheckr  •  ${versionDisplay}`,

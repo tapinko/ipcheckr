@@ -1,16 +1,16 @@
 import { AssignmentGroupType } from "../../../dtos"
 import type { DemoEndpointHandler } from "../../../types/DemoEndpointHandler"
-import { parseBody, demoResponse, resolveUser } from "./_http"
+import { parseBody, demoResponse, extractUserIdFromToken } from "./_http"
 import { readDemoState, writeDemoState, type DemoSubmission } from "../../db"
 import { resolveStatus, getGroupVariants } from "./assignmentGroup.utils"
 import { findVariantAndGroup, computeSubnetSubmissionScore } from "./assignment.utils"
 import { AssignmentGroupStatus } from "../../../dtos"
 
-export const submitSubnetAssignmentHandler: DemoEndpointHandler = async ({ config, role, path, method }) => {
+export const submitSubnetAssignmentHandler: DemoEndpointHandler = async ({ config, path, method }) => {
   if (path !== "/api/assignment/submit-subnet-assignment") return null
   if (method !== "post") return null
 
-  const currentUser = resolveUser(role)
+  const tokenUserId = extractUserIdFromToken(config)
   const body = parseBody(config) as {
     assignmentId?: number
     data?: Array<{
@@ -22,16 +22,14 @@ export const submitSubnetAssignmentHandler: DemoEndpointHandler = async ({ confi
   } | null
 
   const assignmentId = Number(body?.assignmentId ?? 0)
-  if (!assignmentId || !currentUser?.id) {
-    return demoResponse(config, { messageEn: "Invalid submit payload" }, 400)
-  }
+  if (!assignmentId || !tokenUserId) return demoResponse(config, { messageEn: "Invalid submit payload" }, 400)
 
   const state = await readDemoState()
   const found = findVariantAndGroup(state, assignmentId)
   if (!found || found.group.type !== AssignmentGroupType.Subnet) return demoResponse(config, { messageEn: "Assignment not found" }, 400)
   const { group, variant } = found
 
-  if (variant.studentUserId !== currentUser.id) return demoResponse(config, { messageEn: "Forbidden" }, 403)
+  if (variant.studentUserId !== tokenUserId) return demoResponse(config, { messageEn: "Forbidden" }, 403)
   if (state.submissions.some(item => item.assignmentId === assignmentId)) {
     return demoResponse(config, { messageEn: "Assignment has already been submitted" }, 403)
   }
@@ -45,7 +43,7 @@ export const submitSubnetAssignmentHandler: DemoEndpointHandler = async ({ confi
   const submission: DemoSubmission = {
     id: Date.now(),
     assignmentId,
-    studentUserId: currentUser.id,
+    studentUserId: tokenUserId,
     rows,
     score,
     submittedAt: new Date().toISOString(),
@@ -60,13 +58,10 @@ export const submitSubnetAssignmentHandler: DemoEndpointHandler = async ({ confi
   await writeDemoState({
     ...state,
     assignments: state.assignments.map(item =>
-      item.id === group.id ? { ...item, completedAt: shouldComplete ? new Date().toISOString() : item.completedAt ?? null } : item,
+      item.id === group.id ? { ...item, completedAt: shouldComplete ? new Date().toISOString() : null } : item,
     ),
     submissions: nextSubmissions,
   })
 
-  return demoResponse(config, {
-    assignmentSubmitId: submission.id,
-    score,
-  })
+  return demoResponse(config, { score })
 }
