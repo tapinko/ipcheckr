@@ -17,7 +17,7 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
     public class SubnetAGDto : AGBaseDto
     {
         [Required]
-        public double SuccessRate { get; set; }
+        public double? SuccessRate { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public AssignmentGroupIpCat IpCat { get; set; }

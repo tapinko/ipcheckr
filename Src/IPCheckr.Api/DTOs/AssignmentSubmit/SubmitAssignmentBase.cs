@@ -7,6 +7,10 @@ namespace IPCheckr.Api.DTOs.AssignmentSubmit
         [Required(ErrorMessage = "Assignment ID is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "Assignment ID must be a positive integer.")]
         public int AssignmentId { get; set; }
+
+        public int? AssignmentAttemptId { get; set; }
+
+        public string? AssignmentAttemptLockToken { get; set; }
     }
 
     public class SubmitAssignmentBaseRes

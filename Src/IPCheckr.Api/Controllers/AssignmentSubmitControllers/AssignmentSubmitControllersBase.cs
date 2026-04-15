@@ -1,4 +1,5 @@
 using IPCheckr.Api.Common.Constants;
+using IPCheckr.Api.Services.Realtime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,12 @@ namespace IPCheckr.Api.Controllers
     public partial class AssignmentSubmitController : ControllerBase
     {
         private readonly ApiDbContext _db;
+        private readonly IAttemptEventsPublisher _attemptEventsPublisher;
 
-        public AssignmentSubmitController(ApiDbContext db)
+        public AssignmentSubmitController(ApiDbContext db, IAttemptEventsPublisher attemptEventsPublisher)
         {
             _db = db;
+            _attemptEventsPublisher = attemptEventsPublisher;
         }
     }
 }

@@ -77,7 +77,7 @@ interface IAG {
   startDate: string
   deadline: string
   status: AssignmentGroupStatus
-  successRate: number
+  successRate: number | null
   type: AssignmentGroupType
   ipCat?: AssignmentGroupIpCat
   testWildcard?: boolean
@@ -1002,7 +1002,7 @@ const TeacherAssignmentGroups = () => {
                                   <strong>{ag.className}</strong>
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary" noWrap>
-                                  {ag.submitted}/{ag.total} • {ag.successRate.toFixed(0)}%
+                                  {ag.submitted}/{ag.total} • {ag.successRate !== null && ag.successRate !== undefined ? `${ag.successRate.toFixed(0)}%` : t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED)}
                                 </Typography>
                                 <Typography variant="subtitle2" fontWeight={700} color="text.primary">
                                   {formatDateTime(ag.startDate)} - {formatDateTime(ag.deadline)}

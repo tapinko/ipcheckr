@@ -216,11 +216,11 @@ const StudentAssignments = () => {
 
 	const renderCard = (assignment: StudentAssignment, wide = false, allowSubmit = false) => {
 		const computedStatus = resolveComputedStatus(assignment.startDate, assignment.deadline, assignment.successRate)
+		const wasSubmitted = assignment.successRate !== null && assignment.successRate !== undefined
 		const successRateValue = Number.isFinite(assignment.successRate)
 			? Math.min(Math.max(assignment.successRate as number, 0), 100)
 			: 0
-		const canViewDetails = computedStatus !== AssignmentGroupStatus.InProgress || (assignment.successRate !== null && assignment.successRate !== undefined)
-		const isInProgress = computedStatus === AssignmentGroupStatus.InProgress
+		const canViewDetails = computedStatus === AssignmentGroupStatus.Ended
 
 		return (
 		<Card
@@ -238,7 +238,7 @@ const StudentAssignments = () => {
 					computedStatus === AssignmentGroupStatus.InProgress
 						? theme => alpha(theme.palette.warning.main, 0.08)
 						: "background.paper",
-				cursor: assignment.assignmentId && !isInProgress ? "pointer" : "default",
+				cursor: assignment.assignmentId && canViewDetails ? "pointer" : "default",
 				boxShadow: 0,
 				"&::before":
 					computedStatus === AssignmentGroupStatus.InProgress
@@ -262,7 +262,7 @@ const StudentAssignments = () => {
 						transform: "translateX(100%)"
 					}
 				},
-				"&:hover .assignment-title-link": assignment.assignmentId && !isInProgress
+					"&:hover .assignment-title-link": assignment.assignmentId && canViewDetails
 					? {
 						textDecoration: "underline"
 					}
@@ -285,25 +285,12 @@ const StudentAssignments = () => {
 							color={assignment.type === AssignmentGroupType.Subnet ? "primary" : "secondary"}
 							variant="outlined"
 						/>
-						<Chip
-							label={statusMap[computedStatus]?.label ?? computedStatus}
-							size="small"
-							color={statusColor(computedStatus)}
-							variant="outlined"
-						/>
 						{"ipCat" in assignment && assignment.ipCat ? (
 							<Chip
 								label={assignment.ipCat}
 								size="small"
 								variant="outlined"
 								sx={{ borderStyle: "dashed" }}
-							/>
-						) : null}
-						{assignment.successRate !== undefined && assignment.successRate !== null ? (
-							<Chip
-								label={`${assignment.successRate.toFixed(1)}%`}
-								size="small"
-								variant="filled"
 							/>
 						) : null}
 					</Stack>
@@ -343,17 +330,19 @@ const StudentAssignments = () => {
 					<Stack spacing={0.5}>
 						<Stack direction="row" alignItems="center" spacing={1}>
 							<Typography variant="h6" fontWeight={800}>
-								{successRateValue.toFixed(2)}%
-							</Typography>
-							<Typography variant="body2" color="text.secondary">
-								{t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE)}
-							</Typography>
-						</Stack>
+							{wasSubmitted ? `${successRateValue.toFixed(2)}%` : t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED)}
+						</Typography>
+						<Typography variant="body2" color="text.secondary">
+							{t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE)}
+						</Typography>
+					</Stack>
+					{wasSubmitted ? (
 						<LinearProgress
 							variant="determinate"
 							value={successRateValue}
 							sx={{ height: 8, borderRadius: 999 }}
 						/>
+					) : null}
 					</Stack>
 				) : null}
 			</CardContent>

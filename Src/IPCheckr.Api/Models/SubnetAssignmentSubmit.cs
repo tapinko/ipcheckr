@@ -11,6 +11,10 @@ namespace IPCheckr.Api.Models
         public int Id { get; set; }
         public required SubnetAssignment Assignment { get; set; }
 
+        public int? AttemptId { get; set; }
+
+        public AssignmentSubmissionAttempt? Attempt { get; set; }
+
         public string[]? Networks { get; set; }
 
         public string[]? FirstUsables { get; set; }

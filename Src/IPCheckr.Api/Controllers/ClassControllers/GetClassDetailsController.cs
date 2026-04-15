@@ -145,9 +145,13 @@ namespace IPCheckr.Api.Controllers
                 .Select(g =>
                 {
                     var gSubmits = combinedSubmits.Where(s => s.groupId == g.Id).ToList();
-                    double avg = gSubmits.Count > 0 ? gSubmits.Average(s => s.percentage) : 0.0;
+                    if (gSubmits.Count == 0) return null;
+
+                    double avg = gSubmits.Average(s => s.percentage);
                     return new { g.Name, g.StartDate, Avg = avg };
                 })
+                .Where(x => x != null)
+                .Select(x => x!)
                 .OrderBy(x => x.StartDate)
                 .Select(x => new AverageSuccessRateInAssignmentGroupsDto
                 {

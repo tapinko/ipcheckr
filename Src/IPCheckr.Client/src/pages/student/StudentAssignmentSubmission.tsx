@@ -1,10 +1,14 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { assignmentSubmitApi } from "../../utils/apiClients"
 import type {
   ApiProblemDetails,
+  CreateAssignmentSubmissionAttemptReq,
+  CreateAssignmentSubmissionAttemptRes,
   QueryIDNetAssignmentDataForSubmitRes,
   QuerySubnetAssignmentDataForSubmitRes,
+  SaveAssignmentSubmissionAttemptDraftReq,
+  SaveAssignmentSubmissionAttemptDraftRes,
   SubmitIDNetAssignmentRes,
   SubmitSubnetAssignmentRes,
   AssignmentGroupType
@@ -37,6 +41,8 @@ import type { AxiosError, AxiosResponse } from "axios"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
 import { alpha } from "@mui/material/styles"
 import { fromAssignmentTypeParam, toAssignmentTypeParam } from "../../utils/assignmentType"
+import { createAttemptEventsConnection } from "../../utils/attemptEventsHub"
+import getApiBase from "../../utils/getApiBase"
 
 type AssignmentFormRow = {
   network: string
@@ -65,6 +71,7 @@ const StudentAssignmentSubmission = () => {
 
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
   const [nowMs, setNowMs] = useState(() => Date.now())
+  const draftHydratedRef = useRef(false)
   const [assignmentType, setAssignmentType] = useState<AssignmentGroupType | null>(
     () => fromAssignmentTypeParam(assignmentTypeParam) ?? (location.state as any)?.assignmentType ?? null
   )
@@ -81,6 +88,9 @@ const StudentAssignmentSubmission = () => {
   const {
     control,
     handleSubmit,
+    getValues,
+    reset,
+    watch,
     formState: { errors }
   } = useForm<AssignmentFormValues>({
     defaultValues: { rows: [newRow()] },
@@ -138,12 +148,6 @@ const StudentAssignmentSubmission = () => {
     return 0
   }, [assignmentType, subnetData, idNetData])
 
-  useEffect(() => {
-    if (rowCount > 0) {
-      replace(Array.from({ length: rowCount }, () => newRow()))
-    }
-  }, [rowCount, replace])
-
   const submitAssignmentMutation = useMutation<
     AxiosResponse<SubmitSubnetAssignmentRes | SubmitIDNetAssignmentRes>,
     AxiosError<ApiProblemDetails>,
@@ -154,11 +158,19 @@ const StudentAssignmentSubmission = () => {
         throw new Error("Missing assignment context")
       }
 
+      const attemptPayload = assignmentAttemptId && assignmentAttemptLockToken
+        ? {
+            assignmentAttemptId,
+            assignmentAttemptLockToken
+          }
+        : {}
+
       if (assignmentType === AssignmentGroupTypeValues.Idnet) {
         const includeWildcard = !!idNetData?.testWildcard
         const includeFlb = !!idNetData?.testFirstLastBr
         return assignmentSubmitApi.assignmentSubmitSubmitIdNetAssignment({
           assignmentId: assignmentIdNum,
+          ...attemptPayload,
           data: data.rows.map(r => ({
             idNet: r.idNet,
             wildcard: includeWildcard ? r.wildcard : null,
@@ -171,6 +183,7 @@ const StudentAssignmentSubmission = () => {
 
       return assignmentSubmitApi.assignmentSubmitSubmitSubnetAssignment({
         assignmentId: assignmentIdNum,
+        ...attemptPayload,
         data: data.rows.map(r => ({
           network: r.network,
           firstUsable: r.firstUsable,
@@ -181,6 +194,7 @@ const StudentAssignmentSubmission = () => {
     },
     onSuccess: () => {
       setConfirmSubmitVis(false)
+      queryClient.invalidateQueries({ queryKey: ["assignmentAttempt", assignmentType, assignmentIdNum] })
       queryClient.invalidateQueries({
         queryKey: ["studentAssignments"]
       })
@@ -214,7 +228,7 @@ const StudentAssignmentSubmission = () => {
   })
 
   const onSubmit = async (data: AssignmentFormValues) => {
-    if (!assignmentIdNum || !assignmentType) return
+    if (!assignmentIdNum || !assignmentType || attemptLocked || attemptSubmitted) return
     await submitAssignmentMutation.mutateAsync(data).catch(() => {})
   }
 
@@ -223,9 +237,59 @@ const StudentAssignmentSubmission = () => {
     replace(Array.from({ length: target }, () => newRow()))
   }
 
-  const submitting = submitAssignmentMutation.isPending
   const isAvailable = subnetData?.isAvailableForSubmission ?? idNetData?.isAvailableForSubmission
   const assignmentMeta = subnetData ?? idNetData ?? null
+  const attemptCreateRequest: CreateAssignmentSubmissionAttemptReq | null = assignmentType && assignmentMeta?.isAvailableForSubmission
+    ? {
+        assignmentId: assignmentIdNum,
+        assignmentGroupType: assignmentType
+      }
+    : null
+
+  const attemptQuery = useQuery<CreateAssignmentSubmissionAttemptRes, Error>({
+    queryKey: ["assignmentAttempt", assignmentType, assignmentIdNum],
+    enabled: !!attemptCreateRequest,
+    queryFn: () => assignmentSubmitApi.assignmentSubmitCreateOrGetAssignmentAttempt(attemptCreateRequest!).then(res => res.data),
+    refetchInterval: query => (query.state.data?.status === "LOCKED" ? 2000 : false),
+    refetchIntervalInBackground: true,
+    retry: false,
+    placeholderData: prev => prev
+  })
+
+  const attemptData = attemptQuery.data ?? null
+  const [optimisticLocked, setOptimisticLocked] = useState(false)
+  const lockInFlightRef = useRef(false)
+  const attemptLocked = attemptData?.status === "LOCKED" || optimisticLocked
+  const attemptSubmitted = attemptData?.status === "SUBMITTED"
+  const assignmentAttemptId = attemptData?.assignmentAttemptId ?? null
+  const assignmentAttemptLockToken = attemptData?.lockToken ?? null
+
+  const hasServerDraftRows = useMemo(() => {
+    if (assignmentType === AssignmentGroupTypeValues.Subnet) {
+      return (attemptData?.subnetData?.length ?? 0) > 0
+    }
+
+    if (assignmentType === AssignmentGroupTypeValues.Idnet) {
+      return (attemptData?.idNetData?.length ?? 0) > 0
+    }
+
+    return false
+  }, [assignmentType, attemptData?.subnetData, attemptData?.idNetData])
+
+  useEffect(() => {
+    if (rowCount <= 0) return
+    if (draftHydratedRef.current) return
+    if (hasServerDraftRows) return
+    if (fields.length === rowCount) return
+
+    replace(Array.from({ length: rowCount }, () => newRow()))
+  }, [rowCount, hasServerDraftRows, fields.length, replace])
+
+  useEffect(() => {
+    if (attemptData?.status === "ACTIVE" || attemptData?.status === "SUBMITTED") {
+      setOptimisticLocked(false)
+    }
+  }, [attemptData?.status])
   const networkValue = useMemo(() => {
     if (assignmentType === AssignmentGroupTypeValues.Subnet) {
       return subnetData?.cidr ?? "-"
@@ -239,6 +303,262 @@ const StudentAssignmentSubmission = () => {
 
     return "-"
   }, [assignmentType, subnetData?.cidr, idNetData?.addresses])
+
+  useEffect(() => {
+    if (!attemptData || draftHydratedRef.current) return
+
+    const draftRows = assignmentType === AssignmentGroupTypeValues.Subnet
+      ? attemptData.subnetData?.map(row => ({
+          network: row.network ?? "",
+          idNet: "",
+          wildcard: "",
+          firstUsable: row.firstUsable ?? "",
+          lastUsable: row.lastUsable ?? "",
+          broadcast: row.broadcast ?? ""
+        }))
+      : attemptData.idNetData?.map(row => ({
+          network: "",
+          idNet: row.idNet ?? "",
+          wildcard: row.wildcard ?? "",
+          firstUsable: row.firstUsable ?? "",
+          lastUsable: row.lastUsable ?? "",
+          broadcast: row.broadcast ?? ""
+        }))
+
+    if (draftRows?.length) {
+      reset({ rows: draftRows })
+    }
+
+    draftHydratedRef.current = true
+  }, [attemptData, assignmentType, reset])
+
+  const watchedRows = watch("rows")
+
+  const saveDraftMutation = useMutation<SaveAssignmentSubmissionAttemptDraftRes, AxiosError<ApiProblemDetails>, SaveAssignmentSubmissionAttemptDraftReq>({
+    mutationFn: payload => assignmentSubmitApi.assignmentSubmitSaveAssignmentAttemptDraft(payload).then(res => res.data),
+    retry: false
+  })
+
+  const lockAttemptMutation = useMutation({
+    mutationFn: (payload: SaveAssignmentSubmissionAttemptDraftReq) =>
+      assignmentSubmitApi.assignmentSubmitLockAssignmentAttempt(payload).then(res => res.data),
+    onSuccess: data => {
+      queryClient.setQueryData(["assignmentAttempt", assignmentType, assignmentIdNum], data)
+    },
+    onError: () => {
+      setOptimisticLocked(false)
+    },
+    onSettled: () => {
+      lockInFlightRef.current = false
+    }
+  })
+
+  const submitting = submitAssignmentMutation.isPending || lockAttemptMutation.isPending
+  const saveInFlightRef = useRef(false)
+  const queuedSavePayloadRef = useRef<SaveAssignmentSubmissionAttemptDraftReq | null>(null)
+  const saveThrottleTimerRef = useRef<number | null>(null)
+  const lastSaveAtRef = useRef(0)
+
+  const scheduleQueuedSave = useCallback(() => {
+    if (saveThrottleTimerRef.current !== null) return
+
+    const elapsed = Date.now() - lastSaveAtRef.current
+    const delay = Math.max(0, 1000 - elapsed)
+
+    saveThrottleTimerRef.current = window.setTimeout(() => {
+      saveThrottleTimerRef.current = null
+      void flushQueuedSave()
+    }, delay)
+  }, [])
+
+  const flushQueuedSave = useCallback(async () => {
+    if (saveInFlightRef.current) return
+    const payload = queuedSavePayloadRef.current
+    if (!payload) return
+
+    queuedSavePayloadRef.current = null
+    saveInFlightRef.current = true
+    lastSaveAtRef.current = Date.now()
+
+    try {
+      await saveDraftMutation.mutateAsync(payload)
+    } catch {
+    } finally {
+      saveInFlightRef.current = false
+      if (queuedSavePayloadRef.current) {
+        scheduleQueuedSave()
+      }
+    }
+  }, [saveDraftMutation, scheduleQueuedSave])
+
+  const enqueueSaveDraft = useCallback((payload: SaveAssignmentSubmissionAttemptDraftReq) => {
+    queuedSavePayloadRef.current = payload
+    scheduleQueuedSave()
+  }, [scheduleQueuedSave])
+
+  useEffect(() => {
+    return () => {
+      if (saveThrottleTimerRef.current !== null) {
+        window.clearTimeout(saveThrottleTimerRef.current)
+      }
+    }
+  }, [])
+
+  const rowSignature = useMemo(() => JSON.stringify(watchedRows ?? []), [watchedRows])
+
+  useEffect(() => {
+    if (!assignmentAttemptId || !assignmentAttemptLockToken || !attemptData || attemptLocked || attemptSubmitted) return
+    if (!watchedRows || watchedRows.length === 0) return
+
+    let parsedRows: AssignmentFormRow[] = []
+    try {
+      parsedRows = JSON.parse(rowSignature) as AssignmentFormRow[]
+    } catch {
+      return
+    }
+
+    if (!parsedRows || parsedRows.length === 0) return
+
+    if (assignmentType === AssignmentGroupTypeValues.Idnet) {
+      enqueueSaveDraft({
+        assignmentAttemptId,
+        lockToken: assignmentAttemptLockToken,
+        idNetData: parsedRows.map(row => ({
+          idNet: row.idNet,
+          wildcard: row.wildcard,
+          firstUsable: row.firstUsable,
+          lastUsable: row.lastUsable,
+          broadcast: row.broadcast
+        }))
+      })
+      return
+    }
+
+    enqueueSaveDraft({
+      assignmentAttemptId,
+      lockToken: assignmentAttemptLockToken,
+      subnetData: parsedRows.map(row => ({
+        network: row.network,
+        firstUsable: row.firstUsable,
+        lastUsable: row.lastUsable,
+        broadcast: row.broadcast
+      }))
+    })
+  }, [assignmentAttemptId, assignmentAttemptLockToken, attemptData, attemptLocked, attemptSubmitted, assignmentType, rowSignature, enqueueSaveDraft])
+
+  useEffect(() => {
+    if (!assignmentAttemptId || !assignmentAttemptLockToken || !attemptData || attemptLocked || attemptSubmitted) return
+
+    const createLockPayload = (rows: AssignmentFormRow[]): SaveAssignmentSubmissionAttemptDraftReq =>
+      assignmentType === AssignmentGroupTypeValues.Idnet
+        ? {
+            assignmentAttemptId,
+            lockToken: assignmentAttemptLockToken,
+            idNetData: rows.map(row => ({
+              idNet: row.idNet,
+              wildcard: row.wildcard,
+              firstUsable: row.firstUsable,
+              lastUsable: row.lastUsable,
+              broadcast: row.broadcast
+            }))
+          }
+        : {
+            assignmentAttemptId,
+            lockToken: assignmentAttemptLockToken,
+            subnetData: rows.map(row => ({
+              network: row.network,
+              firstUsable: row.firstUsable,
+              lastUsable: row.lastUsable,
+              broadcast: row.broadcast
+            }))
+          }
+
+    const lockNow = (preferKeepalive = false) => {
+      if (lockInFlightRef.current || attemptSubmitted || attemptLocked) return
+      const rows = getValues("rows") ?? []
+      const payload = createLockPayload(rows)
+
+      if (preferKeepalive) {
+        const token = sessionStorage.getItem("token")
+        fetch(`${getApiBase()}/api/assignment/lock-assignment-attempt`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          },
+          body: JSON.stringify(payload),
+          keepalive: true
+        }).catch(() => {})
+        return
+      }
+
+      lockInFlightRef.current = true
+      setOptimisticLocked(true)
+
+      lockAttemptMutation.mutate(payload)
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "hidden") return
+      lockNow()
+    }
+
+    const handleWindowBlur = () => {
+      lockNow()
+    }
+
+    const handlePageHide = () => {
+      lockNow(true)
+    }
+
+    const handleBeforeUnload = () => {
+      lockNow(true)
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    window.addEventListener("blur", handleWindowBlur)
+    window.addEventListener("pagehide", handlePageHide)
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      window.removeEventListener("blur", handleWindowBlur)
+      window.removeEventListener("pagehide", handlePageHide)
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [assignmentAttemptId, assignmentAttemptLockToken, attemptData, attemptLocked, attemptSubmitted, assignmentType, getValues, lockAttemptMutation])
+
+  useEffect(() => {
+    if (!assignmentType || !assignmentIdNum) return
+
+    const connection = createAttemptEventsConnection()
+    const handleAttemptChanged = (event: { assignmentId?: number; assignmentGroupType?: AssignmentGroupType }) => {
+      if (event?.assignmentId !== assignmentIdNum) return
+      if (event?.assignmentGroupType && event.assignmentGroupType !== assignmentType) return
+      queryClient.invalidateQueries({ queryKey: ["assignmentAttempt", assignmentType, assignmentIdNum] })
+    }
+
+    connection.on("AttemptChanged", handleAttemptChanged)
+
+    let cancelled = false
+    const connect = async () => {
+      try {
+        await connection.start()
+        if (cancelled) return
+        await connection.invoke("SubscribeAssignment", assignmentType, assignmentIdNum)
+      } catch {
+      }
+    }
+
+    void connect()
+
+    return () => {
+      cancelled = true
+      connection.off("AttemptChanged", handleAttemptChanged)
+      void connection.invoke("UnsubscribeAssignment", assignmentType, assignmentIdNum).catch(() => {})
+      void connection.stop()
+    }
+  }, [assignmentType, assignmentIdNum, queryClient])
 
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 1000)
@@ -569,6 +889,17 @@ const StudentAssignmentSubmission = () => {
     <>
       {isAvailable ? (
         <Stack spacing={2} sx={{ alignItems: "center", width: "100%" }} component="section">
+          {attemptLocked || attemptSubmitted ? (
+            <Box sx={{ width: "100%", maxWidth: 1200 }}>
+              <CustomAlert
+                severity="warning"
+                message={attemptLocked
+                  ? t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMISSION_LOCKED_BY_TEACHER)
+                  : t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMISSION_NOT_AVAILABLE)}
+                onClose={() => setAlert(null)}
+              />
+            </Box>
+          ) : null}
           <Box
             sx={{
               width: "100%",
@@ -690,7 +1021,9 @@ const StudentAssignmentSubmission = () => {
               gap: 2,
               width: "100%",
               maxWidth: 1200,
-              justifyContent: "center"
+              justifyContent: "center",
+              pointerEvents: attemptLocked || attemptSubmitted ? "none" : "auto",
+              opacity: attemptLocked || attemptSubmitted ? 0.72 : 1
             }}
           >
             {assignmentType === AssignmentGroupTypeValues.Subnet
@@ -699,10 +1032,10 @@ const StudentAssignmentSubmission = () => {
           </Box>
 
           <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-            <Button variant="contained" disabled={submitting} onClick={() => setConfirmSubmitVis(true)}>
+            <Button variant="contained" disabled={submitting || attemptLocked || attemptSubmitted} onClick={() => setConfirmSubmitVis(true)}>
               {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMISSION_SUBMIT)}
             </Button>
-            <Button variant="outlined" disabled={submitting} onClick={handleReset}>
+            <Button variant="outlined" disabled={submitting || attemptLocked || attemptSubmitted} onClick={handleReset}>
               {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMISSION_RESET)}
             </Button>
           </Stack>
@@ -728,7 +1061,7 @@ const StudentAssignmentSubmission = () => {
             onClick={handleSubmit(onSubmit)}
             color="warning"
             variant="contained"
-            disabled={submitting}
+            disabled={submitting || attemptLocked || attemptSubmitted}
           >
             {t(TranslationKey.STUDENT_ASSIGNMENTS_SUBMISSION_SUBMIT)}
           </Button>

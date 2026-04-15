@@ -17,8 +17,7 @@ namespace IPCheckr.Api.DTOs.Assignment
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public required AssignmentGroupIpCat IpCat { get; set; }
 
-        [Required]
-        public double SuccessRate { get; set; }
+        public double? SuccessRate { get; set; }
     }
 
     public class QuerySubnetAssignmentSubmitDetailsFullRecordField

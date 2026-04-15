@@ -1,8 +1,11 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
+  AssignmentSubmissionAttemptStatus,
   AssignmentGroupStatus,
   AssignmentGroupType,
+  type AGSubmitDetailsBaseDtoAssignmentAttemptStatus,
+  type ReopenStudentAssignmentAttemptReq,
   type QueryIDNetAGDetailRes,
   type QuerySubnetAGDetailRes
 } from "../../dtos"
@@ -32,19 +35,23 @@ import {
 import { useNavigate, useParams } from "react-router-dom"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { assignmentGroupApi } from "../../utils/apiClients"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import ErrorLoading from "../../components/ErrorLoading"
 import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import InsightCard from "../../components/InsightCard"
 import InsightGrid from "../../components/InsightGrid"
 import { fromAssignmentTypeParam, toAssignmentTypeParam } from "../../utils/assignmentType"
+import { createAttemptEventsConnection } from "../../utils/attemptEventsHub"
 
 interface IAssignmentGroupSubmitDetailsCard {
   assignmentId: number
   studentUsername: string
   successRate: number
   submittedAt?: string | null
+  assignmentAttemptStatus?: AGSubmitDetailsBaseDtoAssignmentAttemptStatus | null
   assignmentType?: AssignmentGroupType
+  onReopen?: () => void
+  reopenPending?: boolean
 }
 
 const AssignmentGroupSubmitDetailsCard = ({
@@ -52,11 +59,17 @@ const AssignmentGroupSubmitDetailsCard = ({
   studentUsername,
   successRate,
   submittedAt,
-  assignmentType
+  assignmentAttemptStatus,
+  assignmentType,
+  onReopen,
+  reopenPending
 }: IAssignmentGroupSubmitDetailsCard) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { [RouteParams.ASSIGNMENT_GROUP_ID]: assignmentGroupId } = useParams()
+  const canReopenAttempt = assignmentAttemptStatus === AssignmentSubmissionAttemptStatus.Locked && !!onReopen
+  const wasSubmitted = !!submittedAt
+  const successRateValue = Number.isFinite(successRate) ? Math.min(Math.max(successRate, 0), 100) : 0
 
   const submittedLabel = submittedAt
     ? new Date(submittedAt).toLocaleString()
@@ -71,19 +84,17 @@ const AssignmentGroupSubmitDetailsCard = ({
         borderColor: "divider",
         borderWidth: 1.5,
         borderStyle: "solid",
-        cursor: submittedAt ? "pointer" : "not-allowed",
+        cursor: "pointer",
         boxShadow: 0,
         transition: "box-shadow 0.2s, border-color 0.2s",
         backgroundColor: "background.paper",
-        opacity: submittedAt ? 1 : 0.8,
-        "&:hover .submit-student-name": submittedAt
-          ? {
-              textDecoration: "underline"
-            }
-          : undefined
+        opacity: 1,
+        "&:hover .submit-student-name": {
+          textDecoration: "underline"
+        }
       }}
       onClick={() => {
-        if (!submittedAt || !assignmentGroupId) return
+        if (!assignmentGroupId) return
         const targetType = assignmentType
         if (!targetType) return
         navigate(
@@ -110,18 +121,35 @@ const AssignmentGroupSubmitDetailsCard = ({
         <Stack spacing={0.5}>
           <Stack direction="row" alignItems="center" spacing={1}>
             <Typography variant="h6" fontWeight={800}>
-              {successRate.toFixed(2)}%
+              {wasSubmitted ? `${successRateValue.toFixed(2)}%` : t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED)}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE)}
             </Typography>
           </Stack>
-          <LinearProgress
-            variant="determinate"
-            value={Number.isFinite(successRate) ? Math.min(Math.max(successRate, 0), 100) : 0}
-            sx={{ height: 8, borderRadius: 999 }}
-          />
+          {wasSubmitted ? (
+            <LinearProgress
+              variant="determinate"
+              value={successRateValue}
+              sx={{ height: 8, borderRadius: 999 }}
+            />
+          ) : null}
         </Stack>
+
+        {canReopenAttempt ? (
+          <Button
+            size="small"
+            variant="contained"
+            color="warning"
+            disabled={reopenPending}
+            onClick={e => {
+              e.stopPropagation()
+              onReopen?.()
+            }}
+          >
+            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_CONTINUE_TEST)}
+          </Button>
+        ) : null}
 
       </CardContent>
     </Card>
@@ -140,6 +168,7 @@ const TeacherAssignmentGroupDetails = () => {
   const statusMap = getStatusMap(t)
   const [sortField, setSortField] = useState<"name" | "%">("name")
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
+  const [reopenedAssignmentIds, setReopenedAssignmentIds] = useState<Set<number>>(new Set())
 
   const subnetQuery = useQuery<QuerySubnetAGDetailRes, Error>({
     queryKey: ["assignmentGroupDetails", "subnet", assignmentGroupId],
@@ -148,6 +177,10 @@ const TeacherAssignmentGroupDetails = () => {
       assignmentGroupApi
         .assignmentGroupQuerySubnetAssignmentGroupDetails(Number(assignmentGroupId))
         .then(r => r.data),
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: false,
     placeholderData: prev => prev
   })
@@ -161,6 +194,10 @@ const TeacherAssignmentGroupDetails = () => {
       assignmentGroupApi
         .assignmentGroupQueryIdNetAssignmentGroupDetails(Number(assignmentGroupId))
         .then(r => r.data),
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: false,
     placeholderData: prev => prev
   })
@@ -185,6 +222,54 @@ const TeacherAssignmentGroupDetails = () => {
     return subnetQuery.isError && idnetQuery.isError
   })()
 
+  const reopenAttemptMutation = useMutation({
+    mutationFn: (payload: ReopenStudentAssignmentAttemptReq) =>
+      assignmentGroupApi.assignmentGroupReopenStudentAssignmentAttempt(payload).then(r => r.data),
+    onSuccess: (_data, variables) => {
+      setReopenedAssignmentIds(prev => {
+        const next = new Set(prev)
+        next.add(variables.assignmentId)
+        return next
+      })
+      queryClient.invalidateQueries({ queryKey: ["assignmentGroupDetails", "subnet", assignmentGroupId] })
+      queryClient.invalidateQueries({ queryKey: ["assignmentGroupDetails", "idnet", assignmentGroupId] })
+    }
+  })
+
+  useEffect(() => {
+    if (!assignmentGroupId) return
+
+    const channelType = assignmentType ?? data?.type
+    if (!channelType) return
+
+    const connection = createAttemptEventsConnection()
+    const handleAttemptChanged = () => {
+      queryClient.invalidateQueries({ queryKey: ["assignmentGroupDetails", "subnet", assignmentGroupId] })
+      queryClient.invalidateQueries({ queryKey: ["assignmentGroupDetails", "idnet", assignmentGroupId] })
+    }
+
+    connection.on("AttemptChanged", handleAttemptChanged)
+
+    let cancelled = false
+    const connect = async () => {
+      try {
+        await connection.start()
+        if (cancelled) return
+        await connection.invoke("SubscribeAssignmentGroup", channelType, Number(assignmentGroupId))
+      } catch {
+      }
+    }
+
+    void connect()
+
+    return () => {
+      cancelled = true
+      connection.off("AttemptChanged", handleAttemptChanged)
+      void connection.invoke("UnsubscribeAssignmentGroup", channelType, Number(assignmentGroupId)).catch(() => {})
+      void connection.stop()
+    }
+  }, [assignmentGroupId, assignmentType, data?.type, queryClient])
+
   const isIdNetDetail = (detail: QueryIDNetAGDetailRes | QuerySubnetAGDetailRes | null): detail is QueryIDNetAGDetailRes =>
     detail?.type === AssignmentGroupType.Idnet
 
@@ -208,6 +293,28 @@ const TeacherAssignmentGroupDetails = () => {
     })
     return cloned
   }, [data?.assignments, sortDir, sortField])
+
+  useEffect(() => {
+    const assignments = data?.assignments ?? []
+    if (assignments.length === 0) {
+      if (reopenedAssignmentIds.size > 0) {
+        setReopenedAssignmentIds(new Set())
+      }
+      return
+    }
+
+    const currentlyLockedIds = new Set(
+      assignments
+        .filter(a => a.assignmentAttemptStatus === AssignmentSubmissionAttemptStatus.Locked)
+        .map(a => a.assignmentId)
+    )
+
+    setReopenedAssignmentIds(prev => {
+      if (prev.size === 0) return prev
+      const next = new Set(Array.from(prev).filter(id => currentlyLockedIds.has(id)))
+      return next.size === prev.size ? prev : next
+    })
+  }, [data?.assignments, reopenedAssignmentIds.size])
 
   if (isLoading && !data) {
     return <InsightGridSkeleton count={8} columnsMax={3} />
@@ -286,7 +393,7 @@ const TeacherAssignmentGroupDetails = () => {
             />,
             <InsightCard
               title={t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_SUCCESS_RATE)}
-              value={data ? `${data.successRate.toFixed(2)}%` : "-"}
+              value={data ? (data.successRate !== null && data.successRate !== undefined ? `${data.successRate.toFixed(2)}%` : t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED)) : "-"}
               icon={<Percent />}
               tone="success"
               dense
@@ -398,16 +505,33 @@ const TeacherAssignmentGroupDetails = () => {
             gap: 2
           }}
         >
-          {sortedAssignments.map(a => (
-            <AssignmentGroupSubmitDetailsCard
-              key={a.assignmentId}
-              assignmentId={a.assignmentId}
-              studentUsername={a.studentUsername}
-              successRate={a.successRate}
-              submittedAt={"submittedAt" in a ? a.submittedAt : undefined}
-              assignmentType={data?.type}
-            />
-          ))}
+          {sortedAssignments.map(a => {
+            const canReopen =
+              a.assignmentAttemptStatus === AssignmentSubmissionAttemptStatus.Locked &&
+              !reopenedAssignmentIds.has(a.assignmentId)
+
+            return (
+              <AssignmentGroupSubmitDetailsCard
+                key={a.assignmentId}
+                assignmentId={a.assignmentId}
+                studentUsername={a.studentUsername}
+                successRate={a.successRate}
+                submittedAt={"submittedAt" in a ? a.submittedAt : undefined}
+                assignmentAttemptStatus={a.assignmentAttemptStatus}
+                assignmentType={data?.type}
+                reopenPending={reopenAttemptMutation.isPending}
+                onReopen={canReopen
+                  ? () => {
+                      if (!data?.type) return
+                      reopenAttemptMutation.mutate({
+                        assignmentId: a.assignmentId,
+                        assignmentGroupType: data.type
+                      })
+                    }
+                  : undefined}
+              />
+            )
+          })}
         </Box>
       </Stack>
     </>

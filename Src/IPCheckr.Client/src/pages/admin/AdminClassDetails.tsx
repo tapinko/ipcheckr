@@ -111,7 +111,7 @@ const AdminClassDetails = () => {
               <Box>
                 <InsightCard
                   title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
-                  value={`${(detailsQuery.data?.averageSuccessRate ?? 0).toFixed(2)}%`}
+                  value={detailsQuery.data && detailsQuery.data.totalSubmits > 0 ? `${detailsQuery.data.averageSuccessRate.toFixed(2)}%` : (detailsQuery.data ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED) : "0.00%")}
                   icon={<Percent />}
                   tone="success"
                   dense

@@ -134,7 +134,25 @@ export interface AGSubmitDetailsBaseDto {
      * @memberof AGSubmitDetailsBaseDto
      */
     'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof AGSubmitDetailsBaseDto
+     */
+    'assignmentAttemptId'?: number | null;
+    /**
+     * 
+     * @type {AGSubmitDetailsBaseDtoAssignmentAttemptStatus}
+     * @memberof AGSubmitDetailsBaseDto
+     */
+    'assignmentAttemptStatus'?: AGSubmitDetailsBaseDtoAssignmentAttemptStatus | null;
 }
+/**
+ * @type AGSubmitDetailsBaseDtoAssignmentAttemptStatus
+ * @export
+ */
+export type AGSubmitDetailsBaseDtoAssignmentAttemptStatus = AssignmentSubmissionAttemptStatus;
+
 /**
  * 
  * @export
@@ -369,6 +387,133 @@ export type AssignmentGroupType = typeof AssignmentGroupType[keyof typeof Assign
 /**
  * 
  * @export
+ * @interface AssignmentSubmissionAttemptBaseRes
+ */
+export interface AssignmentSubmissionAttemptBaseRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'assignmentAttemptId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'assignmentId': number;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'assignmentGroupType': AssignmentGroupType;
+    /**
+     * 
+     * @type {AssignmentSubmissionAttemptStatus}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'status': AssignmentSubmissionAttemptStatus;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'attemptNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'lockToken': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'startedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'lastActivityAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'lastVisibleAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'lockedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'lastReopenedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'visibilityIncidentCount': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'reopenCount': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'draftJson'?: string | null;
+    /**
+     * 
+     * @type {Array<SubmitSubnetAssignmentField>}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'subnetData'?: Array<SubmitSubnetAssignmentField> | null;
+    /**
+     * 
+     * @type {Array<SubmitIDNetAssignmentField>}
+     * @memberof AssignmentSubmissionAttemptBaseRes
+     */
+    'idNetData'?: Array<SubmitIDNetAssignmentField> | null;
+}
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const AssignmentSubmissionAttemptStatus = {
+    Draft: 'DRAFT',
+    Active: 'ACTIVE',
+    Locked: 'LOCKED',
+    Submitted: 'SUBMITTED'
+} as const;
+
+export type AssignmentSubmissionAttemptStatus = typeof AssignmentSubmissionAttemptStatus[keyof typeof AssignmentSubmissionAttemptStatus];
+
+
+/**
+ * 
+ * @export
  * @interface AuthReq
  */
 export interface AuthReq {
@@ -594,6 +739,138 @@ export interface CreateAGBaseRes {
      */
     'assignmentGroupId': number;
 }
+/**
+ * 
+ * @export
+ * @interface CreateAssignmentSubmissionAttemptReq
+ */
+export interface CreateAssignmentSubmissionAttemptReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAssignmentSubmissionAttemptReq
+     */
+    'assignmentId': number;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof CreateAssignmentSubmissionAttemptReq
+     */
+    'assignmentGroupType': AssignmentGroupType;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface CreateAssignmentSubmissionAttemptRes
+ */
+export interface CreateAssignmentSubmissionAttemptRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'assignmentAttemptId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'assignmentId': number;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'assignmentGroupType': AssignmentGroupType;
+    /**
+     * 
+     * @type {AssignmentSubmissionAttemptStatus}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'status': AssignmentSubmissionAttemptStatus;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'attemptNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'lockToken': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'startedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'lastActivityAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'lastVisibleAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'lockedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'lastReopenedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'visibilityIncidentCount': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'reopenCount': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'draftJson'?: string | null;
+    /**
+     * 
+     * @type {Array<SubmitSubnetAssignmentField>}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'subnetData'?: Array<SubmitSubnetAssignmentField> | null;
+    /**
+     * 
+     * @type {Array<SubmitIDNetAssignmentField>}
+     * @memberof CreateAssignmentSubmissionAttemptRes
+     */
+    'idNetData'?: Array<SubmitIDNetAssignmentField> | null;
+}
+
+
 /**
  * 
  * @export
@@ -1175,6 +1452,117 @@ export type GNS3SessionStatus = typeof GNS3SessionStatus[keyof typeof GNS3Sessio
 /**
  * 
  * @export
+ * @interface GetAssignmentSubmissionAttemptRes
+ */
+export interface GetAssignmentSubmissionAttemptRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'assignmentAttemptId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'assignmentId': number;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'assignmentGroupType': AssignmentGroupType;
+    /**
+     * 
+     * @type {AssignmentSubmissionAttemptStatus}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'status': AssignmentSubmissionAttemptStatus;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'attemptNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'lockToken': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'startedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'lastActivityAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'lastVisibleAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'lockedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'lastReopenedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'visibilityIncidentCount': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'reopenCount': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'draftJson'?: string | null;
+    /**
+     * 
+     * @type {Array<SubmitSubnetAssignmentField>}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'subnetData'?: Array<SubmitSubnetAssignmentField> | null;
+    /**
+     * 
+     * @type {Array<SubmitIDNetAssignmentField>}
+     * @memberof GetAssignmentSubmissionAttemptRes
+     */
+    'idNetData'?: Array<SubmitIDNetAssignmentField> | null;
+}
+
+
+/**
+ * 
+ * @export
  * @interface Gns3SessionBase
  */
 export interface Gns3SessionBase {
@@ -1315,10 +1703,10 @@ export interface IDNetAGDto {
     'type': AssignmentGroupType;
     /**
      * 
-     * @type {number}
+     * @type {number | null}
      * @memberof IDNetAGDto
      */
-    'successRate': number;
+    'successRate': number | null;
     /**
      * 
      * @type {AssignmentGroupIpCat}
@@ -1376,6 +1764,18 @@ export interface IDNetAGSubmitDetailsDto {
      * @memberof IDNetAGSubmitDetailsDto
      */
     'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAGSubmitDetailsDto
+     */
+    'assignmentAttemptId'?: number | null;
+    /**
+     * 
+     * @type {AGSubmitDetailsBaseDtoAssignmentAttemptStatus}
+     * @memberof IDNetAGSubmitDetailsDto
+     */
+    'assignmentAttemptStatus'?: AGSubmitDetailsBaseDtoAssignmentAttemptStatus | null;
 }
 /**
  * 
@@ -2199,16 +2599,28 @@ export interface QueryIDNetAssignmentSubmitDetailsFullRes {
     'results': Array<QueryIDNetAssignmentSubmitDetailsFullRecordField>;
     /**
      * 
+     * @type {boolean}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'testWildcard': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
+     */
+    'testFirstLastBr': boolean;
+    /**
+     * 
      * @type {AssignmentGroupIpCat}
      * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
      */
     'ipCat': AssignmentGroupIpCat;
     /**
      * 
-     * @type {number}
+     * @type {number | null}
      * @memberof QueryIDNetAssignmentSubmitDetailsFullRes
      */
-    'successRate': number;
+    'successRate': number | null;
 }
 
 
@@ -2671,10 +3083,10 @@ export interface QuerySubnetAssignmentSubmitDetailsFullRes {
     'ipCat': AssignmentGroupIpCat;
     /**
      * 
-     * @type {number}
+     * @type {number | null}
      * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
      */
-    'successRate': number;
+    'successRate': number | null;
 }
 
 
@@ -2943,6 +3355,234 @@ export interface QueryUsersRes {
 /**
  * 
  * @export
+ * @interface ReopenAssignmentSubmissionAttemptReq
+ */
+export interface ReopenAssignmentSubmissionAttemptReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof ReopenAssignmentSubmissionAttemptReq
+     */
+    'assignmentAttemptId': number;
+}
+/**
+ * 
+ * @export
+ * @interface ReopenAssignmentSubmissionAttemptRes
+ */
+export interface ReopenAssignmentSubmissionAttemptRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'assignmentAttemptId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'assignmentId': number;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'assignmentGroupType': AssignmentGroupType;
+    /**
+     * 
+     * @type {AssignmentSubmissionAttemptStatus}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'status': AssignmentSubmissionAttemptStatus;
+    /**
+     * 
+     * @type {number}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'attemptNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'lockToken': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'startedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'lastActivityAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'lastVisibleAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'lockedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'lastReopenedAt'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'visibilityIncidentCount': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'reopenCount': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'draftJson'?: string | null;
+    /**
+     * 
+     * @type {Array<SubmitSubnetAssignmentField>}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'subnetData'?: Array<SubmitSubnetAssignmentField> | null;
+    /**
+     * 
+     * @type {Array<SubmitIDNetAssignmentField>}
+     * @memberof ReopenAssignmentSubmissionAttemptRes
+     */
+    'idNetData'?: Array<SubmitIDNetAssignmentField> | null;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface ReopenStudentAssignmentAttemptReq
+ */
+export interface ReopenStudentAssignmentAttemptReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof ReopenStudentAssignmentAttemptReq
+     */
+    'assignmentId': number;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof ReopenStudentAssignmentAttemptReq
+     */
+    'assignmentGroupType': AssignmentGroupType;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface ReopenStudentAssignmentAttemptRes
+ */
+export interface ReopenStudentAssignmentAttemptRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof ReopenStudentAssignmentAttemptRes
+     */
+    'assignmentAttemptId': number;
+    /**
+     * 
+     * @type {AssignmentSubmissionAttemptStatus}
+     * @memberof ReopenStudentAssignmentAttemptRes
+     */
+    'status': AssignmentSubmissionAttemptStatus;
+    /**
+     * 
+     * @type {number}
+     * @memberof ReopenStudentAssignmentAttemptRes
+     */
+    'reopenCount': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ReopenStudentAssignmentAttemptRes
+     */
+    'lastReopenedAt'?: string | null;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface SaveAssignmentSubmissionAttemptDraftReq
+ */
+export interface SaveAssignmentSubmissionAttemptDraftReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof SaveAssignmentSubmissionAttemptDraftReq
+     */
+    'assignmentAttemptId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SaveAssignmentSubmissionAttemptDraftReq
+     */
+    'lockToken': string;
+    /**
+     * 
+     * @type {Array<SubmitSubnetAssignmentField>}
+     * @memberof SaveAssignmentSubmissionAttemptDraftReq
+     */
+    'subnetData'?: Array<SubmitSubnetAssignmentField> | null;
+    /**
+     * 
+     * @type {Array<SubmitIDNetAssignmentField>}
+     * @memberof SaveAssignmentSubmissionAttemptDraftReq
+     */
+    'idNetData'?: Array<SubmitIDNetAssignmentField> | null;
+}
+/**
+ * 
+ * @export
+ * @interface SaveAssignmentSubmissionAttemptDraftRes
+ */
+export interface SaveAssignmentSubmissionAttemptDraftRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof SaveAssignmentSubmissionAttemptDraftRes
+     */
+    'assignmentAttemptId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SaveAssignmentSubmissionAttemptDraftRes
+     */
+    'lastActivityAt': string;
+}
+/**
+ * 
+ * @export
  * @interface StartSessionReq
  */
 export interface StartSessionReq {
@@ -3003,6 +3643,18 @@ export interface SubmitAssignmentBaseReq {
      * @memberof SubmitAssignmentBaseReq
      */
     'assignmentId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubmitAssignmentBaseReq
+     */
+    'assignmentAttemptId'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmitAssignmentBaseReq
+     */
+    'assignmentAttemptLockToken'?: string | null;
 }
 /**
  * 
@@ -3068,6 +3720,18 @@ export interface SubmitIDNetAssignmentReq {
     'assignmentId': number;
     /**
      * 
+     * @type {number}
+     * @memberof SubmitIDNetAssignmentReq
+     */
+    'assignmentAttemptId'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmitIDNetAssignmentReq
+     */
+    'assignmentAttemptLockToken'?: string | null;
+    /**
+     * 
      * @type {Array<SubmitIDNetAssignmentField>}
      * @memberof SubmitIDNetAssignmentReq
      */
@@ -3129,6 +3793,18 @@ export interface SubmitSubnetAssignmentReq {
      * @memberof SubmitSubnetAssignmentReq
      */
     'assignmentId': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubmitSubnetAssignmentReq
+     */
+    'assignmentAttemptId'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmitSubnetAssignmentReq
+     */
+    'assignmentAttemptLockToken'?: string | null;
     /**
      * 
      * @type {Array<SubmitSubnetAssignmentField>}
@@ -3223,10 +3899,10 @@ export interface SubnetAGDto {
     'type': AssignmentGroupType;
     /**
      * 
-     * @type {number}
+     * @type {number | null}
      * @memberof SubnetAGDto
      */
-    'successRate': number;
+    'successRate': number | null;
     /**
      * 
      * @type {AssignmentGroupIpCat}
@@ -3272,6 +3948,18 @@ export interface SubnetAGSubmitDetailsDto {
      * @memberof SubnetAGSubmitDetailsDto
      */
     'submittedAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAGSubmitDetailsDto
+     */
+    'assignmentAttemptId'?: number | null;
+    /**
+     * 
+     * @type {AGSubmitDetailsBaseDtoAssignmentAttemptStatus}
+     * @memberof SubnetAGSubmitDetailsDto
+     */
+    'assignmentAttemptStatus'?: AGSubmitDetailsBaseDtoAssignmentAttemptStatus | null;
 }
 /**
  * 
@@ -4388,6 +5076,44 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {ReopenStudentAssignmentAttemptReq} reopenStudentAssignmentAttemptReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupReopenStudentAssignmentAttempt: async (reopenStudentAssignmentAttemptReq: ReopenStudentAssignmentAttemptReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'reopenStudentAssignmentAttemptReq' is not null or undefined
+            assertParamExists('assignmentGroupReopenStudentAssignmentAttempt', 'reopenStudentAssignmentAttemptReq', reopenStudentAssignmentAttemptReq)
+            const localVarPath = `/api/assignment-group/reopen-student-assignment-attempt`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(reopenStudentAssignmentAttemptReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -4526,6 +5252,18 @@ export const AssignmentGroupApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroups']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @param {ReopenStudentAssignmentAttemptReq} reopenStudentAssignmentAttemptReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentGroupReopenStudentAssignmentAttempt(reopenStudentAssignmentAttemptReq: ReopenStudentAssignmentAttemptReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReopenStudentAssignmentAttemptRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupReopenStudentAssignmentAttempt(reopenStudentAssignmentAttemptReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupReopenStudentAssignmentAttempt']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -4633,6 +5371,15 @@ export const AssignmentGroupApiFactory = function (configuration?: Configuration
          */
         assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<QuerySubnetAGsRes> {
             return localVarFp.assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {ReopenStudentAssignmentAttemptReq} reopenStudentAssignmentAttemptReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupReopenStudentAssignmentAttempt(reopenStudentAssignmentAttemptReq: ReopenStudentAssignmentAttemptReq, options?: RawAxiosRequestConfig): AxiosPromise<ReopenStudentAssignmentAttemptRes> {
+            return localVarFp.assignmentGroupReopenStudentAssignmentAttempt(reopenStudentAssignmentAttemptReq, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4761,6 +5508,17 @@ export class AssignmentGroupApi extends BaseAPI {
     public assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, options?: RawAxiosRequestConfig) {
         return AssignmentGroupApiFp(this.configuration).assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * 
+     * @param {ReopenStudentAssignmentAttemptReq} reopenStudentAssignmentAttemptReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentGroupApi
+     */
+    public assignmentGroupReopenStudentAssignmentAttempt(reopenStudentAssignmentAttemptReq: ReopenStudentAssignmentAttemptReq, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupReopenStudentAssignmentAttempt(reopenStudentAssignmentAttemptReq, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 
@@ -4771,6 +5529,124 @@ export class AssignmentGroupApi extends BaseAPI {
  */
 export const AssignmentSubmitApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @param {CreateAssignmentSubmissionAttemptReq} createAssignmentSubmissionAttemptReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitCreateOrGetAssignmentAttempt: async (createAssignmentSubmissionAttemptReq: CreateAssignmentSubmissionAttemptReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createAssignmentSubmissionAttemptReq' is not null or undefined
+            assertParamExists('assignmentSubmitCreateOrGetAssignmentAttempt', 'createAssignmentSubmissionAttemptReq', createAssignmentSubmissionAttemptReq)
+            const localVarPath = `/api/assignment/create-or-get-assignment-attempt`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createAssignmentSubmissionAttemptReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} [assignmentId] 
+         * @param {AssignmentGroupType} [assignmentGroupType] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitGetCurrentAssignmentAttempt: async (assignmentId?: number, assignmentGroupType?: AssignmentGroupType, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/assignment/get-current-assignment-attempt`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (assignmentId !== undefined) {
+                localVarQueryParameter['AssignmentId'] = assignmentId;
+            }
+
+            if (assignmentGroupType !== undefined) {
+                localVarQueryParameter['AssignmentGroupType'] = assignmentGroupType;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {SaveAssignmentSubmissionAttemptDraftReq} saveAssignmentSubmissionAttemptDraftReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitLockAssignmentAttempt: async (saveAssignmentSubmissionAttemptDraftReq: SaveAssignmentSubmissionAttemptDraftReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'saveAssignmentSubmissionAttemptDraftReq' is not null or undefined
+            assertParamExists('assignmentSubmitLockAssignmentAttempt', 'saveAssignmentSubmissionAttemptDraftReq', saveAssignmentSubmissionAttemptDraftReq)
+            const localVarPath = `/api/assignment/lock-assignment-attempt`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(saveAssignmentSubmissionAttemptDraftReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @param {number} [assignmentId] 
@@ -4839,6 +5715,82 @@ export const AssignmentSubmitApiAxiosParamCreator = function (configuration?: Co
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {ReopenAssignmentSubmissionAttemptReq} reopenAssignmentSubmissionAttemptReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitReopenAssignmentAttempt: async (reopenAssignmentSubmissionAttemptReq: ReopenAssignmentSubmissionAttemptReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'reopenAssignmentSubmissionAttemptReq' is not null or undefined
+            assertParamExists('assignmentSubmitReopenAssignmentAttempt', 'reopenAssignmentSubmissionAttemptReq', reopenAssignmentSubmissionAttemptReq)
+            const localVarPath = `/api/assignment/reopen-assignment-attempt`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(reopenAssignmentSubmissionAttemptReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {SaveAssignmentSubmissionAttemptDraftReq} saveAssignmentSubmissionAttemptDraftReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitSaveAssignmentAttemptDraft: async (saveAssignmentSubmissionAttemptDraftReq: SaveAssignmentSubmissionAttemptDraftReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'saveAssignmentSubmissionAttemptDraftReq' is not null or undefined
+            assertParamExists('assignmentSubmitSaveAssignmentAttemptDraft', 'saveAssignmentSubmissionAttemptDraftReq', saveAssignmentSubmissionAttemptDraftReq)
+            const localVarPath = `/api/assignment/save-assignment-attempt-draft`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(saveAssignmentSubmissionAttemptDraftReq, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -4933,6 +5885,43 @@ export const AssignmentSubmitApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {CreateAssignmentSubmissionAttemptReq} createAssignmentSubmissionAttemptReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentSubmitCreateOrGetAssignmentAttempt(createAssignmentSubmissionAttemptReq: CreateAssignmentSubmissionAttemptReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateAssignmentSubmissionAttemptRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitCreateOrGetAssignmentAttempt(createAssignmentSubmissionAttemptReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitCreateOrGetAssignmentAttempt']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} [assignmentId] 
+         * @param {AssignmentGroupType} [assignmentGroupType] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentSubmitGetCurrentAssignmentAttempt(assignmentId?: number, assignmentGroupType?: AssignmentGroupType, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetAssignmentSubmissionAttemptRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitGetCurrentAssignmentAttempt(assignmentId, assignmentGroupType, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitGetCurrentAssignmentAttempt']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {SaveAssignmentSubmissionAttemptDraftReq} saveAssignmentSubmissionAttemptDraftReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentSubmitLockAssignmentAttempt(saveAssignmentSubmissionAttemptDraftReq: SaveAssignmentSubmissionAttemptDraftReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetAssignmentSubmissionAttemptRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitLockAssignmentAttempt(saveAssignmentSubmissionAttemptDraftReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitLockAssignmentAttempt']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {number} [assignmentId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4953,6 +5942,30 @@ export const AssignmentSubmitApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitQuerySubnetAssignmentDataForSubmit']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {ReopenAssignmentSubmissionAttemptReq} reopenAssignmentSubmissionAttemptReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentSubmitReopenAssignmentAttempt(reopenAssignmentSubmissionAttemptReq: ReopenAssignmentSubmissionAttemptReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReopenAssignmentSubmissionAttemptRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitReopenAssignmentAttempt(reopenAssignmentSubmissionAttemptReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitReopenAssignmentAttempt']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {SaveAssignmentSubmissionAttemptDraftReq} saveAssignmentSubmissionAttemptDraftReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentSubmitSaveAssignmentAttemptDraft(saveAssignmentSubmissionAttemptDraftReq: SaveAssignmentSubmissionAttemptDraftReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SaveAssignmentSubmissionAttemptDraftRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentSubmitSaveAssignmentAttemptDraft(saveAssignmentSubmissionAttemptDraftReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentSubmitApi.assignmentSubmitSaveAssignmentAttemptDraft']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -4991,6 +6004,34 @@ export const AssignmentSubmitApiFactory = function (configuration?: Configuratio
     return {
         /**
          * 
+         * @param {CreateAssignmentSubmissionAttemptReq} createAssignmentSubmissionAttemptReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitCreateOrGetAssignmentAttempt(createAssignmentSubmissionAttemptReq: CreateAssignmentSubmissionAttemptReq, options?: RawAxiosRequestConfig): AxiosPromise<CreateAssignmentSubmissionAttemptRes> {
+            return localVarFp.assignmentSubmitCreateOrGetAssignmentAttempt(createAssignmentSubmissionAttemptReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} [assignmentId] 
+         * @param {AssignmentGroupType} [assignmentGroupType] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitGetCurrentAssignmentAttempt(assignmentId?: number, assignmentGroupType?: AssignmentGroupType, options?: RawAxiosRequestConfig): AxiosPromise<GetAssignmentSubmissionAttemptRes> {
+            return localVarFp.assignmentSubmitGetCurrentAssignmentAttempt(assignmentId, assignmentGroupType, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {SaveAssignmentSubmissionAttemptDraftReq} saveAssignmentSubmissionAttemptDraftReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitLockAssignmentAttempt(saveAssignmentSubmissionAttemptDraftReq: SaveAssignmentSubmissionAttemptDraftReq, options?: RawAxiosRequestConfig): AxiosPromise<GetAssignmentSubmissionAttemptRes> {
+            return localVarFp.assignmentSubmitLockAssignmentAttempt(saveAssignmentSubmissionAttemptDraftReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {number} [assignmentId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -5006,6 +6047,24 @@ export const AssignmentSubmitApiFactory = function (configuration?: Configuratio
          */
         assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig): AxiosPromise<QuerySubnetAssignmentDataForSubmitRes> {
             return localVarFp.assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {ReopenAssignmentSubmissionAttemptReq} reopenAssignmentSubmissionAttemptReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitReopenAssignmentAttempt(reopenAssignmentSubmissionAttemptReq: ReopenAssignmentSubmissionAttemptReq, options?: RawAxiosRequestConfig): AxiosPromise<ReopenAssignmentSubmissionAttemptRes> {
+            return localVarFp.assignmentSubmitReopenAssignmentAttempt(reopenAssignmentSubmissionAttemptReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {SaveAssignmentSubmissionAttemptDraftReq} saveAssignmentSubmissionAttemptDraftReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentSubmitSaveAssignmentAttemptDraft(saveAssignmentSubmissionAttemptDraftReq: SaveAssignmentSubmissionAttemptDraftReq, options?: RawAxiosRequestConfig): AxiosPromise<SaveAssignmentSubmissionAttemptDraftRes> {
+            return localVarFp.assignmentSubmitSaveAssignmentAttemptDraft(saveAssignmentSubmissionAttemptDraftReq, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -5037,6 +6096,40 @@ export const AssignmentSubmitApiFactory = function (configuration?: Configuratio
 export class AssignmentSubmitApi extends BaseAPI {
     /**
      * 
+     * @param {CreateAssignmentSubmissionAttemptReq} createAssignmentSubmissionAttemptReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentSubmitApi
+     */
+    public assignmentSubmitCreateOrGetAssignmentAttempt(createAssignmentSubmissionAttemptReq: CreateAssignmentSubmissionAttemptReq, options?: RawAxiosRequestConfig) {
+        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitCreateOrGetAssignmentAttempt(createAssignmentSubmissionAttemptReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} [assignmentId] 
+     * @param {AssignmentGroupType} [assignmentGroupType] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentSubmitApi
+     */
+    public assignmentSubmitGetCurrentAssignmentAttempt(assignmentId?: number, assignmentGroupType?: AssignmentGroupType, options?: RawAxiosRequestConfig) {
+        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitGetCurrentAssignmentAttempt(assignmentId, assignmentGroupType, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {SaveAssignmentSubmissionAttemptDraftReq} saveAssignmentSubmissionAttemptDraftReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentSubmitApi
+     */
+    public assignmentSubmitLockAssignmentAttempt(saveAssignmentSubmissionAttemptDraftReq: SaveAssignmentSubmissionAttemptDraftReq, options?: RawAxiosRequestConfig) {
+        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitLockAssignmentAttempt(saveAssignmentSubmissionAttemptDraftReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {number} [assignmentId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5055,6 +6148,28 @@ export class AssignmentSubmitApi extends BaseAPI {
      */
     public assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId?: number, options?: RawAxiosRequestConfig) {
         return AssignmentSubmitApiFp(this.configuration).assignmentSubmitQuerySubnetAssignmentDataForSubmit(assignmentId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {ReopenAssignmentSubmissionAttemptReq} reopenAssignmentSubmissionAttemptReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentSubmitApi
+     */
+    public assignmentSubmitReopenAssignmentAttempt(reopenAssignmentSubmissionAttemptReq: ReopenAssignmentSubmissionAttemptReq, options?: RawAxiosRequestConfig) {
+        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitReopenAssignmentAttempt(reopenAssignmentSubmissionAttemptReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {SaveAssignmentSubmissionAttemptDraftReq} saveAssignmentSubmissionAttemptDraftReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentSubmitApi
+     */
+    public assignmentSubmitSaveAssignmentAttemptDraft(saveAssignmentSubmissionAttemptDraftReq: SaveAssignmentSubmissionAttemptDraftReq, options?: RawAxiosRequestConfig) {
+        return AssignmentSubmitApiFp(this.configuration).assignmentSubmitSaveAssignmentAttemptDraft(saveAssignmentSubmissionAttemptDraftReq, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

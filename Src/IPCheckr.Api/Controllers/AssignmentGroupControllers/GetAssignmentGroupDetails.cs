@@ -46,6 +46,11 @@ namespace IPCheckr.Api.Controllers
                 .Where(ak => assignmentIds.Contains(ak.Assignment.Id))
                 .ToListAsync();
 
+            var attempts = await _db.AssignmentSubmissionAttempts
+                .Where(a => a.AssignmentGroupType == AssignmentGroupType.SUBNET)
+                .Where(a => assignmentIds.Contains(a.AssignmentId))
+                .ToListAsync();
+
             var assignmentDetails = new List<SubnetAGSubmitDetailsDto>();
             int submittedStudents = submits.Select(s => s.Assignment.Student.Id).Distinct().Count();
             int totalStudents = assignments.Count;
@@ -60,7 +65,12 @@ namespace IPCheckr.Api.Controllers
 
                 var answerKey = answerKeys.FirstOrDefault(ak => ak.Assignment.Id == assignment.Id);
                 var successRate = AssignmentEvaluationUtils.CalculateSubnetSuccessRate(answerKey, submit);
-                sumSuccessRates += successRate;
+                if (submit != null) sumSuccessRates += successRate;
+
+                var attempt = attempts
+                    .Where(a => a.AssignmentId == assignment.Id && a.StudentId == assignment.Student.Id)
+                    .OrderByDescending(a => a.StartedAt)
+                    .FirstOrDefault();
 
                 assignmentDetails.Add(new SubnetAGSubmitDetailsDto
                 {
@@ -68,7 +78,9 @@ namespace IPCheckr.Api.Controllers
                     StudentUsername = UsernameUtils.ToDisplay(assignment.Student.Username),
                     StudentId = assignment.Student.Id,
                     SuccessRate = submit != null ? successRate : 0.0,
-                    SubmittedAt = submit?.SubmittedAt
+                    SubmittedAt = submit?.SubmittedAt,
+                    AssignmentAttemptId = attempt?.Id,
+                    AssignmentAttemptStatus = attempt?.Status
                 });
             }
 
@@ -96,7 +108,7 @@ namespace IPCheckr.Api.Controllers
                 Total = totalStudents,
                 StartDate = subnetGroup.StartDate,
                 Deadline = subnetGroup.Deadline,
-                SuccessRate = totalStudents > 0 ? sumSuccessRates / totalStudents : 0.0,
+                SuccessRate = submittedStudents > 0 ? sumSuccessRates / submittedStudents : null,
                 Status = status,
                 Type = AssignmentGroupType.SUBNET,
                 IpCat = subnetGroup.AssignmentIpCat,
@@ -146,6 +158,11 @@ namespace IPCheckr.Api.Controllers
                 .Where(ak => assignmentIds.Contains(ak.Assignment.Id))
                 .ToListAsync();
 
+            var attempts = await _db.AssignmentSubmissionAttempts
+                .Where(a => a.AssignmentGroupType == AssignmentGroupType.IDNET)
+                .Where(a => assignmentIds.Contains(a.AssignmentId))
+                .ToListAsync();
+
             var assignmentDetails = new List<IDNetAGSubmitDetailsDto>();
             int submittedStudents = submits.Select(s => s.Assignment.Student.Id).Distinct().Count();
             int totalStudents = assignments.Count;
@@ -160,7 +177,12 @@ namespace IPCheckr.Api.Controllers
 
                 var answerKey = answerKeys.FirstOrDefault(ak => ak.Assignment.Id == assignment.Id);
                 var successRate = AssignmentEvaluationUtils.CalculateIdNetSuccessRate(answerKey, submit, idnetGroup.TestWildcard, idnetGroup.TestFirstLastBr);
-                sumSuccessRates += successRate;
+                if (submit != null) sumSuccessRates += successRate;
+
+                var attempt = attempts
+                    .Where(a => a.AssignmentId == assignment.Id && a.StudentId == assignment.Student.Id)
+                    .OrderByDescending(a => a.StartedAt)
+                    .FirstOrDefault();
 
                 assignmentDetails.Add(new IDNetAGSubmitDetailsDto
                 {
@@ -168,7 +190,9 @@ namespace IPCheckr.Api.Controllers
                     StudentUsername = UsernameUtils.ToDisplay(assignment.Student.Username),
                     StudentId = assignment.Student.Id,
                     SuccessRate = submit != null ? successRate : 0.0,
-                    SubmittedAt = submit?.SubmittedAt
+                    SubmittedAt = submit?.SubmittedAt,
+                    AssignmentAttemptId = attempt?.Id,
+                    AssignmentAttemptStatus = attempt?.Status
                 });
             }
 
@@ -196,7 +220,7 @@ namespace IPCheckr.Api.Controllers
                 Total = totalStudents,
                 StartDate = idnetGroup.StartDate,
                 Deadline = idnetGroup.Deadline,
-                SuccessRate = totalStudents > 0 ? sumSuccessRates / totalStudents : 0.0,
+                SuccessRate = submittedStudents > 0 ? sumSuccessRates / submittedStudents : null,
                 Status = status,
                 Type = AssignmentGroupType.IDNET,
                 IpCat = idnetGroup.AssignmentIpCat,

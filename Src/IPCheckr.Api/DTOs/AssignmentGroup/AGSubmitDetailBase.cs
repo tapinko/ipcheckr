@@ -19,5 +19,10 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         public double SuccessRate { get; set; }
 
         public DateTime? SubmittedAt { get; set; }
+
+        public int? AssignmentAttemptId { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AssignmentSubmissionAttemptStatus? AssignmentAttemptStatus { get; set; }
     }
 }

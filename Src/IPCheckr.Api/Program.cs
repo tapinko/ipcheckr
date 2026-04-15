@@ -14,6 +14,8 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.HttpOverrides;
+using IPCheckr.Api.Services.Realtime;
+using IPCheckr.Api.Hubs;
 
 namespace IPCheckr.Api
 {
@@ -48,6 +50,8 @@ namespace IPCheckr.Api
             builder.Services.AddCustomAuthorization();
             builder.Services.AddMemoryCache();
             builder.Services.AddHostedService<Gns3SessionCleanupService>();
+            builder.Services.AddSignalR();
+            builder.Services.AddSingleton<IAttemptEventsPublisher, AttemptEventsPublisher>();
 
             builder.Services.AddSingleton<ILogStreamBroker, LogStreamBroker>();
             builder.Logging.Services.AddSingleton<ILoggerProvider, BroadcastLoggerProvider>();
@@ -62,10 +66,12 @@ namespace IPCheckr.Api
                     if (path.StartsWithSegments("/api/dashboard/stream-logs"))
                     {
                         var accessToken = context.Request.Query["access_token"];
-                        if (!string.IsNullOrEmpty(accessToken))
-                        {
-                            context.Token = accessToken!;
-                        }
+                        if (!string.IsNullOrEmpty(accessToken)) context.Token = accessToken!;
+                    }
+                    else if (path.StartsWithSegments("/hubs/attempt-events"))
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        if (!string.IsNullOrEmpty(accessToken)) context.Token = accessToken!;
                     }
                     if (prev != null) await prev(context);
                 };
@@ -108,6 +114,7 @@ namespace IPCheckr.Api
             app.UseOpenApi();
 
             app.MapControllers();
+            app.MapHub<AttemptEventsHub>("/hubs/attempt-events");
             app.MapFallbackToFile("index.html");
 
             // creating admin user, setting the language and institution name empty string

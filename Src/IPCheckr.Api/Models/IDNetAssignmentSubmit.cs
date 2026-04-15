@@ -12,6 +12,10 @@ namespace IPCheckr.Api.Models
 
         public required IDNetAssignment Assignment { get; set; }
 
+        public int? AttemptId { get; set; }
+
+        public AssignmentSubmissionAttempt? Attempt { get; set; }
+
         public string[]? IDNet { get; set; }
 
         public string[]? Wildcard { get; set; }

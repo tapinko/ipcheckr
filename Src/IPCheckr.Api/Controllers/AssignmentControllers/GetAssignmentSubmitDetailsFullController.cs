@@ -50,15 +50,15 @@ namespace IPCheckr.Api.Controllers
                 assignment.AssignmentGroup.CompletedAt
             );
 
-            if (isStudentOwner && submit == null)
+            if (isStudentOwner && submit == null && status != AssignmentGroupStatus.ENDED)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
-                    Detail = "Assignment has not been submitted.",
+                    Detail = "Assignment is not available yet.",
                     Status = StatusCodes.Status403Forbidden,
-                    MessageEn = "You must submit the assignment before viewing full answers.",
-                    MessageSk = "Pred zobrazením správnych odpovedí musíte zadanie odovzdať."
+                    MessageEn = "Assignment is not available yet.",
+                    MessageSk = "Zadanie ešte nie je dostupné."
                 });
             }
 
@@ -116,9 +116,9 @@ namespace IPCheckr.Api.Controllers
                 });
             }
 
-            var successRate = submit != null
+            double? successRate = submit != null
                 ? AssignmentEvaluationUtils.CalculateSubnetSuccessRate(answerKey, submit)
-                : 0;
+                : null;
 
             return Ok(new QuerySubnetAssignmentSubmitDetailsFullRes
             {
@@ -176,15 +176,15 @@ namespace IPCheckr.Api.Controllers
                 assignment.AssignmentGroup.CompletedAt
             );
 
-            if (isStudentOwner && submit == null)
+            if (isStudentOwner && submit == null && status != AssignmentGroupStatus.ENDED)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
-                    Detail = "Assignment has not been submitted.",
+                    Detail = "Assignment is not available yet.",
                     Status = StatusCodes.Status403Forbidden,
-                    MessageEn = "You must submit the assignment before viewing full answers.",
-                    MessageSk = "Pred zobrazením správnych odpovedí musíte zadanie odovzdať."
+                    MessageEn = "Assignment is not available yet.",
+                    MessageSk = "Zadanie ešte nie je dostupné."
                 });
             }
 
@@ -247,9 +247,9 @@ namespace IPCheckr.Api.Controllers
                 });
             }
 
-            var successRate = submit != null
+            double? successRate = submit != null
                 ? AssignmentEvaluationUtils.CalculateIdNetSuccessRate(answerKey, submit, assignment.AssignmentGroup.TestWildcard, assignment.AssignmentGroup.TestFirstLastBr)
-                : 0;
+                : null;
 
             return Ok(new QueryIDNetAssignmentSubmitDetailsFullRes
             {

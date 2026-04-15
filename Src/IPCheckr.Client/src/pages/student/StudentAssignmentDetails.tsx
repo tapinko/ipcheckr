@@ -171,7 +171,7 @@ const StudentAssignmentDetails = () => {
     : "-"
   const successRateValue = data?.successRate
   const successRateLabel = successRateValue === undefined || successRateValue === null
-    ? "-"
+    ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED)
     : `${successRateValue.toFixed(2)}%`
   const ipCategoryValue = data?.ipCat
     ? getIpCatLabel(data.ipCat, t)

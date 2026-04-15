@@ -22,6 +22,7 @@ namespace IPCheckr.Api
 
         public DbSet<SubnetAssignmentSubmit> SubnetAssignmentSubmits { get; set; }
         public DbSet<IDNetAssignmentSubmit> IDNetAssignmentSubmits { get; set; }
+        public DbSet<AssignmentSubmissionAttempt> AssignmentSubmissionAttempts { get; set; }
         public DbSet<AppSettings> AppSettings { get; set; }
         public DbSet<Gns3Session> Gns3Sessions { get; set; }
 
@@ -124,6 +125,52 @@ namespace IPCheckr.Api
                 .WithMany()
                 .HasForeignKey("AssignmentId")
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AssignmentSubmissionAttempt>(entity =>
+            {
+                entity.ToTable("AssignmentSubmissionAttempts");
+                entity.HasKey(a => a.Id);
+
+                entity.Property(a => a.Status)
+                    .HasConversion<string>()
+                    .IsRequired();
+
+                entity.Property(a => a.AssignmentGroupType)
+                    .HasConversion<string>()
+                    .IsRequired();
+
+                entity.Property(a => a.LockToken)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.Property(a => a.DraftJson)
+                    .HasColumnType("longtext");
+
+                entity.HasOne(a => a.Student)
+                    .WithMany()
+                    .HasForeignKey(a => a.StudentId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(a => new { a.AssignmentGroupType, a.AssignmentId, a.StudentId });
+                entity.HasIndex(a => a.LockToken)
+                    .IsUnique();
+            });
+
+            modelBuilder.Entity<SubnetAssignmentSubmit>(entity =>
+            {
+                entity.HasOne(sub => sub.Attempt)
+                    .WithMany()
+                    .HasForeignKey("AttemptId")
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<IDNetAssignmentSubmit>(entity =>
+            {
+                entity.HasOne(sub => sub.Attempt)
+                    .WithMany()
+                    .HasForeignKey("AttemptId")
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
 
             modelBuilder.Entity<AppSettings>(entity =>
             {

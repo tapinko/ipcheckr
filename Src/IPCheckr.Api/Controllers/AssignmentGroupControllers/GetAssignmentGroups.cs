@@ -121,7 +121,7 @@ namespace IPCheckr.Api.Controllers
                         .OrderByDescending(s => s.SubmittedAt)
                         .FirstOrDefault();
 
-                    sumSuccessRates += AssignmentEvaluationUtils.CalculateSubnetSuccessRate(answerKey, submit);
+                    if (submit != null) sumSuccessRates += AssignmentEvaluationUtils.CalculateSubnetSuccessRate(answerKey, submit);
                 }
 
                 var status = AssignmentEvaluationUtils.ResolveStatus(ag.StartDate, ag.Deadline, ag.CompletedAt);
@@ -148,7 +148,7 @@ namespace IPCheckr.Api.Controllers
                     Total = totalStudents,
                     StartDate = ag.StartDate,
                     Deadline = ag.Deadline,
-                    SuccessRate = totalAssignments > 0 ? sumSuccessRates / totalAssignments : 0.0,
+                    SuccessRate = submittedStudents > 0 ? sumSuccessRates / submittedStudents : null,
                     Status = status,
                     Type = AssignmentGroupType.SUBNET,
                     IpCat = ag.AssignmentIpCat
@@ -281,7 +281,7 @@ namespace IPCheckr.Api.Controllers
                         .OrderByDescending(s => s.SubmittedAt)
                         .FirstOrDefault();
 
-                    sumSuccessRates += AssignmentEvaluationUtils.CalculateIdNetSuccessRate(answerKey, submit, ag.TestWildcard, ag.TestFirstLastBr);
+                    if (submit != null) sumSuccessRates += AssignmentEvaluationUtils.CalculateIdNetSuccessRate(answerKey, submit, ag.TestWildcard, ag.TestFirstLastBr);
                 }
 
                 var status = AssignmentEvaluationUtils.ResolveStatus(ag.StartDate, ag.Deadline, ag.CompletedAt);
@@ -308,7 +308,7 @@ namespace IPCheckr.Api.Controllers
                     Total = totalStudents,
                     StartDate = ag.StartDate,
                     Deadline = ag.Deadline,
-                    SuccessRate = totalAssignments > 0 ? sumSuccessRates / totalAssignments : 0.0,
+                    SuccessRate = submittedStudents > 0 ? sumSuccessRates / submittedStudents : null,
                     Status = status,
                     Type = AssignmentGroupType.IDNET,
                     IpCat = ag.AssignmentIpCat,
