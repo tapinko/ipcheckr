@@ -72,6 +72,7 @@ const StudentAssignmentSubmission = () => {
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
   const [nowMs, setNowMs] = useState(() => Date.now())
   const draftHydratedRef = useRef(false)
+  const autoSubmitTriggeredRef = useRef(false)
   const [assignmentType, setAssignmentType] = useState<AssignmentGroupType | null>(
     () => fromAssignmentTypeParam(assignmentTypeParam) ?? (location.state as any)?.assignmentType ?? null
   )
@@ -565,10 +566,15 @@ const StudentAssignmentSubmission = () => {
     return () => clearInterval(timer)
   }, [])
 
-  const countdownText = useMemo(() => {
-    if (!assignmentMeta?.deadline) return "--:--:--"
+  const remainingSeconds = useMemo(() => {
+    if (!assignmentMeta?.deadline) return null
+    return Math.max(0, Math.floor((new Date(assignmentMeta.deadline).getTime() - nowMs) / 1000))
+  }, [assignmentMeta?.deadline, nowMs])
 
-    const totalSeconds = Math.max(0, Math.floor((new Date(assignmentMeta.deadline).getTime() - nowMs) / 1000))
+  const countdownText = useMemo(() => {
+    if (remainingSeconds === null) return "--:--:--"
+
+    const totalSeconds = remainingSeconds
     const days = Math.floor(totalSeconds / 86400)
     const hours = Math.floor((totalSeconds % 86400) / 3600)
     const minutes = Math.floor((totalSeconds % 3600) / 60)
@@ -579,7 +585,51 @@ const StudentAssignmentSubmission = () => {
     }
 
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
-  }, [assignmentMeta?.deadline, nowMs])
+  }, [remainingSeconds])
+
+  const isFinalTenSeconds = remainingSeconds !== null && remainingSeconds > 0 && remainingSeconds <= 30
+  const blinkVisible = Math.floor(nowMs / 1000) % 2 === 0
+
+  useEffect(() => {
+    autoSubmitTriggeredRef.current = false
+  }, [assignmentIdNum, assignmentType])
+
+  useEffect(() => {
+    if (!isAvailable || !assignmentMeta?.deadline) return
+    if (autoSubmitTriggeredRef.current) return
+    if (attemptLocked || attemptSubmitted || submitting) return
+
+    const deadlineMs = new Date(assignmentMeta.deadline).getTime()
+    if (!Number.isFinite(deadlineMs)) return
+
+    const submitNow = () => {
+      if (autoSubmitTriggeredRef.current) return
+      autoSubmitTriggeredRef.current = true
+      void onSubmit(getValues())
+    }
+
+    const triggerAtMs = deadlineMs - 1000
+    const delayMs = triggerAtMs - Date.now()
+
+    if (delayMs <= 0) {
+      submitNow()
+      return
+    }
+
+    const timerId = window.setTimeout(submitNow, delayMs)
+
+    return () => {
+      window.clearTimeout(timerId)
+    }
+  }, [
+    isAvailable,
+    assignmentMeta?.deadline,
+    attemptLocked,
+    attemptSubmitted,
+    submitting,
+    getValues,
+    onSubmit
+  ])
 
   const isDeterminingType = !assignmentType && (subnetSubmissionQuery.isLoading || idNetSubmissionQuery.isLoading)
   const typeDetectError = !assignmentType && subnetSubmissionQuery.isError && idNetSubmissionQuery.isError
@@ -994,7 +1044,9 @@ const StudentAssignmentSubmission = () => {
                           fontWeight: 800,
                           fontSize: { xs: 16, md: 18 },
                           px: 0.5,
-                          height: { xs: 34, md: 38 }
+                          height: { xs: 34, md: 38 },
+                          opacity: isFinalTenSeconds ? (blinkVisible ? 1 : 0.3) : 1,
+                          transition: "opacity 0.15s linear"
                         }}
                       />
                     </Stack>
