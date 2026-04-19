@@ -51,6 +51,10 @@ const TeacherDashboard = () => {
   const hasMostSuccessfulClassTarget = !!dashboardQuery.data?.mostSuccessfulClass
   const hasMostSuccessfulStudentTarget = !!dashboardQuery.data?.mostSuccessfulStudent
 
+  const handleMyClassesNavigate = () => {
+    navigate(getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES, {}))
+  }
+
   useEffect(() => {
     if (barChartLength < 1) setBarChartLength(1)
     else if (barChartLength > 10) setBarChartLength(10)
@@ -209,18 +213,46 @@ const TeacherDashboard = () => {
                 dense
               />
             </Box>
-            <InsightCard
-              title={t(TranslationKey.TEACHER_DASHBOARD_CLASSES)}
-              value={dashboardQuery.data?.totalClasses ?? "-"}
-              icon={<Class />}
-              dense
-            />
-            <InsightCard
-              title={t(TranslationKey.TEACHER_DASHBOARD_STUDENTS)}
-              value={dashboardQuery.data?.totalStudents ?? "-"}
-              icon={<Groups />}
-              dense
-            />
+            <Box
+              onClick={handleMyClassesNavigate}
+              sx={{
+                cursor: "pointer",
+                "&:hover .my-classes-link-value": {
+                  textDecoration: "underline"
+                }
+              }}
+            >
+              <InsightCard
+                title={t(TranslationKey.TEACHER_DASHBOARD_CLASSES)}
+                value={
+                  <Box component="span" className="my-classes-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                    {dashboardQuery.data?.totalClasses ?? "-"}
+                  </Box>
+                }
+                icon={<Class />}
+                dense
+              />
+            </Box>
+            <Box
+              onClick={handleMyClassesNavigate}
+              sx={{
+                cursor: "pointer",
+                "&:hover .my-classes-link-value": {
+                  textDecoration: "underline"
+                }
+              }}
+            >
+              <InsightCard
+                title={t(TranslationKey.TEACHER_DASHBOARD_STUDENTS)}
+                value={
+                  <Box component="span" className="my-classes-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                    {dashboardQuery.data?.totalStudents ?? "-"}
+                  </Box>
+                }
+                icon={<Groups />}
+                dense
+              />
+            </Box>
           </Stack>
 
           <Stack spacing={1.25}>
