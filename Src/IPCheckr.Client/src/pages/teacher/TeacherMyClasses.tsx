@@ -29,6 +29,7 @@ import type {
   IsLdapAuthRes
 } from "../../dtos"
 import { classApi, userApi } from "../../utils/apiClients"
+import axiosInstance from "../../utils/axiosInstance"
 import DataGridWithSearch from "../../components/DataGridWithSearch"
 import ActionPanel from "../../components/ActionPanel"
 import type { IUsersSelectedRows } from "../../types/ISelectedRows"
@@ -108,6 +109,8 @@ const TeacherMyClasses = () => {
     handleSubmit: handleAddStudentSubmit,
     control: addStudentControl,
     reset: resetAddStudent,
+    setError: setAddStudentError,
+    clearErrors: clearAddStudentErrors,
     watch: watchAddStudent,
     formState: { errors: addStudentErrors }
   } = useForm<AddStudentFormValues>({
@@ -237,18 +240,44 @@ const TeacherMyClasses = () => {
     placeholderData: prev => prev
   })
 
+  const allStudentsQuery = useQuery<UserDto[], Error>({
+    queryKey: ["allStudentsForClassAssign"],
+    queryFn: () =>
+      userApi
+        .userQueryUsers(null, null, UserRole.STUDENT)
+        .then(r => r.data.users ?? []),
+    staleTime: 60_000
+  })
+
+  const availableStudents = (allStudentsQuery.data ?? []).filter(student => {
+    if (!selectedClass) return true
+    return !(student.classIds ?? []).includes(selectedClass.classId)
+  })
+
+  const isExistingStudentSelected = !isLdapAuth && availableStudents.some(
+    s => s.username.trim().toLowerCase() === (addStudentWatchValues.username ?? "").trim().toLowerCase()
+  )
+
   const addStudentMutation = useMutation<
     AxiosResponse<AddUserRes>,
     AxiosError<ApiProblemDetails>,
     AddStudentFormValues
   >({
-    mutationFn: (data) =>
-      userApi.userAddUser({
+    mutationFn: (data) => {
+      if (!isLdapAuth && isExistingStudentSelected) {
+        return axiosInstance.post<AddUserRes>("/api/classes/add-student", {
+          username: data.username,
+          classIds: data.classIds
+        })
+      }
+
+      return userApi.userAddUser({
         username: data.username,
         password: data.password,
         role: data.role,
         classIds: data.classIds
-      }),
+      })
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["classStudents"] })
       setAlert({
@@ -463,6 +492,15 @@ const TeacherMyClasses = () => {
   }, [classesQuery.data, newClassId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAddStudent = async (data: AddStudentFormValues) => {
+    if (!isLdapAuth && !isExistingStudentSelected && !data.password?.trim()) {
+      setAddStudentError("password", {
+        type: "manual",
+        message: TranslationKey.FORM_RULES_REQUIRED as unknown as string
+      })
+      return
+    }
+
+    clearAddStudentErrors("password")
     await addStudentMutation.mutateAsync(data).catch(() => {})
     resetAddStudent(getAddStudentDefaultValues())
     setAddStudentDialogVis(false)
@@ -551,7 +589,7 @@ const TeacherMyClasses = () => {
 
   const addStudentDisabled =
     !addStudentWatchValues.username ||
-    (!isLdapAuth && !addStudentWatchValues.password) ||
+    (!isLdapAuth && !isExistingStudentSelected && !addStudentWatchValues.password) ||
     (addStudentWatchValues.classIds?.length ?? 0) === 0 ||
     addStudentMutation.isPending
 
@@ -802,17 +840,37 @@ const TeacherMyClasses = () => {
                   ...FormRules.patternLettersNumbersDots()
                 }}
                 render={({ field }) => (
-                  <TextField
-                    margin="dense"
-                    label={t(TranslationKey.TEACHER_MY_CLASSES_USERNAME)}
-                    fullWidth
-                    {...field}
-                    error={!!addStudentErrors.username}
-                    helperText={
-                      addStudentErrors.username
-                        ? t(addStudentErrors.username.message as string)
-                        : ""
-                    }
+                  <Autocomplete
+                    freeSolo
+                    options={availableStudents}
+                    getOptionLabel={option => typeof option === "string" ? option : option.username}
+                    value={availableStudents.find(u => u.username === field.value) ?? null}
+                    onChange={(_, value) => {
+                      const nextUsername = typeof value === "string" ? value : value?.username ?? ""
+                      field.onChange(nextUsername)
+                      clearAddStudentErrors("password")
+                    }}
+                    onInputChange={(_, value, reason) => {
+                      if (reason === "input" || reason === "clear") {
+                        field.onChange(value)
+                        clearAddStudentErrors("password")
+                      }
+                    }}
+                    noOptionsText={t(TranslationKey.TEACHER_MY_CLASSES_NO_DATA)}
+                    renderInput={params => (
+                      <TextField
+                        {...params}
+                        margin="dense"
+                        label={t(TranslationKey.TEACHER_MY_CLASSES_USERNAME)}
+                        fullWidth
+                        error={!!addStudentErrors.username}
+                        helperText={
+                          addStudentErrors.username
+                            ? t(addStudentErrors.username.message as string)
+                            : ""
+                        }
+                      />
+                    )}
                   />
                 )}
               />
@@ -820,22 +878,16 @@ const TeacherMyClasses = () => {
             <Controller
               name="password"
               control={addStudentControl}
-              rules={isLdapAuth ? {} : {
-                ...FormRules.required(),
-                ...FormRules.minLengthLong(),
-                ...FormRules.maxLengthLong(),
-                ...FormRules.patternLettersNumbersSpecial()
-              }}
               render={({ field }) => (
                 <TextField
-                  disabled={isLdapAuth}
+                  disabled={isLdapAuth || isExistingStudentSelected}
                   margin="dense"
                   label={t(TranslationKey.TEACHER_MY_CLASSES_PASSWORD)}
                   fullWidth
                   type="password"
                   {...field}
                   error={!!addStudentErrors.password}
-                  helperText={isLdapAuth ? "" : (addStudentErrors.password ? t(addStudentErrors.password.message as string) : "")}
+                  helperText={isLdapAuth || isExistingStudentSelected ? "" : (addStudentErrors.password ? t(addStudentErrors.password.message as string) : "")}
                 />
               )}
             />
@@ -843,8 +895,8 @@ const TeacherMyClasses = () => {
               name="classIds"
               control={addStudentControl}
               rules={{
-                validate: v =>
-                  (v && v.length > 0) ||
+                validate: value =>
+                  (value && value.length > 0) ||
                   t(TranslationKey.FORM_RULES_REQUIRED).toString()
               }}
               render={({ field }) => (
