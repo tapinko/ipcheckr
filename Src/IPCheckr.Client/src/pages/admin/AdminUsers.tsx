@@ -79,6 +79,7 @@ const AdminUsers = () => {
     control: addUserControl,
     handleSubmit: handleAddUserSubmit,
     reset: resetAddUser,
+    setValue: setAddUserValue,
     watch: watchAddUser,
     formState: { errors: addUserErrors }
   } = useForm<AddUserFormValues>({
@@ -123,6 +124,14 @@ const AdminUsers = () => {
     return list.find(s => (s.name ?? "").toLowerCase() === "authtype") ?? null
   }, [settingsQuery.data])
   const isLdapAuth = useMemo(() => ((authSetting?.value ?? "").toUpperCase() === "LDAP"), [authSetting])
+  const ldapTeacherGroupDn = useMemo(() => {
+    const list: AppSettingDto[] = settingsQuery.data?.data?.appSettings ?? []
+    return list.find(s => (s.name ?? "").toLowerCase() === "ldap_teachergroupdn")?.value ?? null
+  }, [settingsQuery.data])
+  const ldapStudentGroupDn = useMemo(() => {
+    const list: AppSettingDto[] = settingsQuery.data?.data?.appSettings ?? []
+    return list.find(s => (s.name ?? "").toLowerCase() === "ldap_studentgroupdn")?.value ?? null
+  }, [settingsQuery.data])
 
   const usersQuery = useQuery<UserRow[], Error>({
     queryKey: ["users", { searchValue, roleFilterValue, classFilterValue, descending }],
@@ -390,20 +399,35 @@ const AdminUsers = () => {
                   const [options, setOptions] = useState<LdapUserDto[]>([])
                   const [input, setInput] = useState<string>("")
                   const [loading, setLoading] = useState(false)
+                  const [teachersSet, setTeachersSet] = useState<Set<string>>(new Set())
+                  const [studentsSet, setStudentsSet] = useState<Set<string>>(new Set())
                   useEffect(() => {
                     const q = input.trim()
                     if (!q || q.length < minLdapSearchChars) { setOptions([]); return }
                     let cancelled = false
                     setLoading(true)
                     const timer = setTimeout(() => {
-                      userApi
-                        .userLdapSearchUsers(q)
-                        .then(res => res.data.users)
-                        .then(users => { if (!cancelled) setOptions(users) })
+                      Promise.all([
+                        userApi.userLdapSearchUsers(q),
+                        ldapTeacherGroupDn
+                          ? userApi.userLdapSearchUsers(q, null, ldapTeacherGroupDn)
+                          : Promise.resolve({ data: { users: [] as LdapUserDto[] } }),
+                        ldapStudentGroupDn
+                          ? userApi.userLdapSearchUsers(q, null, ldapStudentGroupDn)
+                          : Promise.resolve({ data: { users: [] as LdapUserDto[] } })
+                      ])
+                        .then(([allRes, teacherRes, studentRes]) => {
+                          if (cancelled) return
+
+                          const allUsers = allRes.data.users ?? []
+                          setOptions(allUsers)
+                          setTeachersSet(new Set((teacherRes.data.users ?? []).map(u => u.username.toLowerCase())))
+                          setStudentsSet(new Set((studentRes.data.users ?? []).map(u => u.username.toLowerCase())))
+                        })
                         .finally(() => { if (!cancelled) setLoading(false) })
                     }, 250)
                     return () => { cancelled = true; clearTimeout(timer) }
-                  }, [input])
+                  }, [input, ldapTeacherGroupDn, ldapStudentGroupDn])
                   return (
                     <Autocomplete
                       loading={loading}
@@ -412,7 +436,21 @@ const AdminUsers = () => {
                       noOptionsText={t(TranslationKey.ADMIN_USERS_NO_DATA)}
                       loadingText={t(TranslationKey.ADMIN_USERS_LOADING)}
                       onInputChange={(_, v) => setInput(v)}
-                      onChange={(_, v) => field.onChange(v ? (v as LdapUserDto).username : "")}
+                      onChange={(_, v) => {
+                        const selectedUsername = v ? (v as LdapUserDto).username : ""
+                        field.onChange(selectedUsername)
+
+                        if (!selectedUsername) return
+
+                        const key = selectedUsername.toLowerCase()
+                        if (teachersSet.has(key)) {
+                          setAddUserValue("role", UserRole.TEACHER)
+                        } else if (studentsSet.has(key)) {
+                          setAddUserValue("role", UserRole.STUDENT)
+                        } else {
+                          setAddUserValue("role", UserRole.STUDENT)
+                        }
+                      }}
                       renderInput={(params) => (
                         <TextField
                           {...params}
