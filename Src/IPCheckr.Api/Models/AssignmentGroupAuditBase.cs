@@ -17,6 +17,8 @@ namespace IPCheckr.Api.Models
         public DateTime? CompletedAt { get; set; }
 
         public required AssignmentGroupStatus Status { get; set; }
+
+        public AssignmentGroupDifficulty? Difficulty { get; set; }
         
         public required Class Class { get; set; }
 

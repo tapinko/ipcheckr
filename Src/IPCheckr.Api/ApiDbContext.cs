@@ -73,10 +73,22 @@ namespace IPCheckr.Api
                 .HasConversion<string>()
                 .IsRequired();
 
+            modelBuilder.Entity<SubnetAG>()
+                .Property(ag => ag.Difficulty)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<SubnetAG>()
+                .Property(ag => ag.HostSortStrategy)
+                .HasConversion<string>();
+
             modelBuilder.Entity<IDNetAG>()
                 .Property(ag => ag.Status)
                 .HasConversion<string>()
                 .IsRequired();
+
+            modelBuilder.Entity<IDNetAG>()
+                .Property(ag => ag.Difficulty)
+                .HasConversion<string>();
 
             modelBuilder.Entity<SubnetAssignment>()
                 .HasOne(a => a.AssignmentGroup)

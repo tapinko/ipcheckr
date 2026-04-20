@@ -9,5 +9,7 @@ namespace IPCheckr.Api.Models
     {
         public required int NumberOfRecords { get; set; }
         public required AssignmentGroupIpCat AssignmentIpCat { get; set; }
+
+        public AssignmentGroupHostSortStrategy? HostSortStrategy { get; set; }
     }
 }
