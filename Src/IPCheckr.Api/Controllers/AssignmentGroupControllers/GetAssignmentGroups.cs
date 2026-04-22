@@ -151,7 +151,9 @@ namespace IPCheckr.Api.Controllers
                     SuccessRate = submittedStudents > 0 ? sumSuccessRates / submittedStudents : null,
                     Status = status,
                     Type = AssignmentGroupType.SUBNET,
-                    IpCat = ag.AssignmentIpCat
+                    IpCat = ag.AssignmentIpCat,
+                    Difficulty = ag.Difficulty,
+                    HostSortStrategy = ag.HostSortStrategy
                 });
             }
 
@@ -312,6 +314,7 @@ namespace IPCheckr.Api.Controllers
                     Status = status,
                     Type = AssignmentGroupType.IDNET,
                     IpCat = ag.AssignmentIpCat,
+                    Difficulty = ag.Difficulty,
                     TestWildcard = ag.TestWildcard,
                     TestFirstLastBr = ag.TestFirstLastBr
                 });

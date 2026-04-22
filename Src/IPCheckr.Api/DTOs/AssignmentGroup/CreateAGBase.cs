@@ -32,6 +32,9 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         [DataType(DataType.Date, ErrorMessage = "Deadline must be a valid date.")]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public required DateTime Deadline { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AssignmentGroupDifficulty? Difficulty { get; set; }
     }
 
     public class CreateAGBaseRes

@@ -23,5 +23,8 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? Deadline { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AssignmentGroupDifficulty? Difficulty { get; set; }
     }
 }

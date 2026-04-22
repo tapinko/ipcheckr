@@ -95,6 +95,12 @@ export interface AGBaseDto {
      * @memberof AGBaseDto
      */
     'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof AGBaseDto
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
 }
 
 
@@ -376,6 +382,36 @@ export interface AssignmentDto {
      */
     'status': AssignmentGroupStatus;
 }
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const AssignmentGroupDifficulty = {
+    Easy: 'EASY',
+    Medium: 'MEDIUM',
+    Hard: 'HARD'
+} as const;
+
+export type AssignmentGroupDifficulty = typeof AssignmentGroupDifficulty[keyof typeof AssignmentGroupDifficulty];
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const AssignmentGroupHostSortStrategy = {
+    Random: 'RANDOM',
+    Ascending: 'ASCENDING',
+    Descending: 'DESCENDING'
+} as const;
+
+export type AssignmentGroupHostSortStrategy = typeof AssignmentGroupHostSortStrategy[keyof typeof AssignmentGroupHostSortStrategy];
 
 
 /**
@@ -761,8 +797,20 @@ export interface CreateAGBaseReq {
      * @memberof CreateAGBaseReq
      */
     'deadline': string;
+    /**
+     * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof CreateAGBaseReq
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
 }
 
+
+/**
+ * @type CreateAGBaseReqDifficulty
+ * @export
+ */
+export type CreateAGBaseReqDifficulty = AssignmentGroupDifficulty;
 
 /**
  * 
@@ -991,6 +1039,12 @@ export interface CreateIDNetAGReq {
     'deadline': string;
     /**
      * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof CreateIDNetAGReq
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    /**
+     * 
      * @type {number}
      * @memberof CreateIDNetAGReq
      */
@@ -1085,6 +1139,12 @@ export interface CreateSubnetAGReq {
     'deadline': string;
     /**
      * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof CreateSubnetAGReq
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    /**
+     * 
      * @type {number}
      * @memberof CreateSubnetAGReq
      */
@@ -1095,8 +1155,20 @@ export interface CreateSubnetAGReq {
      * @memberof CreateSubnetAGReq
      */
     'ipCat': AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {CreateSubnetAGReqAllOfHostSortStrategy}
+     * @memberof CreateSubnetAGReq
+     */
+    'hostSortStrategy'?: CreateSubnetAGReqAllOfHostSortStrategy | null;
 }
 
+
+/**
+ * @type CreateSubnetAGReqAllOfHostSortStrategy
+ * @export
+ */
+export type CreateSubnetAGReqAllOfHostSortStrategy = AssignmentGroupHostSortStrategy;
 
 /**
  * 
@@ -1255,6 +1327,12 @@ export interface EditAGBaseReq {
      * @memberof EditAGBaseReq
      */
     'deadline'?: string | null;
+    /**
+     * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof EditAGBaseReq
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
 }
 /**
  * 
@@ -1348,6 +1426,12 @@ export interface EditIDNetAGReq {
      * @memberof EditIDNetAGReq
      */
     'deadline'?: string | null;
+    /**
+     * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof EditIDNetAGReq
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
 }
 /**
  * 
@@ -1391,7 +1475,25 @@ export interface EditSubnetAGReq {
      * @memberof EditSubnetAGReq
      */
     'deadline'?: string | null;
+    /**
+     * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof EditSubnetAGReq
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    /**
+     * 
+     * @type {EditSubnetAGReqAllOfHostSortStrategy}
+     * @memberof EditSubnetAGReq
+     */
+    'hostSortStrategy'?: EditSubnetAGReqAllOfHostSortStrategy | null;
 }
+/**
+ * @type EditSubnetAGReqAllOfHostSortStrategy
+ * @export
+ */
+export type EditSubnetAGReqAllOfHostSortStrategy = AssignmentGroupHostSortStrategy;
+
 /**
  * 
  * @export
@@ -1739,6 +1841,12 @@ export interface IDNetAGDto {
      * @memberof IDNetAGDto
      */
     'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof IDNetAGDto
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
     /**
      * 
      * @type {number}
@@ -2414,6 +2522,12 @@ export interface QueryIDNetAGDetailRes {
     'type': AssignmentGroupType;
     /**
      * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    /**
+     * 
      * @type {number}
      * @memberof QueryIDNetAGDetailRes
      */
@@ -2916,6 +3030,12 @@ export interface QuerySubnetAGDetailRes {
     'type': AssignmentGroupType;
     /**
      * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    /**
+     * 
      * @type {number}
      * @memberof QuerySubnetAGDetailRes
      */
@@ -2926,6 +3046,12 @@ export interface QuerySubnetAGDetailRes {
      * @memberof QuerySubnetAGDetailRes
      */
     'ipCat'?: AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {SubnetAGDtoAllOfHostSortStrategy}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'hostSortStrategy'?: SubnetAGDtoAllOfHostSortStrategy | null;
     /**
      * 
      * @type {Array<SubnetAGSubmitDetailsDto>}
@@ -3937,6 +4063,12 @@ export interface SubnetAGDto {
     'type': AssignmentGroupType;
     /**
      * 
+     * @type {CreateAGBaseReqDifficulty}
+     * @memberof SubnetAGDto
+     */
+    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    /**
+     * 
      * @type {number}
      * @memberof SubnetAGDto
      */
@@ -3947,8 +4079,20 @@ export interface SubnetAGDto {
      * @memberof SubnetAGDto
      */
     'ipCat'?: AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {SubnetAGDtoAllOfHostSortStrategy}
+     * @memberof SubnetAGDto
+     */
+    'hostSortStrategy'?: SubnetAGDtoAllOfHostSortStrategy | null;
 }
 
+
+/**
+ * @type SubnetAGDtoAllOfHostSortStrategy
+ * @export
+ */
+export type SubnetAGDtoAllOfHostSortStrategy = AssignmentGroupHostSortStrategy;
 
 /**
  * 

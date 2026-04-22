@@ -112,6 +112,8 @@ namespace IPCheckr.Api.Controllers
                 Status = status,
                 Type = AssignmentGroupType.SUBNET,
                 IpCat = subnetGroup.AssignmentIpCat,
+                Difficulty = subnetGroup.Difficulty,
+                HostSortStrategy = subnetGroup.HostSortStrategy,
                 Assignments = assignmentDetails.ToArray()
             };
 
@@ -224,6 +226,7 @@ namespace IPCheckr.Api.Controllers
                 Status = status,
                 Type = AssignmentGroupType.IDNET,
                 IpCat = idnetGroup.AssignmentIpCat,
+                Difficulty = idnetGroup.Difficulty,
                 TestWildcard = idnetGroup.TestWildcard,
                 TestFirstLastBr = idnetGroup.TestFirstLastBr,
                 Assignments = assignmentDetails.ToArray()

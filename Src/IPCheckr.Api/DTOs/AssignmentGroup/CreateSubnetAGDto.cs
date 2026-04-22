@@ -14,6 +14,9 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [Required(ErrorMessage = "Assignment IP category is required.")]
         public required AssignmentGroupIpCat IpCat { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AssignmentGroupHostSortStrategy? HostSortStrategy { get; set; }
     }
 
     public class CreateSubnetAGRes : CreateAGBaseRes

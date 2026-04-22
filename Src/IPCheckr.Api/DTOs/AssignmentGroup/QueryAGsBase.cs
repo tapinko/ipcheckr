@@ -59,5 +59,7 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
 
         [Required]
         public AssignmentGroupType Type { get; set; }
+
+        public AssignmentGroupDifficulty? Difficulty { get; set; }
     }
 }

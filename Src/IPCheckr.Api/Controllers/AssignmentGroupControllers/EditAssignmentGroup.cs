@@ -51,6 +51,8 @@ namespace IPCheckr.Api.Controllers
             if (req.Description != null) subnetGroup.Description = req.Description;
             if (req.StartDate.HasValue) subnetGroup.StartDate = req.StartDate.Value;
             if (req.Deadline.HasValue) subnetGroup.Deadline = req.Deadline.Value;
+            if (req.Difficulty.HasValue) subnetGroup.Difficulty = req.Difficulty.Value;
+            if (req.HostSortStrategy.HasValue) subnetGroup.HostSortStrategy = req.HostSortStrategy.Value;
 
             var subnetStartLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(subnetGroup.StartDate);
             var subnetDeadlineLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(subnetGroup.Deadline);
@@ -186,6 +188,7 @@ namespace IPCheckr.Api.Controllers
             if (req.Description != null) idnetGroup.Description = req.Description;
             if (req.StartDate.HasValue) idnetGroup.StartDate = req.StartDate.Value;
             if (req.Deadline.HasValue) idnetGroup.Deadline = req.Deadline.Value;
+            if (req.Difficulty.HasValue) idnetGroup.Difficulty = req.Difficulty.Value;
 
             var idnetStartLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(idnetGroup.StartDate);
             var idnetDeadlineLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(idnetGroup.Deadline);

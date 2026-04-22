@@ -21,5 +21,8 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public AssignmentGroupIpCat IpCat { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AssignmentGroupHostSortStrategy? HostSortStrategy { get; set; }
     }
 }
