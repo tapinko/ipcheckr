@@ -67,6 +67,8 @@ namespace IPCheckr.Api.Controllers
                 Description = req.Description,
                 NumberOfRecords = req.NumberOfRecords,
                 AssignmentIpCat = req.IpCat,
+                Difficulty = ResolveSubnetDifficulty(req.NumberOfRecords),
+                HostSortStrategy = AssignmentGroupHostSortStrategy.DESCENDING,
                 Class = classObj,
                 StartDate = req.StartDate,
                 Deadline = req.Deadline,
@@ -81,7 +83,11 @@ namespace IPCheckr.Api.Controllers
 
             foreach (var student in targetStudents)
             {
-                var assignmentData = TryGenerateAssignmentData(req.NumberOfRecords, req.IpCat);
+                var assignmentData = TryGenerateAssignmentData(
+                    req.NumberOfRecords,
+                    req.IpCat,
+                    subnetGroup.HostSortStrategy
+                );
                 if (assignmentData == null)
                     return StatusCode(StatusCodes.Status500InternalServerError, new ApiProblemDetails
                     {
@@ -193,6 +199,7 @@ namespace IPCheckr.Api.Controllers
                 PossibleOctets = req.PossibleOctets.Value,
                 TestWildcard = req.TestWildcard,
                 TestFirstLastBr = req.TestFirstLastBr,
+                Difficulty = ResolveIdNetDifficulty(req.NumberOfRecords, req.PossibleOctets.Value),
                 Class = classObj,
                 StartDate = req.StartDate,
                 Deadline = req.Deadline,
@@ -236,7 +243,11 @@ namespace IPCheckr.Api.Controllers
         }
 
         private (string cidr, int[] hosts)? TryGenerateAssignmentData(
-            int numberOfRecords, AssignmentGroupIpCat ipCat, int maxAttempts = 1000)
+            int numberOfRecords,
+            AssignmentGroupIpCat ipCat,
+            AssignmentGroupHostSortStrategy? hostSortStrategy,
+            int maxAttempts = 1000
+        )
         {
             int attempts = ipCat == AssignmentGroupIpCat.LOCAL ? Math.Max(maxAttempts, 5000) : maxAttempts;
             for (int attempt = 0; attempt < attempts; attempt++)
@@ -254,8 +265,9 @@ namespace IPCheckr.Api.Controllers
 
                 var hosts = Enumerable.Range(0, numberOfRecords)
                     .Select(_ => rand.Next(2, 254))
-                    .OrderByDescending(h => h)
                     .ToArray();
+
+                hosts = ApplyHostSortStrategy(hosts, hostSortStrategy);
 
                 int totalNeeded = hosts.Select(h => h + 2).Sum();
                 int available = 1 << (32 - prefix);
@@ -300,6 +312,44 @@ namespace IPCheckr.Api.Controllers
                 results.Select(r => r.last).ToArray(),
                 results.Select(r => r.broadcast).ToArray()
             );
+        }
+
+        private static int[] ApplyHostSortStrategy(int[] hosts, AssignmentGroupHostSortStrategy? hostSortStrategy)
+        {
+            var resolvedStrategy = ResolveHostSortStrategy(hostSortStrategy);
+
+            return resolvedStrategy switch
+            {
+                AssignmentGroupHostSortStrategy.RANDOM => hosts,
+                AssignmentGroupHostSortStrategy.ASCENDING => hosts.OrderBy(h => h).ToArray(),
+                _ => hosts.OrderByDescending(h => h).ToArray()
+            };
+        }
+
+        private static AssignmentGroupHostSortStrategy ResolveHostSortStrategy(AssignmentGroupHostSortStrategy? strategy)
+        {
+            return strategy ?? AssignmentGroupHostSortStrategy.DESCENDING;
+        }
+
+        private static AssignmentGroupDifficulty ResolveSubnetDifficulty(int numberOfRecords)
+        {
+            return numberOfRecords switch
+            {
+                <= 4 => AssignmentGroupDifficulty.EASY,
+                <= 8 => AssignmentGroupDifficulty.MEDIUM,
+                _ => AssignmentGroupDifficulty.HARD
+            };
+        }
+
+        private static AssignmentGroupDifficulty ResolveIdNetDifficulty(int numberOfRecords, int possibleOctets)
+        {
+            var score = numberOfRecords + Math.Clamp(possibleOctets, 1, 4);
+            return score switch
+            {
+                <= 6 => AssignmentGroupDifficulty.EASY,
+                <= 11 => AssignmentGroupDifficulty.MEDIUM,
+                _ => AssignmentGroupDifficulty.HARD
+            };
         }
 
         private (string[] Cidrs, string[] Networks, string[] Wildcards, string[] FirstUsables, string[] LastUsables, string[] Broadcasts) GenerateIdNetAssignmentData(

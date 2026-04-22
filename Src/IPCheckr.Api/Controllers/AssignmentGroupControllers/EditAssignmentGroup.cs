@@ -98,7 +98,11 @@ namespace IPCheckr.Api.Controllers
                         if (!studentsDict.TryGetValue(sid, out var studentUser))
                             continue;
 
-                        var assignmentData = TryGenerateAssignmentData(subnetGroup.NumberOfRecords, subnetGroup.AssignmentIpCat);
+                        var assignmentData = TryGenerateAssignmentData(
+                            subnetGroup.NumberOfRecords,
+                            subnetGroup.AssignmentIpCat,
+                            subnetGroup.HostSortStrategy
+                        );
                         if (assignmentData == null)
                             return StatusCode(StatusCodes.Status500InternalServerError, new ApiProblemDetails
                             {
