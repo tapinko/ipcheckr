@@ -80,6 +80,18 @@ const routes: BreadcrumbsRoute[] = [
       </Typography>
   },
   {
+    path: Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_CREATE],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE_ASSIGNMENT_GROUP)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_EDIT],
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_EDIT_ASSIGNMENT_GROUP)} {match.params.ASSIGNMENT_GROUP_ID}
+      </Typography>
+  },
+  {
     path: Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS],
     breadcrumb: ({match}) => <Typography variant="body2" component="span">
         {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS)} {match.params.ASSIGNMENT_GROUP_ID}

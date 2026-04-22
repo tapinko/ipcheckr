@@ -33,6 +33,7 @@ import { useNavigate } from "react-router-dom"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { assignmentGroupApi, classApi, userApi } from "../../utils/apiClients"
 import {
+  AssignmentGroupDifficulty,
   AssignmentGroupIpCat,
   AssignmentGroupStatus,
   AssignmentGroupType,
@@ -51,7 +52,7 @@ import {
 import { useAuth } from "../../contexts/AuthContext"
 import CardsSkeleton from "../../components/CardsSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
-import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import { getParametrizedUrl, RouteKeys, RouteParams, Routes } from "../../router/routes"
 import { Language, TranslationKey } from "../../utils/i18n"
 import { Controller, useForm } from "react-hook-form"
 import FormRules from "../../utils/FormRules"
@@ -61,10 +62,10 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import type { AxiosError, AxiosResponse } from "axios"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
 import UserRole from "../../types/UserRole"
-import AGHeader from "../../components/AGHeader"
-import type { AGClassFilterValue, AGIpCatFilterValue, AGTypeFilterValue } from "../../components/AGHeader"
 import { getStatusMap } from "../../utils/getStatusMap"
 import { toAssignmentTypeParam } from "../../utils/assignmentType"
+import type { AGClassFilterValue } from "../../components/AGHeader"
+import AGHeader from "../../components/AGHeader"
 
 interface IAG {
   id: number
@@ -79,15 +80,13 @@ interface IAG {
   status: AssignmentGroupStatus
   successRate: number | null
   type: AssignmentGroupType
+  difficulty?: AssignmentGroupDifficulty | null
   ipCat?: AssignmentGroupIpCat
   testWildcard?: boolean
   testFirstLastBr?: boolean
 }
 
 type ClassFilterValue = AGClassFilterValue
-type TypeFilterValue = AGTypeFilterValue
-type IpCatFilterValue = AGIpCatFilterValue
-
 type CreateFormValues = {
   name: string
   description: string
@@ -206,6 +205,7 @@ const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
   startDate: ag.startDate,
   deadline: ag.deadline,
   status: ag.status,
+  difficulty: ag.difficulty ?? null,
   successRate: ag.successRate,
   type: AssignmentGroupType.Subnet,
   ipCat: ag.ipCat
@@ -222,6 +222,7 @@ const normalizeIdNet = (ag: IDNetAGDto): IAG => ({
   startDate: ag.startDate,
   deadline: ag.deadline,
   status: ag.status,
+  difficulty: ag.difficulty ?? null,
   successRate: ag.successRate,
   type: AssignmentGroupType.Idnet,
   ipCat: ag.ipCat,
@@ -238,8 +239,20 @@ const TeacherAssignmentGroups = () => {
 
   const [search, setSearch] = useState("")
   const [classFilter, setClassFilter] = useState<ClassFilterValue>(null)
-  const [typeFilter, setTypeFilter] = useState<TypeFilterValue>("ALL")
-  const [ipCatFilter, setIpCatFilter] = useState<IpCatFilterValue>("ALL_CAT")
+  const [typeFilters, setTypeFilters] = useState<AssignmentGroupType[]>([
+    AssignmentGroupType.Subnet,
+    AssignmentGroupType.Idnet
+  ])
+  const [ipCatFilters, setIpCatFilters] = useState<AssignmentGroupIpCat[]>([
+    AssignmentGroupIpCat.All,
+    AssignmentGroupIpCat.Abc,
+    AssignmentGroupIpCat.Local
+  ])
+  const [difficultyFilters, setDifficultyFilters] = useState<AssignmentGroupDifficulty[]>([
+    AssignmentGroupDifficulty.Easy,
+    AssignmentGroupDifficulty.Medium,
+    AssignmentGroupDifficulty.Hard
+  ])
   const [endedPage, setEndedPage] = useState(1)
   
   const [createDialogVis, setCreateDialogVis] = useState(false)
@@ -304,8 +317,9 @@ const TeacherAssignmentGroups = () => {
   ]
 
   const filteredAGs = allAGs
-    .filter(ag => (typeFilter === "ALL" ? true : ag.type === typeFilter))
-    .filter(ag => (ipCatFilter === "ALL_CAT" ? true : ag.ipCat === ipCatFilter))
+    .filter(ag => typeFilters.includes(ag.type))
+    .filter(ag => (ag.ipCat ? ipCatFilters.includes(ag.ipCat) : true))
+    .filter(ag => (ag.difficulty ? difficultyFilters.includes(ag.difficulty) : true))
     .filter(ag => (classFilterNormalized ? ag.classId === classFilterNormalized : true))
     .filter(ag => {
       const searchTerm = search.trim().toLowerCase()
@@ -348,7 +362,7 @@ const TeacherAssignmentGroups = () => {
 
   useEffect(() => {
     setEndedPage(1)
-  }, [search, classFilter, typeFilter, ipCatFilter])
+  }, [search, classFilter, typeFilters, ipCatFilters, difficultyFilters])
 
   const isLoading =
     classesQuery.isLoading || subnetAGsQuery.isLoading || idNetAGsQuery.isLoading
@@ -712,40 +726,35 @@ const TeacherAssignmentGroups = () => {
           classValue={classFilter}
           onClassChange={setClassFilter}
           classOptions={classesQuery.data ?? []}
-          typeValue={typeFilter}
-          onTypeChange={setTypeFilter}
-          ipCatValue={ipCatFilter}
-          onIpCatChange={setIpCatFilter}
-        />
-
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => {
-            resetCreate({
-              name: "",
-              description: "",
-              classId: classFilterNormalized ?? null,
-              type: AssignmentGroupType.Idnet,
-              numberOfRecords: 6,
-              possibleOctets: 3,
-              ipCat: AssignmentGroupIpCat.Abc,
-              testWildcard: false,
-              testFirstLastBr: false,
-              students: [],
-              startDate: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-              deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-            })
-            setCreateDialogVis(true)
+          typeValues={typeFilters}
+          onToggleType={(value: AssignmentGroupType) => {
+            setTypeFilters(prev =>
+              prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+            )
           }}
-          disabled={!classFilterNormalized}
-          sx={{ alignSelf: "flex-start" }}
-        >
-          {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CREATE_ASSIGNMENT_GROUP)}
-        </Button>
+          ipCatValues={ipCatFilters}
+          onToggleIpCat={(value: AssignmentGroupIpCat) => {
+            setIpCatFilters(prev =>
+              prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+            )
+          }}
+          difficultyValues={difficultyFilters}
+          onToggleDifficulty={(value: AssignmentGroupDifficulty) => {
+            setDifficultyFilters(prev =>
+              prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+            )
+          }}
+          onCreateClick={() => {
+            const createPath = Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_CREATE]
+            navigate(
+              classFilterNormalized
+                ? `${createPath}?classId=${classFilterNormalized}`
+                : createPath
+            )
+          }}
+          createDisabled={!classesQuery.data?.length}
+        />
       </Box>
-
-      <Divider />
 
       {isLoading ? (
         <CardsSkeleton />
@@ -929,8 +938,12 @@ const TeacherAssignmentGroups = () => {
                                     size="small"
                                     onClick={e => {
                                       e.stopPropagation()
-                                      setEditAG(ag)
-                                      setEditDialogVis(true)
+                                      navigate(
+                                        getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_EDIT, {
+                                          [RouteParams.ASSIGNMENT_GROUP_ID]: ag.id.toString(),
+                                          [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(ag.type)
+                                        })
+                                      )
                                     }}
                                   >
                                     <EditOutlinedIcon fontSize="small" />

@@ -14,6 +14,8 @@ import TeacherMyClasses from "../pages/teacher/TeacherMyClasses"
 import TeacherStudentDetails from "../pages/teacher/TeacherStudentDetails"
 import TeacherClassDetails from "../pages/teacher/TeacherClassDetails"
 import TeacherAssignmentGroups from "../pages/teacher/TeacherAssignmentGroups"
+import TeacherCreateAssignmentGroup from "../pages/teacher/TeacherCreateAssignmentGroup"
+import TeacherEditAssignmentGroup from "../pages/teacher/TeacherEditAssignmentGroup"
 import TeacherAssignmentGroupDetails from "../pages/teacher/TeacherAssignmentGroupDetails"
 import TeacherAssignmentGroupDetailsSubmit from "../pages/teacher/TeacherAssignmentGroupDetailsSubmit"
 import TeacherGns3 from "../pages/teacher/TeacherGns3"
@@ -57,6 +59,8 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS]: <TeacherStudentDetails />,
   [RouteKeys.TEACHER_MY_CLASSES_CLASS_DETAILS]: <TeacherClassDetails />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS]: <TeacherAssignmentGroups />,
+  [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_CREATE]: <TeacherCreateAssignmentGroup />,
+  [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_EDIT]: <TeacherEditAssignmentGroup />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS]: <TeacherAssignmentGroupDetails />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <TeacherAssignmentGroupDetailsSubmit />,
   [RouteKeys.TEACHER_GNS3]: <TeacherGns3 />,
@@ -130,6 +134,8 @@ const useAuthRouter = () => {
           RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS,
           RouteKeys.TEACHER_MY_CLASSES_CLASS_DETAILS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS,
+          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_CREATE,
+          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_EDIT,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
           RouteKeys.TEACHER_GNS3,

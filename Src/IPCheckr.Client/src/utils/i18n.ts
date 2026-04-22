@@ -124,6 +124,22 @@ export enum TranslationKey {
   BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS = "BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS",
   BREADCRUMBS_STUDENT_ASSIGNMENT_SUBMISSION = "BREADCRUMBS_STUDENT_ASSIGNMENT_SUBMISSION",
   BREADCRUMBS_STUDENT_GNS3 = "BREADCRUMBS_STUDENT_GNS3",
+
+  // AG Header
+  AG_HEADER_SEARCH_PLACEHOLDER = "AG_HEADER_SEARCH_PLACEHOLDER",
+  AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP = "AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP",
+  AG_HEADER_ARCHIVE_TOOLTIP = "AG_HEADER_ARCHIVE_TOOLTIP",
+  AG_HEADER_ALL_CLASSES = "AG_HEADER_ALL_CLASSES",
+  AG_HEADER_TYPE = "AG_HEADER_TYPE",
+  AG_HEADER_TYPE_ALL = "AG_HEADER_TYPE_ALL",
+  AG_HEADER_TYPE_SUBNET = "AG_HEADER_TYPE_SUBNET",
+  AG_HEADER_TYPE_IDNET = "AG_HEADER_TYPE_IDNET",
+  AG_HEADER_IP_CATEGORY = "AG_HEADER_IP_CATEGORY",
+  AG_HEADER_IP_CATEGORY_ALL = "AG_HEADER_IP_CATEGORY_ALL",
+  AG_HEADER_DIFFICULTY = "AG_HEADER_DIFFICULTY",
+  AG_HEADER_DIFFICULTY_EASY = "AG_HEADER_DIFFICULTY_EASY",
+  AG_HEADER_DIFFICULTY_MEDIUM = "AG_HEADER_DIFFICULTY_MEDIUM",
+  AG_HEADER_DIFFICULTY_HARD = "AG_HEADER_DIFFICULTY_HARD",
   
   // ||-------- ADMIN --------||
   // |                        |
@@ -767,6 +783,22 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_SUBMISSION]: "Submit assignment",
   [TranslationKey.BREADCRUMBS_STUDENT_GNS3]: "GNS3",
 
+  // AG Header
+  [TranslationKey.AG_HEADER_SEARCH_PLACEHOLDER]: "Name",
+  [TranslationKey.AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP]: "Create assignment",
+  [TranslationKey.AG_HEADER_ARCHIVE_TOOLTIP]: "Archive",
+  [TranslationKey.AG_HEADER_ALL_CLASSES]: "All classes",
+  [TranslationKey.AG_HEADER_TYPE]: "Type",
+  [TranslationKey.AG_HEADER_TYPE_ALL]: "All types",
+  [TranslationKey.AG_HEADER_TYPE_SUBNET]: "Subnet",
+  [TranslationKey.AG_HEADER_TYPE_IDNET]: "IDNet",
+  [TranslationKey.AG_HEADER_IP_CATEGORY]: "Category",
+  [TranslationKey.AG_HEADER_IP_CATEGORY_ALL]: "All",
+  [TranslationKey.AG_HEADER_DIFFICULTY]: "Difficulty",
+  [TranslationKey.AG_HEADER_DIFFICULTY_EASY]: "Easy",
+  [TranslationKey.AG_HEADER_DIFFICULTY_MEDIUM]: "Medium",
+  [TranslationKey.AG_HEADER_DIFFICULTY_HARD]: "Hard",
+
   // ||-------- ADMIN --------||
   // |                        |
   // AdminNavbar             |
@@ -1406,6 +1438,22 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS]: "Detaily zadania",
   [TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_SUBMISSION]: "Odovzdať zadanie",
   [TranslationKey.BREADCRUMBS_STUDENT_GNS3]: "GNS3",
+
+  // AG Header
+  [TranslationKey.AG_HEADER_SEARCH_PLACEHOLDER]: "Názov",
+  [TranslationKey.AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP]: "Vytvoriť zadanie",
+  [TranslationKey.AG_HEADER_ARCHIVE_TOOLTIP]: "Archív (už čoskoro)",
+  [TranslationKey.AG_HEADER_ALL_CLASSES]: "Všetky triedy",
+  [TranslationKey.AG_HEADER_TYPE]: "Typ",
+  [TranslationKey.AG_HEADER_TYPE_ALL]: "Všetky typy",
+  [TranslationKey.AG_HEADER_TYPE_SUBNET]: "Subnet",
+  [TranslationKey.AG_HEADER_TYPE_IDNET]: "IDNet",
+  [TranslationKey.AG_HEADER_IP_CATEGORY]: "Kategória IP adries",
+  [TranslationKey.AG_HEADER_IP_CATEGORY_ALL]: "Všetky",
+  [TranslationKey.AG_HEADER_DIFFICULTY]: "Obtiažnosť",
+  [TranslationKey.AG_HEADER_DIFFICULTY_EASY]: "Ľahká",
+  [TranslationKey.AG_HEADER_DIFFICULTY_MEDIUM]: "Stredná",
+  [TranslationKey.AG_HEADER_DIFFICULTY_HARD]: "Ťažká",
 
   // ||-------- ADMIN --------||
   // |                        |
