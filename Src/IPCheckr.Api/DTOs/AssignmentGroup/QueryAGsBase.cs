@@ -13,11 +13,11 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         [Range(0, int.MaxValue, ErrorMessage = "Teacher IDs must be a non-negative integer array.")]
         public int? TeacherId { get; set; }
 
-        [EnumDataType(typeof(AssignmentGroupStatus))]
         public string? Status { get; set; }
 
-        [EnumDataType(typeof(AssignmentGroupType))]
         public string? AssignmentGroupType { get; set; }
+
+        public string? Difficulty { get; set; }
     }
 
     public class QueryAGsBaseRes

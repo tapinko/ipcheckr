@@ -61,6 +61,29 @@ namespace IPCheckr.Api.Controllers
                 requestedStatus = parsedStatus;
             }
 
+            var requestedDifficulties = new List<AssignmentGroupDifficulty>();
+            if (!string.IsNullOrWhiteSpace(req.Difficulty))
+            {
+                var parts = req.Difficulty.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var part in parts)
+                {
+                    if (!Enum.TryParse<AssignmentGroupDifficulty>(part, true, out var parsedDifficulty))
+                    {
+                        return BadRequest(new ApiProblemDetails
+                        {
+                            Title = "Bad Request",
+                            Detail = "Invalid assignment group difficulty.",
+                            Status = StatusCodes.Status400BadRequest,
+                            MessageEn = "Invalid assignment group difficulty.",
+                            MessageSk = "Neplatná obtiažnosť skupiny zadania."
+                        });
+                    }
+
+                    if (!requestedDifficulties.Contains(parsedDifficulty))
+                        requestedDifficulties.Add(parsedDifficulty);
+                }
+            }
+
             var callerId = int.Parse(User.Claims.First(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value);
 
             var teacherClasses = await _db.Classes
@@ -84,6 +107,9 @@ namespace IPCheckr.Api.Controllers
 
             if (req.TeacherId.HasValue)
                 subnetQuery = subnetQuery.Where(ag => ag.Class.Teachers!.Any(t => t.Id == req.TeacherId.Value));
+
+            if (requestedDifficulties.Count > 0)
+                subnetQuery = subnetQuery.Where(ag => ag.Difficulty.HasValue && requestedDifficulties.Contains(ag.Difficulty.Value));
 
             var subnetGroups = await subnetQuery.ToListAsync();
 
@@ -223,6 +249,29 @@ namespace IPCheckr.Api.Controllers
                 requestedStatus = parsedStatus;
             }
 
+            var requestedDifficulties = new List<AssignmentGroupDifficulty>();
+            if (!string.IsNullOrWhiteSpace(req.Difficulty))
+            {
+                var parts = req.Difficulty.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var part in parts)
+                {
+                    if (!Enum.TryParse<AssignmentGroupDifficulty>(part, true, out var parsedDifficulty))
+                    {
+                        return BadRequest(new ApiProblemDetails
+                        {
+                            Title = "Bad Request",
+                            Detail = "Invalid assignment group difficulty.",
+                            Status = StatusCodes.Status400BadRequest,
+                            MessageEn = "Invalid assignment group difficulty.",
+                            MessageSk = "Neplatná obtiažnosť skupiny zadania."
+                        });
+                    }
+
+                    if (!requestedDifficulties.Contains(parsedDifficulty))
+                        requestedDifficulties.Add(parsedDifficulty);
+                }
+            }
+
             var callerId = int.Parse(User.Claims.First(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value);
 
             var teacherClasses = await _db.Classes
@@ -246,6 +295,9 @@ namespace IPCheckr.Api.Controllers
 
             if (req.TeacherId.HasValue)
                 idnetQuery = idnetQuery.Where(ag => ag.Class.Teachers!.Any(t => t.Id == req.TeacherId.Value));
+
+            if (requestedDifficulties.Count > 0)
+                idnetQuery = idnetQuery.Where(ag => ag.Difficulty.HasValue && requestedDifficulties.Contains(ag.Difficulty.Value));
 
             var idnetGroups = await idnetQuery.ToListAsync();
 
