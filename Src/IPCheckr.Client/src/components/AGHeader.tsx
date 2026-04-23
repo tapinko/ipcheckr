@@ -1,22 +1,19 @@
 import AddIcon from "@mui/icons-material/Add"
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined"
+import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined"
 import SearchIcon from "@mui/icons-material/Search"
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Checkbox,
-  FormControl,
+  Divider,
   FormControlLabel,
   FormGroup,
   IconButton,
   InputAdornment,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
-  Tab,
-  Tabs,
   TextField,
   Tooltip,
   Typography
@@ -30,6 +27,7 @@ import {
 import { getIpCatLabel } from "../utils/getIpCatLabel"
 import { TranslationKey } from "../utils/i18n"
 import type { TFunction } from "i18next"
+import { useState } from "react"
 
 interface AGHeaderProps {
   t: TFunction
@@ -49,7 +47,9 @@ interface AGHeaderProps {
   onToggleIpCat?: (value: AssignmentGroupIpCat) => void
   onToggleDifficulty?: (value: AssignmentGroupDifficulty) => void
   onCreateClick?: () => void
+  onTemplatesClick?: () => void
   createDisabled?: boolean
+  templatesDisabled?: boolean
 }
 
 const getDifficultyLabel = (difficulty: AssignmentGroupDifficulty, t: TFunction) => {
@@ -67,264 +67,254 @@ const AGHeader = ({
   search,
   classOptions,
   classValue,
-  typeValue,
-  ipCatValue,
   typeValues,
   ipCatValues,
   difficultyValues,
   onSearchChange,
   onClassChange,
-  onTypeChange,
-  onIpCatChange,
   onToggleType,
   onToggleIpCat,
   onToggleDifficulty,
   onCreateClick,
-  createDisabled
+  onTemplatesClick,
+  createDisabled,
+  templatesDisabled
 }: AGHeaderProps) => {
-  const usesNewLayout = Array.isArray(typeValues) && Array.isArray(ipCatValues)
+  const selectedTypeValues = typeValues ?? []
+  const selectedIpCatValues = ipCatValues ?? []
+  const selectedDifficultyValues = difficultyValues ?? []
+  const [filtersVisible, setFiltersVisible] = useState(false)
 
   return (
-    <Box display="flex" flexDirection="column" gap={2}>
-      {!usesNewLayout && (
-        <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems={{ md: "center" }} justifyContent="space-between">
-          <TextField
-            fullWidth
-            value={search}
-            onChange={e => onSearchChange(e.target.value)}
-            placeholder={t(TranslationKey.AG_HEADER_SEARCH_PLACEHOLDER)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              )
-            }}
-          />
+    <Box display="flex" flexDirection="column" gap={3}>
+      <Card
+        variant="outlined"
+        sx={{
+          borderRadius: 1,
+          borderColor: theme => theme.palette.divider
+        }}
+      >
+        <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+          <Stack direction={{ xs: "column", lg: "row" }} spacing={2} alignItems={{ lg: "center" }}>
+            <TextField
+              fullWidth
+              value={search}
+              onChange={e => onSearchChange(e.target.value)}
+              placeholder={t(TranslationKey.AG_HEADER_SEARCH_PLACEHOLDER)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                )
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 1,
+                  bgcolor: "background.paper"
+                }
+              }}
+            />
 
-          {onCreateClick && (
-            <Tooltip title={t(TranslationKey.AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP)}>
-              <span>
-                <IconButton
-                  onClick={onCreateClick}
-                  disabled={createDisabled}
-                  color="success"
-                  aria-label={t(TranslationKey.AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP)}
-                  sx={{
-                    border: theme => `1px solid ${theme.palette.success.main}`,
-                    width: 60,
-                    height: 60
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-          )}
-        </Stack>
-      )}
-
-      {usesNewLayout ? (
-        <>
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-            {onCreateClick && (
-              <Card
-                sx={{
-                  minWidth: 184,
-                  bgcolor: theme => theme.palette.action.hover
-                }}
-              >
-                <CardContent sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                  <Stack spacing={3} alignItems="center" justifyContent="center">
-                    <Tooltip title={t(TranslationKey.AG_HEADER_ARCHIVE_TOOLTIP)}>
-                      <span>
-                        <IconButton
-                          disabled
-                          aria-label="Archive"
-                          sx={{
-                            border: theme => `1px solid ${theme.palette.warning.main}`,
-                            width: 60,
-                            height: 60,
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 30
-                            },
-                            "&.Mui-disabled": {
-                              color: theme => theme.palette.warning.dark,
-                              borderColor: theme => theme.palette.warning.main,
-                              backgroundColor: theme => theme.palette.warning.light,
-                              opacity: 0.75
-                            }
-                          }}
-                        >
-                          <ArchiveOutlinedIcon />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-
-                    <Tooltip title={t(TranslationKey.AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP)}>
-                      <span>
-                        <IconButton
-                          onClick={onCreateClick}
-                          disabled={createDisabled}
-                          color="success"
-                          aria-label={t(TranslationKey.AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP)}
-                          sx={{
-                            border: theme => `1px solid ${theme.palette.success.main}`,
-                            width: 60,
-                            height: 60,
-                            "& .MuiSvgIcon-root": {
-                              fontSize: 34
-                            }
-                          }}
-                        >
-                          <AddIcon />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                  </Stack>
-                </CardContent>
-              </Card>
-            )}
-
-            <Card variant="outlined" sx={{ flex: 1 }}>
-              <CardContent>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                  {t(TranslationKey.AG_HEADER_TYPE)}
-                </Typography>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox checked={typeValues!.includes(AssignmentGroupType.Subnet)} onChange={() => onToggleType?.(AssignmentGroupType.Subnet)} />}
-                    label={t(TranslationKey.AG_HEADER_TYPE_SUBNET)}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={typeValues!.includes(AssignmentGroupType.Idnet)} onChange={() => onToggleType?.(AssignmentGroupType.Idnet)} />}
-                    label={t(TranslationKey.AG_HEADER_TYPE_IDNET)}
-                  />
-                </FormGroup>
-              </CardContent>
-            </Card>
-
-            <Card variant="outlined" sx={{ flex: 1 }}>
-              <CardContent>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                  {t(TranslationKey.AG_HEADER_IP_CATEGORY)}
-                </Typography>
-                <FormGroup>
-                  {Object.values(AssignmentGroupIpCat).map(cat => (
-                    <FormControlLabel
-                      key={cat}
-                      control={<Checkbox checked={ipCatValues!.includes(cat)} onChange={() => onToggleIpCat?.(cat)} />}
-                      label={getIpCatLabel(cat, t)}
-                    />
-                  ))}
-                </FormGroup>
-              </CardContent>
-            </Card>
-
-            <Card variant="outlined" sx={{ flex: 1 }}>
-              <CardContent>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                  {t(TranslationKey.AG_HEADER_DIFFICULTY)}
-                </Typography>
-                <FormGroup>
-                  {Object.values(AssignmentGroupDifficulty).map(difficulty => (
-                    <FormControlLabel
-                      key={difficulty}
-                      control={
-                        <Checkbox
-                          checked={(difficultyValues ?? []).includes(difficulty)}
-                          onChange={() => onToggleDifficulty?.(difficulty)}
-                        />
+            <Stack direction="row" spacing={1.25} justifyContent={{ xs: "flex-start", lg: "flex-end" }}>
+              <Tooltip title={t(TranslationKey.AG_HEADER_ARCHIVE_TOOLTIP)}>
+                <span>
+                  <IconButton
+                    disabled
+                    aria-label="Archive"
+                    sx={{
+                      border: theme => `1px solid ${theme.palette.warning.main}`,
+                      width: 56,
+                      height: 56,
+                      backgroundColor: theme => theme.palette.warning.light,
+                      "& .MuiSvgIcon-root": {
+                        fontSize: 28
+                      },
+                      "&.Mui-disabled": {
+                        color: theme => theme.palette.warning.dark,
+                        borderColor: theme => theme.palette.warning.main,
+                        opacity: 0.75
                       }
-                      label={getDifficultyLabel(difficulty, t)}
-                    />
-                  ))}
-                </FormGroup>
-              </CardContent>
-            </Card>
+                    }}
+                  >
+                    <ArchiveOutlinedIcon />
+                  </IconButton>
+                </span>
+              </Tooltip>
+
+              <Tooltip title={t(TranslationKey.AG_HEADER_TEMPLATES_TOOLTIP)}>
+                <span>
+                  <IconButton
+                    onClick={onTemplatesClick}
+                    disabled={templatesDisabled ?? true}
+                    aria-label={t(TranslationKey.AG_HEADER_TEMPLATES_TOOLTIP)}
+                    sx={{
+                      border: theme => `1px solid ${theme.palette.info.main}`,
+                      width: 56,
+                      height: 56,
+                      backgroundColor: theme => theme.palette.info.light,
+                      "& .MuiSvgIcon-root": {
+                        fontSize: 28
+                      },
+                      "&.Mui-disabled": {
+                        color: theme => theme.palette.info.dark,
+                        borderColor: theme => theme.palette.info.main,
+                        opacity: 0.75
+                      }
+                    }}
+                  >
+                    <LayersOutlinedIcon />
+                  </IconButton>
+                </span>
+              </Tooltip>
+
+              {onCreateClick && (
+                <Tooltip title={t(TranslationKey.AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP)}>
+                  <span>
+                    <IconButton
+                      onClick={onCreateClick}
+                      disabled={createDisabled}
+                      color="success"
+                      aria-label={t(TranslationKey.AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP)}
+                      sx={{
+                        border: theme => `1px solid ${theme.palette.success.main}`,
+                        width: 56,
+                        height: 56,
+                        backgroundColor: theme => theme.palette.success.light,
+                        "& .MuiSvgIcon-root": {
+                          fontSize: 30
+                        },
+                        color: theme => theme.palette.success.dark,
+                        "&.Mui-disabled": {
+                          color: theme => theme.palette.success.dark,
+                          borderColor: theme => theme.palette.success.main,
+                          backgroundColor: theme => theme.palette.success.light,
+                          opacity: 0.75
+                        }
+                      }}
+                    >
+                      <AddIcon />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
+            </Stack>
           </Stack>
 
-          <Box>
-            <Tabs
-              value={classValue ?? "ALL"}
-              onChange={(_, value) => onClassChange(value as number | "ALL")}
-              variant="fullWidth"
-              sx={{ minHeight: 42 }}
+          <Divider sx={{ my: 1.75 }} />
+
+          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center">
+            <Button
+              variant={(classValue ?? "ALL") === "ALL" ? "contained" : "outlined"}
+              onClick={() => onClassChange("ALL")}
+              size="small"
+              sx={{
+                borderRadius: 1,
+                textTransform: "none",
+                px: 2,
+                fontWeight: 600,
+                minHeight: 32
+              }}
             >
-              <Tab
-                value="ALL"
-                label={t(TranslationKey.AG_HEADER_ALL_CLASSES)}
+              {t(TranslationKey.AG_HEADER_ALL_CLASSES)}
+            </Button>
+            {classOptions.map(({ classId, className }) => (
+              <Button
+                key={classId}
+                variant={classValue === classId ? "contained" : "outlined"}
+                onClick={() => onClassChange(classId)}
+                size="small"
                 sx={{
-                  minHeight: 42,
-                  borderBottom: theme => `3px solid ${theme.palette.grey[400]}`,
-                  "&.Mui-selected": {
-                    borderBottomColor: theme => theme.palette.primary.main
-                  }
+                  borderRadius: 1,
+                  textTransform: "none",
+                  px: 2,
+                  fontWeight: 600,
+                  minHeight: 32
                 }}
-              />
-              {classOptions.map(({ classId, className }) => (
-                <Tab
-                  key={classId}
-                  value={classId}
-                  label={className}
-                  sx={{
-                    minHeight: 42,
-                    borderBottom: theme => `3px solid ${theme.palette.grey[400]}`,
-                    "&.Mui-selected": {
-                      borderBottomColor: theme => theme.palette.primary.main
-                    }
-                  }}
-                />
-              ))}
-            </Tabs>
-          </Box>
-        </>
-      ) : (
-        <>
-          <Box>
-            <Tabs
-              value={classValue ?? "ALL"}
-              onChange={(_, value) => onClassChange(value as number | "ALL")}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{ minHeight: 40 }}
+              >
+                {className}
+              </Button>
+            ))}
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setFiltersVisible(prev => !prev)}
+              sx={{
+                borderRadius: 1,
+                textTransform: "none",
+                px: 2,
+                fontWeight: 600,
+                minHeight: 32,
+                ml: { xs: 0, md: "auto" }
+              }}
             >
-              <Tab value="ALL" label={t(TranslationKey.AG_HEADER_ALL_CLASSES)} />
-              {classOptions.map(({ classId, className }) => (
-                <Tab key={classId} value={classId} label={className} />
-              ))}
-            </Tabs>
-          </Box>
-
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-            <FormControl fullWidth>
-              <InputLabel>{t(TranslationKey.AG_HEADER_TYPE)}</InputLabel>
-              <Select
-                label={t(TranslationKey.AG_HEADER_TYPE)}
-                value={typeValue ?? "ALL"}
-                onChange={e => onTypeChange?.(e.target.value as AssignmentGroupType | "ALL")}
-              >
-                <MenuItem value="ALL">{t(TranslationKey.AG_HEADER_TYPE_ALL)}</MenuItem>
-                <MenuItem value={AssignmentGroupType.Subnet}>{t(TranslationKey.AG_HEADER_TYPE_SUBNET)}</MenuItem>
-                <MenuItem value={AssignmentGroupType.Idnet}>{t(TranslationKey.AG_HEADER_TYPE_IDNET)}</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth>
-              <InputLabel>{t(TranslationKey.AG_HEADER_IP_CATEGORY)}</InputLabel>
-              <Select
-                label={t(TranslationKey.AG_HEADER_IP_CATEGORY)}
-                value={ipCatValue ?? "ALL_CAT"}
-                onChange={e => onIpCatChange?.(e.target.value as AssignmentGroupIpCat | "ALL_CAT")}
-              >
-                <MenuItem value="ALL_CAT">{t(TranslationKey.AG_HEADER_IP_CATEGORY_ALL)}</MenuItem>
-                {Object.values(AssignmentGroupIpCat).map(cat => (
-                  <MenuItem key={cat} value={cat}>{getIpCatLabel(cat, t)}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+              {filtersVisible
+                ? t(TranslationKey.AG_HEADER_HIDE_FILTERS)
+                : t(TranslationKey.AG_HEADER_SHOW_FILTERS)}
+            </Button>
           </Stack>
-        </>
+        </CardContent>
+      </Card>
+
+      {filtersVisible && (
+        <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
+          <Card variant="outlined" sx={{ flex: 1, borderRadius: 1 }}>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                {t(TranslationKey.AG_HEADER_TYPE)}
+              </Typography>
+              <FormGroup>
+                <FormControlLabel
+                  control={<Checkbox checked={selectedTypeValues.includes(AssignmentGroupType.Subnet)} onChange={() => onToggleType?.(AssignmentGroupType.Subnet)} />}
+                  label={t(TranslationKey.AG_HEADER_TYPE_SUBNET)}
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={selectedTypeValues.includes(AssignmentGroupType.Idnet)} onChange={() => onToggleType?.(AssignmentGroupType.Idnet)} />}
+                  label={t(TranslationKey.AG_HEADER_TYPE_IDNET)}
+                />
+              </FormGroup>
+            </CardContent>
+          </Card>
+
+          <Card variant="outlined" sx={{ flex: 1, borderRadius: 1 }}>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                {t(TranslationKey.AG_HEADER_IP_CATEGORY)}
+              </Typography>
+              <FormGroup>
+                {Object.values(AssignmentGroupIpCat).map(cat => (
+                  <FormControlLabel
+                    key={cat}
+                    control={<Checkbox checked={selectedIpCatValues.includes(cat)} onChange={() => onToggleIpCat?.(cat)} />}
+                    label={getIpCatLabel(cat, t)}
+                  />
+                ))}
+              </FormGroup>
+            </CardContent>
+          </Card>
+
+          <Card variant="outlined" sx={{ flex: 1, borderRadius: 1 }}>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                {t(TranslationKey.AG_HEADER_DIFFICULTY)}
+              </Typography>
+              <FormGroup>
+                {Object.values(AssignmentGroupDifficulty).map(difficulty => (
+                  <FormControlLabel
+                    key={difficulty}
+                    control={
+                      <Checkbox
+                        checked={selectedDifficultyValues.includes(difficulty)}
+                        onChange={() => onToggleDifficulty?.(difficulty)}
+                      />
+                    }
+                    label={getDifficultyLabel(difficulty, t)}
+                  />
+                ))}
+              </FormGroup>
+            </CardContent>
+          </Card>
+        </Stack>
       )}
     </Box>
   )

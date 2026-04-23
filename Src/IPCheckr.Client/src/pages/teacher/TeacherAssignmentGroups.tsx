@@ -278,9 +278,13 @@ const TeacherAssignmentGroups = () => {
   }, [classFilter, classesQuery.data])
 
   const classFilterNormalized = classFilter === "ALL" || classFilter === null ? null : classFilter
+  const difficultyFilterQuery =
+    difficultyFilters.length === 0 || difficultyFilters.length === 3
+      ? null
+      : difficultyFilters.join(",")
 
   const subnetAGsQuery = useQuery<QuerySubnetAGsRes, Error>({
-    queryKey: ["teacherSubnetAGs", userId, classFilterNormalized, search],
+    queryKey: ["teacherSubnetAGs", userId, classFilterNormalized, search, difficultyFilterQuery],
     enabled: !!userId,
     queryFn: () =>
       assignmentGroupApi
@@ -289,14 +293,15 @@ const TeacherAssignmentGroups = () => {
           classFilterNormalized,
           userId,
           null,
-          AssignmentGroupType.Subnet
+          AssignmentGroupType.Subnet,
+          difficultyFilterQuery
         )
         .then(r => r.data),
     placeholderData: prev => prev
   })
 
   const idNetAGsQuery = useQuery<QueryIDNetAGsRes, Error>({
-    queryKey: ["teacherIdNetAGs", userId, classFilterNormalized, search],
+    queryKey: ["teacherIdNetAGs", userId, classFilterNormalized, search, difficultyFilterQuery],
     enabled: !!userId,
     queryFn: () =>
       assignmentGroupApi
@@ -305,7 +310,8 @@ const TeacherAssignmentGroups = () => {
           classFilterNormalized,
           userId,
           null,
-          AssignmentGroupType.Idnet
+          AssignmentGroupType.Idnet,
+          difficultyFilterQuery
         )
         .then(r => r.data),
     placeholderData: prev => prev
@@ -752,7 +758,9 @@ const TeacherAssignmentGroups = () => {
                 : createPath
             )
           }}
+          onTemplatesClick={() => navigate("/teacher/assignment-groups/templates")}
           createDisabled={!classesQuery.data?.length}
+          templatesDisabled
         />
       </Box>
 
