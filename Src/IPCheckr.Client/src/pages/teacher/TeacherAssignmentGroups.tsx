@@ -24,7 +24,6 @@ import {
   Pagination,
   LinearProgress
 } from "@mui/material"
-import { alpha } from "@mui/material/styles"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined"
 import { useEffect, useState } from "react"
@@ -120,6 +119,109 @@ type MovePlan = {
 
 const formatDateTime = (value: string) =>
   new Date(value).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })
+
+const formatDateTimeByLanguage = (value: string, language: string) =>
+  new Date(value).toLocaleString(language.toLowerCase(), { dateStyle: "medium", timeStyle: "short" })
+
+const formatCountdownClock = (remainingMs: number) => {
+  const clamped = Math.max(0, remainingMs)
+  const totalSeconds = Math.floor(clamped / 1000)
+  const days = Math.floor(totalSeconds / 86400)
+  const hours = Math.floor((totalSeconds % 86400) / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+
+  if (days > 0) {
+    return `${String(days).padStart(2, "0")}:${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+  }
+
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+}
+
+interface AssignmentGroupStatusMetricProps {
+  ag: IAG
+  nowMs: number
+}
+
+const AssignmentGroupStatusMetric = ({ ag, nowMs }: AssignmentGroupStatusMetricProps) => {
+  const { t, i18n } = useTranslation()
+
+  const startMs = new Date(ag.startDate).getTime()
+  const deadlineMs = new Date(ag.deadline).getTime()
+  const toStartMs = startMs - nowMs
+  const toDeadlineMs = deadlineMs - nowMs
+  const activeWindowMs = Math.max(deadlineMs - startMs, 1)
+
+  const inProgressElapsedPct = Math.max(
+    0,
+    Math.min(100, ((nowMs - startMs) / activeWindowMs) * 100)
+  )
+
+  return (
+    <Stack spacing={0.6}>
+      {ag.status === AssignmentGroupStatus.Upcoming && (
+        <>
+          <Typography variant="caption" color="text.secondary">
+            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_STARTS_IN)}
+          </Typography>
+          <Typography variant="subtitle2" fontWeight={700} color="primary.main" sx={{ fontVariantNumeric: "tabular-nums" }}>
+            {toStartMs > 0
+              ? formatCountdownClock(toStartMs)
+              : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_COUNTDOWN_FINISHED)}
+          </Typography>
+          <LinearProgress
+            variant={toStartMs > 0 ? "indeterminate" : "determinate"}
+            value={100}
+            color="primary"
+            sx={{ height: 7, borderRadius: 999 }}
+          />
+        </>
+      )}
+
+      {ag.status === AssignmentGroupStatus.InProgress && (
+        <>
+          <Typography variant="caption" color="text.secondary">
+            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_ENDS_IN)}
+          </Typography>
+          <Typography variant="subtitle2" fontWeight={700} color="warning.main" sx={{ fontVariantNumeric: "tabular-nums" }}>
+            {toDeadlineMs > 0
+              ? formatCountdownClock(toDeadlineMs)
+              : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_COUNTDOWN_FINISHED)}
+          </Typography>
+          <LinearProgress
+            variant="determinate"
+            value={inProgressElapsedPct}
+            color="warning"
+            sx={{ height: 7, borderRadius: 999 }}
+          />
+        </>
+      )}
+
+      {ag.status === AssignmentGroupStatus.Ended && (
+        <>
+          <Typography variant="caption" color="text.secondary">
+            {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_AVG_SUCCESS)}
+          </Typography>
+          <Typography variant="subtitle2" fontWeight={700} color="success.main" sx={{ fontVariantNumeric: "tabular-nums" }}>
+            {ag.successRate !== null && ag.successRate !== undefined
+              ? `${ag.successRate.toFixed(1)}%`
+              : t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED)}
+          </Typography>
+          <LinearProgress
+            variant="determinate"
+            value={Math.max(0, Math.min(100, ag.successRate ?? 0))}
+            color="success"
+            sx={{ height: 7, borderRadius: 999 }}
+          />
+        </>
+      )}
+
+      <Typography variant="caption" color="text.secondary" noWrap>
+        {formatDateTimeByLanguage(ag.startDate, i18n.language)} - {formatDateTimeByLanguage(ag.deadline, i18n.language)}
+      </Typography>
+    </Stack>
+  )
+}
 
 const toLocalDateTimeString = (date: Date) => {
   const y = date.getFullYear()
@@ -264,6 +366,15 @@ const TeacherAssignmentGroups = () => {
   const [draggedAG, setDraggedAG] = useState<IAG | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<AssignmentGroupStatus | null>(null)
   const [movePlan, setMovePlan] = useState<MovePlan | null>(null)
+  const [nowMs, setNowMs] = useState(() => Date.now())
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNowMs(Date.now())
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   const classesQuery = useQuery<ClassDto[], Error>({
     queryKey: ["teacherClasses", userId],
@@ -987,47 +1098,15 @@ const TeacherAssignmentGroups = () => {
                                 </Stack>
                               }
                             />
-                            <LinearProgress
-                              variant="determinate"
-                              value={ag.total ? Math.min((ag.submitted / ag.total) * 100, 100) : 0}
-                              sx={{
-                                height: 8,
-                                borderRadius: 999,
-                                mx: 2,
-                                mb: 1,
-                                backgroundColor: theme => {
-                                  const color =
-                                    status === AssignmentGroupStatus.Upcoming
-                                      ? theme.palette.primary.main
-                                      : status === AssignmentGroupStatus.InProgress
-                                        ? theme.palette.warning.main
-                                        : theme.palette.success.main
-                                  return alpha(color, 0.2)
-                                },
-                                "& .MuiLinearProgress-bar": {
-                                  backgroundColor: theme => {
-                                    if (status === AssignmentGroupStatus.Upcoming) {
-                                      return theme.palette.primary.main
-                                    }
-                                    if (status === AssignmentGroupStatus.InProgress) {
-                                      return theme.palette.warning.main
-                                    }
-                                    return theme.palette.success.main
-                                  }
-                                }
-                              }}
-                            />
                             <CardContent sx={{ display: "flex", flexDirection: "column", gap: 0.4, px: 2 }}>
-                              <Stack spacing={0.2}>
+                              <Stack spacing={0.8}>
                                 <Typography variant="caption" color="text.secondary" noWrap>
                                   <strong>{ag.className}</strong>
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary" noWrap>
-                                  {ag.submitted}/{ag.total} • {ag.successRate !== null && ag.successRate !== undefined ? `${ag.successRate.toFixed(0)}%` : t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED)}
+                                  {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_SUBMITTED)}: {ag.submitted}/{ag.total}
                                 </Typography>
-                                <Typography variant="subtitle2" fontWeight={700} color="text.primary">
-                                  {formatDateTime(ag.startDate)} - {formatDateTime(ag.deadline)}
-                                </Typography>
+                                <AssignmentGroupStatusMetric ag={ag} nowMs={nowMs} />
                               </Stack>
                             </CardContent>
                           </Card>
