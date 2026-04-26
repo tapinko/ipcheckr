@@ -7,7 +7,7 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
     public class CreateSubnetAGReq : CreateAGBaseReq
     {
 
-        [Range(1, int.MaxValue, ErrorMessage = "Number of records must be a positive integer.")]
+        [Range(1, 12, ErrorMessage = "Number of records must be between 1 and 12.")]
         [Required(ErrorMessage = "Number of records is required.")]
         public int NumberOfRecords { get; set; }
 

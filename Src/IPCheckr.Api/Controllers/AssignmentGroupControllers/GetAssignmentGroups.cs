@@ -296,9 +296,6 @@ namespace IPCheckr.Api.Controllers
             if (req.TeacherId.HasValue)
                 idnetQuery = idnetQuery.Where(ag => ag.Class.Teachers!.Any(t => t.Id == req.TeacherId.Value));
 
-            if (requestedDifficulties.Count > 0)
-                idnetQuery = idnetQuery.Where(ag => ag.Difficulty.HasValue && requestedDifficulties.Contains(ag.Difficulty.Value));
-
             var idnetGroups = await idnetQuery.ToListAsync();
 
             var assignmentGroupDtos = new List<IDNetAGDto>();
@@ -366,7 +363,7 @@ namespace IPCheckr.Api.Controllers
                     Status = status,
                     Type = AssignmentGroupType.IDNET,
                     IpCat = ag.AssignmentIpCat,
-                    Difficulty = ag.Difficulty,
+                    Difficulty = null,
                     TestWildcard = ag.TestWildcard,
                     TestFirstLastBr = ag.TestFirstLastBr
                 });

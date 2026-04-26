@@ -28,6 +28,16 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Typ musí byť SUBNET pre tento endpoint."
                 });
 
+            if (req.NumberOfRecords < 1 || req.NumberOfRecords > 12)
+                return BadRequest(new ApiProblemDetails
+                {
+                    Title = "Bad Request",
+                    Detail = "NumberOfRecords must be between 1 and 12.",
+                    Status = StatusCodes.Status400BadRequest,
+                    MessageEn = "NumberOfRecords must be between 1 and 12.",
+                    MessageSk = "NumberOfRecords musí byť medzi 1 a 12."
+                });
+
             var classObj = await _db.Classes
                 .Include(c => c.Teachers)
                 .Include(c => c.Students)
@@ -60,6 +70,7 @@ namespace IPCheckr.Api.Controllers
             }
 
             var initialStatus = AssignmentEvaluationUtils.ResolveStatus(req.StartDate, req.Deadline, null);
+            var resolvedSubnetDifficulty = req.Difficulty ?? ResolveSubnetDifficulty(req.NumberOfRecords);
 
             var subnetGroup = new SubnetAG
             {
@@ -67,7 +78,7 @@ namespace IPCheckr.Api.Controllers
                 Description = req.Description,
                 NumberOfRecords = req.NumberOfRecords,
                 AssignmentIpCat = req.IpCat,
-                Difficulty = req.Difficulty ?? ResolveSubnetDifficulty(req.NumberOfRecords),
+                Difficulty = resolvedSubnetDifficulty,
                 HostSortStrategy = req.HostSortStrategy ?? AssignmentGroupHostSortStrategy.DESCENDING,
                 Class = classObj,
                 StartDate = req.StartDate,
@@ -86,7 +97,8 @@ namespace IPCheckr.Api.Controllers
                 var assignmentData = TryGenerateAssignmentData(
                     req.NumberOfRecords,
                     req.IpCat,
-                    subnetGroup.HostSortStrategy
+                    subnetGroup.HostSortStrategy,
+                    resolvedSubnetDifficulty
                 );
                 if (assignmentData == null)
                     return StatusCode(StatusCodes.Status500InternalServerError, new ApiProblemDetails
@@ -145,6 +157,16 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Typ musí byť IDNET pre tento endpoint."
                 });
 
+            if (req.NumberOfRecords < 1 || req.NumberOfRecords > 12)
+                return BadRequest(new ApiProblemDetails
+                {
+                    Title = "Bad Request",
+                    Detail = "NumberOfRecords must be between 1 and 12.",
+                    Status = StatusCodes.Status400BadRequest,
+                    MessageEn = "NumberOfRecords must be between 1 and 12.",
+                    MessageSk = "NumberOfRecords musí byť medzi 1 a 12."
+                });
+
             if (!req.PossibleOctets.HasValue)
             {
                 return BadRequest(new ApiProblemDetails
@@ -199,7 +221,7 @@ namespace IPCheckr.Api.Controllers
                 PossibleOctets = req.PossibleOctets.Value,
                 TestWildcard = req.TestWildcard,
                 TestFirstLastBr = req.TestFirstLastBr,
-                Difficulty = req.Difficulty ?? ResolveIdNetDifficulty(req.NumberOfRecords, req.PossibleOctets.Value),
+                Difficulty = null,
                 Class = classObj,
                 StartDate = req.StartDate,
                 Deadline = req.Deadline,
@@ -246,6 +268,7 @@ namespace IPCheckr.Api.Controllers
             int numberOfRecords,
             AssignmentGroupIpCat ipCat,
             AssignmentGroupHostSortStrategy? hostSortStrategy,
+            AssignmentGroupDifficulty? difficulty,
             int maxAttempts = 1000
         )
         {
@@ -263,9 +286,8 @@ namespace IPCheckr.Api.Controllers
                 uint networkIpUint = ipUint & mask;
                 var cidr = $"{UintToIp(networkIpUint)}/{prefix}";
 
-                var hosts = Enumerable.Range(0, numberOfRecords)
-                    .Select(_ => rand.Next(2, 254))
-                    .ToArray();
+                var resolvedDifficulty = difficulty ?? AssignmentGroupDifficulty.MEDIUM;
+                var hosts = PickUniqueHostCounts(rand, resolvedDifficulty, numberOfRecords);
 
                 hosts = ApplyHostSortStrategy(hosts, hostSortStrategy);
 
@@ -277,6 +299,18 @@ namespace IPCheckr.Api.Controllers
             return null;
         }
 
+        private static int[] PickUniqueHostCounts(Random rand, AssignmentGroupDifficulty difficulty, int count)
+        {
+            var (minHosts, maxHosts) = ResolveHostsRangeByDifficulty(difficulty);
+            var candidates = Enumerable.Range(minHosts, maxHosts - minHosts + 1).ToList();
+            for (int i = candidates.Count - 1; i > 0; i--)
+            {
+                int j = rand.Next(i + 1);
+                (candidates[i], candidates[j]) = (candidates[j], candidates[i]);
+            }
+            return candidates.Take(count).ToArray();
+        }
+
         private (string[] Networks, string[] FirstUsables, string[] LastUsables, string[] Broadcasts) CalculateSubnettingAnswerKey(string cidr, int[] hosts)
         {
             var ipParts = cidr.Split("/");
@@ -284,8 +318,12 @@ namespace IPCheckr.Api.Controllers
             int prefix = int.Parse(ipParts[1]);
             uint ipInt = IpToUint(baseIp);
 
-            var results = new List<(string net, string first, string last, string broadcast)>();
-            foreach (var h in hosts)
+            // VLSM: always allocate from largest to smallest subnet to ensure correct address alignment,
+            // then restore results to the original display order.
+            var indexed = hosts.Select((h, i) => (h, originalIndex: i)).OrderByDescending(x => x.h).ToArray();
+            var results = new (string net, string first, string last, string broadcast)[hosts.Length];
+
+            foreach (var (h, originalIndex) in indexed)
             {
                 int needed = h + 2;
                 int subnetBits = 32 - (int)Math.Ceiling(Math.Log(needed, 2));
@@ -296,12 +334,12 @@ namespace IPCheckr.Api.Controllers
                 var lastIp = subnetBits >= 31 ? netIp : netIp + (uint)(subnetSize - 2);
                 var broadcastIp = netIp + (uint)(subnetSize - 1);
 
-                results.Add((
+                results[originalIndex] = (
                     $"{UintToIp(netIp)}/{subnetBits}",
                     UintToIp(firstIp),
                     UintToIp(lastIp),
                     UintToIp(broadcastIp)
-                ));
+                );
 
                 ipInt += (uint)subnetSize;
             }
@@ -341,14 +379,15 @@ namespace IPCheckr.Api.Controllers
             };
         }
 
-        private static AssignmentGroupDifficulty ResolveIdNetDifficulty(int numberOfRecords, int possibleOctets)
+        private static (int minHosts, int maxHosts) ResolveHostsRangeByDifficulty(AssignmentGroupDifficulty? difficulty)
         {
-            var score = numberOfRecords + Math.Clamp(possibleOctets, 1, 4);
-            return score switch
+            var resolvedDifficulty = difficulty ?? AssignmentGroupDifficulty.MEDIUM;
+
+            return resolvedDifficulty switch
             {
-                <= 6 => AssignmentGroupDifficulty.EASY,
-                <= 11 => AssignmentGroupDifficulty.MEDIUM,
-                _ => AssignmentGroupDifficulty.HARD
+                AssignmentGroupDifficulty.EASY => (96, 253),
+                AssignmentGroupDifficulty.HARD => (2, 48),
+                _ => (32, 160)
             };
         }
 

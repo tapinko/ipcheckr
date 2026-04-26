@@ -226,7 +226,7 @@ namespace IPCheckr.Api.Controllers
                 Status = status,
                 Type = AssignmentGroupType.IDNET,
                 IpCat = idnetGroup.AssignmentIpCat,
-                Difficulty = idnetGroup.Difficulty,
+                Difficulty = null,
                 TestWildcard = idnetGroup.TestWildcard,
                 TestFirstLastBr = idnetGroup.TestFirstLastBr,
                 Assignments = assignmentDetails.ToArray()
