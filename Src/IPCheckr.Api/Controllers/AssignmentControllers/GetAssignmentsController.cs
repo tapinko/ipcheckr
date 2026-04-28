@@ -79,7 +79,10 @@ namespace IPCheckr.Api.Controllers
                     ClassName = group.Class.Name,
                     Status = status,
                     IpCat = group.AssignmentIpCat,
-                    SuccessRate = submit != null ? successRate : null
+                    SuccessRate = submit != null ? successRate : null,
+                    NumberOfRecords = group.NumberOfRecords,
+                    Difficulty = group.Difficulty,
+                    HostSortStrategy = group.HostSortStrategy
                 });
             }
 
@@ -159,7 +162,10 @@ namespace IPCheckr.Api.Controllers
                     ClassName = group.Class.Name,
                     Status = status,
                     IpCat = group.AssignmentIpCat,
-                    SuccessRate = submit != null ? successRate : null
+                    SuccessRate = submit != null ? successRate : null,
+                    NumberOfRecords = group.NumberOfRecords,
+                    TestWildcard = group.TestWildcard,
+                    TestFirstLastBr = group.TestFirstLastBr
                 });
             }
 

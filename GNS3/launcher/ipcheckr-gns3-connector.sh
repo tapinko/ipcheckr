@@ -47,7 +47,13 @@ handle_connection() {
 			start)
 				env_file="/var/lib/gns3/${instance}/env"
 				instance_dir="/var/lib/gns3/${instance}"
+				config_file="${instance_dir}/gns3_server.conf"
 				mkdir -p "${instance_dir}/projects"
+				if [ ! -f "${config_file}" ]; then
+					printf '[Server]\nprojects_path = %s/projects\n' "${instance_dir}" > "${config_file}"
+					chown gns3svc:gns3svc "${config_file}" 2>/dev/null || true
+					chmod 640 "${config_file}" 2>/dev/null || true
+				fi
 				if systemctl is-active --quiet "gns3@${instance}.service"; then
 					port=""
 					[ -f "$env_file" ] && port=$(awk -F= '$1=="GNS3_PORT"{print $2}' "$env_file" | tr -d ' \n')

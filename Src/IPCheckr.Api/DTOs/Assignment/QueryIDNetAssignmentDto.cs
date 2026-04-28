@@ -21,5 +21,14 @@ namespace IPCheckr.Api.DTOs.Assignment
         public AssignmentGroupIpCat IpCat { get; set; }
 
         public double? SuccessRate { get; set; }
+
+        [Required]
+        public int NumberOfRecords { get; set; }
+
+        [Required]
+        public bool TestWildcard { get; set; }
+
+        [Required]
+        public bool TestFirstLastBr { get; set; }
     }
 }

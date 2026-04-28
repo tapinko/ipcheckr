@@ -21,5 +21,14 @@ namespace IPCheckr.Api.DTOs.Assignment
         public AssignmentGroupIpCat IpCat { get; set; }
 
         public double? SuccessRate { get; set; }
+
+        [Required]
+        public int NumberOfRecords { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AssignmentGroupDifficulty? Difficulty { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AssignmentGroupHostSortStrategy? HostSortStrategy { get; set; }
     }
 }
