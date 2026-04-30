@@ -12,6 +12,8 @@ import {
 import { TranslationKey } from "../../utils/i18n"
 import { getStatusMap } from "../../utils/getStatusMap"
 import { getIpCatLabel } from "../../utils/getIpCatLabel"
+import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficultyLabel"
+import { getHostSortLabel } from "../../utils/getHostSortLabel"
 import {
   AccessTime,
   Category,
@@ -368,6 +370,46 @@ const TeacherAssignmentGroupDetails = () => {
                     }
                     size="small"
                   />
+                </Stack>
+
+                <Stack direction="row" flexWrap="wrap" gap={0.5} alignItems="center">
+                  {data.ipCat && (
+                    <Chip
+                      label={getIpCatLabel(data.ipCat, t)}
+                      size="small"
+                      sx={{ borderStyle: "dashed" }}
+                      variant="outlined"
+                    />
+                  )}
+                  {data.difficulty && (
+                    <Chip
+                      label={getDifficultyLabel(data.difficulty, t)}
+                      color={getDifficultyColor(data.difficulty)}
+                      size="small"
+                      variant="outlined"
+                    />
+                  )}
+                  {!isIdNetData && (data as any).hostSortStrategy && (
+                    <Chip
+                      label={getHostSortLabel((data as any).hostSortStrategy, t)}
+                      size="small"
+                      variant="outlined"
+                    />
+                  )}
+                  {isIdNetData && data.testWildcard && (
+                    <Chip
+                      label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_WILDCARD)}
+                      size="small"
+                      variant="outlined"
+                    />
+                  )}
+                  {isIdNetData && data.testFirstLastBr && (
+                    <Chip
+                      label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_FIRST_LAST_BR)}
+                      size="small"
+                      variant="outlined"
+                    />
+                  )}
                 </Stack>
 
                 {data.description ? (

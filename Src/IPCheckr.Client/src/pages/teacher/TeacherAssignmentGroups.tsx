@@ -33,6 +33,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { assignmentGroupApi, classApi, userApi } from "../../utils/apiClients"
 import {
   AssignmentGroupDifficulty,
+  AssignmentGroupHostSortStrategy,
   AssignmentGroupIpCat,
   AssignmentGroupStatus,
   AssignmentGroupType,
@@ -53,6 +54,8 @@ import CardsSkeleton from "../../components/CardsSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { getParametrizedUrl, RouteKeys, RouteParams, Routes } from "../../router/routes"
 import { Language, TranslationKey } from "../../utils/i18n"
+import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficultyLabel"
+import { getHostSortLabel } from "../../utils/getHostSortLabel"
 import { Controller, useForm } from "react-hook-form"
 import FormRules from "../../utils/FormRules"
 import DeleteDialog from "../../components/DeleteDialog"
@@ -81,6 +84,7 @@ interface IAG {
   type: AssignmentGroupType
   difficulty?: AssignmentGroupDifficulty | null
   ipCat?: AssignmentGroupIpCat
+  hostSortStrategy?: AssignmentGroupHostSortStrategy | null
   testWildcard?: boolean
   testFirstLastBr?: boolean
 }
@@ -235,6 +239,7 @@ const toLocalDateTimeString = (date: Date) => {
 
 const TEN_MINUTES_MS = 10 * 60 * 1000
 const TWENTY_MINUTES_MS = 20 * 60 * 1000
+const MAX_NETWORK_COUNT = 12
 
 const computeMoveDates = (
   ag: IAG,
@@ -310,7 +315,8 @@ const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
   difficulty: ag.difficulty ?? null,
   successRate: ag.successRate,
   type: AssignmentGroupType.Subnet,
-  ipCat: ag.ipCat
+  ipCat: ag.ipCat,
+  hostSortStrategy: ag.hostSortStrategy ?? null
 })
 
 const normalizeIdNet = (ag: IDNetAGDto): IAG => ({
@@ -324,7 +330,7 @@ const normalizeIdNet = (ag: IDNetAGDto): IAG => ({
   startDate: ag.startDate,
   deadline: ag.deadline,
   status: ag.status,
-  difficulty: ag.difficulty ?? null,
+  difficulty: null,
   successRate: ag.successRate,
   type: AssignmentGroupType.Idnet,
   ipCat: ag.ipCat,
@@ -412,7 +418,7 @@ const TeacherAssignmentGroups = () => {
   })
 
   const idNetAGsQuery = useQuery<QueryIDNetAGsRes, Error>({
-    queryKey: ["teacherIdNetAGs", userId, classFilterNormalized, search, difficultyFilterQuery],
+    queryKey: ["teacherIdNetAGs", userId, classFilterNormalized, search],
     enabled: !!userId,
     queryFn: () =>
       assignmentGroupApi
@@ -422,7 +428,7 @@ const TeacherAssignmentGroups = () => {
           userId,
           null,
           AssignmentGroupType.Idnet,
-          difficultyFilterQuery
+          null
         )
         .then(r => r.data),
     placeholderData: prev => prev
@@ -956,8 +962,6 @@ const TeacherAssignmentGroups = () => {
                             draggable={!moveMutation.isPending}
                             variant="outlined"
                             sx={{
-                              minWidth: 320,
-                              maxWidth: 360,
                               width: "100%",
                               border: "1px solid",
                               borderColor: "action.disabled",
@@ -965,8 +969,6 @@ const TeacherAssignmentGroups = () => {
                               display: "flex",
                               flexDirection: "column",
                               gap: 0.5,
-                              maxHeight: 220,
-                              overflow: "hidden",
                               cursor: "pointer",
                               "&:hover": {
                                 opacity: 0.9
@@ -997,62 +999,14 @@ const TeacherAssignmentGroups = () => {
                             }
                           >
                             <CardHeader
-                              sx={{ py: 2, px: 2, "& .MuiCardHeader-title": { mb: 0.25 }, "& .MuiCardHeader-subheader": { mt: 0 } }}
+                              sx={{ py: 1.5, px: 2, "& .MuiCardHeader-title": { mb: 0.25 }, "& .MuiCardHeader-subheader": { mt: 0.25 } }}
                               title={
-                                ag.name.length > 10 ? (
-                                  <Stack spacing={0.25}>
-                                    <Typography variant="subtitle2" fontWeight={700} noWrap className="ag-title-text">
-                                      {ag.name}
-                                    </Typography>
-                                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                                      <Chip
-                                        label={
-                                          ag.type === AssignmentGroupType.Subnet
-                                            ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET)
-                                            : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_IDNET)
-                                        }
-                                        color={ag.type === AssignmentGroupType.Subnet ? "primary" : "secondary"}
-                                        size="small"
-                                        variant="outlined"
-                                      />
-                                      {ag.ipCat && (
-                                        <Chip
-                                          label={ag.ipCat}
-                                          size="small"
-                                          sx={{ borderStyle: "dashed" }}
-                                          variant="outlined"
-                                        />
-                                      )}
-                                    </Stack>
-                                  </Stack>
-                                ) : (
-                                  <Stack direction="row" alignItems="center" spacing={0.5}>
-                                    <Typography variant="subtitle2" fontWeight={700} noWrap className="ag-title-text">
-                                      {ag.name}
-                                    </Typography>
-                                    <Chip
-                                      label={
-                                        ag.type === AssignmentGroupType.Subnet
-                                          ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET)
-                                          : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_IDNET)
-                                      }
-                                      color={ag.type === AssignmentGroupType.Subnet ? "primary" : "secondary"}
-                                      size="small"
-                                      variant="outlined"
-                                    />
-                                    {ag.ipCat && (
-                                      <Chip
-                                        label={ag.ipCat}
-                                        size="small"
-                                        sx={{ borderStyle: "dashed" }}
-                                        variant="outlined"
-                                      />
-                                    )}
-                                  </Stack>
-                                )
+                                <Typography variant="subtitle2" fontWeight={700} noWrap className="ag-title-text">
+                                  {ag.name}
+                                </Typography>
                               }
                               action={
-                                <Stack direction="row" spacing={1} alignItems="center">
+                                <Stack direction="row" spacing={0.5} alignItems="center">
                                   <IconButton
                                     size="small"
                                     onClick={e => {
@@ -1080,7 +1034,40 @@ const TeacherAssignmentGroups = () => {
                                 </Stack>
                               }
                               subheader={
-                                <Stack direction="row" spacing={0.5} alignItems="center">
+                                <Stack direction="row" flexWrap="wrap" gap={0.5} alignItems="center">
+                                  <Chip
+                                    label={
+                                      ag.type === AssignmentGroupType.Subnet
+                                        ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET)
+                                        : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_IDNET)
+                                    }
+                                    color={ag.type === AssignmentGroupType.Subnet ? "primary" : "secondary"}
+                                    size="small"
+                                    variant="outlined"
+                                  />
+                                  {ag.ipCat && (
+                                    <Chip
+                                      label={ag.ipCat}
+                                      size="small"
+                                      sx={{ borderStyle: "dashed" }}
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  {ag.difficulty && (
+                                    <Chip
+                                      label={getDifficultyLabel(ag.difficulty, t)}
+                                      color={getDifficultyColor(ag.difficulty)}
+                                      size="small"
+                                      variant="outlined"
+                                    />
+                                  )}
+                                  {ag.hostSortStrategy && (
+                                    <Chip
+                                      label={getHostSortLabel(ag.hostSortStrategy, t)}
+                                      size="small"
+                                      variant="outlined"
+                                    />
+                                  )}
                                   {ag.testWildcard && (
                                     <Chip
                                       label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_WILDCARD)}
@@ -1100,12 +1087,14 @@ const TeacherAssignmentGroups = () => {
                             />
                             <CardContent sx={{ display: "flex", flexDirection: "column", gap: 0.4, px: 2 }}>
                               <Stack spacing={0.8}>
-                                <Typography variant="caption" color="text.secondary" noWrap>
-                                  <strong>{ag.className}</strong>
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary" noWrap>
-                                  {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_SUBMITTED)}: {ag.submitted}/{ag.total}
-                                </Typography>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                  <Typography variant="caption" color="text.secondary" noWrap>
+                                    {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CARD_SUBMITTED)}: {ag.submitted}/{ag.total}
+                                  </Typography>
+                                  <Typography variant="caption" fontWeight={700} color="text.primary" noWrap sx={{ ml: 1 }}>
+                                    {ag.className}
+                                  </Typography>
+                                </Stack>
                                 <AssignmentGroupStatusMetric ag={ag} nowMs={nowMs} />
                               </Stack>
                             </CardContent>
@@ -1223,7 +1212,9 @@ const TeacherAssignmentGroups = () => {
               control={createControl}
               rules={{
                 ...FormRules.required(),
-                validate: v => v > 0 || t(TranslationKey.FORM_RULES_REQUIRED).toString()
+                validate: v =>
+                  (v > 0 && v <= MAX_NETWORK_COUNT) ||
+                  t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS_RANGE).toString()
               }}
               render={({ field }) => (
                 <Tooltip title={getNumberOfRecordsTooltip()}>
@@ -1232,12 +1223,13 @@ const TeacherAssignmentGroups = () => {
                     label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NUMBER_OF_RECORDS)}
                     type="number"
                     fullWidth
+                    inputProps={{ min: 1, max: MAX_NETWORK_COUNT }}
                     {...field}
                     onChange={e => field.onChange(Number(e.target.value))}
                     error={!!createErrors.numberOfRecords}
                     helperText={
                       createErrors.numberOfRecords
-                        ? createErrors.numberOfRecords.message?.toString()
+                        ? t(createErrors.numberOfRecords.message as string)
                         : ""
                     }
                   />

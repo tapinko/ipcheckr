@@ -8,6 +8,8 @@ import {
 	type IDNetAssignmentDto,
 	type SubnetAssignmentDto
 } from "../../dtos"
+import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficultyLabel"
+import { getHostSortLabel } from "../../utils/getHostSortLabel"
 import { assignmentApi } from "../../utils/apiClients"
 import {
 	Box,
@@ -275,27 +277,57 @@ const StudentAssignments = () => {
 		>
 			<CardHeader
 				title={
-					<Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
-						<Typography variant={wide ? "h5" : "h6"} fontWeight={700} className="assignment-title-link">
-							{assignment.name}
-						</Typography>
+					<Typography variant={wide ? "h5" : "h6"} fontWeight={700} className="assignment-title-link" noWrap>
+						{assignment.name}
+					</Typography>
+				}
+				subheader={
+					<Stack direction="row" flexWrap="wrap" gap={0.5} alignItems="center" sx={{ mt: 0.5 }}>
 						<Chip
 							label={assignment.type === AssignmentGroupType.Subnet ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET) : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_IDNET)}
 							size="small"
 							color={assignment.type === AssignmentGroupType.Subnet ? "primary" : "secondary"}
 							variant="outlined"
 						/>
-						{"ipCat" in assignment && assignment.ipCat ? (
+						{assignment.ipCat && (
 							<Chip
 								label={assignment.ipCat}
 								size="small"
 								variant="outlined"
 								sx={{ borderStyle: "dashed" }}
 							/>
-						) : null}
+						)}
+						{(assignment as any).difficulty && (
+							<Chip
+								label={getDifficultyLabel((assignment as any).difficulty, t)}
+								color={getDifficultyColor((assignment as any).difficulty)}
+								size="small"
+								variant="outlined"
+							/>
+						)}
+						{(assignment as any).hostSortStrategy && (
+							<Chip
+								label={getHostSortLabel((assignment as any).hostSortStrategy, t)}
+								size="small"
+								variant="outlined"
+							/>
+						)}
+						{(assignment as any).testWildcard && (
+							<Chip
+								label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_WILDCARD)}
+								size="small"
+								variant="outlined"
+							/>
+						)}
+						{(assignment as any).testFirstLastBr && (
+							<Chip
+								label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_FIRST_LAST_BR)}
+								size="small"
+								variant="outlined"
+							/>
+						)}
 					</Stack>
 				}
-				subheader={null}
 			/>
 			<CardContent sx={{ display: "flex", flexDirection: "column", gap: 0.8 }}>
 				<Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
@@ -374,8 +406,6 @@ const StudentAssignments = () => {
 					ipCatValue={ipCatFilter}
 					onIpCatChange={setIpCatFilter}
 				/>
-
-        <Divider />
 
 				<Box
 					sx={{

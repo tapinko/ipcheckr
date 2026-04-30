@@ -258,6 +258,38 @@ const TeacherAssignmentGroupDetailsSubmit = () => {
                 </Stack>
               </Stack>
 
+              <Stack direction="row" flexWrap="wrap" gap={0.5} alignItems="center">
+                {data.results.length > 0 && (
+                  <Chip
+                    label={`${data.results.length}×`}
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
+                {data.ipCat && (
+                  <Chip
+                    label={getIpCatLabel(data.ipCat, t)}
+                    size="small"
+                    sx={{ borderStyle: "dashed" }}
+                    variant="outlined"
+                  />
+                )}
+                {includeWildcard && (
+                  <Chip
+                    label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_WILDCARD)}
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
+                {includeFirstLastBr && (
+                  <Chip
+                    label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_FIRST_LAST_BR)}
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
+              </Stack>
+
               {descriptionValue !== "-" ? (
                 <Typography variant="body2" color="text.secondary">
                   {descriptionValue}
