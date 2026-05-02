@@ -1,3 +1,4 @@
+using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
 using IPCheckr.Api.Models;
@@ -43,7 +44,7 @@ namespace IPCheckr.Api.Controllers
                 .Include(c => c.Students)
                 .FirstOrDefaultAsync(c => c.Id == req.ClassId);
 
-            if (classObj == null || classObj.Teachers == null || !classObj.Teachers.Any(t => t.Id == callerId))
+            if (!User.IsInRole(Roles.Admin) && (classObj == null || classObj.Teachers == null || !classObj.Teachers.Any(t => t.Id == callerId)))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
@@ -184,7 +185,7 @@ namespace IPCheckr.Api.Controllers
                 .Include(c => c.Students)
                 .FirstOrDefaultAsync(c => c.Id == req.ClassId);
 
-            if (classObj == null || classObj.Teachers == null || !classObj.Teachers.Any(t => t.Id == callerId))
+            if (!User.IsInRole(Roles.Admin) && (classObj == null || classObj.Teachers == null || !classObj.Teachers.Any(t => t.Id == callerId)))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",

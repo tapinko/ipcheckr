@@ -1,3 +1,4 @@
+using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.Assignment;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +37,7 @@ namespace IPCheckr.Api.Controllers
                 });
 
             var classTeachers = assignment.AssignmentGroup.Class.Teachers?.Select(t => t.Id).ToList() ?? new List<int>();
+            bool isAdmin = User.IsInRole(Roles.Admin);
             bool isTeacherInClass = callerRole == "Teacher" && classTeachers.Contains(callerId);
             bool isStudentOwner = callerRole == "Student" && assignment.Student.Id == callerId;
 
@@ -62,7 +64,7 @@ namespace IPCheckr.Api.Controllers
                 });
             }
 
-            if (!(isTeacherInClass || isStudentOwner))
+            if (!(isTeacherInClass || isStudentOwner || isAdmin))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
@@ -162,6 +164,7 @@ namespace IPCheckr.Api.Controllers
                 });
 
             var classTeachers = assignment.AssignmentGroup.Class.Teachers?.Select(t => t.Id).ToList() ?? new List<int>();
+            bool isAdmin = User.IsInRole(Roles.Admin);
             bool isTeacherInClass = callerRole == "Teacher" && classTeachers.Contains(callerId);
             bool isStudentOwner = callerRole == "Student" && assignment.Student.Id == callerId;
 
@@ -188,7 +191,7 @@ namespace IPCheckr.Api.Controllers
                 });
             }
 
-            if (!(isTeacherInClass || isStudentOwner))
+            if (!(isTeacherInClass || isStudentOwner || isAdmin))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",

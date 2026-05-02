@@ -1,3 +1,4 @@
+using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.Common.Enums;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
@@ -85,19 +86,23 @@ namespace IPCheckr.Api.Controllers
             }
 
             var callerId = int.Parse(User.Claims.First(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value);
-
-            var teacherClasses = await _db.Classes
-                .Include(c => c.Teachers)
-                .Where(c => c.Teachers!.Any(t => t.Id == callerId))
-                .ToListAsync();
-
-            var allowedClassIds = teacherClasses.Select(c => c.Id).ToHashSet();
+            var isAdmin = User.IsInRole(Roles.Admin);
 
             var subnetQuery = _db.SubnetAGs
                 .Include(ag => ag.Class)
                 .ThenInclude(c => c.Teachers)
-                .Where(ag => allowedClassIds.Contains(ag.Class.Id))
                 .AsQueryable();
+
+            if (!isAdmin)
+            {
+                var allowedClassIds = (await _db.Classes
+                    .Include(c => c.Teachers)
+                    .Where(c => c.Teachers!.Any(t => t.Id == callerId))
+                    .Select(c => c.Id)
+                    .ToListAsync()).ToHashSet();
+
+                subnetQuery = subnetQuery.Where(ag => allowedClassIds.Contains(ag.Class.Id));
+            }
 
             if (!string.IsNullOrEmpty(req.Name))
                 subnetQuery = subnetQuery.Where(ag => ag.Name.Contains(req.Name));
@@ -273,19 +278,23 @@ namespace IPCheckr.Api.Controllers
             }
 
             var callerId = int.Parse(User.Claims.First(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value);
-
-            var teacherClasses = await _db.Classes
-                .Include(c => c.Teachers)
-                .Where(c => c.Teachers!.Any(t => t.Id == callerId))
-                .ToListAsync();
-
-            var allowedClassIds = teacherClasses.Select(c => c.Id).ToHashSet();
+            var isAdmin = User.IsInRole(Roles.Admin);
 
             var idnetQuery = _db.IDNetAGs
                 .Include(ag => ag.Class)
                 .ThenInclude(c => c.Teachers)
-                .Where(ag => allowedClassIds.Contains(ag.Class.Id))
                 .AsQueryable();
+
+            if (!isAdmin)
+            {
+                var allowedClassIds = (await _db.Classes
+                    .Include(c => c.Teachers)
+                    .Where(c => c.Teachers!.Any(t => t.Id == callerId))
+                    .Select(c => c.Id)
+                    .ToListAsync()).ToHashSet();
+
+                idnetQuery = idnetQuery.Where(ag => allowedClassIds.Contains(ag.Class.Id));
+            }
 
             if (!string.IsNullOrEmpty(req.Name))
                 idnetQuery = idnetQuery.Where(ag => ag.Name.Contains(req.Name));

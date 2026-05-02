@@ -2,15 +2,15 @@ import { useNavigate } from "react-router-dom"
 import AGAssignmentGroupDetailsSubmitFeature from "../../features/assignmentGroups/AGAssignmentGroupDetailsSubmitFeature"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 
-const TeacherAssignmentGroupDetailsSubmit = () => {
+const AdminAssignmentGroupDetailsSubmit = () => {
   const navigate = useNavigate()
   return (
     <AGAssignmentGroupDetailsSubmitFeature
-      onNavigateStudentDetails={studentId => navigate(getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS, {
-        [RouteParams.STUDENT_ID]: studentId.toString()
+      onNavigateStudentDetails={studentId => navigate(getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
+        [RouteParams.USER_ID]: studentId.toString()
       }))}
     />
   )
 }
 
-export default TeacherAssignmentGroupDetailsSubmit
+export default AdminAssignmentGroupDetailsSubmit

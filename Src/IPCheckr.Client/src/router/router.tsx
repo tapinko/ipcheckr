@@ -7,6 +7,11 @@ import AdminClassDetails from "../pages/admin/AdminClassDetails"
 import AdminGns3 from "../pages/admin/AdminGns3"
 import AdminGns3AllSessions from "../pages/admin/AdminGnsAllSessions"
 import AdminSettings from "../pages/admin/AdminSettings"
+import AdminAssignmentGroups from "../pages/admin/AdminAssignmentGroups"
+import AdminCreateAssignmentGroup from "../pages/admin/AdminCreateAssignmentGroup"
+import AdminEditAssignmentGroup from "../pages/admin/AdminEditAssignmentGroup"
+import AdminAssignmentGroupDetails from "../pages/admin/AdminAssignmentGroupDetails"
+import AdminAssignmentGroupDetailsSubmit from "../pages/admin/AdminAssignmentGroupDetailsSubmit"
 
 import TeacherLayout from "../layouts/TeacherLayout"
 import TeacherDashboard from "../pages/teacher/TeacherDashboard"
@@ -52,6 +57,11 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.ADMIN_GNS3]: <AdminGns3 />,
   [RouteKeys.ADMIN_GNS3_ALL_SESSIONS]: <AdminGns3AllSessions />,
   [RouteKeys.ADMIN_SETTINGS]: <AdminSettings />,
+  [RouteKeys.ADMIN_ASSIGNMENT_GROUPS]: <AdminAssignmentGroups />,
+  [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_CREATE]: <AdminCreateAssignmentGroup />,
+  [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_EDIT]: <AdminEditAssignmentGroup />,
+  [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS]: <AdminAssignmentGroupDetails />,
+  [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <AdminAssignmentGroupDetailsSubmit />,
 
   [RouteKeys.TEACHER]: <Navigate to={Routes[RouteKeys.TEACHER_DASHBOARD]} />,
   [RouteKeys.TEACHER_DASHBOARD]: <TeacherDashboard />,
@@ -117,6 +127,11 @@ const useAuthRouter = () => {
           RouteKeys.ADMIN_GNS3,
           RouteKeys.ADMIN_GNS3_ALL_SESSIONS,
           RouteKeys.ADMIN_SETTINGS,
+          RouteKeys.ADMIN_ASSIGNMENT_GROUPS,
+          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_CREATE,
+          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_EDIT,
+          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS,
+          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
         ].map(key => ({
           path: childPath(Routes[key], Routes[RouteKeys.ADMIN]),
           element: routeElements[key]!,

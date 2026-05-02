@@ -1,3 +1,4 @@
+using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
 using System.Security.Claims;
@@ -53,7 +54,7 @@ namespace IPCheckr.Api.Controllers
                         MessageSk = "Môžete odstrániť iba skupiny zadaní v triedach, ku ktorým ste pridelení."
                     });
             }
-            else
+            else if (callerRole != Roles.Admin)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
@@ -115,7 +116,7 @@ namespace IPCheckr.Api.Controllers
                         MessageSk = "Môžete odstrániť iba skupiny zadania v triedach, ku ktorým ste pridelení."
                     });
             }
-            else
+            else if (callerRole != Roles.Admin)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {

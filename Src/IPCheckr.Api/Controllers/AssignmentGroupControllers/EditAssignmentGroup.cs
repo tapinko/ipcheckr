@@ -1,4 +1,5 @@
 using IPCheckr.Api.Common.Enums;
+using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
 using IPCheckr.Api.Models;
@@ -37,7 +38,7 @@ namespace IPCheckr.Api.Controllers
                 });
 
             var groupClass = subnetGroup.Class;
-            if (groupClass.Teachers == null || !groupClass.Teachers.Any(t => t.Id == callerId))
+            if (!User.IsInRole(Roles.Admin) && (groupClass.Teachers == null || !groupClass.Teachers.Any(t => t.Id == callerId)))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
@@ -173,7 +174,7 @@ namespace IPCheckr.Api.Controllers
                 });
 
             var groupClass = idnetGroup.Class;
-            if (groupClass.Teachers == null || !groupClass.Teachers.Any(t => t.Id == callerId))
+            if (!User.IsInRole(Roles.Admin) && (groupClass.Teachers == null || !groupClass.Teachers.Any(t => t.Id == callerId)))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",

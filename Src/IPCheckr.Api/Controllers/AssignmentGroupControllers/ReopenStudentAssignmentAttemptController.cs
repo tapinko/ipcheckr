@@ -1,3 +1,4 @@
+using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.Common.Enums;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
@@ -45,7 +46,7 @@ namespace IPCheckr.Api.Controllers
                     });
 
                 var isTeacherInClass = assignment.AssignmentGroup.Class.Teachers?.Any(t => t.Id == callerId) == true;
-                if (!isTeacherInClass)
+                if (!isTeacherInClass && !User.IsInRole(Roles.Admin))
                     return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                     {
                         Title = "Forbidden",
@@ -125,7 +126,7 @@ namespace IPCheckr.Api.Controllers
                 });
 
             var teacherInClass = idNetAssignment.AssignmentGroup.Class.Teachers?.Any(t => t.Id == callerId) == true;
-            if (!teacherInClass)
+            if (!teacherInClass && !User.IsInRole(Roles.Admin))
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
                 {
                     Title = "Forbidden",
