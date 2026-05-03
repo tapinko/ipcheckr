@@ -68,11 +68,20 @@ const AGCreateAssignmentGroupFeature = ({ onAfterCreate, teacherFilter }: AGCrea
   const { userId } = useAuth()
   const queryUserId = teacherFilter !== undefined ? teacherFilter : userId
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
 
   const value = Number(searchParams.get("classId"))
   const initialClassId = Number.isFinite(value) && value > 0 ? value : null
+
+  const parseEnumParam = <T extends string>(key: string, enumObj: Record<string, T>, fallback: T): T => {
+    const val = searchParams.get(key)
+    return val !== null && Object.values(enumObj).includes(val as T) ? (val as T) : fallback
+  }
+  const parseIntParam = (key: string, fallback: number, min: number, max: number): number => {
+    const val = Number(searchParams.get(key))
+    return Number.isInteger(val) && val >= min && val <= max ? val : fallback
+  }
 
   const classesQuery = useQuery<ClassDto[], Error>({
     queryKey: ["agCreateClasses", queryUserId],
@@ -85,20 +94,21 @@ const AGCreateAssignmentGroupFeature = ({ onAfterCreate, teacherFilter }: AGCrea
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors }
   } = useForm<CreateFormValues>({
     defaultValues: {
-      name: "",
-      description: "",
+      name: searchParams.get("name") ?? "",
+      description: searchParams.get("desc") ?? "",
       classId: initialClassId,
-      type: AssignmentGroupType.Idnet,
-      numberOfRecords: 6,
-      possibleOctets: 3,
-      ipCat: AssignmentGroupIpCat.Abc,
-      difficulty: AssignmentGroupDifficulty.Medium,
-      hostSortStrategy: AssignmentGroupHostSortStrategy.Descending,
-      testWildcard: false,
-      testFirstLastBr: false,
+      type: parseEnumParam("type", AssignmentGroupType, AssignmentGroupType.Idnet),
+      numberOfRecords: parseIntParam("records", 6, 1, 12),
+      possibleOctets: parseIntParam("octets", 3, 1, 4),
+      ipCat: parseEnumParam("ipCat", AssignmentGroupIpCat, AssignmentGroupIpCat.Abc),
+      difficulty: parseEnumParam("difficulty", AssignmentGroupDifficulty, AssignmentGroupDifficulty.Medium),
+      hostSortStrategy: parseEnumParam("hostSort", AssignmentGroupHostSortStrategy, AssignmentGroupHostSortStrategy.Descending),
+      testWildcard: searchParams.get("wildcard") === "true",
+      testFirstLastBr: searchParams.get("firstLastBr") === "true",
       students: [],
       startDate: "",
       deadline: ""
@@ -125,6 +135,25 @@ const AGCreateAssignmentGroupFeature = ({ onAfterCreate, teacherFilter }: AGCrea
   useEffect(() => {
     studentsInitializedClassRef.current = null
   }, [selectedClassId])
+
+  useEffect(() => {
+    const subscription = watch(values => {
+      const params: Record<string, string> = {}
+      if (values.classId) params.classId = String(values.classId)
+      if (values.name) params.name = values.name
+      if (values.description) params.desc = values.description
+      if (values.type) params.type = values.type
+      if (values.ipCat) params.ipCat = values.ipCat
+      if (values.numberOfRecords) params.records = String(values.numberOfRecords)
+      if (values.difficulty) params.difficulty = values.difficulty
+      if (values.hostSortStrategy) params.hostSort = values.hostSortStrategy
+      if (values.possibleOctets) params.octets = String(values.possibleOctets)
+      params.wildcard = String(values.testWildcard ?? false)
+      params.firstLastBr = String(values.testFirstLastBr ?? false)
+      setSearchParams(params, { replace: true })
+    })
+    return () => subscription.unsubscribe()
+  }, [watch, setSearchParams])
 
   const studentsQuery = useQuery<UserDto[], Error>({
     queryKey: ["agCreateStudents", userId, selectedClassId],
