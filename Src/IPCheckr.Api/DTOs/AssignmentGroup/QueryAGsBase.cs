@@ -18,6 +18,8 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         public string? AssignmentGroupType { get; set; }
 
         public string? Difficulty { get; set; }
+
+        public bool IsArchived { get; set; } = false;
     }
 
     public class QueryAGsBaseRes
@@ -61,5 +63,8 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         public AssignmentGroupType Type { get; set; }
 
         public AssignmentGroupDifficulty? Difficulty { get; set; }
+
+        [Required]
+        public bool IsArchived { get; set; }
     }
 }

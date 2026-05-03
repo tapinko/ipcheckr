@@ -67,6 +67,7 @@ export interface IAG {
   hostSortStrategy?: AssignmentGroupHostSortStrategy | null
   testWildcard?: boolean
   testFirstLastBr?: boolean
+  isArchived: boolean
 }
 
 type ClassFilterValue = AGClassFilterValue
@@ -186,7 +187,8 @@ const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
   successRate: ag.successRate,
   type: AssignmentGroupType.Subnet,
   ipCat: ag.ipCat,
-  hostSortStrategy: ag.hostSortStrategy ?? null
+  hostSortStrategy: ag.hostSortStrategy ?? null,
+  isArchived: ag.isArchived
 })
 
 const normalizeIdNet = (ag: IDNetAGDto): IAG => ({
@@ -205,10 +207,9 @@ const normalizeIdNet = (ag: IDNetAGDto): IAG => ({
   type: AssignmentGroupType.Idnet,
   ipCat: ag.ipCat,
   testWildcard: ag.testWildcard,
-  testFirstLastBr: ag.testFirstLastBr
+  testFirstLastBr: ag.testFirstLastBr,
+  isArchived: ag.isArchived
 })
-
-// ---- AssignmentGroupStatusMetric ----
 
 interface AssignmentGroupStatusMetricProps {
   ag: IAG
@@ -290,8 +291,6 @@ const AssignmentGroupStatusMetric = ({ ag, nowMs }: AssignmentGroupStatusMetricP
     </Stack>
   )
 }
-
-// ---- AGStatusColumn ----
 
 interface AGStatusColumnProps {
   status: AssignmentGroupStatus
@@ -419,6 +418,7 @@ const AGStatusColumn = ({
                     <Stack direction="row" spacing={0.5} alignItems="center">
                       <IconButton
                         size="small"
+                        disabled={ag.isArchived}
                         onClick={e => {
                           e.stopPropagation()
                           onCardEdit(ag)
@@ -518,6 +518,7 @@ interface AGAssignmentGroupsFeatureProps {
   onNavigateTemplates: () => void
   onNavigateDetails: (id: number, type: AssignmentGroupType) => void
   onNavigateEdit: (id: number, type: AssignmentGroupType) => void
+  onNavigateArchive: () => void
   teacherFilter?: number | null
 }
 
@@ -526,6 +527,7 @@ const AGAssignmentGroupsFeature = ({
   onNavigateTemplates,
   onNavigateDetails,
   onNavigateEdit,
+  onNavigateArchive,
   teacherFilter
 }: AGAssignmentGroupsFeatureProps) => {
   const { t, i18n } = useTranslation()
@@ -790,6 +792,7 @@ const AGAssignmentGroupsFeature = ({
           }}
           onCreateClick={() => onNavigateCreate(classFilterNormalized ?? undefined)}
           onTemplatesClick={() => onNavigateTemplates()}
+          onArchiveClick={() => onNavigateArchive()}
           createDisabled={!classesQuery.data?.length}
           templatesDisabled
         />

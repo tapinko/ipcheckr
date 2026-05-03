@@ -48,6 +48,16 @@ namespace IPCheckr.Api.Controllers
                     MessageSk = "Nemáte oprávnenie upravovať túto skupinu zadania."
                 });
 
+            if (subnetGroup.IsArchived)
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = "Archived assignment groups cannot be edited.",
+                    Status = StatusCodes.Status403Forbidden,
+                    MessageEn = "Archived assignment groups cannot be edited.",
+                    MessageSk = "Archivované skupiny zadaní nie je možné upravovať."
+                });
+
             if (req.Name != null) subnetGroup.Name = req.Name;
             if (req.Description != null) subnetGroup.Description = req.Description;
             if (req.StartDate.HasValue) subnetGroup.StartDate = req.StartDate.Value;
@@ -182,6 +192,16 @@ namespace IPCheckr.Api.Controllers
                     Status = StatusCodes.Status403Forbidden,
                     MessageEn = "You do not have permission to edit this assignment group.",
                     MessageSk = "Nemáte oprávnenie upravovať túto skupinu zadania."
+                });
+
+            if (idnetGroup.IsArchived)
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = "Archived assignment groups cannot be edited.",
+                    Status = StatusCodes.Status403Forbidden,
+                    MessageEn = "Archived assignment groups cannot be edited.",
+                    MessageSk = "Archivované skupiny zadaní nie je možné upravovať."
                 });
 
             if (req.Name != null) idnetGroup.Name = req.Name;

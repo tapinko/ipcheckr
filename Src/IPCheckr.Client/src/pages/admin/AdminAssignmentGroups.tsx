@@ -21,6 +21,7 @@ const AdminAssignmentGroups = () => {
         [RouteParams.ASSIGNMENT_GROUP_ID]: id.toString(),
         [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(type)
       }))}
+      onNavigateArchive={() => navigate(Routes[RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE])}
     />
   )
 }

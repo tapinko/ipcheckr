@@ -20,6 +20,7 @@ const TeacherAssignmentGroups = () => {
         [RouteParams.ASSIGNMENT_GROUP_ID]: id.toString(),
         [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(type)
       }))}
+      onNavigateArchive={() => navigate(Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE])}
     />
   )
 }

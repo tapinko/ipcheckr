@@ -84,6 +84,12 @@ const routes: BreadcrumbsRoute[] = [
         {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT)} {match.params.ASSIGNMENT_ID}
       </Typography>
   },
+  {
+    path: Routes[RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_ASSIGNMENT_GROUPS_ARCHIVE)}
+      </Typography>
+  },
 
   {
     path: Routes[RouteKeys.TEACHER_MY_CLASSES],
@@ -131,6 +137,12 @@ const routes: BreadcrumbsRoute[] = [
     path: Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT],
     breadcrumb: ({match}) => <Typography variant="body2" component="span">
         {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUP_DETAILS_SUBMIT)} {match.params.ASSIGNMENT_ID}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUPS_ARCHIVE)}
       </Typography>
   },
   {

@@ -27,5 +27,7 @@ namespace IPCheckr.Api.Models
         public DateTime Deadline { get; set; }
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public bool IsArchived { get; set; } = false;
     }
 }

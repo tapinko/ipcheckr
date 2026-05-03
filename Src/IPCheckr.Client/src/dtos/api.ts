@@ -97,10 +97,16 @@ export interface AGBaseDto {
     'type': AssignmentGroupType;
     /**
      * 
-     * @type {CreateAGBaseReqDifficulty}
+     * @type {SubnetAssignmentDtoAllOfDifficulty}
      * @memberof AGBaseDto
      */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    'difficulty'?: SubnetAssignmentDtoAllOfDifficulty | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AGBaseDto
+     */
+    'isArchived': boolean;
 }
 
 
@@ -799,18 +805,12 @@ export interface CreateAGBaseReq {
     'deadline': string;
     /**
      * 
-     * @type {CreateAGBaseReqDifficulty}
+     * @type {SubnetAssignmentDtoAllOfDifficulty}
      * @memberof CreateAGBaseReq
      */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    'difficulty'?: SubnetAssignmentDtoAllOfDifficulty | null;
 }
 
-
-/**
- * @type CreateAGBaseReqDifficulty
- * @export
- */
-export type CreateAGBaseReqDifficulty = AssignmentGroupDifficulty;
 
 /**
  * 
@@ -1039,10 +1039,10 @@ export interface CreateIDNetAGReq {
     'deadline': string;
     /**
      * 
-     * @type {CreateAGBaseReqDifficulty}
+     * @type {SubnetAssignmentDtoAllOfDifficulty}
      * @memberof CreateIDNetAGReq
      */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    'difficulty'?: SubnetAssignmentDtoAllOfDifficulty | null;
     /**
      * 
      * @type {number}
@@ -1139,10 +1139,10 @@ export interface CreateSubnetAGReq {
     'deadline': string;
     /**
      * 
-     * @type {CreateAGBaseReqDifficulty}
+     * @type {SubnetAssignmentDtoAllOfDifficulty}
      * @memberof CreateSubnetAGReq
      */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    'difficulty'?: SubnetAssignmentDtoAllOfDifficulty | null;
     /**
      * 
      * @type {number}
@@ -1327,12 +1327,6 @@ export interface EditAGBaseReq {
      * @memberof EditAGBaseReq
      */
     'deadline'?: string | null;
-    /**
-     * 
-     * @type {CreateAGBaseReqDifficulty}
-     * @memberof EditAGBaseReq
-     */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
 }
 /**
  * 
@@ -1426,12 +1420,6 @@ export interface EditIDNetAGReq {
      * @memberof EditIDNetAGReq
      */
     'deadline'?: string | null;
-    /**
-     * 
-     * @type {CreateAGBaseReqDifficulty}
-     * @memberof EditIDNetAGReq
-     */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
 }
 /**
  * 
@@ -1475,25 +1463,7 @@ export interface EditSubnetAGReq {
      * @memberof EditSubnetAGReq
      */
     'deadline'?: string | null;
-    /**
-     * 
-     * @type {CreateAGBaseReqDifficulty}
-     * @memberof EditSubnetAGReq
-     */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
-    /**
-     * 
-     * @type {EditSubnetAGReqAllOfHostSortStrategy}
-     * @memberof EditSubnetAGReq
-     */
-    'hostSortStrategy'?: EditSubnetAGReqAllOfHostSortStrategy | null;
 }
-/**
- * @type EditSubnetAGReqAllOfHostSortStrategy
- * @export
- */
-export type EditSubnetAGReqAllOfHostSortStrategy = AssignmentGroupHostSortStrategy;
-
 /**
  * 
  * @export
@@ -1843,10 +1813,16 @@ export interface IDNetAGDto {
     'type': AssignmentGroupType;
     /**
      * 
-     * @type {CreateAGBaseReqDifficulty}
+     * @type {SubnetAssignmentDtoAllOfDifficulty}
      * @memberof IDNetAGDto
      */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    'difficulty'?: SubnetAssignmentDtoAllOfDifficulty | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof IDNetAGDto
+     */
+    'isArchived': boolean;
     /**
      * 
      * @type {number}
@@ -1989,6 +1965,24 @@ export interface IDNetAssignmentDto {
      * @memberof IDNetAssignmentDto
      */
     'successRate'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAssignmentDto
+     */
+    'numberOfRecords': number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof IDNetAssignmentDto
+     */
+    'testWildcard': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof IDNetAssignmentDto
+     */
+    'testFirstLastBr': boolean;
 }
 
 
@@ -2522,10 +2516,16 @@ export interface QueryIDNetAGDetailRes {
     'type': AssignmentGroupType;
     /**
      * 
-     * @type {CreateAGBaseReqDifficulty}
+     * @type {SubnetAssignmentDtoAllOfDifficulty}
      * @memberof QueryIDNetAGDetailRes
      */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    'difficulty'?: SubnetAssignmentDtoAllOfDifficulty | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QueryIDNetAGDetailRes
+     */
+    'isArchived': boolean;
     /**
      * 
      * @type {number}
@@ -3030,10 +3030,16 @@ export interface QuerySubnetAGDetailRes {
     'type': AssignmentGroupType;
     /**
      * 
-     * @type {CreateAGBaseReqDifficulty}
+     * @type {SubnetAssignmentDtoAllOfDifficulty}
      * @memberof QuerySubnetAGDetailRes
      */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    'difficulty'?: SubnetAssignmentDtoAllOfDifficulty | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QuerySubnetAGDetailRes
+     */
+    'isArchived': boolean;
     /**
      * 
      * @type {number}
@@ -4063,10 +4069,16 @@ export interface SubnetAGDto {
     'type': AssignmentGroupType;
     /**
      * 
-     * @type {CreateAGBaseReqDifficulty}
+     * @type {SubnetAssignmentDtoAllOfDifficulty}
      * @memberof SubnetAGDto
      */
-    'difficulty'?: CreateAGBaseReqDifficulty | null;
+    'difficulty'?: SubnetAssignmentDtoAllOfDifficulty | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SubnetAGDto
+     */
+    'isArchived': boolean;
     /**
      * 
      * @type {number}
@@ -4209,8 +4221,38 @@ export interface SubnetAssignmentDto {
      * @memberof SubnetAssignmentDto
      */
     'successRate'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAssignmentDto
+     */
+    'numberOfRecords': number;
+    /**
+     * 
+     * @type {SubnetAssignmentDtoAllOfDifficulty}
+     * @memberof SubnetAssignmentDto
+     */
+    'difficulty'?: SubnetAssignmentDtoAllOfDifficulty | null;
+    /**
+     * 
+     * @type {SubnetAssignmentDtoAllOfHostSortStrategy}
+     * @memberof SubnetAssignmentDto
+     */
+    'hostSortStrategy'?: SubnetAssignmentDtoAllOfHostSortStrategy | null;
 }
 
+
+/**
+ * @type SubnetAssignmentDtoAllOfDifficulty
+ * @export
+ */
+export type SubnetAssignmentDtoAllOfDifficulty = AssignmentGroupDifficulty;
+
+/**
+ * @type SubnetAssignmentDtoAllOfHostSortStrategy
+ * @export
+ */
+export type SubnetAssignmentDtoAllOfHostSortStrategy = AssignmentGroupHostSortStrategy;
 
 /**
  * 
@@ -5115,10 +5157,11 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
          * @param {string | null} [status] 
          * @param {string | null} [assignmentGroupType] 
          * @param {string | null} [difficulty] 
+         * @param {boolean} [isArchived] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupQueryIdNetAssignmentGroups: async (name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        assignmentGroupQueryIdNetAssignmentGroups: async (name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, isArchived?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/assignment-group/get-idnet-assignment-groups`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5156,6 +5199,10 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
 
             if (difficulty !== undefined) {
                 localVarQueryParameter['Difficulty'] = difficulty;
+            }
+
+            if (isArchived !== undefined) {
+                localVarQueryParameter['IsArchived'] = isArchived;
             }
 
 
@@ -5214,10 +5261,11 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
          * @param {string | null} [status] 
          * @param {string | null} [assignmentGroupType] 
          * @param {string | null} [difficulty] 
+         * @param {boolean} [isArchived] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupQuerySubnetAssignmentGroups: async (name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        assignmentGroupQuerySubnetAssignmentGroups: async (name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, isArchived?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/assignment-group/get-subnet-assignment-groups`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5255,6 +5303,10 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
 
             if (difficulty !== undefined) {
                 localVarQueryParameter['Difficulty'] = difficulty;
+            }
+
+            if (isArchived !== undefined) {
+                localVarQueryParameter['IsArchived'] = isArchived;
             }
 
 
@@ -5408,11 +5460,12 @@ export const AssignmentGroupApiFp = function(configuration?: Configuration) {
          * @param {string | null} [status] 
          * @param {string | null} [assignmentGroupType] 
          * @param {string | null} [difficulty] 
+         * @param {boolean} [isArchived] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentGroupQueryIdNetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryIDNetAGsRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQueryIdNetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, options);
+        async assignmentGroupQueryIdNetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, isArchived?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryIDNetAGsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQueryIdNetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, isArchived, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupQueryIdNetAssignmentGroups']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -5437,11 +5490,12 @@ export const AssignmentGroupApiFp = function(configuration?: Configuration) {
          * @param {string | null} [status] 
          * @param {string | null} [assignmentGroupType] 
          * @param {string | null} [difficulty] 
+         * @param {boolean} [isArchived] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuerySubnetAGsRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, options);
+        async assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, isArchived?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuerySubnetAGsRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, isArchived, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroups']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -5539,11 +5593,12 @@ export const AssignmentGroupApiFactory = function (configuration?: Configuration
          * @param {string | null} [status] 
          * @param {string | null} [assignmentGroupType] 
          * @param {string | null} [difficulty] 
+         * @param {boolean} [isArchived] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupQueryIdNetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<QueryIDNetAGsRes> {
-            return localVarFp.assignmentGroupQueryIdNetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, options).then((request) => request(axios, basePath));
+        assignmentGroupQueryIdNetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, isArchived?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<QueryIDNetAGsRes> {
+            return localVarFp.assignmentGroupQueryIdNetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, isArchived, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -5562,11 +5617,12 @@ export const AssignmentGroupApiFactory = function (configuration?: Configuration
          * @param {string | null} [status] 
          * @param {string | null} [assignmentGroupType] 
          * @param {string | null} [difficulty] 
+         * @param {boolean} [isArchived] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<QuerySubnetAGsRes> {
-            return localVarFp.assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, options).then((request) => request(axios, basePath));
+        assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, isArchived?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<QuerySubnetAGsRes> {
+            return localVarFp.assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, isArchived, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -5672,12 +5728,13 @@ export class AssignmentGroupApi extends BaseAPI {
      * @param {string | null} [status] 
      * @param {string | null} [assignmentGroupType] 
      * @param {string | null} [difficulty] 
+     * @param {boolean} [isArchived] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssignmentGroupApi
      */
-    public assignmentGroupQueryIdNetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, options?: RawAxiosRequestConfig) {
-        return AssignmentGroupApiFp(this.configuration).assignmentGroupQueryIdNetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, options).then((request) => request(this.axios, this.basePath));
+    public assignmentGroupQueryIdNetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, isArchived?: boolean, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupQueryIdNetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, isArchived, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5699,12 +5756,13 @@ export class AssignmentGroupApi extends BaseAPI {
      * @param {string | null} [status] 
      * @param {string | null} [assignmentGroupType] 
      * @param {string | null} [difficulty] 
+     * @param {boolean} [isArchived] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssignmentGroupApi
      */
-    public assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, options?: RawAxiosRequestConfig) {
-        return AssignmentGroupApiFp(this.configuration).assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, options).then((request) => request(this.axios, this.basePath));
+    public assignmentGroupQuerySubnetAssignmentGroups(name?: string | null, classId?: number | null, teacherId?: number | null, status?: string | null, assignmentGroupType?: string | null, difficulty?: string | null, isArchived?: boolean, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupQuerySubnetAssignmentGroups(name, classId, teacherId, status, assignmentGroupType, difficulty, isArchived, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -48,8 +48,11 @@ interface AGHeaderProps {
   onToggleDifficulty?: (value: AssignmentGroupDifficulty) => void
   onCreateClick?: () => void
   onTemplatesClick?: () => void
+  onArchiveClick?: () => void
   createDisabled?: boolean
   templatesDisabled?: boolean
+  hideArchive?: boolean
+  hideTemplates?: boolean
 }
 
 const getDifficultyLabel = (difficulty: AssignmentGroupDifficulty, t: TFunction) => {
@@ -77,8 +80,11 @@ const AGHeader = ({
   onToggleDifficulty,
   onCreateClick,
   onTemplatesClick,
+  onArchiveClick,
   createDisabled,
-  templatesDisabled
+  templatesDisabled,
+  hideArchive,
+  hideTemplates
 }: AGHeaderProps) => {
   const selectedTypeValues = typeValues ?? []
   const selectedIpCatValues = ipCatValues ?? []
@@ -117,56 +123,57 @@ const AGHeader = ({
             />
 
             <Stack direction="row" spacing={1.25} justifyContent={{ xs: "flex-start", lg: "flex-end" }}>
-              <Tooltip title={t(TranslationKey.AG_HEADER_ARCHIVE_TOOLTIP)}>
-                <span>
-                  <IconButton
-                    disabled
-                    aria-label="Archive"
-                    sx={{
-                      border: theme => `1px solid ${theme.palette.warning.main}`,
-                      width: 56,
-                      height: 56,
-                      backgroundColor: theme => theme.palette.warning.light,
-                      "& .MuiSvgIcon-root": {
-                        fontSize: 28
-                      },
-                      "&.Mui-disabled": {
+              {!hideArchive && (
+                <Tooltip title={t(TranslationKey.AG_HEADER_ARCHIVE_TOOLTIP)}>
+                  <span>
+                    <IconButton
+                      onClick={onArchiveClick}
+                      disabled={!onArchiveClick}
+                      aria-label="Archive"
+                      sx={{
+                        border: theme => `1px solid ${theme.palette.warning.main}`,
+                        width: 56,
+                        height: 56,
+                        "& .MuiSvgIcon-root": { fontSize: 28 },
                         color: theme => theme.palette.warning.dark,
-                        borderColor: theme => theme.palette.warning.main,
-                        opacity: 0.75
-                      }
-                    }}
-                  >
-                    <ArchiveOutlinedIcon />
-                  </IconButton>
-                </span>
-              </Tooltip>
+                        "&.Mui-disabled": {
+                          color: theme => theme.palette.warning.dark,
+                          borderColor: theme => theme.palette.warning.main,
+                          opacity: 0.75
+                        }
+                      }}
+                    >
+                      <ArchiveOutlinedIcon />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
 
-              <Tooltip title={t(TranslationKey.AG_HEADER_TEMPLATES_TOOLTIP)}>
-                <span>
-                  <IconButton
-                    onClick={onTemplatesClick}
-                    disabled={templatesDisabled ?? true}
-                    aria-label={t(TranslationKey.AG_HEADER_TEMPLATES_TOOLTIP)}
-                    sx={{
-                      border: theme => `1px solid ${theme.palette.info.main}`,
-                      width: 56,
-                      height: 56,
-                      backgroundColor: theme => theme.palette.info.light,
-                      "& .MuiSvgIcon-root": {
-                        fontSize: 28
-                      },
-                      "&.Mui-disabled": {
-                        color: theme => theme.palette.info.dark,
-                        borderColor: theme => theme.palette.info.main,
-                        opacity: 0.75
-                      }
-                    }}
-                  >
-                    <LayersOutlinedIcon />
-                  </IconButton>
-                </span>
-              </Tooltip>
+              {!hideTemplates && (
+                <Tooltip title={t(TranslationKey.AG_HEADER_TEMPLATES_TOOLTIP)}>
+                  <span>
+                    <IconButton
+                      onClick={onTemplatesClick}
+                      disabled={templatesDisabled ?? true}
+                      aria-label={t(TranslationKey.AG_HEADER_TEMPLATES_TOOLTIP)}
+                      sx={{
+                        border: theme => `1px solid ${theme.palette.info.main}`,
+                        width: 56,
+                        height: 56,
+                        backgroundColor: theme => theme.palette.info.light,
+                        "& .MuiSvgIcon-root": { fontSize: 28 },
+                        "&.Mui-disabled": {
+                          color: theme => theme.palette.info.dark,
+                          borderColor: theme => theme.palette.info.main,
+                          opacity: 0.75
+                        }
+                      }}
+                    >
+                      <LayersOutlinedIcon />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
 
               {onCreateClick && (
                 <Tooltip title={t(TranslationKey.AG_HEADER_CREATE_ASSIGNMENT_TOOLTIP)}>

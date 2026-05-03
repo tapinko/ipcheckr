@@ -116,6 +116,18 @@ namespace IPCheckr.Api.Controllers
             if (requestedDifficulties.Count > 0)
                 subnetQuery = subnetQuery.Where(ag => ag.Difficulty.HasValue && requestedDifficulties.Contains(ag.Difficulty.Value));
 
+            var archiveThreshold = DateTime.UtcNow.AddDays(-7);
+            var toAutoArchiveSubnet = await _db.SubnetAGs
+                .Where(ag => !ag.IsArchived && ag.Deadline < archiveThreshold)
+                .ToListAsync();
+            if (toAutoArchiveSubnet.Count > 0)
+            {
+                toAutoArchiveSubnet.ForEach(ag => ag.IsArchived = true);
+                await _db.SaveChangesAsync();
+            }
+
+            subnetQuery = subnetQuery.Where(ag => ag.IsArchived == req.IsArchived);
+
             var subnetGroups = await subnetQuery.ToListAsync();
 
             var assignmentGroupDtos = new List<SubnetAGDto>();
@@ -184,7 +196,8 @@ namespace IPCheckr.Api.Controllers
                     Type = AssignmentGroupType.SUBNET,
                     IpCat = ag.AssignmentIpCat,
                     Difficulty = ag.Difficulty,
-                    HostSortStrategy = ag.HostSortStrategy
+                    HostSortStrategy = ag.HostSortStrategy,
+                    IsArchived = ag.IsArchived
                 });
             }
 
@@ -305,6 +318,18 @@ namespace IPCheckr.Api.Controllers
             if (req.TeacherId.HasValue)
                 idnetQuery = idnetQuery.Where(ag => ag.Class.Teachers!.Any(t => t.Id == req.TeacherId.Value));
 
+            var archiveThresholdIdnet = DateTime.UtcNow.AddDays(-7);
+            var toAutoArchiveIdnet = await _db.IDNetAGs
+                .Where(ag => !ag.IsArchived && ag.Deadline < archiveThresholdIdnet)
+                .ToListAsync();
+            if (toAutoArchiveIdnet.Count > 0)
+            {
+                toAutoArchiveIdnet.ForEach(ag => ag.IsArchived = true);
+                await _db.SaveChangesAsync();
+            }
+
+            idnetQuery = idnetQuery.Where(ag => ag.IsArchived == req.IsArchived);
+
             var idnetGroups = await idnetQuery.ToListAsync();
 
             var assignmentGroupDtos = new List<IDNetAGDto>();
@@ -374,7 +399,8 @@ namespace IPCheckr.Api.Controllers
                     IpCat = ag.AssignmentIpCat,
                     Difficulty = null,
                     TestWildcard = ag.TestWildcard,
-                    TestFirstLastBr = ag.TestFirstLastBr
+                    TestFirstLastBr = ag.TestFirstLastBr,
+                    IsArchived = ag.IsArchived
                 });
             }
 
