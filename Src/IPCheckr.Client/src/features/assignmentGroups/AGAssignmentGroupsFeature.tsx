@@ -30,11 +30,9 @@ import {
   AssignmentGroupStatus,
   AssignmentGroupType,
   type ApiProblemDetails,
+  type AssignmentGroupDto,
   type ClassDto,
-  type IDNetAGDto,
-  type QueryIDNetAGsRes,
-  type QuerySubnetAGsRes,
-  type SubnetAGDto,
+  type QueryAssignmentGroupsRes,
 } from "../../dtos"
 import { useAuth } from "../../contexts/AuthContext"
 import CardsSkeleton from "../../components/CardsSkeleton"
@@ -172,7 +170,7 @@ const computeMoveDates = (
   }
 }
 
-const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
+const normalizeAssignmentGroup = (ag: AssignmentGroupDto): IAG => ({
   id: ag.assignmentGroupId,
   name: ag.name,
   description: ag.description,
@@ -185,29 +183,11 @@ const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
   status: ag.status,
   difficulty: ag.difficulty ?? null,
   successRate: ag.successRate,
-  type: AssignmentGroupType.Subnet,
-  ipCat: ag.ipCat,
+  type: ag.type,
+  ipCat: ag.ipCat ?? undefined,
   hostSortStrategy: ag.hostSortStrategy ?? null,
-  isArchived: ag.isArchived
-})
-
-const normalizeIdNet = (ag: IDNetAGDto): IAG => ({
-  id: ag.assignmentGroupId,
-  name: ag.name,
-  description: ag.description,
-  classId: ag.classId,
-  className: ag.className,
-  submitted: ag.submitted,
-  total: ag.total,
-  startDate: ag.startDate,
-  deadline: ag.deadline,
-  status: ag.status,
-  difficulty: null,
-  successRate: ag.successRate,
-  type: AssignmentGroupType.Idnet,
-  ipCat: ag.ipCat,
-  testWildcard: ag.testWildcard,
-  testFirstLastBr: ag.testFirstLastBr,
+  testWildcard: ag.testWildcard ?? undefined,
+  testFirstLastBr: ag.testFirstLastBr ?? undefined,
   isArchived: ag.isArchived
 })
 
@@ -585,44 +565,25 @@ const AGAssignmentGroupsFeature = ({
       ? null
       : difficultyFilters.join(",")
 
-  const subnetAGsQuery = useQuery<QuerySubnetAGsRes, Error>({
-    queryKey: ["agSubnetAGs", queryUserId, classFilterNormalized, search, difficultyFilterQuery],
+  const agsQuery = useQuery<QueryAssignmentGroupsRes, Error>({
+    queryKey: ["agAssignmentGroups", queryUserId, classFilterNormalized, search, difficultyFilterQuery],
     enabled: !!userId,
     queryFn: () =>
       assignmentGroupApi
-        .assignmentGroupQuerySubnetAssignmentGroups(
+        .assignmentGroupQueryAssignmentGroups(
           search.trim() ? search.trim() : null,
           classFilterNormalized,
           queryUserId,
           null,
-          AssignmentGroupType.Subnet,
-          difficultyFilterQuery
+          null,
+          difficultyFilterQuery,
+          false
         )
         .then(r => r.data),
     placeholderData: prev => prev
   })
 
-  const idNetAGsQuery = useQuery<QueryIDNetAGsRes, Error>({
-    queryKey: ["agIdNetAGs", queryUserId, classFilterNormalized, search],
-    enabled: !!userId,
-    queryFn: () =>
-      assignmentGroupApi
-        .assignmentGroupQueryIdNetAssignmentGroups(
-          search.trim() ? search.trim() : null,
-          classFilterNormalized,
-          queryUserId,
-          null,
-          AssignmentGroupType.Idnet,
-          null
-        )
-        .then(r => r.data),
-    placeholderData: prev => prev
-  })
-
-  const allAGs = [
-    ...(subnetAGsQuery.data?.assignmentGroups ?? []).map(normalizeSubnet),
-    ...(idNetAGsQuery.data?.assignmentGroups ?? []).map(normalizeIdNet)
-  ]
+  const allAGs = (agsQuery.data?.assignmentGroups ?? []).map(normalizeAssignmentGroup)
 
   const filteredAGs = allAGs
     .filter(ag => typeFilters.includes(ag.type))
@@ -667,8 +628,8 @@ const AGAssignmentGroupsFeature = ({
     setEndedPage(1)
   }, [search, classFilter, typeFilters, ipCatFilters, difficultyFilters])
 
-  const isLoading = classesQuery.isLoading || subnetAGsQuery.isLoading || idNetAGsQuery.isLoading
-  const hasError = classesQuery.isError || subnetAGsQuery.isError || idNetAGsQuery.isError
+  const isLoading = classesQuery.isLoading || agsQuery.isLoading
+  const hasError = classesQuery.isError || agsQuery.isError
 
   useEffect(() => {
     if (hasError) setAlert({ severity: "error", message: "Error loading data" })
@@ -676,8 +637,7 @@ const AGAssignmentGroupsFeature = ({
 
   const retry = () => {
     queryClient.invalidateQueries({ queryKey: ["agClasses"] })
-    queryClient.invalidateQueries({ queryKey: ["agSubnetAGs"] })
-    queryClient.invalidateQueries({ queryKey: ["agIdNetAGs"] })
+    queryClient.invalidateQueries({ queryKey: ["agAssignmentGroups"] })
   }
 
   const deleteMutation = useMutation<void, AxiosError<ApiProblemDetails>, IAG[]>({

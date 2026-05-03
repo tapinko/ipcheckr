@@ -19,11 +19,9 @@ import {
   AssignmentGroupDifficulty,
   AssignmentGroupIpCat,
   AssignmentGroupType,
+  type AssignmentGroupDto,
   type ClassDto,
-  type IDNetAGDto,
-  type QueryIDNetAGsRes,
-  type QuerySubnetAGsRes,
-  type SubnetAGDto,
+  type QueryAssignmentGroupsRes,
 } from "../../dtos"
 import { useAuth } from "../../contexts/AuthContext"
 import CardsSkeleton from "../../components/CardsSkeleton"
@@ -38,7 +36,7 @@ import type { IAG } from "./AGAssignmentGroupsFeature"
 const formatDateTimeByLanguage = (value: string, language: string) =>
   new Date(value).toLocaleString(language.toLowerCase(), { dateStyle: "medium", timeStyle: "short" })
 
-const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
+const normalizeAssignmentGroup = (ag: AssignmentGroupDto): IAG => ({
   id: ag.assignmentGroupId,
   name: ag.name,
   description: ag.description,
@@ -51,29 +49,11 @@ const normalizeSubnet = (ag: SubnetAGDto): IAG => ({
   status: ag.status,
   difficulty: ag.difficulty ?? null,
   successRate: ag.successRate,
-  type: AssignmentGroupType.Subnet,
-  ipCat: ag.ipCat,
+  type: ag.type,
+  ipCat: ag.ipCat ?? undefined,
   hostSortStrategy: ag.hostSortStrategy ?? null,
-  isArchived: ag.isArchived
-})
-
-const normalizeIdNet = (ag: IDNetAGDto): IAG => ({
-  id: ag.assignmentGroupId,
-  name: ag.name,
-  description: ag.description,
-  classId: ag.classId,
-  className: ag.className,
-  submitted: ag.submitted,
-  total: ag.total,
-  startDate: ag.startDate,
-  deadline: ag.deadline,
-  status: ag.status,
-  difficulty: null,
-  successRate: ag.successRate,
-  type: AssignmentGroupType.Idnet,
-  ipCat: ag.ipCat,
-  testWildcard: ag.testWildcard,
-  testFirstLastBr: ag.testFirstLastBr,
+  testWildcard: ag.testWildcard ?? undefined,
+  testFirstLastBr: ag.testFirstLastBr ?? undefined,
   isArchived: ag.isArchived
 })
 
@@ -227,17 +207,17 @@ const AGArchiveAssignmentGroupsFeature = ({
       ? null
       : difficultyFilters.join(",")
 
-  const subnetAGsQuery = useQuery<QuerySubnetAGsRes, Error>({
-    queryKey: ["archiveSubnetAGs", queryUserId, classFilterNormalized, search, difficultyFilterQuery],
+  const agsQuery = useQuery<QueryAssignmentGroupsRes, Error>({
+    queryKey: ["archiveAssignmentGroups", queryUserId, classFilterNormalized, search, difficultyFilterQuery],
     enabled: !!userId,
     queryFn: () =>
       assignmentGroupApi
-        .assignmentGroupQuerySubnetAssignmentGroups(
+        .assignmentGroupQueryAssignmentGroups(
           search.trim() ? search.trim() : null,
           classFilterNormalized,
           queryUserId,
           null,
-          AssignmentGroupType.Subnet,
+          null,
           difficultyFilterQuery,
           true
         )
@@ -245,28 +225,7 @@ const AGArchiveAssignmentGroupsFeature = ({
     placeholderData: prev => prev
   })
 
-  const idNetAGsQuery = useQuery<QueryIDNetAGsRes, Error>({
-    queryKey: ["archiveIdNetAGs", queryUserId, classFilterNormalized, search],
-    enabled: !!userId,
-    queryFn: () =>
-      assignmentGroupApi
-        .assignmentGroupQueryIdNetAssignmentGroups(
-          search.trim() ? search.trim() : null,
-          classFilterNormalized,
-          queryUserId,
-          null,
-          AssignmentGroupType.Idnet,
-          null,
-          true
-        )
-        .then(r => r.data),
-    placeholderData: prev => prev
-  })
-
-  const allAGs: IAG[] = [
-    ...(subnetAGsQuery.data?.assignmentGroups ?? []).map(normalizeSubnet),
-    ...(idNetAGsQuery.data?.assignmentGroups ?? []).map(normalizeIdNet)
-  ]
+  const allAGs: IAG[] = (agsQuery.data?.assignmentGroups ?? []).map(normalizeAssignmentGroup)
 
   const filteredAGs = allAGs
     .filter(ag => typeFilters.includes(ag.type))
@@ -284,13 +243,12 @@ const AGArchiveAssignmentGroupsFeature = ({
   const totalPages = Math.max(1, Math.ceil(filteredAGs.length / ITEMS_PER_PAGE))
   const pagedAGs = filteredAGs.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
 
-  const isLoading = classesQuery.isLoading || subnetAGsQuery.isLoading || idNetAGsQuery.isLoading
-  const hasError = classesQuery.isError || subnetAGsQuery.isError || idNetAGsQuery.isError
+  const isLoading = classesQuery.isLoading || agsQuery.isLoading
+  const hasError = classesQuery.isError || agsQuery.isError
 
   const retry = () => {
     queryClient.invalidateQueries({ queryKey: ["archiveClasses"] })
-    queryClient.invalidateQueries({ queryKey: ["archiveSubnetAGs"] })
-    queryClient.invalidateQueries({ queryKey: ["archiveIdNetAGs"] })
+    queryClient.invalidateQueries({ queryKey: ["archiveAssignmentGroups"] })
   }
 
   return (
