@@ -70,6 +70,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false)
       return
     }
+
+    // Locally check token expiry before making an API call
+    const expiryMs = getTokenExpiryMs(token)
+    if (expiryMs !== null && expiryMs <= Date.now()) {
+      clearAuthState(true)
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
 
     if (isDemoMode) {

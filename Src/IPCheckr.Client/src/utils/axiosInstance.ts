@@ -70,4 +70,21 @@ axiosInstance.interceptors.request.use(config => {
   return config
 })
 
+axiosInstance.interceptors.response.use(
+  response => response,
+  (error: AxiosError) => {
+    if (!isDemoMode && error.response?.status === 401) {
+      const url = error.config?.url || ""
+      if (!url.includes("/auth/")) {
+        sessionStorage.removeItem("token")
+        sessionStorage.removeItem("role")
+        if (window.location.pathname !== "/login") {
+          window.location.replace("/login")
+        }
+      }
+    }
+    return Promise.reject(error)
+  },
+)
+
 export default axiosInstance

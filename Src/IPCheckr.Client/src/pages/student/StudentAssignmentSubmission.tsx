@@ -228,11 +228,6 @@ const StudentAssignmentSubmission = () => {
     }
   })
 
-  const onSubmit = async (data: AssignmentFormValues) => {
-    if (!assignmentIdNum || !assignmentType || attemptLocked || attemptSubmitted) return
-    await submitAssignmentMutation.mutateAsync(data).catch(() => {})
-  }
-
   const handleReset = () => {
     const target = rowCount > 0 ? rowCount : Math.max(fields.length, 1)
     replace(Array.from({ length: target }, () => newRow()))
@@ -264,6 +259,12 @@ const StudentAssignmentSubmission = () => {
   const attemptSubmitted = attemptData?.status === "SUBMITTED"
   const assignmentAttemptId = attemptData?.assignmentAttemptId ?? null
   const assignmentAttemptLockToken = attemptData?.lockToken ?? null
+
+  // onSubmit is placed after attemptLocked/attemptSubmitted to avoid TDZ errors
+  const onSubmit = useCallback(async (data: AssignmentFormValues) => {
+    if (!assignmentIdNum || !assignmentType || attemptLocked || attemptSubmitted) return
+    await submitAssignmentMutation.mutateAsync(data).catch(() => {})
+  }, [assignmentIdNum, assignmentType, attemptLocked, attemptSubmitted, submitAssignmentMutation])
 
   const hasServerDraftRows = useMemo(() => {
     if (assignmentType === AssignmentGroupTypeValues.Subnet) {
@@ -609,12 +610,19 @@ const StudentAssignmentSubmission = () => {
     }
 
     const triggerAtMs = deadlineMs - 1000
-    const delayMs = triggerAtMs - Date.now()
+    const delayMs = triggerAtMs - nowMs
 
     if (delayMs <= 0) {
       submitNow()
       return
     }
+
+    // Guard: setTimeout internally converts delay to a signed 32-bit integer.
+    // Values above 2^31-1 (~24.8 days) overflow and fire immediately.
+    // Skip setting the timer for now — nowMs updates every second, so this
+    // effect will re-run and set the timer once the deadline is close enough.
+    const MAX_SAFE_TIMEOUT_MS = 2_147_483_647 // 2^31 - 1
+    if (delayMs > MAX_SAFE_TIMEOUT_MS) return
 
     const timerId = window.setTimeout(submitNow, delayMs)
 
@@ -628,7 +636,8 @@ const StudentAssignmentSubmission = () => {
     attemptSubmitted,
     submitting,
     getValues,
-    onSubmit
+    onSubmit,
+    nowMs
   ])
 
   const isDeterminingType = !assignmentType && (subnetSubmissionQuery.isLoading || idNetSubmissionQuery.isLoading)
