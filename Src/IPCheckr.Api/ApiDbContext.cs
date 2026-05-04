@@ -25,6 +25,7 @@ namespace IPCheckr.Api
         public DbSet<AssignmentSubmissionAttempt> AssignmentSubmissionAttempts { get; set; }
         public DbSet<AppSettings> AppSettings { get; set; }
         public DbSet<Gns3Session> Gns3Sessions { get; set; }
+        public DbSet<AGTemplate> AGTemplates { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -212,6 +213,41 @@ namespace IPCheckr.Api
                 entity.HasOne(s => s.User)
                       .WithMany()
                       .HasForeignKey(s => s.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<AGTemplate>(entity =>
+            {
+                entity.ToTable("AGTemplates");
+                entity.HasKey(t => t.Id);
+
+                entity.Property(t => t.Name)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                entity.Property(t => t.AGName)
+                      .HasMaxLength(100);
+
+                entity.Property(t => t.AGDescription)
+                      .HasMaxLength(500);
+
+                entity.Property(t => t.Type)
+                      .HasConversion<string>()
+                      .IsRequired();
+
+                entity.Property(t => t.IpCat)
+                      .HasConversion<string>()
+                      .IsRequired();
+
+                entity.Property(t => t.Difficulty)
+                      .HasConversion<string>();
+
+                entity.Property(t => t.HostSortStrategy)
+                      .HasConversion<string>();
+
+                entity.HasOne(t => t.Owner)
+                      .WithMany()
+                      .HasForeignKey(t => t.OwnerId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
         }
