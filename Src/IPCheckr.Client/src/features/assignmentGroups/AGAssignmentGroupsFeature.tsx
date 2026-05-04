@@ -754,7 +754,6 @@ const AGAssignmentGroupsFeature = ({
           onTemplatesClick={() => onNavigateTemplates()}
           onArchiveClick={() => onNavigateArchive()}
           createDisabled={!classesQuery.data?.length}
-          templatesDisabled
         />
       </Box>
 

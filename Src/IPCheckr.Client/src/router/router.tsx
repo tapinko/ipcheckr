@@ -13,6 +13,9 @@ import AdminEditAssignmentGroup from "../pages/admin/AdminEditAssignmentGroup"
 import AdminAssignmentGroupDetails from "../pages/admin/AdminAssignmentGroupDetails"
 import AdminAssignmentGroupDetailsSubmit from "../pages/admin/AdminAssignmentGroupDetailsSubmit"
 import AdminArchiveAssignmentGroups from "../pages/admin/AdminArchiveAssignmentGroups"
+import AdminAGTemplates from "../pages/admin/AdminAGTemplates"
+import AdminCreateAGTemplate from "../pages/admin/AdminCreateAGTemplate"
+import AdminEditAGTemplate from "../pages/admin/AdminEditAGTemplate"
 
 import TeacherLayout from "../layouts/TeacherLayout"
 import TeacherDashboard from "../pages/teacher/TeacherDashboard"
@@ -25,6 +28,9 @@ import TeacherEditAssignmentGroup from "../pages/teacher/TeacherEditAssignmentGr
 import TeacherAssignmentGroupDetails from "../pages/teacher/TeacherAssignmentGroupDetails"
 import TeacherAssignmentGroupDetailsSubmit from "../pages/teacher/TeacherAssignmentGroupDetailsSubmit"
 import TeacherArchiveAssignmentGroups from "../pages/teacher/TeacherArchiveAssignmentGroups"
+import TeacherAGTemplates from "../pages/teacher/TeacherAGTemplates"
+import TeacherCreateAGTemplate from "../pages/teacher/TeacherCreateAGTemplate"
+import TeacherEditAGTemplate from "../pages/teacher/TeacherEditAGTemplate"
 import TeacherGns3 from "../pages/teacher/TeacherGns3"
 import TeacherGns3AllSessions from "../pages/teacher/TeacherGns3AllSessions"
 
@@ -65,6 +71,9 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS]: <AdminAssignmentGroupDetails />,
   [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <AdminAssignmentGroupDetailsSubmit />,
   [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE]: <AdminArchiveAssignmentGroups />,
+  [RouteKeys.ADMIN_AG_TEMPLATES]: <AdminAGTemplates />,
+  [RouteKeys.ADMIN_AG_TEMPLATE_CREATE]: <AdminCreateAGTemplate />,
+  [RouteKeys.ADMIN_AG_TEMPLATE_EDIT]: <AdminEditAGTemplate />,
 
   [RouteKeys.TEACHER]: <Navigate to={Routes[RouteKeys.TEACHER_DASHBOARD]} />,
   [RouteKeys.TEACHER_DASHBOARD]: <TeacherDashboard />,
@@ -77,6 +86,9 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS]: <TeacherAssignmentGroupDetails />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <TeacherAssignmentGroupDetailsSubmit />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE]: <TeacherArchiveAssignmentGroups />,
+  [RouteKeys.TEACHER_AG_TEMPLATES]: <TeacherAGTemplates />,
+  [RouteKeys.TEACHER_AG_TEMPLATE_CREATE]: <TeacherCreateAGTemplate />,
+  [RouteKeys.TEACHER_AG_TEMPLATE_EDIT]: <TeacherEditAGTemplate />,
   [RouteKeys.TEACHER_GNS3]: <TeacherGns3 />,
   [RouteKeys.TEACHER_GNS3_ALL_SESSIONS]: <TeacherGns3AllSessions />,
 
@@ -137,6 +149,9 @@ const useAuthRouter = () => {
           RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS,
           RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
           RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE,
+          RouteKeys.ADMIN_AG_TEMPLATES,
+          RouteKeys.ADMIN_AG_TEMPLATE_CREATE,
+          RouteKeys.ADMIN_AG_TEMPLATE_EDIT,
         ].map(key => ({
           path: childPath(Routes[key], Routes[RouteKeys.ADMIN]),
           element: routeElements[key]!,
@@ -159,6 +174,9 @@ const useAuthRouter = () => {
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE,
+          RouteKeys.TEACHER_AG_TEMPLATES,
+          RouteKeys.TEACHER_AG_TEMPLATE_CREATE,
+          RouteKeys.TEACHER_AG_TEMPLATE_EDIT,
           RouteKeys.TEACHER_GNS3,
           RouteKeys.TEACHER_GNS3_ALL_SESSIONS,
         ].map(key => ({

@@ -168,6 +168,93 @@ export type AGSubmitDetailsBaseDtoAssignmentAttemptStatus = AssignmentSubmission
 /**
  * 
  * @export
+ * @interface AGTemplateDto
+ */
+export interface AGTemplateDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof AGTemplateDto
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGTemplateDto
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGTemplateDto
+     */
+    'agName'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGTemplateDto
+     */
+    'agDescription'?: string | null;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof AGTemplateDto
+     */
+    'type'?: AssignmentGroupType;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof AGTemplateDto
+     */
+    'ipCat'?: AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {number}
+     * @memberof AGTemplateDto
+     */
+    'numberOfRecords'?: number;
+    /**
+     * 
+     * @type {CreateAGTemplateReqDifficulty}
+     * @memberof AGTemplateDto
+     */
+    'difficulty'?: CreateAGTemplateReqDifficulty | null;
+    /**
+     * 
+     * @type {CreateAGTemplateReqHostSortStrategy}
+     * @memberof AGTemplateDto
+     */
+    'hostSortStrategy'?: CreateAGTemplateReqHostSortStrategy | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof AGTemplateDto
+     */
+    'possibleOctets'?: number | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AGTemplateDto
+     */
+    'testWildcard'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AGTemplateDto
+     */
+    'testFirstLastBr'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof AGTemplateDto
+     */
+    'createdAt'?: string;
+}
+
+
+/**
+ * 
+ * @export
  * @interface AddStudentToClassReq
  */
 export interface AddStudentToClassReq {
@@ -957,6 +1044,106 @@ export interface CreateAGBaseRes {
 /**
  * 
  * @export
+ * @interface CreateAGTemplateReq
+ */
+export interface CreateAGTemplateReq {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAGTemplateReq
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAGTemplateReq
+     */
+    'agName'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAGTemplateReq
+     */
+    'agDescription'?: string | null;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof CreateAGTemplateReq
+     */
+    'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof CreateAGTemplateReq
+     */
+    'ipCat': AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAGTemplateReq
+     */
+    'numberOfRecords': number;
+    /**
+     * 
+     * @type {CreateAGTemplateReqDifficulty}
+     * @memberof CreateAGTemplateReq
+     */
+    'difficulty'?: CreateAGTemplateReqDifficulty | null;
+    /**
+     * 
+     * @type {CreateAGTemplateReqHostSortStrategy}
+     * @memberof CreateAGTemplateReq
+     */
+    'hostSortStrategy'?: CreateAGTemplateReqHostSortStrategy | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAGTemplateReq
+     */
+    'possibleOctets'?: number | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateAGTemplateReq
+     */
+    'testWildcard'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateAGTemplateReq
+     */
+    'testFirstLastBr'?: boolean;
+}
+
+
+/**
+ * @type CreateAGTemplateReqDifficulty
+ * @export
+ */
+export type CreateAGTemplateReqDifficulty = AssignmentGroupDifficulty;
+
+/**
+ * @type CreateAGTemplateReqHostSortStrategy
+ * @export
+ */
+export type CreateAGTemplateReqHostSortStrategy = AssignmentGroupHostSortStrategy;
+
+/**
+ * 
+ * @export
+ * @interface CreateAGTemplateRes
+ */
+export interface CreateAGTemplateRes {
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAGTemplateRes
+     */
+    'templateId'?: number;
+}
+/**
+ * 
+ * @export
  * @interface CreateAssignmentSubmissionAttemptReq
  */
 export interface CreateAssignmentSubmissionAttemptReq {
@@ -1352,6 +1539,19 @@ export interface DashboardResBase {
 /**
  * 
  * @export
+ * @interface DeleteAGTemplatesReq
+ */
+export interface DeleteAGTemplatesReq {
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof DeleteAGTemplatesReq
+     */
+    'templateIds': Array<number>;
+}
+/**
+ * 
+ * @export
  * @interface DeleteAgsBaseReq
  */
 export interface DeleteAgsBaseReq {
@@ -1457,6 +1657,81 @@ export interface EditAGBaseReq {
      */
     'deadline'?: string | null;
 }
+/**
+ * 
+ * @export
+ * @interface EditAGTemplateReq
+ */
+export interface EditAGTemplateReq {
+    /**
+     * 
+     * @type {string}
+     * @memberof EditAGTemplateReq
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditAGTemplateReq
+     */
+    'agName'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EditAGTemplateReq
+     */
+    'agDescription'?: string | null;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof EditAGTemplateReq
+     */
+    'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {AssignmentGroupIpCat}
+     * @memberof EditAGTemplateReq
+     */
+    'ipCat': AssignmentGroupIpCat;
+    /**
+     * 
+     * @type {number}
+     * @memberof EditAGTemplateReq
+     */
+    'numberOfRecords': number;
+    /**
+     * 
+     * @type {CreateAGTemplateReqDifficulty}
+     * @memberof EditAGTemplateReq
+     */
+    'difficulty'?: CreateAGTemplateReqDifficulty | null;
+    /**
+     * 
+     * @type {CreateAGTemplateReqHostSortStrategy}
+     * @memberof EditAGTemplateReq
+     */
+    'hostSortStrategy'?: CreateAGTemplateReqHostSortStrategy | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof EditAGTemplateReq
+     */
+    'possibleOctets'?: number | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof EditAGTemplateReq
+     */
+    'testWildcard'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof EditAGTemplateReq
+     */
+    'testFirstLastBr'?: boolean;
+}
+
+
 /**
  * 
  * @export
@@ -2242,6 +2517,19 @@ export interface ProblemDetails {
      * @memberof ProblemDetails
      */
     'instance'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface QueryAGTemplatesRes
+ */
+export interface QueryAGTemplatesRes {
+    /**
+     * 
+     * @type {Array<AGTemplateDto>}
+     * @memberof QueryAGTemplatesRes
+     */
+    'templates'?: Array<AGTemplateDto>;
 }
 /**
  * 
@@ -4502,6 +4790,323 @@ export interface ValidateTokenRes {
      */
     'username': string;
 }
+
+/**
+ * AGTemplateApi - axios parameter creator
+ * @export
+ */
+export const AGTemplateApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {CreateAGTemplateReq} createAGTemplateReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        aGTemplateCreateAGTemplate: async (createAGTemplateReq: CreateAGTemplateReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createAGTemplateReq' is not null or undefined
+            assertParamExists('aGTemplateCreateAGTemplate', 'createAGTemplateReq', createAGTemplateReq)
+            const localVarPath = `/api/ag-template/create`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createAGTemplateReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {DeleteAGTemplatesReq} deleteAGTemplatesReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        aGTemplateDeleteAGTemplates: async (deleteAGTemplatesReq: DeleteAGTemplatesReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deleteAGTemplatesReq' is not null or undefined
+            assertParamExists('aGTemplateDeleteAGTemplates', 'deleteAGTemplatesReq', deleteAGTemplatesReq)
+            const localVarPath = `/api/ag-template/delete`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deleteAGTemplatesReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {EditAGTemplateReq} editAGTemplateReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        aGTemplateEditAGTemplate: async (id: number, editAGTemplateReq: EditAGTemplateReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('aGTemplateEditAGTemplate', 'id', id)
+            // verify required parameter 'editAGTemplateReq' is not null or undefined
+            assertParamExists('aGTemplateEditAGTemplate', 'editAGTemplateReq', editAGTemplateReq)
+            const localVarPath = `/api/ag-template/edit/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(editAGTemplateReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        aGTemplateQueryAGTemplates: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ag-template/query`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AGTemplateApi - functional programming interface
+ * @export
+ */
+export const AGTemplateApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AGTemplateApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {CreateAGTemplateReq} createAGTemplateReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async aGTemplateCreateAGTemplate(createAGTemplateReq: CreateAGTemplateReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateAGTemplateRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.aGTemplateCreateAGTemplate(createAGTemplateReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AGTemplateApi.aGTemplateCreateAGTemplate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {DeleteAGTemplatesReq} deleteAGTemplatesReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async aGTemplateDeleteAGTemplates(deleteAGTemplatesReq: DeleteAGTemplatesReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.aGTemplateDeleteAGTemplates(deleteAGTemplatesReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AGTemplateApi.aGTemplateDeleteAGTemplates']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {EditAGTemplateReq} editAGTemplateReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async aGTemplateEditAGTemplate(id: number, editAGTemplateReq: EditAGTemplateReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.aGTemplateEditAGTemplate(id, editAGTemplateReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AGTemplateApi.aGTemplateEditAGTemplate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async aGTemplateQueryAGTemplates(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryAGTemplatesRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.aGTemplateQueryAGTemplates(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AGTemplateApi.aGTemplateQueryAGTemplates']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * AGTemplateApi - factory interface
+ * @export
+ */
+export const AGTemplateApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AGTemplateApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {CreateAGTemplateReq} createAGTemplateReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        aGTemplateCreateAGTemplate(createAGTemplateReq: CreateAGTemplateReq, options?: RawAxiosRequestConfig): AxiosPromise<CreateAGTemplateRes> {
+            return localVarFp.aGTemplateCreateAGTemplate(createAGTemplateReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {DeleteAGTemplatesReq} deleteAGTemplatesReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        aGTemplateDeleteAGTemplates(deleteAGTemplatesReq: DeleteAGTemplatesReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.aGTemplateDeleteAGTemplates(deleteAGTemplatesReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {EditAGTemplateReq} editAGTemplateReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        aGTemplateEditAGTemplate(id: number, editAGTemplateReq: EditAGTemplateReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.aGTemplateEditAGTemplate(id, editAGTemplateReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        aGTemplateQueryAGTemplates(options?: RawAxiosRequestConfig): AxiosPromise<QueryAGTemplatesRes> {
+            return localVarFp.aGTemplateQueryAGTemplates(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AGTemplateApi - object-oriented interface
+ * @export
+ * @class AGTemplateApi
+ * @extends {BaseAPI}
+ */
+export class AGTemplateApi extends BaseAPI {
+    /**
+     * 
+     * @param {CreateAGTemplateReq} createAGTemplateReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AGTemplateApi
+     */
+    public aGTemplateCreateAGTemplate(createAGTemplateReq: CreateAGTemplateReq, options?: RawAxiosRequestConfig) {
+        return AGTemplateApiFp(this.configuration).aGTemplateCreateAGTemplate(createAGTemplateReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {DeleteAGTemplatesReq} deleteAGTemplatesReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AGTemplateApi
+     */
+    public aGTemplateDeleteAGTemplates(deleteAGTemplatesReq: DeleteAGTemplatesReq, options?: RawAxiosRequestConfig) {
+        return AGTemplateApiFp(this.configuration).aGTemplateDeleteAGTemplates(deleteAGTemplatesReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} id 
+     * @param {EditAGTemplateReq} editAGTemplateReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AGTemplateApi
+     */
+    public aGTemplateEditAGTemplate(id: number, editAGTemplateReq: EditAGTemplateReq, options?: RawAxiosRequestConfig) {
+        return AGTemplateApiFp(this.configuration).aGTemplateEditAGTemplate(id, editAGTemplateReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AGTemplateApi
+     */
+    public aGTemplateQueryAGTemplates(options?: RawAxiosRequestConfig) {
+        return AGTemplateApiFp(this.configuration).aGTemplateQueryAGTemplates(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
 
 /**
  * AppSettingsApi - axios parameter creator

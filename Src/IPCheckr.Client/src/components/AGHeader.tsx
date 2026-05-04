@@ -154,14 +154,14 @@ const AGHeader = ({
                   <span>
                     <IconButton
                       onClick={onTemplatesClick}
-                      disabled={templatesDisabled ?? true}
+                      disabled={templatesDisabled ?? !onTemplatesClick}
                       aria-label={t(TranslationKey.AG_HEADER_TEMPLATES_TOOLTIP)}
                       sx={{
                         border: theme => `1px solid ${theme.palette.info.main}`,
                         width: 56,
                         height: 56,
-                        backgroundColor: theme => theme.palette.info.light,
                         "& .MuiSvgIcon-root": { fontSize: 28 },
+                        color: theme => theme.palette.info.dark,
                         "&.Mui-disabled": {
                           color: theme => theme.palette.info.dark,
                           borderColor: theme => theme.palette.info.main,

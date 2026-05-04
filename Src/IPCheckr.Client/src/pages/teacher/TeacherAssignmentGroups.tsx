@@ -11,7 +11,7 @@ const TeacherAssignmentGroups = () => {
         const path = Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_CREATE]
         navigate(classId ? `${path}?classId=${classId}` : path)
       }}
-      onNavigateTemplates={() => navigate("/teacher/assignment-groups/templates")}
+      onNavigateTemplates={() => navigate(Routes[RouteKeys.TEACHER_AG_TEMPLATES])}
       onNavigateDetails={(id, type) => navigate(getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS, {
         [RouteParams.ASSIGNMENT_GROUP_ID]: id.toString(),
         [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(type)

@@ -90,6 +90,24 @@ const routes: BreadcrumbsRoute[] = [
         {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_ASSIGNMENT_GROUPS_ARCHIVE)}
       </Typography>
   },
+  {
+    path: Routes[RouteKeys.ADMIN_AG_TEMPLATES],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_AG_TEMPLATES)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.ADMIN_AG_TEMPLATE_CREATE],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_AG_TEMPLATE_CREATE)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.ADMIN_AG_TEMPLATE_EDIT],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_AG_TEMPLATE_EDIT)}
+      </Typography>
+  },
 
   {
     path: Routes[RouteKeys.TEACHER_MY_CLASSES],
@@ -143,6 +161,24 @@ const routes: BreadcrumbsRoute[] = [
     path: Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE],
     breadcrumb: () => <Typography variant="body2" component="span">
         {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUPS_ARCHIVE)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.TEACHER_AG_TEMPLATES],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_AG_TEMPLATES)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.TEACHER_AG_TEMPLATE_CREATE],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_AG_TEMPLATE_CREATE)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.TEACHER_AG_TEMPLATE_EDIT],
+    breadcrumb: () => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_AG_TEMPLATE_EDIT)}
       </Typography>
   },
   {

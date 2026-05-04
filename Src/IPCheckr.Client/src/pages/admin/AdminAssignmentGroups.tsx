@@ -12,7 +12,7 @@ const AdminAssignmentGroups = () => {
         const path = Routes[RouteKeys.ADMIN_ASSIGNMENT_GROUPS_CREATE]
         navigate(classId ? `${path}?classId=${classId}` : path)
       }}
-      onNavigateTemplates={() => navigate("/admin/assignment-groups/templates")}
+      onNavigateTemplates={() => navigate(Routes[RouteKeys.ADMIN_AG_TEMPLATES])}
       onNavigateDetails={(id, type) => navigate(getParametrizedUrl(RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS, {
         [RouteParams.ASSIGNMENT_GROUP_ID]: id.toString(),
         [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(type)
