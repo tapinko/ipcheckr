@@ -29,7 +29,7 @@ import {
 } from "@mui/material"
 import { alpha } from "@mui/material/styles"
 import { TranslationKey } from "../../utils/i18n"
-import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import { getParametrizedUrl, RouteKeys, RouteParams, Routes } from "../../router/routes"
 import { useAuth } from "../../contexts/AuthContext"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import ErrorLoading from "../../components/ErrorLoading"
@@ -405,6 +405,8 @@ const StudentAssignments = () => {
 					onTypeChange={setTypeFilter}
 					ipCatValue={ipCatFilter}
 					onIpCatChange={setIpCatFilter}
+					hideTemplates
+					onArchiveClick={() => navigate(Routes[RouteKeys.STUDENT_ASSIGNMENT_GROUPS_ARCHIVE])}
 				/>
 
 				<Box

@@ -2,6 +2,7 @@ using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.Common.Enums;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IPCheckr.Api.Common.Utils;
@@ -12,6 +13,7 @@ namespace IPCheckr.Api.Controllers
     public partial class AssignmentGroupController : ControllerBase
     {
         [HttpGet("get-assignment-groups")]
+        [Authorize(Policy = Roles.Student)]
         [ProducesResponseType(typeof(QueryAssignmentGroupsRes), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<QueryAssignmentGroupsRes>> QueryAssignmentGroups([FromQuery] QueryAssignmentGroupsReq req)
@@ -77,6 +79,7 @@ namespace IPCheckr.Api.Controllers
 
             var callerId = int.Parse(User.Claims.First(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value);
             var isAdmin = User.IsInRole(Roles.Admin);
+            var isStudent = User.IsInRole(Roles.Student);
 
             var subnetQuery = _db.SubnetAGs
                 .Include(ag => ag.Class)
@@ -88,7 +91,24 @@ namespace IPCheckr.Api.Controllers
                 .ThenInclude(c => c.Teachers)
                 .AsQueryable();
 
-            if (!isAdmin)
+            if (!isAdmin && isStudent)
+            {
+                var allowedSubnetAgIds = (await _db.SubnetAssignments
+                    .Where(a => a.Student.Id == callerId)
+                    .Select(a => a.AssignmentGroup.Id)
+                    .Distinct()
+                    .ToListAsync()).ToHashSet();
+
+                var allowedIdnetAgIds = (await _db.IDNetAssignments
+                    .Where(a => a.Student.Id == callerId)
+                    .Select(a => a.AssignmentGroup.Id)
+                    .Distinct()
+                    .ToListAsync()).ToHashSet();
+
+                subnetQuery = subnetQuery.Where(ag => allowedSubnetAgIds.Contains(ag.Id));
+                idnetQuery = idnetQuery.Where(ag => allowedIdnetAgIds.Contains(ag.Id));
+            }
+            else if (!isAdmin)
             {
                 var allowedClassIds = (await _db.Classes
                     .Include(c => c.Teachers)

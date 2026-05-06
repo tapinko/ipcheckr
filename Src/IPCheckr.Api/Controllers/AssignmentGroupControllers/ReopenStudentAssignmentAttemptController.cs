@@ -2,6 +2,7 @@ using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.Common.Enums;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ namespace IPCheckr.Api.Controllers
     public partial class AssignmentGroupController : ControllerBase
     {
         [HttpPost("reopen-student-assignment-attempt")]
+        [Authorize(Policy = Roles.Teacher)]
         [ProducesResponseType(typeof(ReopenStudentAssignmentAttemptRes), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status404NotFound)]

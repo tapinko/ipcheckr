@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace IPCheckr.Api.Controllers
 {
     [ApiController]
-    [Authorize(Policy = Roles.Teacher)]
     [Route("api/assignment-group")]
     public partial class AssignmentGroupController : ControllerBase
     {

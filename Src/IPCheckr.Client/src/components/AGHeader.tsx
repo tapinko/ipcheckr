@@ -53,6 +53,7 @@ interface AGHeaderProps {
   templatesDisabled?: boolean
   hideArchive?: boolean
   hideTemplates?: boolean
+  hideClassFilter?: boolean
 }
 
 const getDifficultyLabel = (difficulty: AssignmentGroupDifficulty, t: TFunction) => {
@@ -84,7 +85,8 @@ const AGHeader = ({
   createDisabled,
   templatesDisabled,
   hideArchive,
-  hideTemplates
+  hideTemplates,
+  hideClassFilter
 }: AGHeaderProps) => {
   const selectedTypeValues = typeValues ?? []
   const selectedIpCatValues = ipCatValues ?? []
@@ -208,9 +210,9 @@ const AGHeader = ({
             </Stack>
           </Stack>
 
-          <Divider sx={{ my: 1.75 }} />
+          {!hideClassFilter && <Divider sx={{ my: 1.75 }} />}
 
-          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center">
+          {!hideClassFilter && <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center">
             <Button
               variant={(classValue ?? "ALL") === "ALL" ? "contained" : "outlined"}
               onClick={() => onClassChange("ALL")}
@@ -259,7 +261,7 @@ const AGHeader = ({
                 ? t(TranslationKey.AG_HEADER_HIDE_FILTERS)
                 : t(TranslationKey.AG_HEADER_SHOW_FILTERS)}
             </Button>
-          </Stack>
+          </Stack>}
         </CardContent>
       </Card>
 

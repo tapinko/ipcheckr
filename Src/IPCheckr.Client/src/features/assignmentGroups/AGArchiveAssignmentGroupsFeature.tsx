@@ -59,7 +59,7 @@ const normalizeAssignmentGroup = (ag: AssignmentGroupDto): IAG => ({
 
 interface AGArchiveCardProps {
   ag: IAG
-  onCardClick: (ag: IAG) => void
+  onCardClick?: (ag: IAG) => void
 }
 
 const AGArchiveCard = ({ ag, onCardClick }: AGArchiveCardProps) => {
@@ -77,11 +77,13 @@ const AGArchiveCard = ({ ag, onCardClick }: AGArchiveCardProps) => {
           display: "flex",
           flexDirection: "column",
           gap: 0.5,
-          cursor: "pointer",
-          "&:hover": { opacity: 0.9 },
-          "&:hover .ag-title-text": { textDecoration: "underline" }
+          ...(onCardClick && {
+            cursor: "pointer",
+            "&:hover": { opacity: 0.9 },
+            "&:hover .ag-title-text": { textDecoration: "underline" }
+          })
         }}
-        onClick={() => onCardClick(ag)}
+        onClick={onCardClick ? () => onCardClick(ag) : undefined}
       >
         <CardHeader
           sx={{ py: 1.5, px: 2, "& .MuiCardHeader-title": { mb: 0.25 }, "& .MuiCardHeader-subheader": { mt: 0.25 } }}
@@ -162,15 +164,17 @@ const AGArchiveCard = ({ ag, onCardClick }: AGArchiveCardProps) => {
 }
 
 interface AGArchiveAssignmentGroupsFeatureProps {
-  onNavigateDetails: (id: number, type: AssignmentGroupType) => void
+  onNavigateDetails?: (id: number, type: AssignmentGroupType) => void
   teacherFilter?: number | null
+  hideClassFilter?: boolean
 }
 
 const ITEMS_PER_PAGE = 12
 
 const AGArchiveAssignmentGroupsFeature = ({
   onNavigateDetails,
-  teacherFilter
+  teacherFilter,
+  hideClassFilter
 }: AGArchiveAssignmentGroupsFeatureProps) => {
   const { t } = useTranslation()
   const { userId } = useAuth()
@@ -197,7 +201,7 @@ const AGArchiveAssignmentGroupsFeature = ({
 
   const classesQuery = useQuery<ClassDto[], Error>({
     queryKey: ["archiveClasses", queryUserId],
-    enabled: !!userId,
+    enabled: !!userId && !hideClassFilter,
     queryFn: () => classApi.classQueryClasses(null, null, queryUserId).then(r => r.data.classes)
   })
 
@@ -243,8 +247,8 @@ const AGArchiveAssignmentGroupsFeature = ({
   const totalPages = Math.max(1, Math.ceil(filteredAGs.length / ITEMS_PER_PAGE))
   const pagedAGs = filteredAGs.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
 
-  const isLoading = classesQuery.isLoading || agsQuery.isLoading
-  const hasError = classesQuery.isError || agsQuery.isError
+  const isLoading = (!hideClassFilter && classesQuery.isLoading) || agsQuery.isLoading
+  const hasError = (!hideClassFilter && classesQuery.isError) || agsQuery.isError
 
   const retry = () => {
     queryClient.invalidateQueries({ queryKey: ["archiveClasses"] })
@@ -277,6 +281,7 @@ const AGArchiveAssignmentGroupsFeature = ({
         }}
         hideArchive
         hideTemplates
+        hideClassFilter={hideClassFilter}
       />
 
       {isLoading ? (
@@ -319,7 +324,7 @@ const AGArchiveAssignmentGroupsFeature = ({
                 <AGArchiveCard
                   key={`${ag.type}-${ag.id}`}
                   ag={ag}
-                  onCardClick={ag => onNavigateDetails(ag.id, ag.type)}
+                  onCardClick={onNavigateDetails ? ag => onNavigateDetails(ag.id, ag.type) : undefined}
                 />
               ))}
             </Box>

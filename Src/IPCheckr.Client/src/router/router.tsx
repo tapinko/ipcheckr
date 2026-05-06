@@ -39,6 +39,7 @@ import StudentDashboard from "../pages/student/StudentDashboard"
 import StudentAssignments from "../pages/student/StudentAssignments"
 import StudentAssignmentSubmission from "../pages/student/StudentAssignmentSubmission"
 import StudentAssignmentDetails from "../pages/student/StudentAssignmentDetails"
+import StudentArchiveAssignmentGroups from "../pages/student/StudentArchiveAssignmentGroups"
 import StudentGns3 from "../pages/student/StudentGns3"
 
 import Unauthorized401 from "../pages/errors/Unauthorized401"
@@ -97,6 +98,7 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.STUDENT_ASSIGNMENTS]: <StudentAssignments />,
   [RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION]: <StudentAssignmentSubmission />,
   [RouteKeys.STUDENT_ASSIGNMENT_DETAILS]: <StudentAssignmentDetails />,
+  [RouteKeys.STUDENT_ASSIGNMENT_GROUPS_ARCHIVE]: <StudentArchiveAssignmentGroups />,
   [RouteKeys.STUDENT_GNS3]: <StudentGns3 />,
 }
 
@@ -195,6 +197,7 @@ const useAuthRouter = () => {
           RouteKeys.STUDENT_ASSIGNMENTS,
           RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION,
           RouteKeys.STUDENT_ASSIGNMENT_DETAILS,
+          RouteKeys.STUDENT_ASSIGNMENT_GROUPS_ARCHIVE,
           RouteKeys.STUDENT_GNS3,
         ].map(key => ({
           path: childPath(Routes[key], Routes[RouteKeys.STUDENT]),

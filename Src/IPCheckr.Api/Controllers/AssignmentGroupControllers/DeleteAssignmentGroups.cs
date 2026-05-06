@@ -2,6 +2,7 @@ using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ namespace IPCheckr.Api.Controllers
     public partial class AssignmentGroupController : ControllerBase
     {
         [HttpDelete("delete-subnet-assignment-groups")]
+        [Authorize(Policy = Roles.Teacher)]
         [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status400BadRequest)]
@@ -72,6 +74,7 @@ namespace IPCheckr.Api.Controllers
         }
 
         [HttpDelete("delete-idnet-assignment-groups")]
+        [Authorize(Policy = Roles.Teacher)]
         [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status400BadRequest)]
