@@ -74,6 +74,7 @@ export const createIdnetAssignmentGroupHandler: DemoEndpointHandler = async ({ c
     expectedRows: studentAssignments[0]?.rows ?? [],
     testWildcard: !!body?.testWildcard,
     testFirstLastBr: !!body?.testFirstLastBr,
+    isArchived: false,
     createdByUserId: 101,
     studentAssignments,
   }

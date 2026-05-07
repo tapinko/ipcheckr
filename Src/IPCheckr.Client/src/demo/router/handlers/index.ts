@@ -1,3 +1,7 @@
+import { queryAGTemplatesHandler } from "./agTemplate.queryTemplates"
+import { createAGTemplateHandler } from "./agTemplate.createTemplate"
+import { editAGTemplateHandler } from "./agTemplate.editTemplate"
+import { deleteAGTemplatesHandler } from "./agTemplate.deleteTemplates"
 import { getIdnetAssignmentsHandler } from "./assignment.getIdnetAssignments"
 import { getIdnetDataForSubmitHandler } from "./assignment.getIdnetDataForSubmit"
 import { getIdnetSubmitDetailsFullHandler } from "./assignment.getIdnetSubmitDetailsFull"
@@ -6,6 +10,7 @@ import { getSubnetDataForSubmitHandler } from "./assignment.getSubnetDataForSubm
 import { getSubnetSubmitDetailsFullHandler } from "./assignment.getSubnetSubmitDetailsFull"
 import { submitIdnetAssignmentHandler } from "./assignment.submitIdnet"
 import { submitSubnetAssignmentHandler } from "./assignment.submitSubnet"
+import { getAssignmentGroupsHandler } from "./assignmentGroup.getAssignmentGroups"
 import { createIdnetAssignmentGroupHandler } from "./assignmentGroup.createIdnet"
 import { createSubnetAssignmentGroupHandler } from "./assignmentGroup.createSubnet"
 import { deleteIdnetAssignmentGroupsHandler } from "./assignmentGroup.deleteIdnet"
@@ -45,6 +50,7 @@ export const demoEndpointHandlers: DemoEndpointHandler[] = [
   editClassHandler,
   deleteClassesHandler,
   getClassDetailsHandler,
+  getAssignmentGroupsHandler,
   getIdnetAssignmentGroupsHandler,
   getSubnetAssignmentGroupsHandler,
   getIdnetAssignmentGroupDetailsHandler,
@@ -63,4 +69,8 @@ export const demoEndpointHandlers: DemoEndpointHandler[] = [
   getSubnetDataForSubmitHandler,
   submitIdnetAssignmentHandler,
   submitSubnetAssignmentHandler,
+  queryAGTemplatesHandler,
+  createAGTemplateHandler,
+  editAGTemplateHandler,
+  deleteAGTemplatesHandler,
 ]

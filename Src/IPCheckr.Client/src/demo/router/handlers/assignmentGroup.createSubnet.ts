@@ -94,6 +94,7 @@ export const createSubnetAssignmentGroupHandler: DemoEndpointHandler = async ({ 
     })),
     testWildcard: false,
     testFirstLastBr: false,
+    isArchived: false,
     createdByUserId: 101,
     studentAssignments,
   }
