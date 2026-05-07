@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   Accordion,
   AccordionDetails,
@@ -67,6 +67,7 @@ const AGCreateAssignmentGroupFeature = ({ onAfterCreate, teacherFilter }: AGCrea
   const { t, i18n } = useTranslation()
   const { userId } = useAuth()
   const queryUserId = teacherFilter !== undefined ? teacherFilter : userId
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
@@ -93,7 +94,6 @@ const AGCreateAssignmentGroupFeature = ({ onAfterCreate, teacherFilter }: AGCrea
     control,
     handleSubmit,
     setValue,
-    reset,
     watch,
     formState: { errors }
   } = useForm<CreateFormValues>({
@@ -199,8 +199,8 @@ const AGCreateAssignmentGroupFeature = ({ onAfterCreate, teacherFilter }: AGCrea
       })
     },
     onSuccess: (_response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["agAssignmentGroups"] })
       onAfterCreate(variables.classId ?? undefined)
-      reset()
     },
     onError: error => {
       const details = error.response?.data

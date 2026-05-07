@@ -132,6 +132,7 @@ const AGTemplatesFeature = ({ onNavigateCreate, onNavigateEdit, teacherFilter }:
       }
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agAssignmentGroups"] })
       setAlert({ severity: "success", message: t(TranslationKey.AG_TEMPLATES_QC_SUCCESS) })
       setQcTemplate(null)
     },

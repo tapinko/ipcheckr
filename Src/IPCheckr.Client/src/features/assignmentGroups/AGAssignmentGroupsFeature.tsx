@@ -170,6 +170,14 @@ const computeMoveDates = (
   }
 }
 
+const getEffectiveStatus = (ag: IAG, nowMs: number): AssignmentGroupStatus => {
+  const startMs = new Date(ag.startDate).getTime()
+  const deadlineMs = new Date(ag.deadline).getTime()
+  if (nowMs >= deadlineMs) return AssignmentGroupStatus.Ended
+  if (nowMs >= startMs) return AssignmentGroupStatus.InProgress
+  return AssignmentGroupStatus.Upcoming
+}
+
 const normalizeAssignmentGroup = (ag: AssignmentGroupDto): IAG => ({
   id: ag.assignmentGroupId,
   name: ag.name,
@@ -580,7 +588,22 @@ const AGAssignmentGroupsFeature = ({
           false
         )
         .then(r => r.data),
-    placeholderData: prev => prev
+    placeholderData: prev => prev,
+    refetchInterval: query => {
+      const ags = (query.state.data as QueryAssignmentGroupsRes | undefined)?.assignmentGroups ?? []
+      const now = Date.now()
+      let nextMs = Infinity
+      for (const ag of ags) {
+        if (ag.status === AssignmentGroupStatus.Upcoming) {
+          const ms = new Date(ag.startDate).getTime() - now
+          if (ms > 0) nextMs = Math.min(nextMs, ms)
+        } else if (ag.status === AssignmentGroupStatus.InProgress) {
+          const ms = new Date(ag.deadline).getTime() - now
+          if (ms > 0) nextMs = Math.min(nextMs, ms)
+        }
+      }
+      return nextMs === Infinity ? false : Math.max(5000, nextMs + 1500)
+    }
   })
 
   const allAGs = (agsQuery.data?.assignmentGroups ?? []).map(normalizeAssignmentGroup)
@@ -603,7 +626,10 @@ const AGAssignmentGroupsFeature = ({
     [AssignmentGroupStatus.Ended]: []
   }
 
-  filteredAGs.forEach(ag => grouped[ag.status]?.push(ag))
+  filteredAGs.forEach(ag => {
+    const effectiveStatus = getEffectiveStatus(ag, nowMs)
+    grouped[effectiveStatus]?.push({ ...ag, status: effectiveStatus })
+  })
 
   grouped[AssignmentGroupStatus.Upcoming].sort(
     (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
@@ -654,8 +680,7 @@ const AGAssignmentGroupsFeature = ({
       await Promise.all(calls)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["agSubnetAGs"], exact: false })
-      queryClient.invalidateQueries({ queryKey: ["agIdNetAGs"], exact: false })
+      queryClient.invalidateQueries({ queryKey: ["agAssignmentGroups"] })
       setAlert({ severity: "success", message: t(TranslationKey.AG_ASSIGNMENT_GROUPS_DELETE_SUCCESS) })
       setDeleteDialogVis(false)
       setDeleteAG(null)
@@ -686,8 +711,7 @@ const AGAssignmentGroupsFeature = ({
       })
     },
     onSuccess: (_data, plan) => {
-      queryClient.invalidateQueries({ queryKey: ["agSubnetAGs"], exact: false })
-      queryClient.invalidateQueries({ queryKey: ["agIdNetAGs"], exact: false })
+      queryClient.invalidateQueries({ queryKey: ["agAssignmentGroups"] })
       setAlert({
         severity: "success",
         message: t(TranslationKey.AG_ASSIGNMENT_GROUPS_MOVE_SUCCESS, { value: plan.ag.name })

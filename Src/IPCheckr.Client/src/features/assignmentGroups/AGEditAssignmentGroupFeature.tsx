@@ -159,8 +159,7 @@ const AGEditAssignmentGroupFeature = ({ onAfterSave }: AGEditAssignmentGroupFeat
       return assignmentGroupApi.assignmentGroupEditIdNetAssignmentGroup(payload)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["agSubnetAGs"] })
-      queryClient.invalidateQueries({ queryKey: ["agIdNetAGs"] })
+      queryClient.invalidateQueries({ queryKey: ["agAssignmentGroups"] })
       queryClient.invalidateQueries({ queryKey: ["agEditDetail", assignmentGroupId, assignmentType] })
       onAfterSave(assignmentGroupId ?? "", assignmentType ?? AssignmentGroupType.Subnet)
     },
