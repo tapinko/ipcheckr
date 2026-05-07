@@ -39,6 +39,7 @@ export const createDemoAssignment = async (input: CreateAssignmentInput) => {
     ],
     testWildcard: false,
     testFirstLastBr: false,
+    // isArchived: false,
     createdByUserId: input.createdByUserId,
   }
 

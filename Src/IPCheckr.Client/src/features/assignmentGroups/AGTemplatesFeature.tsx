@@ -39,7 +39,7 @@ import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficult
 import { getHostSortLabel } from "../../utils/getHostSortLabel"
 import DeleteDialog from "../../components/DeleteDialog"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import AGTemplatesSkeleton from "../../components/ag/AGTemplatesSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import type { AxiosError } from "axios"
 import { toLocalDateTimeString } from "./AGDateColumn"
@@ -171,7 +171,7 @@ const AGTemplatesFeature = ({ onNavigateCreate, onNavigateEdit, teacherFilter }:
     !!qcForm.deadline &&
     !quickCreateMutation.isPending
 
-  if (templatesQuery.isLoading || classesQuery.isLoading) return <CardsSkeleton />
+  if (templatesQuery.isLoading || classesQuery.isLoading) return <AGTemplatesSkeleton />
   if (templatesQuery.isError) return <ErrorLoading onRetry={() => templatesQuery.refetch()} />
 
   return (

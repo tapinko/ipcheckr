@@ -24,7 +24,7 @@ import { assignmentGroupApi, userApi } from "../../utils/apiClients"
 import { useAuth } from "../../contexts/AuthContext"
 import UserRole from "../../types/UserRole"
 import ErrorLoading from "../../components/ErrorLoading"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import AGFormSkeleton from "../../components/ag/AGFormSkeleton"
 import { Language, TranslationKey } from "../../utils/i18n"
 import FormRules from "../../utils/FormRules"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
@@ -183,7 +183,7 @@ const AGEditAssignmentGroupFeature = ({ onAfterSave }: AGEditAssignmentGroupFeat
     setValue("deadline", toLocalDateTimeString(end))
   }
 
-  if (detailQuery.isLoading) return <CardsSkeleton />
+  if (detailQuery.isLoading) return <AGFormSkeleton />
   if (detailQuery.isError || !detailQuery.data) return <ErrorLoading onRetry={() => detailQuery.refetch()} />
 
   const detail = detailQuery.data

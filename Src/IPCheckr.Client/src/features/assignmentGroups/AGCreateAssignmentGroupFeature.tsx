@@ -23,7 +23,7 @@ import { assignmentGroupApi, classApi, userApi } from "../../utils/apiClients"
 import { useAuth } from "../../contexts/AuthContext"
 import UserRole from "../../types/UserRole"
 import ErrorLoading from "../../components/ErrorLoading"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import AGFormSkeleton from "../../components/ag/AGFormSkeleton"
 import { Language, TranslationKey } from "../../utils/i18n"
 import FormRules from "../../utils/FormRules"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
@@ -221,7 +221,7 @@ const AGCreateAssignmentGroupFeature = ({ onAfterCreate, teacherFilter }: AGCrea
     setValue("deadline", toLocalDateTimeString(end))
   }
 
-  if (classesQuery.isLoading) return <CardsSkeleton />
+  if (classesQuery.isLoading) return <AGFormSkeleton />
   if (classesQuery.isError) return <ErrorLoading onRetry={() => classesQuery.refetch()} />
 
   const hasStudentsInClass = (studentsQuery.data?.length ?? 0) > 0

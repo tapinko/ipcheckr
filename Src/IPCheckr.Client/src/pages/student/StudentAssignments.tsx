@@ -33,7 +33,7 @@ import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { useAuth } from "../../contexts/AuthContext"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import ErrorLoading from "../../components/ErrorLoading"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import AGListSkeleton from "../../components/ag/AGListSkeleton"
 import { getStatusMap } from "../../utils/getStatusMap"
 import AGHeader from "../../components/AGHeader"
 import type { AGClassFilterValue, AGIpCatFilterValue, AGTypeFilterValue } from "../../components/AGHeader"
@@ -203,7 +203,7 @@ const StudentAssignments = () => {
 	}
 
 	if (isLoading) {
-		return <CardsSkeleton />
+		return <AGListSkeleton columns={2} />
 	}
 
 	if (hasError) {

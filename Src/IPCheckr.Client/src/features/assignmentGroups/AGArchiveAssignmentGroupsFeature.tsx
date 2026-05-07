@@ -24,7 +24,7 @@ import {
   type QueryAssignmentGroupsRes,
 } from "../../dtos"
 import { useAuth } from "../../contexts/AuthContext"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import AGArchiveSkeleton from "../../components/ag/AGArchiveSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
 import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficultyLabel"
@@ -280,7 +280,7 @@ const AGArchiveAssignmentGroupsFeature = ({
       />
 
       {isLoading ? (
-        <CardsSkeleton />
+        <AGArchiveSkeleton />
       ) : hasError ? (
         <ErrorLoading onRetry={retry} />
       ) : (

@@ -39,7 +39,7 @@ import { RouteParams } from "../../router/routes"
 import { assignmentGroupApi } from "../../utils/apiClients"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import ErrorLoading from "../../components/ErrorLoading"
-import InsightGridSkeleton from "../../components/InsightGridSkeleton"
+import AGDetailsSkeleton from "../../components/ag/AGDetailsSkeleton"
 import InsightCard from "../../components/InsightCard"
 import InsightGrid from "../../components/InsightGrid"
 import { fromAssignmentTypeParam } from "../../utils/assignmentType"
@@ -307,7 +307,7 @@ const AGAssignmentGroupDetailsFeature = ({
   }, [data?.assignments, reopenedAssignmentIds.size])
 
   if (isLoading && !data) {
-    return <InsightGridSkeleton count={8} columnsMax={3} />
+    return <AGDetailsSkeleton />
   }
 
   if (hasError) {

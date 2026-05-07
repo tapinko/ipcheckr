@@ -23,7 +23,7 @@ import {
 import { Language, TranslationKey } from "../../utils/i18n"
 import FormRules from "../../utils/FormRules"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
-import CardsSkeleton from "../../components/CardsSkeleton"
+import AGFormSkeleton from "../../components/ag/AGFormSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { RouteParams } from "../../router/routes"
 import AGTypeIpCatSelector from "./AGTypeIpCatSelector"
@@ -148,7 +148,7 @@ const AGEditTemplateFeature = ({ onAfterSave }: AGEditTemplateFeatureProps) => {
     }
   })
 
-  if (isEdit && templateQuery.isLoading) return <CardsSkeleton />
+  if (isEdit && templateQuery.isLoading) return <AGFormSkeleton />
   if (isEdit && templateQuery.isError) return <ErrorLoading onRetry={() => templateQuery.refetch()} />
 
   const canSubmit = !!nameValue?.trim() && !saveMutation.isPending
