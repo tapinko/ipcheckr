@@ -84,6 +84,16 @@ namespace IPCheckr.Api.Controllers
                         MessageSk = "Odovzdaný pokus nie je možné znova otvoriť."
                     });
 
+                if (assignment.AssignmentGroup.Deadline < DateTime.UtcNow)
+                    return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
+                    {
+                        Title = "Forbidden",
+                        Detail = "Cannot reopen an attempt for an ended assignment group.",
+                        Status = StatusCodes.Status403Forbidden,
+                        MessageEn = "Cannot reopen an attempt after the assignment group deadline has passed.",
+                        MessageSk = "Pokus nie je možné znova otvoriť po uplynutí termínu skupiny zadaní."
+                    });
+
                 attempt.Status = AssignmentSubmissionAttemptStatus.ACTIVE;
                 attempt.ReopenCount += 1;
                 attempt.LastReopenedAt = DateTime.UtcNow;
@@ -162,6 +172,16 @@ namespace IPCheckr.Api.Controllers
                     Status = StatusCodes.Status403Forbidden,
                     MessageEn = "Submitted attempts cannot be reopened.",
                     MessageSk = "Odovzdaný pokus nie je možné znova otvoriť."
+                });
+
+            if (idNetAssignment.AssignmentGroup.Deadline < DateTime.UtcNow)
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = "Cannot reopen an attempt for an ended assignment group.",
+                    Status = StatusCodes.Status403Forbidden,
+                    MessageEn = "Cannot reopen an attempt after the assignment group deadline has passed.",
+                    MessageSk = "Pokus nie je možné znova otvoriť po uplynutí termínu skupiny zadaní."
                 });
 
             idNetAttempt.Status = AssignmentSubmissionAttemptStatus.ACTIVE;

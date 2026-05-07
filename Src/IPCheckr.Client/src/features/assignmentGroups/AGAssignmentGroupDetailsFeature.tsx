@@ -510,7 +510,9 @@ const AGAssignmentGroupDetailsFeature = ({
           {sortedAssignments.map(a => {
             const canReopen =
               a.assignmentAttemptStatus === AssignmentSubmissionAttemptStatus.Locked &&
-              !reopenedAssignmentIds.has(a.assignmentId)
+              !reopenedAssignmentIds.has(a.assignmentId) &&
+              data?.status !== AssignmentGroupStatus.Ended &&
+              !("submittedAt" in a && a.submittedAt)
 
             return (
               <AssignmentGroupSubmitDetailsCard
