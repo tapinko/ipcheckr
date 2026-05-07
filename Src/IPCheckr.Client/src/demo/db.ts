@@ -1,5 +1,5 @@
 import { isDemoMode } from "../config/demoMode"
-import { AssignmentGroupIpCat, AssignmentGroupType } from "../dtos"
+import { AssignmentGroupDifficulty, AssignmentGroupHostSortStrategy, AssignmentGroupIpCat, AssignmentGroupType } from "../dtos"
 import UserRole from "../types/UserRole"
 
 const DEMO_DB_NAME = "ipcheckr-demo"
@@ -29,6 +29,7 @@ export type DemoAssignment = {
   }>
   testWildcard: boolean
   testFirstLastBr: boolean
+  isArchived: boolean
   createdByUserId: number
   studentAssignments?: Array<{
     assignmentId: number
@@ -65,6 +66,21 @@ export type DemoSubmission = {
   submittedAt: string
 }
 
+export type DemoTemplate = {
+  id: number
+  name: string
+  agName: string | null
+  agDescription: string | null
+  type: typeof AssignmentGroupType[keyof typeof AssignmentGroupType]
+  ipCat: typeof AssignmentGroupIpCat[keyof typeof AssignmentGroupIpCat]
+  numberOfRecords: number
+  difficulty: string | null
+  hostSortStrategy: string | null
+  possibleOctets: number | null
+  testWildcard: boolean
+  testFirstLastBr: boolean
+}
+
 export type DemoState = {
   users: Array<{
     id: number
@@ -81,6 +97,7 @@ export type DemoState = {
   }>
   assignments: DemoAssignment[]
   submissions: DemoSubmission[]
+  templates: DemoTemplate[]
 }
 
 type DemoStateRecord = {
@@ -107,6 +124,92 @@ const createDefaultState = (): DemoState => ({
   ],
   assignments: [],
   submissions: [],
+  templates: [
+    {
+      id: 1,
+      name: "Subnet Basics",
+      agName: "Network Addressing",
+      agDescription: "Basic subnetting - class ABC, easy difficulty",
+      type: AssignmentGroupType.Subnet,
+      ipCat: AssignmentGroupIpCat.Abc,
+      numberOfRecords: 6,
+      difficulty: AssignmentGroupDifficulty.Easy,
+      hostSortStrategy: AssignmentGroupHostSortStrategy.Descending,
+      possibleOctets: null,
+      testWildcard: false,
+      testFirstLastBr: false,
+    },
+    {
+      id: 2,
+      name: "Advanced Subnet",
+      agName: "Advanced Subnetting",
+      agDescription: "All IP categories, medium difficulty, random order",
+      type: AssignmentGroupType.Subnet,
+      ipCat: AssignmentGroupIpCat.All,
+      numberOfRecords: 8,
+      difficulty: AssignmentGroupDifficulty.Medium,
+      hostSortStrategy: AssignmentGroupHostSortStrategy.Random,
+      possibleOctets: null,
+      testWildcard: false,
+      testFirstLastBr: false,
+    },
+    {
+      id: 3,
+      name: "Subnet Local Networks",
+      agName: "Local Addressing",
+      agDescription: "Private IP ranges, hard difficulty, ascending order",
+      type: AssignmentGroupType.Subnet,
+      ipCat: AssignmentGroupIpCat.Local,
+      numberOfRecords: 10,
+      difficulty: AssignmentGroupDifficulty.Hard,
+      hostSortStrategy: AssignmentGroupHostSortStrategy.Ascending,
+      possibleOctets: null,
+      testWildcard: false,
+      testFirstLastBr: false,
+    },
+    {
+      id: 4,
+      name: "Subnet Quick Test",
+      agName: null,
+      agDescription: "Short subnet test, 4 records",
+      type: AssignmentGroupType.Subnet,
+      ipCat: AssignmentGroupIpCat.Abc,
+      numberOfRecords: 4,
+      difficulty: AssignmentGroupDifficulty.Medium,
+      hostSortStrategy: AssignmentGroupHostSortStrategy.Descending,
+      possibleOctets: null,
+      testWildcard: false,
+      testFirstLastBr: false,
+    },
+    {
+      id: 5,
+      name: "IDNet Basics",
+      agName: "Network Identification",
+      agDescription: "Basic network identification with wildcard masks",
+      type: AssignmentGroupType.Idnet,
+      ipCat: AssignmentGroupIpCat.Abc,
+      numberOfRecords: 6,
+      difficulty: AssignmentGroupDifficulty.Medium,
+      hostSortStrategy: AssignmentGroupHostSortStrategy.Descending,
+      possibleOctets: 3,
+      testWildcard: true,
+      testFirstLastBr: false,
+    },
+    {
+      id: 6,
+      name: "Advanced IDNet",
+      agName: "Advanced IDNet Analysis",
+      agDescription: "All IP categories, tests first/last and broadcast",
+      type: AssignmentGroupType.Idnet,
+      ipCat: AssignmentGroupIpCat.All,
+      numberOfRecords: 8,
+      difficulty: AssignmentGroupDifficulty.Medium,
+      hostSortStrategy: AssignmentGroupHostSortStrategy.Descending,
+      possibleOctets: 4,
+      testWildcard: false,
+      testFirstLastBr: true,
+    },
+  ],
 })
 
 const ensureStateShape = (state: DemoState): DemoState => {
@@ -116,6 +219,7 @@ const ensureStateShape = (state: DemoState): DemoState => {
     classes: state.classes ?? defaults.classes,
     assignments: state.assignments ?? defaults.assignments,
     submissions: state.submissions ?? defaults.submissions,
+    templates: (state.templates && state.templates.length > 0) ? state.templates : defaults.templates,
   }
 }
 

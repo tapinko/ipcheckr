@@ -60,8 +60,10 @@ export const makeIdNetAgDto = (state: DemoState, assignment: DemoState["assignme
     status: resolveStatus(assignment.startDate, assignment.deadline, assignment.completedAt ?? null),
     successRate,
     ipCat: assignment.ipCat,
+    type: AssignmentGroupType.Idnet,
     testWildcard: assignment.testWildcard,
     testFirstLastBr: assignment.testFirstLastBr,
+    isArchived: assignment.isArchived ?? false,
   }
 }
 
@@ -91,6 +93,7 @@ export const makeSubnetAgDto = (state: DemoState, assignment: DemoState["assignm
     successRate,
     ipCat: assignment.ipCat,
     type: AssignmentGroupType.Subnet,
+    isArchived: assignment.isArchived ?? false,
   }
 }
 

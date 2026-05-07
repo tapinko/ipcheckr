@@ -14,6 +14,7 @@ import AddIcon from "@mui/icons-material/Add"
 import RemoveIcon from "@mui/icons-material/Remove"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { AssignmentGroupDifficulty, AssignmentGroupHostSortStrategy, AssignmentGroupType } from "../../dtos"
+import { isDemoMode } from "../../config/demoMode"
 import FormRules from "../../utils/FormRules"
 
 type AGTypeSpecificSettingsLabels = {
@@ -154,6 +155,7 @@ const AGTypeSpecificSettings = ({ control, selectedType, numberOfRecordsError, p
                 onChange={(_, val) => val && field.onChange(val)}
                 size="small"
                 sx={{ width: "100%" }}
+                disabled={isDemoMode}
               >
                 <ToggleButton value={AssignmentGroupDifficulty.Easy} sx={{ flex: 1 }}>{labels.easy}</ToggleButton>
                 <ToggleButton value={AssignmentGroupDifficulty.Medium} sx={{ flex: 1 }}>{labels.medium}</ToggleButton>
@@ -177,6 +179,7 @@ const AGTypeSpecificSettings = ({ control, selectedType, numberOfRecordsError, p
                 onChange={(_, val) => val && field.onChange(val)}
                 size="small"
                 sx={{ width: "100%" }}
+                disabled={isDemoMode}
               >
                 <ToggleButton value={AssignmentGroupHostSortStrategy.Random} sx={{ flex: 1 }}>{labels.random}</ToggleButton>
                 <ToggleButton value={AssignmentGroupHostSortStrategy.Ascending} sx={{ flex: 1 }}>{labels.ascending}</ToggleButton>
