@@ -117,7 +117,10 @@ const StudentAssignments = () => {
 			...(idNetQuery.data ?? []).map(normalizeIdNet),
 			...(subnetQuery.data ?? []).map(normalizeSubnet)
 		]
-		return normalized.filter(a => !a.isArchived)
+		return normalized.filter(a =>
+			!a.isArchived &&
+			resolveComputedStatus(a.startDate, a.deadline, a.successRate) !== AssignmentGroupStatus.Upcoming
+		)
 	}, [idNetQuery.data, subnetQuery.data])
 
 	const classOptions = useMemo<ClassDto[]>(() => {
@@ -406,6 +409,7 @@ const StudentAssignments = () => {
 					ipCatValue={ipCatFilter}
 					onIpCatChange={setIpCatFilter}
 					onArchiveClick={() => navigate(Routes[RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE])}
+					hideTemplates
 				/>
 
 				<Box
