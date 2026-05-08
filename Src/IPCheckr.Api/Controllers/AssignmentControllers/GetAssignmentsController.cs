@@ -71,6 +71,7 @@ namespace IPCheckr.Api.Controllers
                 assignmentDtos.Add(new SubnetAssignmentDto
                 {
                     AssignmentId = assignment.Id,
+                    AssignmentGroupId = group.Id,
                     Name = group.Name,
                     AssignmentGroupDescription = group.Description,
                     StartDate = group.StartDate,
@@ -78,6 +79,7 @@ namespace IPCheckr.Api.Controllers
                     TeacherUsername = teacherUsername,
                     ClassName = group.Class.Name,
                     Status = status,
+                    IsArchived = group.IsArchived,
                     IpCat = group.AssignmentIpCat,
                     SuccessRate = submit != null ? successRate : null,
                     NumberOfRecords = group.NumberOfRecords,
@@ -154,6 +156,7 @@ namespace IPCheckr.Api.Controllers
                 assignmentDtos.Add(new IDNetAssignmentDto
                 {
                     AssignmentId = assignment.Id,
+                    AssignmentGroupId = group.Id,
                     Name = group.Name,
                     AssignmentGroupDescription = group.Description,
                     StartDate = group.StartDate,
@@ -161,6 +164,7 @@ namespace IPCheckr.Api.Controllers
                     TeacherUsername = teacherUsername,
                     ClassName = group.Class.Name,
                     Status = status,
+                    IsArchived = group.IsArchived,
                     IpCat = group.AssignmentIpCat,
                     SuccessRate = submit != null ? successRate : null,
                     NumberOfRecords = group.NumberOfRecords,

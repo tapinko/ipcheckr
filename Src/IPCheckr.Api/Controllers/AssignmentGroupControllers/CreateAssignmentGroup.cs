@@ -1,4 +1,5 @@
 using IPCheckr.Api.Common.Constants;
+using Microsoft.AspNetCore.Authorization;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
 using IPCheckr.Api.Models;
@@ -11,6 +12,7 @@ namespace IPCheckr.Api.Controllers
 {
     public partial class AssignmentGroupController : ControllerBase
     {
+        [Authorize(Policy = Roles.Teacher)]
         [HttpPost("create-subnet-assignment-group")]
         [ProducesResponseType(typeof(CreateSubnetAGRes), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status403Forbidden)]
@@ -140,6 +142,7 @@ namespace IPCheckr.Api.Controllers
             return Ok(new CreateSubnetAGRes { AssignmentGroupId = subnetGroup.Id });
         }
 
+        [Authorize(Policy = Roles.Teacher)]
         [HttpPost("create-idnet-assignment-group")]
         [ProducesResponseType(typeof(CreateIDNetAGRes), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status403Forbidden)]

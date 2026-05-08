@@ -29,7 +29,7 @@ import {
 } from "@mui/material"
 import { alpha } from "@mui/material/styles"
 import { TranslationKey } from "../../utils/i18n"
-import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import { getParametrizedUrl, RouteKeys, RouteParams, Routes } from "../../router/routes"
 import { useAuth } from "../../contexts/AuthContext"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import ErrorLoading from "../../components/ErrorLoading"
@@ -117,7 +117,7 @@ const StudentAssignments = () => {
 			...(idNetQuery.data ?? []).map(normalizeIdNet),
 			...(subnetQuery.data ?? []).map(normalizeSubnet)
 		]
-		return normalized
+		return normalized.filter(a => !a.isArchived)
 	}, [idNetQuery.data, subnetQuery.data])
 
 	const classOptions = useMemo<ClassDto[]>(() => {
@@ -284,7 +284,7 @@ const StudentAssignments = () => {
 				subheader={
 					<Stack direction="row" flexWrap="wrap" gap={0.5} alignItems="center" sx={{ mt: 0.5 }}>
 						<Chip
-							label={assignment.type === AssignmentGroupType.Subnet ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_SUBNET) : t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_TYPE_IDNET)}
+							label={assignment.type === AssignmentGroupType.Subnet ? t(TranslationKey.STUDENT_ASSIGNMENTS_TYPE_SUBNET) : t(TranslationKey.STUDENT_ASSIGNMENTS_TYPE_IDNET)}
 							size="small"
 							color={assignment.type === AssignmentGroupType.Subnet ? "primary" : "secondary"}
 							variant="outlined"
@@ -314,14 +314,14 @@ const StudentAssignments = () => {
 						)}
 						{(assignment as any).testWildcard && (
 							<Chip
-								label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_WILDCARD)}
+								label={t(TranslationKey.STUDENT_ASSIGNMENTS_CHIP_WILDCARD)}
 								size="small"
 								variant="outlined"
 							/>
 						)}
 						{(assignment as any).testFirstLastBr && (
 							<Chip
-								label={t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_CHIP_FIRST_LAST_BR)}
+								label={t(TranslationKey.STUDENT_ASSIGNMENTS_CHIP_FIRST_LAST_BR)}
 								size="small"
 								variant="outlined"
 							/>
@@ -362,10 +362,10 @@ const StudentAssignments = () => {
 					<Stack spacing={0.5}>
 						<Stack direction="row" alignItems="center" spacing={1}>
 							<Typography variant="h6" fontWeight={800}>
-							{wasSubmitted ? `${successRateValue.toFixed(2)}%` : t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED)}
+							{wasSubmitted ? `${successRateValue.toFixed(2)}%` : t(TranslationKey.STUDENT_ASSIGNMENTS_CARD_UNSUBMITTED)}
 						</Typography>
 						<Typography variant="body2" color="text.secondary">
-							{t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_SUCCESS_RATE)}
+							{t(TranslationKey.STUDENT_ASSIGNMENTS_CARD_SUCCESS_RATE)}
 						</Typography>
 					</Stack>
 					{wasSubmitted ? (
@@ -405,6 +405,7 @@ const StudentAssignments = () => {
 					onTypeChange={setTypeFilter}
 					ipCatValue={ipCatFilter}
 					onIpCatChange={setIpCatFilter}
+					onArchiveClick={() => navigate(Routes[RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE])}
 				/>
 
 				<Box
@@ -446,14 +447,14 @@ const StudentAssignments = () => {
 									color={section.status === AssignmentGroupStatus.Upcoming ? "primary" : "success"}
 								/>
 								<Typography variant="subtitle2" color="text.secondary">
-									{section.items.length} {t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_ITEMS_LABEL)}
+									{section.items.length} {t(TranslationKey.STUDENT_ASSIGNMENTS_ITEMS_LABEL)}
 								</Typography>
 							</Stack>
 							<Divider />
 							<Stack spacing={1.5}>
 								{section.items.length === 0 ? (
 									<Typography variant="body2" color="text.secondary">
-										{t(TranslationKey.TEACHER_ASSIGNMENT_GROUPS_NO_DATA)}
+										{t(TranslationKey.STUDENT_ASSIGNMENTS_NO_DATA)}
 									</Typography>
 								) : (
 									section.items.map(a => renderCard(a, true))

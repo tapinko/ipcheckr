@@ -25,6 +25,10 @@ namespace IPCheckr.Api.DTOs.Assignment
         public int AssignmentId { get; set; }
 
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Assignment Group ID must be a positive integer.")]
+        public int AssignmentGroupId { get; set; }
+
+        [Required]
         public required string Name { get; set; }
 
         public string? AssignmentGroupDescription { get; set; }
@@ -44,5 +48,8 @@ namespace IPCheckr.Api.DTOs.Assignment
         [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public AssignmentGroupStatus Status { get; set; }
+
+        [Required]
+        public bool IsArchived { get; set; }
     }
 }

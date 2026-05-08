@@ -1,5 +1,6 @@
 using IPCheckr.Api.Common.Enums;
 using IPCheckr.Api.Common.Constants;
+using Microsoft.AspNetCore.Authorization;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
 using IPCheckr.Api.Models;
@@ -11,6 +12,7 @@ namespace IPCheckr.Api.Controllers
 {
     public partial class AssignmentGroupController : ControllerBase
     {
+        [Authorize(Policy = Roles.Teacher)]
         [HttpPut("edit-subnet-assignment-group")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status404NotFound)]
@@ -157,6 +159,7 @@ namespace IPCheckr.Api.Controllers
             return Ok();
         }
 
+        [Authorize(Policy = Roles.Teacher)]
         [HttpPut("edit-idnet-assignment-group")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiProblemDetails), StatusCodes.Status404NotFound)]

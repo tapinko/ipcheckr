@@ -40,6 +40,7 @@ import StudentAssignments from "../pages/student/StudentAssignments"
 import StudentAssignmentSubmission from "../pages/student/StudentAssignmentSubmission"
 import StudentAssignmentDetails from "../pages/student/StudentAssignmentDetails"
 import StudentGns3 from "../pages/student/StudentGns3"
+import StudentArchiveAssignmentGroups from "../pages/student/StudentArchiveAssignmentGroups"
 
 import Unauthorized401 from "../pages/errors/Unauthorized401"
 import NotFound404 from "../pages/errors/NotFound404"
@@ -98,6 +99,7 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION]: <StudentAssignmentSubmission />,
   [RouteKeys.STUDENT_ASSIGNMENT_DETAILS]: <StudentAssignmentDetails />,
   [RouteKeys.STUDENT_GNS3]: <StudentGns3 />,
+  [RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE]: <StudentArchiveAssignmentGroups />,
 }
 
 const useAuthRouter = () => {
@@ -193,6 +195,7 @@ const useAuthRouter = () => {
         ...[
           RouteKeys.STUDENT_DASHBOARD,
           RouteKeys.STUDENT_ASSIGNMENTS,
+          RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE,
           RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION,
           RouteKeys.STUDENT_ASSIGNMENT_DETAILS,
           RouteKeys.STUDENT_GNS3,

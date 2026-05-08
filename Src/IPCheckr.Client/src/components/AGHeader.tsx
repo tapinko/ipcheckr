@@ -53,6 +53,7 @@ interface AGHeaderProps {
   templatesDisabled?: boolean
   hideArchive?: boolean
   hideTemplates?: boolean
+  hideClassFilter?: boolean
 }
 
 const getDifficultyLabel = (difficulty: AssignmentGroupDifficulty, t: TFunction) => {
@@ -84,7 +85,8 @@ const AGHeader = ({
   createDisabled,
   templatesDisabled,
   hideArchive,
-  hideTemplates
+  hideTemplates,
+  hideClassFilter
 }: AGHeaderProps) => {
   const selectedTypeValues = typeValues ?? []
   const selectedIpCatValues = ipCatValues ?? []
@@ -211,37 +213,41 @@ const AGHeader = ({
           <Divider sx={{ my: 1.75 }} />
 
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center">
-            <Button
-              variant={(classValue ?? "ALL") === "ALL" ? "contained" : "outlined"}
-              onClick={() => onClassChange("ALL")}
-              size="small"
-              sx={{
-                borderRadius: 1,
-                textTransform: "none",
-                px: 2,
-                fontWeight: 600,
-                minHeight: 32
-              }}
-            >
-              {t(TranslationKey.AG_HEADER_ALL_CLASSES)}
-            </Button>
-            {classOptions.map(({ classId, className }) => (
-              <Button
-                key={classId}
-                variant={classValue === classId ? "contained" : "outlined"}
-                onClick={() => onClassChange(classId)}
-                size="small"
-                sx={{
-                  borderRadius: 1,
-                  textTransform: "none",
-                  px: 2,
-                  fontWeight: 600,
-                  minHeight: 32
-                }}
-              >
-                {className}
-              </Button>
-            ))}
+            {!hideClassFilter && (
+              <>
+                <Button
+                  variant={(classValue ?? "ALL") === "ALL" ? "contained" : "outlined"}
+                  onClick={() => onClassChange("ALL")}
+                  size="small"
+                  sx={{
+                    borderRadius: 1,
+                    textTransform: "none",
+                    px: 2,
+                    fontWeight: 600,
+                    minHeight: 32
+                  }}
+                >
+                  {t(TranslationKey.AG_HEADER_ALL_CLASSES)}
+                </Button>
+                {classOptions.map(({ classId, className }) => (
+                  <Button
+                    key={classId}
+                    variant={classValue === classId ? "contained" : "outlined"}
+                    onClick={() => onClassChange(classId)}
+                    size="small"
+                    sx={{
+                      borderRadius: 1,
+                      textTransform: "none",
+                      px: 2,
+                      fontWeight: 600,
+                      minHeight: 32
+                    }}
+                  >
+                    {className}
+                  </Button>
+                ))}
+              </>
+            )}
             <Button
               variant="outlined"
               size="small"

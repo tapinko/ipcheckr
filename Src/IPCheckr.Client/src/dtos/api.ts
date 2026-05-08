@@ -474,6 +474,18 @@ export interface AssignmentDto {
      * @memberof AssignmentDto
      */
     'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AssignmentDto
+     */
+    'isArchived': boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignmentDto
+     */
+    'assignmentGroupId': number;
 }
 
 
@@ -2357,6 +2369,18 @@ export interface IDNetAssignmentDto {
      * @memberof IDNetAssignmentDto
      */
     'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof IDNetAssignmentDto
+     */
+    'isArchived': boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof IDNetAssignmentDto
+     */
+    'assignmentGroupId': number;
     /**
      * 
      * @type {AssignmentGroupIpCat}
@@ -4607,6 +4631,18 @@ export interface SubnetAssignmentDto {
      * @memberof SubnetAssignmentDto
      */
     'status': AssignmentGroupStatus;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SubnetAssignmentDto
+     */
+    'isArchived': boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubnetAssignmentDto
+     */
+    'assignmentGroupId': number;
     /**
      * 
      * @type {AssignmentGroupIpCat}
