@@ -133,7 +133,8 @@ namespace IPCheckr.Api.Controllers
                 StudentName = UsernameUtils.ToDisplay(assignment.Student.Username),
                 SuccessRate = successRate,
                 IpCat = assignment.AssignmentGroup.AssignmentIpCat,
-                Status = status
+                Status = status,
+                Cidr = assignment.Cidr
             });
         }
 

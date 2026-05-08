@@ -18,6 +18,9 @@ namespace IPCheckr.Api.DTOs.Assignment
         public required AssignmentGroupIpCat IpCat { get; set; }
 
         public double? SuccessRate { get; set; }
+
+        [Required]
+        public required string Cidr { get; set; }
     }
 
     public class QuerySubnetAssignmentSubmitDetailsFullRecordField

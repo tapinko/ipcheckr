@@ -27,10 +27,11 @@ import { getIpCatLabel } from "../../utils/getIpCatLabel"
 import { fromAssignmentTypeParam } from "../../utils/assignmentType"
 
 interface AGAssignmentGroupDetailsSubmitFeatureProps {
-  onNavigateStudentDetails: (studentId: number) => void
+  onNavigateStudentDetails?: (studentId: number) => void
+  refetchInterval?: number
 }
 
-const AGAssignmentGroupDetailsSubmitFeature = ({ onNavigateStudentDetails }: AGAssignmentGroupDetailsSubmitFeatureProps) => {
+const AGAssignmentGroupDetailsSubmitFeature = ({ onNavigateStudentDetails, refetchInterval }: AGAssignmentGroupDetailsSubmitFeatureProps) => {
   const { t } = useTranslation()
   const {
     [RouteParams.ASSIGNMENT_ID]: assignmentId,
@@ -46,7 +47,8 @@ const AGAssignmentGroupDetailsSubmitFeature = ({ onNavigateStudentDetails }: AGA
       assignmentApi
         .assignmentQuerySubnetAssignmentSubmitDetailsFull(Number(assignmentId))
         .then(r => r.data),
-    placeholderData: prev => prev
+    placeholderData: prev => prev,
+    ...(refetchInterval !== undefined && { refetchInterval, retry: false })
   })
 
   const idNetDetailsQuery = useQuery<QueryIDNetAssignmentSubmitDetailsFullRes, Error>({
@@ -58,7 +60,8 @@ const AGAssignmentGroupDetailsSubmitFeature = ({ onNavigateStudentDetails }: AGA
       assignmentApi
         .assignmentQueryIdNetAssignmentSubmitDetailsFull(Number(assignmentId))
         .then(r => r.data),
-    placeholderData: prev => prev
+    placeholderData: prev => prev,
+    ...(refetchInterval !== undefined && { refetchInterval, retry: false })
   })
 
   const data = useMemo(() => {
@@ -126,7 +129,7 @@ const AGAssignmentGroupDetailsSubmitFeature = ({ onNavigateStudentDetails }: AGA
 
   const studentLookupQuery = useQuery({
     queryKey: ["agSubmitStudentLookup", data?.studentName],
-    enabled: !!data?.studentName,
+    enabled: !!data?.studentName && !!onNavigateStudentDetails,
     queryFn: () => userApi.userQueryUsers(null, data!.studentName, UserRole.STUDENT).then(r => r.data.users ?? []),
     placeholderData: prev => prev
   })
@@ -220,24 +223,26 @@ const AGAssignmentGroupDetailsSubmitFeature = ({ onNavigateStudentDetails }: AGA
                   />
                 </Stack>
 
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                  onClick={() => {
-                    if (!studentId) return
-                    onNavigateStudentDetails(studentId)
-                  }}
-                  sx={{
-                    cursor: studentId ? "pointer" : "default",
-                    "&:hover .student-link-name": studentId ? { textDecoration: "underline" } : undefined
-                  }}
-                >
-                  <Person fontSize="small" color="action" />
-                  <Typography variant="body2" fontWeight={700} className="student-link-name">
-                    {studentName}
-                  </Typography>
-                </Stack>
+                {onNavigateStudentDetails && (
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={1}
+                    onClick={() => {
+                      if (!studentId) return
+                      onNavigateStudentDetails(studentId)
+                    }}
+                    sx={{
+                      cursor: studentId ? "pointer" : "default",
+                      "&:hover .student-link-name": studentId ? { textDecoration: "underline" } : undefined
+                    }}
+                  >
+                    <Person fontSize="small" color="action" />
+                    <Typography variant="body2" fontWeight={700} className="student-link-name">
+                      {studentName}
+                    </Typography>
+                  </Stack>
+                )}
               </Stack>
 
               <Stack direction="row" flexWrap="wrap" gap={0.5} alignItems="center">
@@ -308,15 +313,19 @@ const AGAssignmentGroupDetailsSubmitFeature = ({ onNavigateStudentDetails }: AGA
             />
           ]}
         />
+        {isSubnetData(data) && (
+          <Typography variant="h5" fontWeight={700} textAlign="center">
+            {data.cidr}
+          </Typography>
+        )}
       </Stack>
-
-      <Divider sx={{ my: 2 }} />
 
       <Box
         sx={{
           display: "grid",
           gridTemplateColumns: { xs: "1fr", md: isSingleResult ? "1fr" : "repeat(2, 1fr)" },
           gap: 2,
+          mt: 1.75,
           width: "100%",
           maxWidth: 1200,
           justifyContent: "center",

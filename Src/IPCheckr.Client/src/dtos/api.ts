@@ -434,6 +434,12 @@ export interface AssignmentDto {
     'assignmentId': number;
     /**
      * 
+     * @type {number}
+     * @memberof AssignmentDto
+     */
+    'assignmentGroupId': number;
+    /**
+     * 
      * @type {string}
      * @memberof AssignmentDto
      */
@@ -480,12 +486,6 @@ export interface AssignmentDto {
      * @memberof AssignmentDto
      */
     'isArchived': boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignmentDto
-     */
-    'assignmentGroupId': number;
 }
 
 
@@ -2329,6 +2329,12 @@ export interface IDNetAssignmentDto {
     'assignmentId': number;
     /**
      * 
+     * @type {number}
+     * @memberof IDNetAssignmentDto
+     */
+    'assignmentGroupId': number;
+    /**
+     * 
      * @type {string}
      * @memberof IDNetAssignmentDto
      */
@@ -2375,12 +2381,6 @@ export interface IDNetAssignmentDto {
      * @memberof IDNetAssignmentDto
      */
     'isArchived': boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof IDNetAssignmentDto
-     */
-    'assignmentGroupId': number;
     /**
      * 
      * @type {AssignmentGroupIpCat}
@@ -3679,6 +3679,12 @@ export interface QuerySubnetAssignmentSubmitDetailsFullRes {
      * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
      */
     'successRate'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuerySubnetAssignmentSubmitDetailsFullRes
+     */
+    'cidr': string;
 }
 
 
@@ -4591,6 +4597,12 @@ export interface SubnetAssignmentDto {
     'assignmentId': number;
     /**
      * 
+     * @type {number}
+     * @memberof SubnetAssignmentDto
+     */
+    'assignmentGroupId': number;
+    /**
+     * 
      * @type {string}
      * @memberof SubnetAssignmentDto
      */
@@ -4637,12 +4649,6 @@ export interface SubnetAssignmentDto {
      * @memberof SubnetAssignmentDto
      */
     'isArchived': boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof SubnetAssignmentDto
-     */
-    'assignmentGroupId': number;
     /**
      * 
      * @type {AssignmentGroupIpCat}
