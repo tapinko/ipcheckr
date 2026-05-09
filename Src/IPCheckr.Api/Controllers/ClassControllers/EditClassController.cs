@@ -21,6 +21,7 @@ namespace IPCheckr.Api.Controllers
 
             var cls = await _db.Classes
                 .Include(c => c.Teachers)
+                .Include(c => c.Students)
                 .FirstOrDefaultAsync(c => c.Id == req.Id);
 
             if (cls == null)
@@ -101,6 +102,28 @@ namespace IPCheckr.Api.Controllers
                 }
 
                 cls.Teachers = teacherUsers;
+                anyChange = true;
+            }
+
+            if (req.Students != null)
+            {
+                var studentUsers = await _db.Users
+                    .Where(u => req.Students.Contains(u.Id) && u.Role == "Student")
+                    .ToListAsync();
+
+                if (studentUsers.Count != req.Students.Length)
+                {
+                    return BadRequest(new ApiProblemDetails
+                    {
+                        Title = "Bad Request",
+                        Detail = "One or more students do not exist or are not valid.",
+                        Status = StatusCodes.Status400BadRequest,
+                        MessageEn = "One or more students do not exist or are not valid.",
+                        MessageSk = "Jeden alebo viac študentov neexistuje alebo nie je platných."
+                    });
+                }
+
+                cls.Students = studentUsers;
                 anyChange = true;
             }
 

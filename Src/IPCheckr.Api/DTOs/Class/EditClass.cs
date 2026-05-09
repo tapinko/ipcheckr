@@ -12,5 +12,7 @@ namespace IPCheckr.Api.DTOs.Class
         
         
         public int[]? Teachers { get; set; }
+
+        public int[]? Students { get; set; }
     }
 }

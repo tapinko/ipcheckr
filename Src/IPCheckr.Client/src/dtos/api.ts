@@ -1793,6 +1793,12 @@ export interface EditClassReq {
      * @memberof EditClassReq
      */
     'teachers'?: Array<number> | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof EditClassReq
+     */
+    'students'?: Array<number> | null;
 }
 /**
  * 

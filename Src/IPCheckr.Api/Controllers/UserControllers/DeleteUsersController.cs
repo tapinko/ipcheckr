@@ -50,33 +50,6 @@ namespace IPCheckr.Api.Controllers
             {
                 usersToDelete = usersToDelete.Where(u => u.Id != callerId).ToList();
             }
-            else if (callerRole == "Teacher")
-            {
-                var teacherClasses = await _db.Classes
-                    .Include(c => c.Teachers)
-                    .Include(c => c.Students)
-                    .Where(c => c.Teachers!.Any(t => t.Id == callerId))
-                    .ToListAsync();
-
-                var allowedStudents = teacherClasses
-                    .SelectMany(c => c.Students!.Select(s => s.Id))
-                    .Distinct()
-                    .ToHashSet();
-
-                usersToDelete = usersToDelete
-                    .Where(u => u.Role == "Student" && allowedStudents.Contains(u.Id))
-                    .ToList();
-
-                if (usersToDelete.Count == 0)
-                    return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails
-                    {
-                        Title = "Forbidden",
-                        Detail = "You do not have permission to delete these users.",
-                        Status = StatusCodes.Status403Forbidden,
-                        MessageEn = "You do not have permission to delete these users.",
-                        MessageSk = "Nemáte oprávnenie na odstránenie týchto používateľov."
-                    });
-            }
             else
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new ApiProblemDetails

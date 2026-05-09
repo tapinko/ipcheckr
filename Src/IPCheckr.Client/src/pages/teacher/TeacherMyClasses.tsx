@@ -275,7 +275,7 @@ const TeacherMyClasses = () => {
   })
 
   const deleteStudentMutation = useMutation<AxiosResponse, AxiosError<ApiProblemDetails>, number>({
-    mutationFn: id => userApi.userDeleteUsers({ userIds: [id] }),
+    mutationFn: id => classApi.classEditClass({ id: selectedClassId!, students: students.filter(s => s.id !== id).map(s => s.id) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["classStudents"] })
       queryClient.invalidateQueries({ queryKey: ["allStudentsForClassAssign"] })
@@ -288,7 +288,7 @@ const TeacherMyClasses = () => {
   })
 
   const bulkDeleteMutation = useMutation<AxiosResponse, AxiosError<ApiProblemDetails>, number[]>({
-    mutationFn: ids => userApi.userDeleteUsers({ userIds: ids }),
+    mutationFn: ids => classApi.classEditClass({ id: selectedClassId!, students: students.filter(s => !ids.includes(s.id)).map(s => s.id) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["classStudents"] })
       queryClient.invalidateQueries({ queryKey: ["allStudentsForClassAssign"] })
