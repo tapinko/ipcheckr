@@ -455,6 +455,7 @@ export enum TranslationKey {
   TEACHER_MY_CLASSES_NO_DATA = "TEACHER_MY_CLASSES_NO_DATA",
   TEACHER_MY_CLASSES_LOADING = "TEACHER_MY_CLASSES_LOADING",
   TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER = "TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER",
+  TEACHER_MY_CLASSES_CREATE_CLASS_TOOLTIP = "TEACHER_MY_CLASSES_CREATE_CLASS_TOOLTIP",
 
   // TeacherStudentDetails
   TEACHER_STUDENT_DETAILS_USERNAME = "TEACHER_STUDENT_DETAILS_USERNAME",
@@ -1396,6 +1397,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_MY_CLASSES_NO_DATA]: "No students available",
   [TranslationKey.TEACHER_MY_CLASSES_LOADING]: "Loading",
   [TranslationKey.TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER]: "Type at least {{value}} letters to search",
+  [TranslationKey.TEACHER_MY_CLASSES_CREATE_CLASS_TOOLTIP]: "Create new class",
 
   // TeacherStudentDetails
   [TranslationKey.TEACHER_STUDENT_DETAILS_USERNAME]: "Name",
@@ -2336,6 +2338,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.TEACHER_MY_CLASSES_NO_DATA]: "Žiadni dostupní študenti",
   [TranslationKey.TEACHER_MY_CLASSES_LOADING]: "Načítavam",
   [TranslationKey.TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER]: "Zadajte aspoň {{value}} písmená pre vyhľadávanie",
+  [TranslationKey.TEACHER_MY_CLASSES_CREATE_CLASS_TOOLTIP]: "Vytvoriť novú triedu",
 
   // TeacherStudentDetails
   [TranslationKey.TEACHER_STUDENT_DETAILS_USERNAME]: "Meno",
