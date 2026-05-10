@@ -12,6 +12,7 @@ import InsightGridSkeleton from "./InsightGridSkeleton"
 import TableSkeleton from "./TableSkeleton"
 import SubmissionSkeleton from "./SubmissionSkeleton"
 import AdminUsersSkeleton from "./AdminUsersSkeleton"
+import AdminClassesSkeleton from "./AdminClassesSkeleton"
 import MyClassesSkeleton from "./MyClassesSkeleton"
 
 const resolvePageSkeleton = (path: string): JSX.Element => {
@@ -46,6 +47,7 @@ const resolvePageSkeleton = (path: string): JSX.Element => {
 
   // Users & classes management
   if (/\/admin\/users/.test(path)) return <AdminUsersSkeleton />
+  if (/\/admin\/classes/.test(path)) return <AdminClassesSkeleton />
   if (/\/teacher\/my-classes/.test(path)) return <MyClassesSkeleton />
 
   // Dashboards

@@ -40,5 +40,8 @@ namespace IPCheckr.Api.DTOs.Class
 
         [Required]
         public required string[] TeacherUsernames { get; set; }
+
+        [Required]
+        public int StudentCount { get; set; }
     }
 }

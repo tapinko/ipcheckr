@@ -41,7 +41,8 @@ namespace IPCheckr.Api.Controllers
                 ClassId = c.Id,
                 ClassName = c.Name,
                 Teachers = c.Teachers?.Select(t => t.Id).ToArray() ?? Array.Empty<int>(),
-                TeacherUsernames = c.Teachers?.Select(t => UsernameUtils.ToDisplay(t.Username)).ToArray() ?? Array.Empty<string>()
+                TeacherUsernames = c.Teachers?.Select(t => UsernameUtils.ToDisplay(t.Username)).ToArray() ?? Array.Empty<string>(),
+                StudentCount = c.Students?.Count ?? 0
             }).ToArray();
 
             var res = new QueryClassesRes

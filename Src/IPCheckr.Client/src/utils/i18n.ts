@@ -287,6 +287,12 @@ export enum TranslationKey {
   ADMIN_CLASSES_DELETE_SUCCESS = "ADMIN_CLASSES_DELETE_SUCCESS",
   ADMIN_CLASSES_DELETE_ERROR = "ADMIN_CLASSES_DELETE_ERROR",
   ADMIN_CLASSES_SAVE = "ADMIN_CLASSES_SAVE",
+  ADMIN_CLASSES_SEARCH = "ADMIN_CLASSES_SEARCH",
+  ADMIN_CLASSES_STUDENTS = "ADMIN_CLASSES_STUDENTS",
+  ADMIN_CLASSES_NO_DATA = "ADMIN_CLASSES_NO_DATA",
+  ADMIN_CLASSES_ADD_TOOLTIP = "ADMIN_CLASSES_ADD_TOOLTIP",
+  ADMIN_CLASSES_DELETE_SELECTED = "ADMIN_CLASSES_DELETE_SELECTED",
+  ADMIN_CLASSES_NO_TEACHERS = "ADMIN_CLASSES_NO_TEACHERS",
 
   // AdminClassDetails
   ADMIN_CLASS_DETAILS_CLASS_NAME = "ADMIN_CLASS_DETAILS_CLASS_NAME",
@@ -1217,7 +1223,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_CLASSES_CLASS]: "Class",
   [TranslationKey.ADMIN_CLASSES_DELETE_CONFIRMATION_QUESTION]: "You are about to delete these classes. Are you sure?",
   [TranslationKey.ADMIN_CLASSES_DELETE_CONFIRMATION_TITLE]: "Delete classes",
-  [TranslationKey.ADMIN_CLASSES_ALL]: "All",
+  [TranslationKey.ADMIN_CLASSES_ALL]: "All teachers",
   [TranslationKey.ADMIN_CLASSES_TEACHER]: "Teacher",
   [TranslationKey.ADMIN_CLASSES_NAME]: "Name",
   [TranslationKey.ADMIN_CLASSES_CANCEL]: "Cancel",
@@ -1229,6 +1235,12 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_CLASSES_DELETE_SUCCESS]: "Classes deleted successfully",
   [TranslationKey.ADMIN_CLASSES_DELETE_ERROR]: "Error deleting classes",
   [TranslationKey.ADMIN_CLASSES_SAVE]: "Save",
+  [TranslationKey.ADMIN_CLASSES_SEARCH]: "Name",
+  [TranslationKey.ADMIN_CLASSES_STUDENTS]: "Students",
+  [TranslationKey.ADMIN_CLASSES_NO_DATA]: "No classes found",
+  [TranslationKey.ADMIN_CLASSES_ADD_TOOLTIP]: "Create class",
+  [TranslationKey.ADMIN_CLASSES_DELETE_SELECTED]: "Delete selected",
+  [TranslationKey.ADMIN_CLASSES_NO_TEACHERS]: "No teachers assigned",
 
   // ADMINClassDetails
   [TranslationKey.ADMIN_CLASS_DETAILS_CLASS_NAME]: "Class name",
@@ -2158,7 +2170,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_CLASSES_CLASS]: "Trieda",
   [TranslationKey.ADMIN_CLASSES_DELETE_CONFIRMATION_QUESTION]: "Chystáte sa odstrániť tieto triedy. Ste si istý?",
   [TranslationKey.ADMIN_CLASSES_DELETE_CONFIRMATION_TITLE]: "Potvrdiť odstránenie tried",
-  [TranslationKey.ADMIN_CLASSES_ALL]: "Všetky",
+  [TranslationKey.ADMIN_CLASSES_ALL]: "Všetci učitelia",
   [TranslationKey.ADMIN_CLASSES_TEACHER]: "Učiteľ",
   [TranslationKey.ADMIN_CLASSES_NAME]: "Názov",
   [TranslationKey.ADMIN_CLASSES_CANCEL]: "Zrušiť",
@@ -2170,6 +2182,12 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_CLASSES_DELETE_SUCCESS]: "Triedy boli úspešne odstránené",
   [TranslationKey.ADMIN_CLASSES_DELETE_ERROR]: "Chyba pri odstraňovaní tried",
   [TranslationKey.ADMIN_CLASSES_SAVE]: "Uložiť",
+  [TranslationKey.ADMIN_CLASSES_SEARCH]: "Názov",
+  [TranslationKey.ADMIN_CLASSES_STUDENTS]: "Žiakov",
+  [TranslationKey.ADMIN_CLASSES_NO_DATA]: "Žiadne triedy",
+  [TranslationKey.ADMIN_CLASSES_ADD_TOOLTIP]: "Vytvoriť triedu",
+  [TranslationKey.ADMIN_CLASSES_DELETE_SELECTED]: "Odstrániť vybrané",
+  [TranslationKey.ADMIN_CLASSES_NO_TEACHERS]: "Žiadni učitelia",
 
   // AdminClassDetails
   [TranslationKey.ADMIN_CLASS_DETAILS_CLASS_NAME]: "Názov triedy",

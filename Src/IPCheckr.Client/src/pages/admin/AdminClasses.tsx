@@ -1,566 +1,384 @@
-import { useState } from "react"
-import { useTranslation } from "react-i18next"
-import ActionPanel from "../../components/ActionPanel"
-import DeleteDialog from "../../components/DeleteDialog"
-import DataGridWithSearch from "../../components/DataGridWithSearch"
-import { classApi, userApi } from "../../utils/apiClients"
-import type { ClassDto, UserDto, ApiProblemDetails, CreateClassRes } from "../../dtos"
+import AddIcon from "@mui/icons-material/Add"
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
+import SearchIcon from "@mui/icons-material/Search"
 import {
+  Box,
   Button,
+  Card,
+  CardContent,
   Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControl,
+  IconButton,
+  InputAdornment,
   InputLabel,
   ListItemText,
   MenuItem,
   OutlinedInput,
   Select,
-  TextField
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material"
-import type { IClassesSelectedRows } from "../../types/ISelectedRows"
-import i18n, { Language, TranslationKey } from "../../utils/i18n"
-import { Controller, useForm } from "react-hook-form"
-import FormRules from "../../utils/FormRules"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import TableSkeleton from "../../components/TableSkeleton"
-import ErrorLoading from "../../components/ErrorLoading"
-import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { AxiosError, AxiosResponse } from "axios"
-import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import { useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
+import ClassCard from "../../components/ClassCard"
+import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
+import DeleteDialog from "../../components/DeleteDialog"
+import ErrorLoading from "../../components/ErrorLoading"
+import type { ApiProblemDetails, ClassDto, CreateClassRes, UserDto } from "../../dtos"
+import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import UserRole from "../../types/UserRole"
+import { classApi, userApi } from "../../utils/apiClients"
+import FormRules from "../../utils/FormRules"
+import i18n, { Language, TranslationKey } from "../../utils/i18n"
 
-type CreateClassFormValues = {
-  className: string
-  teacherIds: number[]
-}
-
-type EditClassFormValues = {
-  className: string
-  teacherIds: number[]
-}
-
-type ClassRow = ClassDto & { teacherUsernamesDisplay: string; id: number }
+type CreateFormValues = { className: string; teacherIds: number[] }
+type EditFormValues = { className: string; teacherIds: number[] }
 
 const AdminClasses = () => {
-  const navigate = useNavigate()
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const createClassDefaultValues: CreateClassFormValues = {
-    className: "",
-    teacherIds: []
-  }
-
-  const editClassDefaultValues: EditClassFormValues = {
-    className: "",
-    teacherIds: []
-  }
-
-  const selectedRowsDefault: IClassesSelectedRows = {
-    rowId: [],
-    classId: [],
-    className: []
-  }
-
-  const {
-    control: createClassControl,
-    handleSubmit: handleCreateClassSubmit,
-    reset: resetCreateClass,
-    watch: watchCreateClass,
-    formState: { errors: createClassErrors }
-  } = useForm<CreateClassFormValues>({
-    defaultValues: createClassDefaultValues,
-    mode: "onBlur"
-  })
-
-  const {
-    control: editClassControl,
-    handleSubmit: handleEditClassSubmit,
-    reset: resetEditClass,
-    watch: watchEditClass,
-    formState: { errors: editClassErrors }
-  } = useForm<EditClassFormValues>({
-    defaultValues: editClassDefaultValues,
-    mode: "onBlur"
-  })
-
-  const createWatch = watchCreateClass()
-  const editWatch = watchEditClass()
-
-  const [searchValue, setSearchValue] = useState("")
-  const [selectedRows, setSelectedRows] = useState<IClassesSelectedRows>(selectedRowsDefault)
-
+  const [search, setSearch] = useState("")
+  const [teacherFilter, setTeacherFilter] = useState<number | null>(null)
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [createDialogVis, setCreateDialogVis] = useState(false)
-  const [deleteDialogVis, setDeleteDialogvis] = useState(false)
-  const [editDialogVis, setEditDialogVis] = useState(false)
-
-  const [teacherFilterValue, setTeacherFilterValue] = useState("")
-  const [descending, setDescending] = useState(false)
-
+  const [editingClass, setEditingClass] = useState<ClassDto | null>(null)
+  const [deletingIds, setDeletingIds] = useState<number[]>([])
+  const [deleteDialogVis, setDeleteDialogVis] = useState(false)
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
 
-  const classesQuery = useQuery<ClassRow[], Error>({
-    queryKey: ["classes", { searchValue, teacherFilterValue, descending }],
-    queryFn: () =>
-      classApi
-        .classQueryClasses(
-          null,
-          searchValue || null,
-          teacherFilterValue ? Number(teacherFilterValue) : null,
-          null,
-          descending || null
-        )
-        .then(r =>
-          (r.data.classes ?? []).map(c => ({
-            ...c,
-            id: c.classId,
-            teacherUsernamesDisplay: (c.teacherUsernames ?? []).join(", ")
-          }))
-        ),
-    placeholderData: prev => prev
+  const createDefaults: CreateFormValues = { className: "", teacherIds: [] }
+  const {
+    control: createControl, handleSubmit: handleCreateSubmit, reset: resetCreate, watch: watchCreate,
+    formState: { errors: createErrors }
+  } = useForm<CreateFormValues>({ defaultValues: createDefaults, mode: "onBlur" })
+  const createClassName = watchCreate("className")
+
+  const editDefaults: EditFormValues = { className: "", teacherIds: [] }
+  const {
+    control: editControl, handleSubmit: handleEditSubmit, reset: resetEdit, watch: watchEdit,
+    formState: { errors: editErrors }
+  } = useForm<EditFormValues>({ defaultValues: editDefaults, mode: "onBlur" })
+  const editClassName = watchEdit("className")
+
+  const classesQuery = useQuery<ClassDto[], Error>({
+    queryKey: ["classes", search, teacherFilter],
+    queryFn: () => classApi.classQueryClasses(null, search || null, teacherFilter).then(r => r.data.classes),
+    placeholderData: prev => prev,
   })
 
   const teachersQuery = useQuery<UserDto[], Error>({
     queryKey: ["teachers"],
-    queryFn: () =>
-      userApi
-        .userQueryUsers(null, null, "Teacher")
-        .then(r => r.data.users),
-    staleTime: 5 * 60_000
+    queryFn: () => userApi.userQueryUsers(null, null, UserRole.TEACHER).then(r => r.data.users),
+    staleTime: 5 * 60_000,
   })
 
-  const createClassMutation = useMutation<
-    AxiosResponse<CreateClassRes>,
-    AxiosError<ApiProblemDetails>,
-    CreateClassFormValues
-  >({
-    mutationFn: (data) =>
-      classApi.classCreateClass({
-        className: data.className,
-        teachers: data.teacherIds
-      }),
-    onSuccess: () => {
+  const createMutation = useMutation<AxiosResponse<CreateClassRes>, AxiosError<ApiProblemDetails>, CreateFormValues>({
+    mutationFn: data => classApi.classCreateClass({ className: data.className, teachers: data.teacherIds }),
+    onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["classes"] })
-      setAlert({
-        severity: "success",
-        message: t(TranslationKey.ADMIN_CLASSES_CREATE_SUCCESS, {
-          value: createWatch.className
-        })
-      })
+      setAlert({ severity: "success", message: t(TranslationKey.ADMIN_CLASSES_CREATE_SUCCESS, { value: vars.className }) })
     },
-    onError: (error) => {
-      const details = error.response?.data
-      const localMessage =
-        i18n.language === Language.EN
-          ? details?.messageEn
-          : details?.messageSk
-      setAlert({
-        severity: "error",
-        message: `${t(TranslationKey.ADMIN_CLASSES_CREATE_ERROR)}. ${localMessage ?? ""}`
-      })
-    }
+    onError: error => {
+      const msg = i18n.language === Language.EN ? error.response?.data?.messageEn : error.response?.data?.messageSk
+      setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASSES_CREATE_ERROR)}. ${msg ?? ""}` })
+    },
   })
 
-  const deleteClassesMutation = useMutation<
-    AxiosResponse,
-    AxiosError<ApiProblemDetails>,
-    IClassesSelectedRows["classId"]
-  >({
-    mutationFn: (classIds) =>
-      classApi.classDeleteClasses({ classIds }),
-    onSuccess: () => {
+  const editMutation = useMutation<AxiosResponse, AxiosError<ApiProblemDetails>, EditFormValues & { id: number }>({
+    mutationFn: data => classApi.classEditClass({ id: data.id, classname: data.className, teachers: data.teacherIds }),
+    onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["classes"] })
-      setAlert({
-        severity: "warning",
-        message: t(TranslationKey.ADMIN_CLASSES_DELETE_SUCCESS, {
-          value: selectedRows.className.join(", ")
-        })
-      })
+      setAlert({ severity: "success", message: t(TranslationKey.ADMIN_CLASSES_EDIT_SUCCESS, { value: vars.className }) })
     },
-    onError: (error) => {
-      const details = error.response?.data
-      const localMessage =
-        i18n.language === Language.EN
-          ? details?.messageEn
-          : details?.messageSk
-      setAlert({
-        severity: "error",
-        message: `${t(TranslationKey.ADMIN_CLASSES_DELETE_ERROR)}. ${localMessage ?? ""}`
-      })
-    }
+    onError: error => {
+      const msg = i18n.language === Language.EN ? error.response?.data?.messageEn : error.response?.data?.messageSk
+      setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASSES_EDIT_ERROR)}. ${msg ?? ""}` })
+    },
   })
 
-  const editClassMutation = useMutation<
-    AxiosResponse,
-    AxiosError<ApiProblemDetails>,
-    EditClassFormValues
-  >({
-    mutationFn: (data) =>
-      classApi.classEditClass({
-        id: selectedRows.classId[0],
-        classname: data.className,
-        teachers: data.teacherIds
-      }),
-    onSuccess: () => {
+  const deleteMutation = useMutation<AxiosResponse, AxiosError<ApiProblemDetails>, number[]>({
+    mutationFn: classIds => classApi.classDeleteClasses({ classIds }),
+    onSuccess: (_, classIds) => {
       queryClient.invalidateQueries({ queryKey: ["classes"] })
-      setAlert({
-        severity: "success",
-        message: t(TranslationKey.ADMIN_CLASSES_EDIT_SUCCESS, {
-          value: editWatch.className
-        })
-      })
+      setSelectedIds(prev => prev.filter(id => !classIds.includes(id)))
+      const names = (classesQuery.data ?? []).filter(c => classIds.includes(c.classId)).map(c => c.className).join(", ")
+      setAlert({ severity: "warning", message: t(TranslationKey.ADMIN_CLASSES_DELETE_SUCCESS, { value: names }) })
     },
-    onError: (error) => {
-      const details = error.response?.data
-      const localMessage =
-        i18n.language === Language.EN
-          ? details?.messageEn
-          : details?.messageSk
-      setAlert({
-        severity: "error",
-        message: `${t(TranslationKey.ADMIN_CLASSES_EDIT_ERROR)}. ${localMessage ?? ""}`
-      })
-    }
+    onError: error => {
+      const msg = i18n.language === Language.EN ? error.response?.data?.messageEn : error.response?.data?.messageSk
+      setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASSES_DELETE_ERROR)}. ${msg ?? ""}` })
+    },
   })
 
-  const columns = [
-    { label: t(TranslationKey.ADMIN_CLASSES_CLASS), key: "className" },
-    { label: t(TranslationKey.ADMIN_CLASSES_TEACHERS), key: "teacherUsernamesDisplay" }
-  ]
+  const toggleSelect = (id: number) =>
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
-  const teacherFilter = {
-    label: t(TranslationKey.ADMIN_CLASSES_TEACHER),
-    value: teacherFilterValue,
-    setValue: setTeacherFilterValue,
-    options: [
-      { value: "", label: t(TranslationKey.ADMIN_CLASSES_ALL) },
-      ...(teachersQuery.data
-        ? teachersQuery.data.map(tchr => ({
-            value: tchr.id.toString(),
-            label: tchr.username
-          }))
-        : [])
-    ]
+  const openEdit = (classId: number) => {
+    const cls = (classesQuery.data ?? []).find(c => c.classId === classId)
+    if (!cls) return
+    setEditingClass(cls)
+    resetEdit({ className: cls.className, teacherIds: cls.teachers ?? [] })
   }
 
-  const handleCreateClass = async (data: CreateClassFormValues) => {
-    await createClassMutation.mutateAsync(data).catch(() => {})
-    resetCreateClass(createClassDefaultValues)
+  const openDelete = (classIds: number[]) => {
+    setDeletingIds(classIds)
+    setDeleteDialogVis(true)
+  }
+
+  const handleCreate = async (data: CreateFormValues) => {
+    await createMutation.mutateAsync(data).catch(() => {})
+    resetCreate(createDefaults)
     setCreateDialogVis(false)
   }
 
-  const handleDeleteClasses = async () => {
-    if (selectedRows.classId.length === 0) return
-    await deleteClassesMutation.mutateAsync(selectedRows.classId).catch(() => {})
-    setSelectedRows(selectedRowsDefault)
-    setDeleteDialogvis(false)
+  const handleEdit = async (data: EditFormValues) => {
+    if (!editingClass) return
+    await editMutation.mutateAsync({ ...data, id: editingClass.classId }).catch(() => {})
+    resetEdit(editDefaults)
+    setEditingClass(null)
   }
 
-  const handleEditClass = async (data: EditClassFormValues) => {
-    if (selectedRows.classId.length !== 1) return
-    await editClassMutation.mutateAsync(data).catch(() => {})
-    resetEditClass(editClassDefaultValues)
-    setEditDialogVis(false)
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync(deletingIds).catch(() => {})
+    setDeleteDialogVis(false)
+    setDeletingIds([])
   }
 
-  const createDisabled =
-    !createWatch.className || createClassMutation.isPending
+  const classes = classesQuery.data ?? []
+  const deletingNames = classes.filter(c => deletingIds.includes(c.classId)).map(c => c.className).join(", ")
 
-  const editDisabled =
-    !editWatch.className || editClassMutation.isPending
+  const teacherSelect = (control: any, errors: any, name: "teacherIds") => (
+    <Controller
+      name={name} control={control}
+      render={({ field }) => (
+        <FormControl fullWidth margin="dense">
+          <InputLabel>{t(TranslationKey.ADMIN_CLASSES_TEACHER)}</InputLabel>
+          <Select
+            multiple value={field.value}
+            onChange={e => field.onChange(Array.isArray(e.target.value) ? e.target.value.map(Number) : [])}
+            input={<OutlinedInput label={t(TranslationKey.ADMIN_CLASSES_TEACHER)} />}
+            renderValue={selected =>
+              (teachersQuery.data ?? []).filter(tc => (selected as number[]).includes(tc.id)).map(tc => tc.username).join(", ")
+            }
+          >
+            {(teachersQuery.data ?? []).map(tc => (
+              <MenuItem key={tc.id} value={tc.id}>
+                <Checkbox checked={(field.value ?? []).includes(tc.id)} />
+                <ListItemText primary={tc.username} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+    />
+  )
 
   return (
-    <>
-      <ActionPanel
-        onAdd={() => {
-          resetCreateClass(createClassDefaultValues)
-            setCreateDialogVis(true)
-        }}
-        onEdit={() => {
-          if (selectedRows.classId.length === 1) {
-            const cls = classesQuery.data?.find(c => c.classId === selectedRows.classId[0])
-            if (cls) {
-              resetEditClass({
-                className: cls.className,
-                teacherIds: cls.teachers ?? []
-              })
-              setEditDialogVis(true)
-            }
-          }
-        }}
-        onDetails={() => {
-          navigate(
-            getParametrizedUrl(RouteKeys.ADMIN_CLASS_DETAILS, {
-              [RouteParams.CLASS_ID]:
-                String(selectedRows.classId[0])
-            })
-          )
-        }}
-        onDelete={() => setDeleteDialogvis(true)}
-        disableEdit={selectedRows.classId.length !== 1}
-        disableDetails={selectedRows.classId.length !== 1}
-        disableDelete={
-          selectedRows.classId.length === 0 || deleteClassesMutation.isPending
-        }
-        title={t(TranslationKey.ADMIN_CLASSES_TITLE)}
-        addLabel={t(TranslationKey.ADMIN_CLASSES_CREATE_CLASS)}
-      />
+    <Box display="flex" flexDirection="column" gap={3}>
+      {alert && <CustomAlert {...alert} onClose={() => setAlert(null)} />}
 
-      {classesQuery.isLoading ? (
-        <TableSkeleton />
-      ) : classesQuery.isError ? (
+      {/* Toolbar */}
+      <Card variant="outlined" sx={{ borderRadius: 1, borderColor: theme => theme.palette.divider }}>
+        <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }}>
+            <TextField
+              fullWidth value={search} onChange={e => setSearch(e.target.value)}
+              placeholder={t(TranslationKey.ADMIN_CLASSES_SEARCH)}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  )
+                }
+              }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1, bgcolor: "background.paper" } }}
+            />
+            {selectedIds.length >= 2 && (
+              <Tooltip title={t(TranslationKey.ADMIN_CLASSES_DELETE_SELECTED)}>
+                <span>
+                  <IconButton
+                    onClick={() => openDelete(selectedIds)}
+                    sx={{
+                      border: theme => `1px solid ${theme.palette.error.main}`,
+                      width: 56, height: 56,
+                      "& .MuiSvgIcon-root": { fontSize: 26 },
+                      color: theme => theme.palette.error.dark,
+                      flexShrink: 0
+                    }}
+                  >
+                    <DeleteOutlineIcon />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+            <Tooltip title={t(TranslationKey.ADMIN_CLASSES_ADD_TOOLTIP)}>
+              <span>
+                <IconButton
+                  onClick={() => { resetCreate(createDefaults); setCreateDialogVis(true) }}
+                  sx={{
+                    border: theme => `1px solid ${theme.palette.success.main}`,
+                    width: 56, height: 56,
+                    backgroundColor: theme => theme.palette.success.light,
+                    "& .MuiSvgIcon-root": { fontSize: 30 },
+                    color: theme => theme.palette.success.dark,
+                    flexShrink: 0
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Stack>
+
+          {(teachersQuery.data ?? []).length > 0 && (
+            <>
+              <Divider sx={{ my: 1.75 }} />
+              <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                <Button
+                  variant={teacherFilter === null ? "contained" : "outlined"}
+                  onClick={() => setTeacherFilter(null)}
+                  size="small"
+                  sx={{ borderRadius: 1, textTransform: "none", px: 2, fontWeight: 600, minHeight: 32 }}
+                >
+                  {t(TranslationKey.ADMIN_CLASSES_ALL)}
+                </Button>
+                {(teachersQuery.data ?? []).map(tc => (
+                  <Button
+                    key={tc.id}
+                    variant={teacherFilter === tc.id ? "contained" : "outlined"}
+                    onClick={() => setTeacherFilter(tc.id)}
+                    size="small"
+                    sx={{ borderRadius: 1, textTransform: "none", px: 2, fontWeight: 600, minHeight: 32 }}
+                  >
+                    {tc.username}
+                  </Button>
+                ))}
+              </Stack>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Grid */}
+      {classesQuery.isError ? (
         <ErrorLoading onRetry={() => queryClient.invalidateQueries({ queryKey: ["classes"] })} />
+      ) : classes.length === 0 && !classesQuery.isLoading ? (
+        <Box sx={{ py: 6, textAlign: "center" }}>
+          <Typography color="text.secondary">{t(TranslationKey.ADMIN_CLASSES_NO_DATA)}</Typography>
+        </Box>
       ) : (
-        <DataGridWithSearch
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-          columns={columns}
-          filter1={teacherFilter}
-          rows={classesQuery.data ?? []}
-          selectableRows
-          selectedRows={selectedRows.classId.filter((id): id is number => id !== undefined)}
-          setSelectedRows={classIds => {
-            const rows = classesQuery.data ?? []
-            setSelectedRows({
-              rowId: classIds.map(id => rows.findIndex(c => c.classId === id)),
-              classId: classIds,
-              className: classIds.map(id => rows.find(c => c.classId === id)?.className ?? "")
-            })
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+              lg: "repeat(4, 1fr)",
+            },
+            gap: 2,
           }}
-          descending={descending}
-          setDescending={setDescending}
-        />
+        >
+          {classes.map(cls => (
+            <ClassCard
+              key={cls.classId}
+              classId={cls.classId}
+              className={cls.className}
+              teacherUsernames={cls.teacherUsernames ?? []}
+              studentCount={cls.studentCount}
+              selected={selectedIds.includes(cls.classId)}
+              onSelect={toggleSelect}
+              onEdit={openEdit}
+              onDelete={id => openDelete([id])}
+              onClick={id => navigate(getParametrizedUrl(RouteKeys.ADMIN_CLASS_DETAILS, { [RouteParams.CLASS_ID]: id.toString() }))}
+            />
+          ))}
+        </Box>
       )}
 
-      <Dialog
-        open={createDialogVis}
-        onClose={() => setCreateDialogVis(false)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <form onSubmit={handleCreateClassSubmit(handleCreateClass)}>
-          <DialogTitle>
-            {t(TranslationKey.ADMIN_CLASSES_CREATE_CLASS)}
-          </DialogTitle>
+      {/* Create dialog */}
+      <Dialog open={createDialogVis} onClose={() => { setCreateDialogVis(false); resetCreate(createDefaults) }} fullWidth maxWidth="sm">
+        <form onSubmit={handleCreateSubmit(handleCreate)}>
+          <DialogTitle>{t(TranslationKey.ADMIN_CLASSES_CREATE_CLASS)}</DialogTitle>
           <DialogContent>
             <Controller
-              name="className"
-              control={createClassControl}
-              rules={{
-                ...FormRules.required(),
-                ...FormRules.minLengthShort(),
-                ...FormRules.maxLengthShort(),
-                ...FormRules.patternLettersNumbersSpaces()
-              }}
+              name="className" control={createControl}
+              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort(), ...FormRules.patternLettersNumbersSpaces() }}
               render={({ field }) => (
                 <TextField
-                  margin="dense"
-                  label={t(TranslationKey.ADMIN_CLASSES_NAME)}
-                  fullWidth
-                  {...field}
-                  error={!!createClassErrors.className}
-                  helperText={
-                    createClassErrors.className
-                      ? t(createClassErrors.className.message as string)
-                      : ""
-                  }
+                  {...field} margin="dense" fullWidth label={t(TranslationKey.ADMIN_CLASSES_NAME)}
+                  error={!!createErrors.className}
+                  helperText={createErrors.className ? t(createErrors.className.message as string) : ""}
                 />
               )}
             />
-            <Controller
-              name="teacherIds"
-              control={createClassControl}
-              render={({ field }) => (
-                <FormControl fullWidth margin="dense">
-                  <InputLabel>
-                    {t(TranslationKey.ADMIN_CLASSES_TEACHER)}
-                  </InputLabel>
-                  <Select
-                    multiple
-                    value={field.value}
-                    onChange={e =>
-                      field.onChange(
-                        Array.isArray(e.target.value)
-                          ? e.target.value.map(Number)
-                          : []
-                      )
-                    }
-                    input={
-                      <OutlinedInput
-                        label={t(TranslationKey.ADMIN_CLASSES_TEACHER)}
-                      />
-                    }
-                    renderValue={selected =>
-                      (teachersQuery.data ?? [])
-                        .filter(t =>
-                          (selected as (number | string)[]).includes(t.id)
-                        )
-                        .map(t => t.username)
-                        .join(", ")
-                    }
-                  >
-                    {(teachersQuery.data ?? []).map(teacher => (
-                      <MenuItem key={teacher.id} value={teacher.id}>
-                        <Checkbox
-                          checked={
-                            (field.value ?? []).indexOf(teacher.id) > -1
-                          }
-                        />
-                        <ListItemText primary={teacher.username} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
+            {teacherSelect(createControl, createErrors, "teacherIds")}
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={() => {
-                setCreateDialogVis(false)
-                resetCreateClass(createClassDefaultValues)
-              }}
-            >
+            <Button onClick={() => { setCreateDialogVis(false); resetCreate(createDefaults) }}>
               {t(TranslationKey.ADMIN_CLASSES_CANCEL)}
             </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="success"
-              disabled={createDisabled}
-            >
+            <Button type="submit" variant="contained" color="success" disabled={!createClassName || createMutation.isPending}>
               {t(TranslationKey.ADMIN_CLASSES_CREATE)}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
 
-      <DeleteDialog
-        open={deleteDialogVis}
-        onClose={() => setDeleteDialogvis(false)}
-        onConfirm={handleDeleteClasses}
-        question={t(TranslationKey.ADMIN_CLASSES_DELETE_CONFIRMATION_QUESTION)}
-        title={t(TranslationKey.ADMIN_CLASSES_DELETE_CONFIRMATION_TITLE)}
-        label={selectedRows.className.join(", ")}
-      />
-
-      <Dialog
-        open={editDialogVis}
-        onClose={() => {
-          setEditDialogVis(false)
-          resetEditClass(editClassDefaultValues)
-        }}
-        fullWidth
-        maxWidth="sm"
-      >
-        <form onSubmit={handleEditClassSubmit(handleEditClass)}>
-          <DialogTitle>
-            {t(TranslationKey.ADMIN_CLASSES_EDIT_CLASS)}
-          </DialogTitle>
+      {/* Edit dialog */}
+      <Dialog open={!!editingClass} onClose={() => { setEditingClass(null); resetEdit(editDefaults) }} fullWidth maxWidth="sm">
+        <form onSubmit={handleEditSubmit(handleEdit)}>
+          <DialogTitle>{t(TranslationKey.ADMIN_CLASSES_EDIT_CLASS)}</DialogTitle>
           <DialogContent>
             <Controller
-              name="className"
-              control={editClassControl}
-              rules={{
-                ...FormRules.required(),
-                ...FormRules.minLengthShort(),
-                ...FormRules.maxLengthShort(),
-                ...FormRules.patternLettersNumbersSpaces()
-              }}
+              name="className" control={editControl}
+              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort(), ...FormRules.patternLettersNumbersSpaces() }}
               render={({ field }) => (
                 <TextField
-                  margin="dense"
-                  label={t(TranslationKey.ADMIN_CLASSES_NAME)}
-                  fullWidth
-                  {...field}
-                  error={!!editClassErrors.className}
-                  helperText={
-                    editClassErrors.className
-                      ? t(editClassErrors.className.message as string)
-                      : ""
-                  }
+                  {...field} margin="dense" fullWidth label={t(TranslationKey.ADMIN_CLASSES_NAME)}
+                  error={!!editErrors.className}
+                  helperText={editErrors.className ? t(editErrors.className.message as string) : ""}
                 />
               )}
             />
-            <Controller
-              name="teacherIds"
-              control={editClassControl}
-              render={({ field }) => (
-                <FormControl fullWidth margin="dense">
-                  <InputLabel>
-                    {t(TranslationKey.ADMIN_CLASSES_TEACHER)}
-                  </InputLabel>
-                  <Select
-                    multiple
-                    value={field.value}
-                    onChange={e =>
-                      field.onChange(
-                        Array.isArray(e.target.value)
-                          ? e.target.value.map(Number)
-                          : []
-                      )
-                    }
-                    input={
-                      <OutlinedInput
-                        label={t(TranslationKey.ADMIN_CLASSES_TEACHER)}
-                      />
-                    }
-                    renderValue={selected =>
-                      (teachersQuery.data ?? [])
-                        .filter(t =>
-                          (selected as (number | string)[]).includes(t.id)
-                        )
-                        .map(t => t.username)
-                        .join(", ")
-                    }
-                  >
-                    {(teachersQuery.data ?? []).map(teacher => (
-                      <MenuItem key={teacher.id} value={teacher.id}>
-                        <Checkbox
-                          checked={
-                            (field.value ?? []).indexOf(teacher.id) > -1
-                          }
-                        />
-                        <ListItemText primary={teacher.username} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
+            {teacherSelect(editControl, editErrors, "teacherIds")}
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={() => {
-                setEditDialogVis(false)
-                resetEditClass(editClassDefaultValues)
-              }}
-            >
+            <Button onClick={() => { setEditingClass(null); resetEdit(editDefaults) }}>
               {t(TranslationKey.ADMIN_CLASSES_CANCEL)}
             </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="success"
-              disabled={editDisabled}
-            >
+            <Button type="submit" variant="contained" color="success" disabled={!editClassName || editMutation.isPending}>
               {t(TranslationKey.ADMIN_CLASSES_SAVE)}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
 
-      {alert && (
-        <CustomAlert
-          severity={alert.severity}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
-    </>
+      {/* Delete dialog */}
+      <DeleteDialog
+        open={deleteDialogVis}
+        onClose={() => { setDeleteDialogVis(false); setDeletingIds([]) }}
+        onConfirm={handleDelete}
+        question={t(TranslationKey.ADMIN_CLASSES_DELETE_CONFIRMATION_QUESTION)}
+        title={t(TranslationKey.ADMIN_CLASSES_DELETE_CONFIRMATION_TITLE)}
+        label={deletingNames}
+      />
+    </Box>
   )
 }
 

@@ -982,6 +982,12 @@ export interface ClassDto {
      * @memberof ClassDto
      */
     'teacherUsernames': Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof ClassDto
+     */
+    'studentCount': number;
 }
 /**
  * 
