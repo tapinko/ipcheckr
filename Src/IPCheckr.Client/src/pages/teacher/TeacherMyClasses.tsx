@@ -2,7 +2,6 @@ import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import SearchIcon from "@mui/icons-material/Search"
 import {
   Autocomplete,
   Box,
@@ -14,16 +13,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   FormControl,
   IconButton,
-  InputAdornment,
   InputLabel,
   ListItemText,
   MenuItem,
   OutlinedInput,
   Select,
-  Skeleton,
   Stack,
   TextField,
   Tooltip,
@@ -39,6 +35,7 @@ import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert
 import DeleteDialog from "../../components/DeleteDialog"
 import ErrorLoading from "../../components/ErrorLoading"
 import MyClassesSkeleton from "../../components/MyClassesSkeleton"
+import UserListPanel, { type UserRow } from "../../components/UserListPanel"
 import { useAuth } from "../../contexts/AuthContext"
 import type { AddUserRes, ApiProblemDetails, ClassDto, IsLdapAuthRes, LdapUserDto, UserDto } from "../../dtos"
 import { classApi, userApi } from "../../utils/apiClients"
@@ -64,12 +61,6 @@ type AddStudentFormValues = {
   classIds: number[]
 }
 
-type EditStudentFormValues = {
-  username: string
-  password: string
-  classIds: number[]
-}
-
 const minLdapSearchChars = 2
 
 const TeacherMyClasses = () => {
@@ -83,17 +74,10 @@ const TeacherMyClasses = () => {
   const [editClassDialogVis, setEditClassDialogVis] = useState(false)
   const [deleteClassDialogVis, setDeleteClassDialogVis] = useState(false)
   const [removeSelfDialogVis, setRemoveSelfDialogVis] = useState(false)
-
   const [pendingEditData, setPendingEditData] = useState<EditClassFormValues | null>(null)
 
   const [studentSearch, setStudentSearch] = useState("")
-  const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([])
   const [addStudentDialogVis, setAddStudentDialogVis] = useState(false)
-  const [editStudentDialogVis, setEditStudentDialogVis] = useState(false)
-  const [deleteStudentDialogVis, setDeleteStudentDialogVis] = useState(false)
-  const [bulkDeleteDialogVis, setBulkDeleteDialogVis] = useState(false)
-  const [editingStudentId, setEditingStudentId] = useState<number | null>(null)
-  const [deletingStudentId, setDeletingStudentId] = useState<number | null>(null)
 
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
 
@@ -122,19 +106,10 @@ const TeacherMyClasses = () => {
     formState: { errors: addStudentErrors }
   } = useForm<AddStudentFormValues>({ defaultValues: getAddStudentDefaults(), mode: "onBlur" })
 
-  const {
-    handleSubmit: handleEditStudentSubmit, control: editStudentControl,
-    reset: resetEditStudent, watch: watchEditStudent,
-    formState: { errors: editStudentErrors }
-  } = useForm<EditStudentFormValues>({
-    defaultValues: { username: "", password: "", classIds: [] }, mode: "onBlur"
-  })
-
   const createClassNameValue = watchCreate("className")
   const editClassNameValue = watchEditClass("className")
   const editClassTeachersValue = watchEditClass("teachers")
   const addStudentValues = watchAddStudent()
-  const editStudentUsernameValue = watchEditStudent("username")
 
   const classesQuery = useQuery<ClassDto[], Error>({
     queryKey: ["teacherClasses", userId],
@@ -181,10 +156,6 @@ const TeacherMyClasses = () => {
     const classes = classesQuery.data ?? []
     if (classes.length && !selectedClassId) setSelectedClassId(classes[0].classId)
   }, [classesQuery.data]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    setSelectedStudentIds([])
-  }, [selectedClassId])
 
   const createMutation = useMutation<{ classId: number }, unknown, CreateClassFormValues>({
     mutationFn: data =>
@@ -248,52 +219,6 @@ const TeacherMyClasses = () => {
     }
   })
 
-  const editStudentMutation = useMutation<AxiosResponse, AxiosError<ApiProblemDetails>, EditStudentFormValues>({
-    mutationFn: data =>
-      userApi.userEditUser({
-        id: editingStudentId!,
-        username: data.username,
-        password: data.password || undefined,
-        classIds: data.classIds
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["classStudents"] })
-      setAlert({ severity: "success", message: t(TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT_SUCCESS, { value: editStudentUsernameValue }) })
-      closeEditStudentDialog()
-    },
-    onError: error => {
-      const msg = i18n.language === Language.EN ? error.response?.data?.messageEn : error.response?.data?.messageSk
-      setAlert({ severity: "error", message: `${t(TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT_ERROR)}. ${msg ?? ""}` })
-    }
-  })
-
-  const deleteStudentMutation = useMutation<AxiosResponse, AxiosError<ApiProblemDetails>, number>({
-    mutationFn: id => classApi.classEditClass({ id: selectedClassId!, students: students.filter(s => s.id !== id).map(s => s.id) }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["classStudents"] })
-      queryClient.invalidateQueries({ queryKey: ["allStudentsForClassAssign"] })
-      setAlert({ severity: "warning", message: t(TranslationKey.TEACHER_MY_CLASSES_DELETE_STUDENTS_SUCCESS) })
-    },
-    onError: error => {
-      const msg = i18n.language === Language.EN ? error.response?.data?.messageEn : error.response?.data?.messageSk
-      setAlert({ severity: "error", message: `${t(TranslationKey.TEACHER_MY_CLASSES_DELETE_STUDENTS_ERROR)}. ${msg ?? ""}` })
-    }
-  })
-
-  const bulkDeleteMutation = useMutation<AxiosResponse, AxiosError<ApiProblemDetails>, number[]>({
-    mutationFn: ids => classApi.classEditClass({ id: selectedClassId!, students: students.filter(s => !ids.includes(s.id)).map(s => s.id) }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["classStudents"] })
-      queryClient.invalidateQueries({ queryKey: ["allStudentsForClassAssign"] })
-      setSelectedStudentIds([])
-      setAlert({ severity: "warning", message: t(TranslationKey.TEACHER_MY_CLASSES_DELETE_STUDENTS_SUCCESS) })
-    },
-    onError: error => {
-      const msg = i18n.language === Language.EN ? error.response?.data?.messageEn : error.response?.data?.messageSk
-      setAlert({ severity: "error", message: `${t(TranslationKey.TEACHER_MY_CLASSES_DELETE_STUDENTS_ERROR)}. ${msg ?? ""}` })
-    }
-  })
-
   const closeCreateDialog = () => { setCreateDialogVis(false); resetCreate() }
 
   const closeEditClassDialog = () => {
@@ -339,23 +264,6 @@ const TeacherMyClasses = () => {
 
   const closeAddStudentDialog = () => { setAddStudentDialogVis(false); resetAddStudent(getAddStudentDefaults()) }
 
-  const closeEditStudentDialog = () => {
-    setEditStudentDialogVis(false)
-    resetEditStudent({ username: "", password: "", classIds: [] })
-    setEditingStudentId(null)
-  }
-
-  const openEditStudentDialog = (student: UserDto) => {
-    setEditingStudentId(student.id)
-    resetEditStudent({ username: student.username, password: "", classIds: student.classIds ?? [] })
-    setEditStudentDialogVis(true)
-  }
-
-  const openDeleteStudentDialog = (id: number) => {
-    setDeletingStudentId(id)
-    setDeleteStudentDialogVis(true)
-  }
-
   const handleAddStudent = async (data: AddStudentFormValues) => {
     if (!isLdapAuth && !isExistingStudentSelected && !data.password?.trim()) {
       setAddStudentError("password", { type: "manual", message: TranslationKey.FORM_RULES_REQUIRED as unknown as string })
@@ -364,9 +272,6 @@ const TeacherMyClasses = () => {
     clearAddStudentErrors("password")
     await addStudentMutation.mutateAsync(data).catch(() => {})
   }
-
-  const toggleStudent = (id: number) =>
-    setSelectedStudentIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
   const addStudentDisabled =
     !addStudentValues.username ||
@@ -378,7 +283,28 @@ const TeacherMyClasses = () => {
   const isError = classesQuery.isError
   const classes = classesQuery.data ?? []
   const students = studentsQuery.data ?? []
-  const deletingStudent = students.find(s => s.id === deletingStudentId)
+  const studentRows: UserRow[] = students.map(s => ({ ...s, classNamesDisplay: "" }))
+
+  const handleStudentEditSave = async (userId: number, data: { username: string; password: string; classIds: number[] }) => {
+    const res = await userApi.userEditUser({
+      id: userId,
+      username: data.username,
+      password: data.password || undefined,
+      classIds: data.classIds
+    })
+    queryClient.invalidateQueries({ queryKey: ["classStudents"] })
+    return res
+  }
+
+  const handleStudentDelete = async (userIds: number[]) => {
+    const res = await classApi.classEditClass({
+      id: selectedClassId!,
+      students: students.filter(s => !userIds.includes(s.id)).map(s => s.id)
+    })
+    queryClient.invalidateQueries({ queryKey: ["classStudents"] })
+    queryClient.invalidateQueries({ queryKey: ["allStudentsForClassAssign"] })
+    return res
+  }
 
   return (
     <Box display="flex" flexDirection="column" gap={3}>
@@ -481,138 +407,30 @@ const TeacherMyClasses = () => {
           </Card>
 
           {selectedClassId && (
-            <Card variant="outlined" sx={{ borderRadius: 1, borderColor: theme => theme.palette.divider }}>
-              <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }}>
-                  <TextField
-                    fullWidth
-                    value={studentSearch}
-                    onChange={e => setStudentSearch(e.target.value)}
-                    placeholder={t(TranslationKey.TEACHER_MY_CLASSES_SEARCH)}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon fontSize="small" />
-                        </InputAdornment>
-                      )
-                    }}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1, bgcolor: "background.paper" } }}
-                  />
-                  {selectedStudentIds.length >= 2 && (
-                    <Tooltip title={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_TITLE_STUDENTS)}>
-                      <span>
-                        <IconButton
-                          onClick={() => setBulkDeleteDialogVis(true)}
-                          sx={{
-                            border: theme => `1px solid ${theme.palette.error.main}`,
-                            width: 56, height: 56,
-                            "& .MuiSvgIcon-root": { fontSize: 26 },
-                            color: theme => theme.palette.error.dark,
-                            flexShrink: 0
-                          }}
-                        >
-                          <DeleteOutlineIcon />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                  )}
-                  <Tooltip title={t(TranslationKey.TEACHER_MY_CLASSES_ADD_STUDENT)}>
-                    <span>
-                      <IconButton
-                        onClick={() => { resetAddStudent(getAddStudentDefaults()); setAddStudentDialogVis(true) }}
-                        sx={{
-                          border: theme => `1px solid ${theme.palette.success.main}`,
-                          width: 56, height: 56,
-                          backgroundColor: theme => theme.palette.success.light,
-                          "& .MuiSvgIcon-root": { fontSize: 30 },
-                          color: theme => theme.palette.success.dark,
-                          flexShrink: 0
-                        }}
-                      >
-                        <AddIcon />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                </Stack>
-              </CardContent>
-
-              <Divider />
-
-              {studentsQuery.isLoading ? (
-                <Box>
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        display: "flex", alignItems: "center", px: 1, py: 0.5,
-                        borderBottom: i < 5 ? "1px solid" : "none", borderColor: "divider"
-                      }}
-                    >
-                      <Skeleton variant="rounded" width={24} height={24} sx={{ borderRadius: 0.5, flexShrink: 0 }} />
-                      <Skeleton variant="text" sx={{ flex: 1, mx: 1.5, fontSize: "1rem" }} />
-                      <Stack direction="row" spacing={0.5}>
-                        <Skeleton variant="circular" width={28} height={28} />
-                        <Skeleton variant="circular" width={28} height={28} />
-                      </Stack>
-                    </Box>
-                  ))}
-                </Box>
-              ) : studentsQuery.isError ? (
-                <Box sx={{ p: 2 }}>
-                  <ErrorLoading onRetry={() => queryClient.invalidateQueries({ queryKey: ["classStudents"] })} />
-                </Box>
-              ) : students.length === 0 ? (
-                <Box sx={{ px: 3, py: 4, textAlign: "center" }}>
-                  <Typography color="text.secondary">{t(TranslationKey.TEACHER_MY_CLASSES_NO_DATA)}</Typography>
-                </Box>
-              ) : (
-                <Box>
-                  {students.map((student, index) => (
-                    <Box
-                      key={student.id}
-                      onClick={() => navigate(getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS, { [RouteParams.STUDENT_ID]: student.id.toString() }))}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        px: 1,
-                        py: 0.5,
-                        borderBottom: index < students.length - 1 ? "1px solid" : "none",
-                        borderColor: "divider",
-                        cursor: "pointer",
-                        "&:hover": { bgcolor: "action.hover" },
-                        "&:hover .student-name": { textDecoration: "underline" }
-                      }}
-                    >
-                      <Checkbox
-                        size="small"
-                        checked={selectedStudentIds.includes(student.id)}
-                        onChange={() => toggleStudent(student.id)}
-                        onClick={e => e.stopPropagation()}
-                      />
-
-                      <Typography className="student-name" sx={{ flex: 1, fontWeight: 500, ml: 0.5 }}>
-                        {student.username}
-                      </Typography>
-
-                      <Stack direction="row" onClick={e => e.stopPropagation()}>
-                        <IconButton
-                          size="small"
-                          onClick={() => openDeleteStudentDialog(student.id)}
-                        >
-                          <DeleteOutlineIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => openEditStudentDialog(student)}
-                        >
-                          <EditOutlinedIcon fontSize="small" />
-                        </IconButton>
-                      </Stack>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-            </Card>
+            <UserListPanel
+              key={selectedClassId}
+              users={studentRows}
+              isLoading={studentsQuery.isLoading}
+              isError={studentsQuery.isError}
+              onRetry={() => queryClient.invalidateQueries({ queryKey: ["classStudents"] })}
+              search={studentSearch}
+              onSearchChange={setStudentSearch}
+              addTooltip={t(TranslationKey.TEACHER_MY_CLASSES_ADD_STUDENT)}
+              onAddClick={() => { resetAddStudent(getAddStudentDefaults()); setAddStudentDialogVis(true) }}
+              isLdapAuth={isLdapAuth}
+              classesData={classesQuery.data}
+              onEditSave={handleStudentEditSave}
+              editSuccessMessage={t(TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT_SUCCESS)}
+              editErrorMessage={t(TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT_ERROR)}
+              onDelete={handleStudentDelete}
+              deleteQuestion={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_QUESTION_STUDENTS)}
+              deleteTitle={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_TITLE_STUDENTS)}
+              deleteBulkTooltip={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_TITLE_STUDENTS)}
+              deleteSuccessMessage={t(TranslationKey.TEACHER_MY_CLASSES_DELETE_STUDENTS_SUCCESS)}
+              deleteErrorMessage={t(TranslationKey.TEACHER_MY_CLASSES_DELETE_STUDENTS_ERROR)}
+              noDataMessage={t(TranslationKey.TEACHER_MY_CLASSES_NO_DATA)}
+              onRowClick={student => navigate(getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS, { [RouteParams.STUDENT_ID]: student.id.toString() }))}
+            />
           )}
         </>
       )}
@@ -820,82 +638,6 @@ const TeacherMyClasses = () => {
           </DialogActions>
         </form>
       </Dialog>
-
-      <Dialog open={editStudentDialogVis} onClose={closeEditStudentDialog} fullWidth maxWidth="md">
-        <form onSubmit={handleEditStudentSubmit(data => editStudentMutation.mutate(data))}>
-          <DialogTitle>{t(TranslationKey.TEACHER_MY_CLASSES_EDIT_STUDENT)}</DialogTitle>
-          <DialogContent>
-            <Controller
-              name="username" control={editStudentControl}
-              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.patternLettersNumbersDots() }}
-              render={({ field }) => (
-                <TextField {...field} disabled={isLdapAuth} margin="dense" fullWidth
-                  label={t(TranslationKey.TEACHER_MY_CLASSES_USERNAME)}
-                  error={!!editStudentErrors.username}
-                  helperText={editStudentErrors.username ? t(editStudentErrors.username.message as string) : ""}
-                />
-              )}
-            />
-            <Controller
-              name="password" control={editStudentControl}
-              rules={{ ...FormRules.minLengthLong(), ...FormRules.maxLengthLong(), ...FormRules.patternLettersNumbersSpecial() }}
-              render={({ field }) => (
-                <TextField {...field} disabled={isLdapAuth} margin="dense" type="password" fullWidth
-                  label={t(TranslationKey.TEACHER_MY_CLASSES_PASSWORD)}
-                  error={!!editStudentErrors.password}
-                  helperText={isLdapAuth ? "" : (editStudentErrors.password ? t(editStudentErrors.password.message as string) : "")}
-                />
-              )}
-            />
-            <Controller
-              name="classIds" control={editStudentControl}
-              render={({ field }) => (
-                <FormControl fullWidth margin="dense">
-                  <InputLabel id="edit-student-classes-label">{t(TranslationKey.TEACHER_MY_CLASSES_CLASSES)}</InputLabel>
-                  <Select multiple labelId="edit-student-classes-label" value={field.value}
-                    onChange={e => field.onChange(Array.isArray(e.target.value) ? e.target.value.map(Number) : [])}
-                    input={<OutlinedInput label={t(TranslationKey.TEACHER_MY_CLASSES_CLASSES)} />}
-                    renderValue={selected =>
-                      (classesQuery.data ?? []).filter(c => (selected as number[]).includes(c.classId)).map(c => c.className).join(", ")
-                    }
-                  >
-                    {(classesQuery.data ?? []).map(cls => (
-                      <MenuItem key={cls.classId} value={cls.classId}>
-                        <Checkbox checked={(field.value ?? []).includes(cls.classId)} />
-                        <ListItemText primary={cls.className} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={closeEditStudentDialog}>{t(TranslationKey.TEACHER_MY_CLASSES_CANCEL)}</Button>
-            <Button type="submit" variant="contained" color="success" disabled={!editStudentUsernameValue || editStudentMutation.isPending}>
-              {t(TranslationKey.TEACHER_MY_CLASSES_SAVE)}
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-
-      <DeleteDialog
-        open={deleteStudentDialogVis}
-        onClose={() => setDeleteStudentDialogVis(false)}
-        onConfirm={() => { if (deletingStudentId) deleteStudentMutation.mutate(deletingStudentId) }}
-        question={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_QUESTION_STUDENTS)}
-        title={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_TITLE_STUDENTS)}
-        label={deletingStudent?.username ?? ""}
-      />
-
-      <DeleteDialog
-        open={bulkDeleteDialogVis}
-        onClose={() => setBulkDeleteDialogVis(false)}
-        onConfirm={() => bulkDeleteMutation.mutate(selectedStudentIds)}
-        question={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_QUESTION_STUDENTS)}
-        title={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_TITLE_STUDENTS)}
-        label={students.filter(s => selectedStudentIds.includes(s.id)).map(s => s.username).join(", ")}
-      />
     </Box>
   )
 }
