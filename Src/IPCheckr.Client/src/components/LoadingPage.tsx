@@ -11,6 +11,8 @@ import AGFormSkeleton from "./ag/AGFormSkeleton"
 import InsightGridSkeleton from "./InsightGridSkeleton"
 import TableSkeleton from "./TableSkeleton"
 import SubmissionSkeleton from "./SubmissionSkeleton"
+import AdminUsersSkeleton from "./AdminUsersSkeleton"
+import MyClassesSkeleton from "./MyClassesSkeleton"
 
 const resolvePageSkeleton = (path: string): JSX.Element => {
   // Templates — check before generic assignment-groups
@@ -41,6 +43,10 @@ const resolvePageSkeleton = (path: string): JSX.Element => {
   if (path.includes("/assignment-groups") || path.endsWith("/assignments")) {
     return path.includes("/student") ? <AGListSkeleton columns={2} /> : <AGListSkeleton columns={3} />
   }
+
+  // Users & classes management
+  if (/\/admin\/users/.test(path)) return <AdminUsersSkeleton />
+  if (/\/teacher\/my-classes/.test(path)) return <MyClassesSkeleton />
 
   // Dashboards
   if (/\/dashboard/.test(path)) return <InsightGridSkeleton count={8} columnsMax={3} />

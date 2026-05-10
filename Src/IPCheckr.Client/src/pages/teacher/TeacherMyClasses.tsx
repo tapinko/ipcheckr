@@ -84,14 +84,14 @@ const TeacherMyClasses = () => {
   const {
     handleSubmit: handleCreateSubmit, control: createControl,
     reset: resetCreate, watch: watchCreate, formState: { errors: createErrors }
-  } = useForm<CreateClassFormValues>({ defaultValues: { className: "" }, mode: "onBlur" })
+  } = useForm<CreateClassFormValues>({ defaultValues: { className: "" }, mode: "onTouched" })
 
   const {
     handleSubmit: handleEditClassSubmit, control: editClassControl,
     reset: resetEditClass, watch: watchEditClass, setValue: setEditClassValue,
     formState: { errors: editClassErrors }
   } = useForm<EditClassFormValues>({
-    defaultValues: { className: "", teachers: userId ? [userId] : [] }, mode: "onBlur"
+    defaultValues: { className: "", teachers: userId ? [userId] : [] }, mode: "onTouched"
   })
 
   const getAddStudentDefaults = (): AddStudentFormValues => ({
@@ -104,7 +104,7 @@ const TeacherMyClasses = () => {
     reset: resetAddStudent, watch: watchAddStudent,
     setError: setAddStudentError, clearErrors: clearAddStudentErrors,
     formState: { errors: addStudentErrors }
-  } = useForm<AddStudentFormValues>({ defaultValues: getAddStudentDefaults(), mode: "onBlur" })
+  } = useForm<AddStudentFormValues>({ defaultValues: getAddStudentDefaults(), mode: "onTouched" })
 
   const createClassNameValue = watchCreate("className")
   const editClassNameValue = watchEditClass("className")
@@ -444,7 +444,7 @@ const TeacherMyClasses = () => {
               rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort(), ...FormRules.patternLettersNumbersSpecial() }}
               render={({ field }) => (
                 <TextField {...field} label={t(TranslationKey.TEACHER_MY_CLASSES_CLASS_NAME)}
-                  fullWidth margin="dense" autoFocus
+                  fullWidth margin="dense"
                   error={!!createErrors.className}
                   helperText={createErrors.className ? t(createErrors.className.message as string) : ""}
                 />

@@ -167,141 +167,157 @@ const UserListPanel = ({
       {alert && <CustomAlert {...alert} onClose={() => setAlert(null)} />}
 
       <Card variant="outlined" sx={{ borderRadius: 1, borderColor: theme => theme.palette.divider }}>
-        <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }}>
-            {title && (
-              <Typography variant="subtitle1" fontWeight={600} sx={{ flexShrink: 0, minWidth: 90 }}>
-                {title}
-              </Typography>
-            )}
-            <TextField
-              fullWidth
-              value={search}
-              onChange={e => onSearchChange(e.target.value)}
-              placeholder={t(TranslationKey.USER_LIST_PANEL_SEARCH)}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" />
-                    </InputAdornment>
-                  )
-                }
-              }}
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1, bgcolor: "background.paper" } }}
-            />
-            {selectedIds.length >= 2 && (
-              <Tooltip title={deleteBulkTooltip ?? t(TranslationKey.USER_LIST_PANEL_DELETE_SELECTED)}>
-                <span>
-                  <IconButton
-                    onClick={() => setBulkDeleteDialogVis(true)}
-                    sx={{
-                      border: theme => `1px solid ${theme.palette.error.main}`,
-                      width: 56, height: 56,
-                      "& .MuiSvgIcon-root": { fontSize: 26 },
-                      color: theme => theme.palette.error.dark,
-                      flexShrink: 0
-                    }}
-                  >
-                    <DeleteOutlineIcon />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            )}
-            <Tooltip title={addTooltip}>
-              <span>
-                <IconButton
-                  onClick={onAddClick}
+        {isLoading ? (
+          <>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }}>
+                {title && <Skeleton variant="rounded" height={32} sx={{ borderRadius: 1, flexShrink: 0, width: 90 }} />}
+                <Skeleton variant="rounded" height={56} sx={{ flex: 1, borderRadius: 1 }} />
+                <Skeleton variant="circular" width={56} height={56} sx={{ flexShrink: 0 }} />
+              </Stack>
+            </CardContent>
+
+            <Divider />
+
+            <Box>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Box
+                  key={i}
                   sx={{
-                    border: theme => `1px solid ${theme.palette.success.main}`,
-                    width: 56, height: 56,
-                    backgroundColor: theme => theme.palette.success.light,
-                    "& .MuiSvgIcon-root": { fontSize: 30 },
-                    color: theme => theme.palette.success.dark,
-                    flexShrink: 0
+                    display: "flex", alignItems: "center", px: 1, py: 0.5,
+                    borderBottom: i < 5 ? "1px solid" : "none", borderColor: "divider"
                   }}
                 >
-                  <AddIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </Stack>
-        </CardContent>
-
-        <Divider />
-
-        {isLoading ? (
-          <Box>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Box
-                key={i}
-                sx={{
-                  display: "flex", alignItems: "center", px: 1, py: 0.5,
-                  borderBottom: i < 3 ? "1px solid" : "none", borderColor: "divider"
-                }}
-              >
-                <Skeleton variant="rounded" width={24} height={24} sx={{ borderRadius: 0.5, flexShrink: 0 }} />
-                <Skeleton variant="text" sx={{ flex: 1, mx: 1.5, fontSize: "1rem" }} />
-                <Stack direction="row" spacing={0.5}>
-                  <Skeleton variant="circular" width={28} height={28} />
-                  <Skeleton variant="circular" width={28} height={28} />
-                </Stack>
-              </Box>
-            ))}
-          </Box>
-        ) : isError ? (
-          <Box sx={{ p: 2 }}>
-            <ErrorLoading onRetry={onRetry} />
-          </Box>
-        ) : users.length === 0 ? (
-          <Box sx={{ px: 3, py: 4, textAlign: "center" }}>
-            <Typography color="text.secondary">
-              {noDataMessage ?? t(TranslationKey.USER_LIST_PANEL_NO_DATA)}
-            </Typography>
-          </Box>
+                  <Skeleton variant="rounded" width={24} height={24} sx={{ borderRadius: 0.5, flexShrink: 0 }} />
+                  <Skeleton variant="text" sx={{ flex: 1, mx: 1.5, fontSize: "1rem" }} />
+                  <Stack direction="row" spacing={0.5}>
+                    <Skeleton variant="circular" width={28} height={28} />
+                    <Skeleton variant="circular" width={28} height={28} />
+                  </Stack>
+                </Box>
+              ))}
+            </Box>
+          </>
         ) : (
-          <Box>
-            {users.map((user, index) => (
-              <Box
-                key={user.id}
-                onClick={() => onRowClick?.(user)}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  px: 1,
-                  py: 0.5,
-                  borderBottom: index < users.length - 1 ? "1px solid" : "none",
-                  borderColor: "divider",
-                  cursor: onRowClick ? "pointer" : "default",
-                  "&:hover": onRowClick ? { bgcolor: "action.hover" } : undefined,
-                  "&:hover .user-name": onRowClick ? { textDecoration: "underline" } : undefined,
-                }}
-              >
-                <Checkbox
-                  size="small"
-                  checked={selectedIds.includes(user.id)}
-                  onChange={() => toggleSelect(user.id)}
-                  onClick={e => e.stopPropagation()}
-                />
-                <Typography className="user-name" sx={{ flex: 1, fontWeight: 500, ml: 0.5 }}>
-                  {user.username}
-                </Typography>
-                {user.classNamesDisplay && (
-                  <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
-                    {user.classNamesDisplay}
+          <>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }}>
+                {title && (
+                  <Typography variant="subtitle1" fontWeight={600} sx={{ flexShrink: 0, minWidth: 90 }}>
+                    {title}
                   </Typography>
                 )}
-                <Stack direction="row" onClick={e => e.stopPropagation()}>
-                  <IconButton size="small" onClick={() => openEditDialog(user)}>
-                    <EditOutlinedIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" onClick={() => { setDeletingUser(user); setSingleDeleteDialogVis(true) }}>
-                    <DeleteOutlineIcon fontSize="small" />
-                  </IconButton>
-                </Stack>
+                <TextField
+                  fullWidth
+                  value={search}
+                  onChange={e => onSearchChange(e.target.value)}
+                  placeholder={t(TranslationKey.USER_LIST_PANEL_SEARCH)}
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon fontSize="small" />
+                        </InputAdornment>
+                      )
+                    }
+                  }}
+                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1, bgcolor: "background.paper" } }}
+                />
+                {selectedIds.length >= 2 && (
+                  <Tooltip title={deleteBulkTooltip ?? t(TranslationKey.USER_LIST_PANEL_DELETE_SELECTED)}>
+                    <span>
+                      <IconButton
+                        onClick={() => setBulkDeleteDialogVis(true)}
+                        sx={{
+                          border: theme => `1px solid ${theme.palette.error.main}`,
+                          width: 56, height: 56,
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                          color: theme => theme.palette.error.dark,
+                          flexShrink: 0
+                        }}
+                      >
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                )}
+                <Tooltip title={addTooltip}>
+                  <span>
+                    <IconButton
+                      onClick={onAddClick}
+                      sx={{
+                        border: theme => `1px solid ${theme.palette.success.main}`,
+                        width: 56, height: 56,
+                        backgroundColor: theme => theme.palette.success.light,
+                        "& .MuiSvgIcon-root": { fontSize: 30 },
+                        color: theme => theme.palette.success.dark,
+                        flexShrink: 0
+                      }}
+                    >
+                      <AddIcon />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Stack>
+            </CardContent>
+
+            <Divider />
+
+            {isError ? (
+              <Box sx={{ p: 2 }}>
+                <ErrorLoading onRetry={onRetry} />
               </Box>
-            ))}
-          </Box>
+            ) : users.length === 0 ? (
+              <Box sx={{ px: 3, py: 4, textAlign: "center" }}>
+                <Typography color="text.secondary">
+                  {noDataMessage ?? t(TranslationKey.USER_LIST_PANEL_NO_DATA)}
+                </Typography>
+              </Box>
+            ) : (
+              <Box>
+                {users.map((user, index) => (
+                  <Box
+                    key={user.id}
+                    onClick={() => onRowClick?.(user)}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      px: 1,
+                      py: 0.5,
+                      borderBottom: index < users.length - 1 ? "1px solid" : "none",
+                      borderColor: "divider",
+                      cursor: onRowClick ? "pointer" : "default",
+                      "&:hover": onRowClick ? { bgcolor: "action.hover" } : undefined,
+                      "&:hover .user-name": onRowClick ? { textDecoration: "underline" } : undefined,
+                    }}
+                  >
+                    <Checkbox
+                      size="small"
+                      checked={selectedIds.includes(user.id)}
+                      onChange={() => toggleSelect(user.id)}
+                      onClick={e => e.stopPropagation()}
+                    />
+                    <Typography className="user-name" sx={{ flex: 1, fontWeight: 500, ml: 0.5 }}>
+                      {user.username}
+                    </Typography>
+                    {user.classNamesDisplay && (
+                      <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
+                        {user.classNamesDisplay}
+                      </Typography>
+                    )}
+                    <Stack direction="row" onClick={e => e.stopPropagation()}>
+                      <IconButton size="small" onClick={() => openEditDialog(user)}>
+                        <EditOutlinedIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => { setDeletingUser(user); setSingleDeleteDialogVis(true) }}>
+                        <DeleteOutlineIcon fontSize="small" />
+                      </IconButton>
+                    </Stack>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </>
         )}
       </Card>
 
