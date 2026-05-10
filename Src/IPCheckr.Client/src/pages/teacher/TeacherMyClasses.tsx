@@ -83,7 +83,7 @@ const TeacherMyClasses = () => {
   const [editClassDialogVis, setEditClassDialogVis] = useState(false)
   const [deleteClassDialogVis, setDeleteClassDialogVis] = useState(false)
   const [removeSelfDialogVis, setRemoveSelfDialogVis] = useState(false)
-  const [deleteStudentsWithClass, setDeleteStudentsWithClass] = useState(true)
+
   const [pendingEditData, setPendingEditData] = useState<EditClassFormValues | null>(null)
 
   const [studentSearch, setStudentSearch] = useState("")
@@ -215,15 +215,8 @@ const TeacherMyClasses = () => {
     }
   })
 
-  const deleteClassMutation = useMutation<AxiosResponse, AxiosError<ApiProblemDetails>, { classId: number; deleteStudentsFirst: boolean }>({
-    mutationFn: async ({ classId, deleteStudentsFirst }) => {
-      if (deleteStudentsFirst) {
-        const res = await userApi.userQueryUsers(null, null, UserRole.STUDENT, classId)
-        const ids = res.data.users.map((u: UserDto) => u.id)
-        if (ids.length) await userApi.userDeleteUsers({ userIds: ids })
-      }
-      return classApi.classDeleteClasses({ classIds: [classId] })
-    },
+  const deleteClassMutation = useMutation<AxiosResponse, AxiosError<ApiProblemDetails>, { classId: number }>({
+    mutationFn: async ({ classId }) => classApi.classDeleteClasses({ classIds: [classId] }),
     onSuccess: () => {
       const name = (classesQuery.data ?? []).find(c => c.classId === selectedClassId)?.className ?? ""
       setSelectedClassId(null)
@@ -699,13 +692,10 @@ const TeacherMyClasses = () => {
       <DeleteDialog
         open={deleteClassDialogVis}
         onClose={() => setDeleteClassDialogVis(false)}
-        onConfirm={() => { if (selectedClassId) deleteClassMutation.mutate({ classId: selectedClassId, deleteStudentsFirst: deleteStudentsWithClass }) }}
+        onConfirm={() => { if (selectedClassId) deleteClassMutation.mutate({ classId: selectedClassId }) }}
         question={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_QUESTION_CLASS)}
         title={t(TranslationKey.TEACHER_MY_CLASSES_CONFIRMATION_TITLE_CLASS)}
         label={(classesQuery.data ?? []).find(c => c.classId === selectedClassId)?.className ?? ""}
-        checkboxLabel={t(TranslationKey.TEACHER_MY_CLASSES_DELETE_STUDENTS_CHECKBOX)}
-        checked={deleteStudentsWithClass}
-        setChecked={setDeleteStudentsWithClass}
       />
 
       <DeleteDialog
