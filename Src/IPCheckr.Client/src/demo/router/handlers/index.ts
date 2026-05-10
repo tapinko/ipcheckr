@@ -21,6 +21,7 @@ import { getIdnetAssignmentGroupDetailsHandler } from "./assignmentGroup.getIdne
 import { getIdnetAssignmentGroupsHandler } from "./assignmentGroup.getIdnetGroups"
 import { getSubnetAssignmentGroupDetailsHandler } from "./assignmentGroup.getSubnetDetails"
 import { getSubnetAssignmentGroupsHandler } from "./assignmentGroup.getSubnetGroups"
+import { addStudentToClassHandler } from "./classes.addStudent"
 import { createClassHandler } from "./classes.createClass"
 import { deleteClassesHandler } from "./classes.deleteClasses"
 import { editClassHandler } from "./classes.editClass"
@@ -47,6 +48,7 @@ export const demoEndpointHandlers: DemoEndpointHandler[] = [
   getUserDetailsHandler,
   getClassesHandler,
   createClassHandler,
+  addStudentToClassHandler,
   editClassHandler,
   deleteClassesHandler,
   getClassDetailsHandler,

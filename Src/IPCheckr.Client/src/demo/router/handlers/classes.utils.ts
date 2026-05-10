@@ -42,14 +42,14 @@ export const createClass = async (className: string, teachers: number[]) => {
   return classId
 }
 
-export const editClass = async (id: number, className?: string | null, teachers?: number[] | null) => {
+export const editClass = async (id: number, className?: string | null, teachers?: number[] | null, students?: number[] | null) => {
   const state = await readDemoState()
   const idx = state.classes.findIndex(c => c.classId === id)
   if (idx < 0) return false
 
   const updatedTeachers = Array.isArray(teachers) ? teachers.filter(Number.isFinite) : state.classes[idx].teachers
   const teacherUsernames = state.users.filter(user => updatedTeachers.includes(user.id)).map(user => user.username)
-  
+
   const updated = {
     ...state.classes[idx],
     className: className?.trim() || state.classes[idx].className,
@@ -59,7 +59,20 @@ export const editClass = async (id: number, className?: string | null, teachers?
 
   const classes = [...state.classes]
   classes[idx] = updated
-  await writeDemoState({ ...state, classes })
+
+  let users = state.users
+  if (Array.isArray(students)) {
+    const newStudentIds = new Set(students.filter(Number.isFinite))
+    users = state.users.map(user => {
+      if (user.role !== UserRole.STUDENT) return user
+      const inClass = user.classIds.includes(id)
+      const shouldBeIn = newStudentIds.has(user.id)
+      if (inClass && !shouldBeIn) return { ...user, classIds: user.classIds.filter(cid => cid !== id) }
+      return user
+    })
+  }
+
+  await writeDemoState({ ...state, classes, users })
   return true
 }
 
