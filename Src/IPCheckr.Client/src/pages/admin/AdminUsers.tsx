@@ -61,15 +61,6 @@ const AdminUsers = () => {
     return (list.find(s => (s.name ?? "").toLowerCase() === "authtype")?.value ?? "").toUpperCase() === "LDAP"
   }, [settingsQuery.data])
 
-  const ldapTeacherGroupDn = useMemo(() => {
-    const list: AppSettingDto[] = settingsQuery.data?.data?.appSettings ?? []
-    return list.find(s => (s.name ?? "").toLowerCase() === "ldap_teachergroupdn")?.value ?? null
-  }, [settingsQuery.data])
-
-  const ldapStudentGroupDn = useMemo(() => {
-    const list: AppSettingDto[] = settingsQuery.data?.data?.appSettings ?? []
-    return list.find(s => (s.name ?? "").toLowerCase() === "ldap_studentgroupdn")?.value ?? null
-  }, [settingsQuery.data])
 
   const classesQuery = useQuery<ClassDto[]>({
     queryKey: ["classes"],
@@ -104,7 +95,6 @@ const AdminUsers = () => {
   const addWatch = watchAdd()
 
   const currentRole = addDialogRole === "teacher" ? UserRole.TEACHER : UserRole.STUDENT
-  const currentLdapGroupDn = addDialogRole === "teacher" ? ldapTeacherGroupDn : ldapStudentGroupDn
 
   useEffect(() => {
     if (addDialogRole === null) resetAdd(addDefaults)
