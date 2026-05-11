@@ -129,7 +129,8 @@ const StudentAssignments = () => {
 			classId: index + 1,
 			className,
 			teachers: [],
-			teacherUsernames: []
+			teacherUsernames: [],
+			studentCount: 0
 		}))
 	}, [assignments])
 

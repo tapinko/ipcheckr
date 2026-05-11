@@ -160,7 +160,7 @@ const AdminClasses = () => {
   const classes = classesQuery.data ?? []
   const deletingNames = classes.filter(c => deletingIds.includes(c.classId)).map(c => c.className).join(", ")
 
-  const teacherSelect = (control: any, errors: any, name: "teacherIds") => (
+  const teacherSelect = (control: any, _errors: any, name: "teacherIds") => (
     <Controller
       name={name} control={control}
       render={({ field }) => (
