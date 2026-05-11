@@ -21,7 +21,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import type { AddUserRes, ApiProblemDetails, AppSettingDto, ClassDto, LdapUserDto } from "../../dtos"
 import { appSettingsApi, classApi, userApi } from "../../utils/apiClients"
-import { TranslationKey } from "../../utils/i18n"
+import i18n, { Language, TranslationKey } from "../../utils/i18n"
+import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
 import FormRules from "../../utils/FormRules"
 import { Controller, useForm } from "react-hook-form"
 import { AxiosError, type AxiosResponse } from "axios"
@@ -47,6 +48,7 @@ const AdminUsers = () => {
   const [teacherSearch, setTeacherSearch] = useState("")
   const [studentSearch, setStudentSearch] = useState("")
   const [addDialogRole, setAddDialogRole] = useState<RoleKey | null>(null)
+  const [alert, setAlert] = useState<CustomAlertState | null>(null)
 
   const settingsQuery = useQuery({
     queryKey: ["appsettings"],
@@ -112,6 +114,12 @@ const AdminUsers = () => {
     mutationFn: data => userApi.userAddUser({ username: data.username, password: data.password, role: data.role, classIds: data.classIds }),
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["users", vars.role] })
+      resetAdd(addDefaults)
+      setAddDialogRole(null)
+    },
+    onError: (error) => {
+      const msg = i18n.language === Language.EN ? error.response?.data?.messageEn : error.response?.data?.messageSk
+      setAlert({ severity: "error", message: msg ?? t(TranslationKey.USER_LIST_PANEL_EDIT_ERROR) })
     }
   })
 
@@ -124,9 +132,7 @@ const AdminUsers = () => {
   })
 
   const handleAdd = async (data: AddFormValues) => {
-    await addMutation.mutateAsync({ ...data, role: currentRole })
-    resetAdd(addDefaults)
-    setAddDialogRole(null)
+    await addMutation.mutateAsync({ ...data, role: currentRole }).catch(() => {})
   }
 
   const handleEditSave = async (userId: number, data: EditFormValues) => {
@@ -170,7 +176,7 @@ const AdminUsers = () => {
                   let cancelled = false
                   setLoading(true)
                   const timer = setTimeout(() => {
-                    userApi.userLdapSearchUsers(q, null, currentLdapGroupDn ?? undefined)
+                    userApi.userLdapSearchUsers(q)
                       .then(r => { if (!cancelled) setOptions(r.data.users ?? []) })
                       .finally(() => { if (!cancelled) setLoading(false) })
                   }, 250)
@@ -274,6 +280,7 @@ const AdminUsers = () => {
 
   return (
     <Box display="flex" flexDirection="column" gap={3}>
+      {alert && <CustomAlert {...alert} onClose={() => setAlert(null)} />}
       {addDialog}
 
       <UserListPanel
