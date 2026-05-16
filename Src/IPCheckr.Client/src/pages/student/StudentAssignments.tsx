@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import {
@@ -55,6 +55,19 @@ const resolveAssignmentId = (a: unknown): number => {
 const formatDateTime = (value: string) =>
 	new Date(value).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })
 
+const formatCountdownClock = (remainingMs: number) => {
+	const clamped = Math.max(0, remainingMs)
+	const totalSeconds = Math.floor(clamped / 1000)
+	const days = Math.floor(totalSeconds / 86400)
+	const hours = Math.floor((totalSeconds % 86400) / 3600)
+	const minutes = Math.floor((totalSeconds % 3600) / 60)
+	const seconds = totalSeconds % 60
+	if (days > 0) {
+		return `${String(days).padStart(2, "0")}:${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+	}
+	return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+}
+
 const normalizeSubnet = (a: SubnetAssignmentDto): StudentAssignment => ({
 	...a,
 	assignmentId: resolveAssignmentId(a),
@@ -80,6 +93,13 @@ const StudentAssignments = () => {
 	const { userId } = useAuth()
 	const queryClient = useQueryClient()
 	const statusMap = getStatusMap(t)
+
+	const [nowMs, setNowMs] = useState(() => Date.now())
+
+	useEffect(() => {
+		const interval = setInterval(() => setNowMs(Date.now()), 1000)
+		return () => clearInterval(interval)
+	}, [])
 
 	const [confirmDialogVis, setConfirmDialogVis] = useState(false)
 	const [selectedAssignment, setSelectedAssignment] = useState<StudentAssignment | null>(null)
@@ -353,9 +373,64 @@ const StudentAssignments = () => {
 						</Button>
 					) : null}
 				</Stack>
-				<Typography variant="subtitle1" fontWeight={700} color="text.primary">
-					{formatDateTime(assignment.startDate)} - {formatDateTime(assignment.deadline)}
-				</Typography>
+				{(() => {
+					const startMs = new Date(assignment.startDate).getTime()
+					const deadlineMs = new Date(assignment.deadline).getTime()
+					const toStartMs = startMs - nowMs
+					const toDeadlineMs = deadlineMs - nowMs
+					const activeWindowMs = Math.max(deadlineMs - startMs, 1)
+					const inProgressElapsedPct = Math.max(0, Math.min(100, ((nowMs - startMs) / activeWindowMs) * 100))
+
+					if (computedStatus === AssignmentGroupStatus.Upcoming) {
+						return (
+							<Stack spacing={0.6}>
+								<Typography variant="caption" color="text.secondary">
+									{t(TranslationKey.AG_ASSIGNMENT_GROUPS_CARD_STARTS_IN)}
+								</Typography>
+								<Typography variant="subtitle2" fontWeight={700} color="primary.main" sx={{ fontVariantNumeric: "tabular-nums" }}>
+									{toStartMs > 0 ? formatCountdownClock(toStartMs) : t(TranslationKey.AG_ASSIGNMENT_GROUPS_CARD_COUNTDOWN_FINISHED)}
+								</Typography>
+								<LinearProgress
+									variant={toStartMs > 0 ? "indeterminate" : "determinate"}
+									value={100}
+									color="primary"
+									sx={{ height: 7, borderRadius: 999 }}
+								/>
+								<Typography variant="caption" color="text.secondary" noWrap>
+									{formatDateTime(assignment.startDate)} - {formatDateTime(assignment.deadline)}
+								</Typography>
+							</Stack>
+						)
+					}
+
+					if (computedStatus === AssignmentGroupStatus.InProgress) {
+						return (
+							<Stack spacing={0.6}>
+								<Typography variant="caption" color="text.secondary">
+									{t(TranslationKey.AG_ASSIGNMENT_GROUPS_CARD_ENDS_IN)}
+								</Typography>
+								<Typography variant="subtitle2" fontWeight={700} color="warning.main" sx={{ fontVariantNumeric: "tabular-nums" }}>
+									{toDeadlineMs > 0 ? formatCountdownClock(toDeadlineMs) : t(TranslationKey.AG_ASSIGNMENT_GROUPS_CARD_COUNTDOWN_FINISHED)}
+								</Typography>
+								<LinearProgress
+									variant="determinate"
+									value={inProgressElapsedPct}
+									color="warning"
+									sx={{ height: 7, borderRadius: 999 }}
+								/>
+								<Typography variant="caption" color="text.secondary" noWrap>
+									{formatDateTime(assignment.startDate)} - {formatDateTime(assignment.deadline)}
+								</Typography>
+							</Stack>
+						)
+					}
+
+					return (
+						<Typography variant="subtitle1" fontWeight={700} color="text.primary">
+							{formatDateTime(assignment.startDate)} - {formatDateTime(assignment.deadline)}
+						</Typography>
+					)
+				})()}
 				{computedStatus === AssignmentGroupStatus.Ended ? (
 					<Stack spacing={0.5}>
 						<Stack direction="row" alignItems="center" spacing={1}>
