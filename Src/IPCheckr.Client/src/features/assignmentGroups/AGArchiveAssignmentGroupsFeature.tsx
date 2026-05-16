@@ -14,7 +14,7 @@ import {
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { assignmentGroupApi, classApi } from "../../utils/apiClients"
+import { assignmentGroupApi } from "../../utils/apiClients"
 import {
   AssignmentGroupDifficulty,
   AssignmentGroupIpCat,
@@ -197,12 +197,6 @@ const AGArchiveAssignmentGroupsFeature = ({
   ])
   const [page, setPage] = useState(1)
 
-  const classesQuery = useQuery<ClassDto[], Error>({
-    queryKey: ["archiveClasses", queryUserId],
-    enabled: !!userId && !hideClassFilter,
-    queryFn: () => classApi.classQueryClasses(null, null, queryUserId).then(r => r.data.classes)
-  })
-
   const classFilterNormalized = classFilter === "ALL" || classFilter === null ? null : classFilter
   const difficultyFilterQuery =
     difficultyFilters.length === 0 || difficultyFilters.length === 3
@@ -229,6 +223,12 @@ const AGArchiveAssignmentGroupsFeature = ({
 
   const allAGs: IAG[] = (agsQuery.data?.assignmentGroups ?? []).map(normalizeAssignmentGroup)
 
+  const classOptions: ClassDto[] = Array.from(
+    new Map(allAGs.map(ag => [ag.classId, ag.className])).entries()
+  )
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .map(([classId, className]) => ({ classId, className, teachers: [], teacherUsernames: [], studentCount: 0 }))
+
   const filteredAGs = allAGs
     .filter(ag => typeFilters.includes(ag.type))
     .filter(ag => (ag.ipCat ? ipCatFilters.includes(ag.ipCat) : true))
@@ -245,11 +245,10 @@ const AGArchiveAssignmentGroupsFeature = ({
   const totalPages = Math.max(1, Math.ceil(filteredAGs.length / ITEMS_PER_PAGE))
   const pagedAGs = filteredAGs.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
 
-  const isLoading = (!hideClassFilter && classesQuery.isLoading) || agsQuery.isLoading
-  const hasError = (!hideClassFilter && classesQuery.isError) || agsQuery.isError
+  const isLoading = agsQuery.isLoading
+  const hasError = agsQuery.isError
 
   const retry = () => {
-    queryClient.invalidateQueries({ queryKey: ["archiveClasses"] })
     queryClient.invalidateQueries({ queryKey: ["archiveAssignmentGroups"] })
   }
 
@@ -261,7 +260,7 @@ const AGArchiveAssignmentGroupsFeature = ({
         onSearchChange={v => { setSearch(v); setPage(1) }}
         classValue={classFilter ?? "ALL"}
         onClassChange={v => { setClassFilter(v); setPage(1) }}
-        classOptions={classesQuery.data ?? []}
+        classOptions={classOptions}
         typeValues={typeFilters}
         onToggleType={value => {
           setTypeFilters(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value])

@@ -2,6 +2,8 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import {
+	AssignmentGroupDifficulty,
+	AssignmentGroupIpCat,
 	AssignmentGroupStatus,
 	AssignmentGroupType,
 	type ClassDto,
@@ -36,7 +38,7 @@ import ErrorLoading from "../../components/ErrorLoading"
 import AGListSkeleton from "../../components/ag/AGListSkeleton"
 import { getStatusMap } from "../../utils/getStatusMap"
 import AGHeader from "../../components/AGHeader"
-import type { AGClassFilterValue, AGIpCatFilterValue, AGTypeFilterValue } from "../../components/AGHeader"
+import type { AGClassFilterValue } from "../../components/AGHeader"
 import { toAssignmentTypeParam } from "../../utils/assignmentType"
 
 type StudentAssignment = (IDNetAssignmentDto | SubnetAssignmentDto) & {
@@ -93,8 +95,9 @@ const StudentAssignments = () => {
 	const [selectedAssignment, setSelectedAssignment] = useState<StudentAssignment | null>(null)
 	const [search, setSearch] = useState("")
 	const [classFilter, setClassFilter] = useState<AGClassFilterValue>("ALL")
-	const [typeFilter, setTypeFilter] = useState<AGTypeFilterValue>("ALL")
-	const [ipCatFilter, setIpCatFilter] = useState<AGIpCatFilterValue>("ALL_CAT")
+	const [typeFilter, setTypeFilter] = useState<AssignmentGroupType[]>([AssignmentGroupType.Subnet, AssignmentGroupType.Idnet])
+	const [ipCatFilter, setIpCatFilter] = useState<AssignmentGroupIpCat[]>([AssignmentGroupIpCat.All, AssignmentGroupIpCat.Abc, AssignmentGroupIpCat.Local])
+	const [difficultyFilter, setDifficultyFilter] = useState<AssignmentGroupDifficulty[]>([AssignmentGroupDifficulty.Easy, AssignmentGroupDifficulty.Medium, AssignmentGroupDifficulty.Hard])
 
 	const idNetQuery = useQuery({
 		queryKey: ["studentAssignments", "idnet", userId],
@@ -117,10 +120,7 @@ const StudentAssignments = () => {
 			...(idNetQuery.data ?? []).map(normalizeIdNet),
 			...(subnetQuery.data ?? []).map(normalizeSubnet)
 		]
-		return normalized.filter(a =>
-			!a.isArchived &&
-			resolveComputedStatus(a.startDate, a.deadline, a.successRate) !== AssignmentGroupStatus.Upcoming
-		)
+		return normalized.filter(a => !a.isArchived)
 	}, [idNetQuery.data, subnetQuery.data])
 
 	const classOptions = useMemo<ClassDto[]>(() => {
@@ -142,8 +142,9 @@ const StudentAssignments = () => {
 	const filteredAssignments = useMemo(() => {
 		const term = search.trim().toLowerCase()
 		return assignments
-			.filter(a => (typeFilter === "ALL" ? true : a.type === typeFilter))
-			.filter(a => (ipCatFilter === "ALL_CAT" ? true : a.ipCat === ipCatFilter))
+			.filter(a => typeFilter.includes(a.type))
+			.filter(a => a.ipCat == null || ipCatFilter.includes(a.ipCat))
+			.filter(a => (a as any).difficulty == null || difficultyFilter.includes((a as any).difficulty))
 			.filter(a => (selectedClassName ? a.className === selectedClassName : true))
 			.filter(a =>
 				term
@@ -155,13 +156,13 @@ const StudentAssignments = () => {
 	}, [assignments, typeFilter, ipCatFilter, selectedClassName, search])
 
 	const inProgressAssignment = useMemo(() => {
-		const items = assignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.InProgress)
+		const items = filteredAssignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.InProgress)
 		return items.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())[0]
-	}, [assignments])
+	}, [filteredAssignments])
 
 	const inProgressOthers = useMemo(
-		() => assignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.InProgress && a !== inProgressAssignment),
-		[assignments, inProgressAssignment]
+		() => filteredAssignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.InProgress && a !== inProgressAssignment),
+		[filteredAssignments, inProgressAssignment]
 	)
 
 	const inProgressList = useMemo(
@@ -405,10 +406,12 @@ const StudentAssignments = () => {
 					classValue={classFilter}
 					onClassChange={setClassFilter}
 					classOptions={classOptions}
-					typeValue={typeFilter}
-					onTypeChange={setTypeFilter}
-					ipCatValue={ipCatFilter}
-					onIpCatChange={setIpCatFilter}
+					typeValues={typeFilter}
+					onToggleType={v => setTypeFilter(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
+					ipCatValues={ipCatFilter}
+					onToggleIpCat={v => setIpCatFilter(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
+					difficultyValues={difficultyFilter}
+					onToggleDifficulty={v => setDifficultyFilter(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
 					onArchiveClick={() => navigate(Routes[RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE])}
 					hideTemplates
 				/>

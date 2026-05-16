@@ -38,7 +38,6 @@ const StudentArchiveAssignmentGroups = () => {
   return (
     <AGArchiveAssignmentGroupsFeature
       teacherFilter={null}
-      hideClassFilter
       onNavigateDetails={handleNavigate}
     />
   )
