@@ -12,6 +12,7 @@ import {
 } from "../../dtos"
 import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficultyLabel"
 import { getHostSortLabel } from "../../utils/getHostSortLabel"
+import { resolveComputedStatus, resolveEffectiveStatus } from "../../features/assignmentGroups/agStatus"
 import { assignmentApi } from "../../utils/apiClients"
 import {
 	Box,
@@ -72,17 +73,6 @@ const statusColor = (status: AssignmentGroupStatus) => {
 	return "default"
 }
 
-const resolveComputedStatus = (startDate: string, deadline: string, successRate?: number | null): AssignmentGroupStatus => {
-	if (successRate !== null && successRate !== undefined) return AssignmentGroupStatus.Ended
-
-	const now = Date.now()
-	const start = new Date(startDate).getTime()
-	const end = new Date(deadline).getTime()
-
-	if (now < start) return AssignmentGroupStatus.Upcoming
-	if (now > end) return AssignmentGroupStatus.Ended
-	return AssignmentGroupStatus.InProgress
-}
 
 const StudentAssignments = () => {
 	const { t } = useTranslation()
@@ -153,15 +143,18 @@ const StudentAssignments = () => {
 						a.teacherUsername.toLowerCase().includes(term)
 					: true
 			)
-	}, [assignments, typeFilter, ipCatFilter, selectedClassName, search])
+	}, [assignments, typeFilter, ipCatFilter, difficultyFilter, selectedClassName, search])
+
+	const effectiveStatus = (a: StudentAssignment) =>
+		resolveEffectiveStatus(a.startDate, a.deadline, a.status, a.successRate)
 
 	const inProgressAssignment = useMemo(() => {
-		const items = filteredAssignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.InProgress)
+		const items = filteredAssignments.filter(a => effectiveStatus(a) === AssignmentGroupStatus.InProgress)
 		return items.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())[0]
 	}, [filteredAssignments])
 
 	const inProgressOthers = useMemo(
-		() => filteredAssignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.InProgress && a !== inProgressAssignment),
+		() => filteredAssignments.filter(a => effectiveStatus(a) === AssignmentGroupStatus.InProgress && a !== inProgressAssignment),
 		[filteredAssignments, inProgressAssignment]
 	)
 
@@ -171,13 +164,13 @@ const StudentAssignments = () => {
 	)
 
 	const grouped = useMemo(() => {
-		const remaining = filteredAssignments.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) !== AssignmentGroupStatus.InProgress)
+		const remaining = filteredAssignments.filter(a => effectiveStatus(a) !== AssignmentGroupStatus.InProgress)
 		const endedSorted = remaining
-			.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.Ended)
+			.filter(a => effectiveStatus(a) === AssignmentGroupStatus.Ended)
 			.sort((a, b) => new Date(b.deadline).getTime() - new Date(a.deadline).getTime())
 
 		return {
-			upcoming: remaining.filter(a => resolveComputedStatus(a.startDate, a.deadline, a.successRate) === AssignmentGroupStatus.Upcoming),
+			upcoming: remaining.filter(a => effectiveStatus(a) === AssignmentGroupStatus.Upcoming),
 			ended: endedSorted
 		}
 	}, [filteredAssignments])

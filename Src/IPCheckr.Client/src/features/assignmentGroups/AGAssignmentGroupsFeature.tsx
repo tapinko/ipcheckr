@@ -44,6 +44,7 @@ import DeleteDialog from "../../components/DeleteDialog"
 import type { AxiosError, AxiosResponse } from "axios"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
 import { getStatusMap } from "../../utils/getStatusMap"
+import { resolveEffectiveStatus } from "./agStatus"
 import type { AGClassFilterValue } from "../../components/AGHeader"
 import AGHeader from "../../components/AGHeader"
 
@@ -170,13 +171,6 @@ const computeMoveDates = (
   }
 }
 
-const getEffectiveStatus = (ag: IAG, nowMs: number): AssignmentGroupStatus => {
-  const startMs = new Date(ag.startDate).getTime()
-  const deadlineMs = new Date(ag.deadline).getTime()
-  if (nowMs >= deadlineMs) return AssignmentGroupStatus.Ended
-  if (nowMs >= startMs) return AssignmentGroupStatus.InProgress
-  return AssignmentGroupStatus.Upcoming
-}
 
 const normalizeAssignmentGroup = (ag: AssignmentGroupDto): IAG => ({
   id: ag.assignmentGroupId,
@@ -627,7 +621,7 @@ const AGAssignmentGroupsFeature = ({
   }
 
   filteredAGs.forEach(ag => {
-    const effectiveStatus = getEffectiveStatus(ag, nowMs)
+    const effectiveStatus = resolveEffectiveStatus(ag.startDate, ag.deadline, ag.status)
     grouped[effectiveStatus]?.push({ ...ag, status: effectiveStatus })
   })
 
