@@ -8,18 +8,12 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
   Stack,
   TextField,
   Tooltip,
@@ -96,7 +90,7 @@ const TeacherMyClasses = () => {
 
   const getAddStudentDefaults = (): AddStudentFormValues => ({
     username: "", password: "", role: UserRole.STUDENT,
-    classIds: selectedClassId ? [selectedClassId] : []
+    classIds: []
   })
 
   const {
@@ -478,23 +472,30 @@ const TeacherMyClasses = () => {
             <Controller
               name="teachers" control={editClassControl}
               render={({ field }) => (
-                <FormControl fullWidth margin="dense" disabled={teachersQuery.isLoading || teachersQuery.isError}>
-                  <InputLabel id="edit-class-teachers-label">{t(TranslationKey.TEACHER_MY_CLASSES_TEACHERS)}</InputLabel>
-                  <Select multiple labelId="edit-class-teachers-label" value={field.value}
-                    onChange={e => field.onChange(Array.isArray(e.target.value) ? e.target.value.map(Number) : [])}
-                    input={<OutlinedInput label={t(TranslationKey.TEACHER_MY_CLASSES_TEACHERS)} />}
-                    renderValue={selected =>
-                      (teachersQuery.data ?? []).filter(tchr => (selected as number[]).includes(tchr.id)).map(tchr => tchr.username).join(", ")
-                    }
-                  >
-                    {(teachersQuery.data ?? []).map(tchr => (
-                      <MenuItem key={tchr.id} value={tchr.id}>
-                        <Checkbox checked={(field.value ?? []).includes(tchr.id)} />
-                        <ListItemText primary={tchr.username} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <Box mt={1.5}>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {(teachersQuery.data ?? []).map(tchr => {
+                      const selected = (field.value ?? []).includes(tchr.id)
+                      return (
+                        <Chip
+                          key={tchr.id}
+                          label={tchr.username}
+                          variant={selected ? "filled" : "outlined"}
+                          color={selected ? "primary" : "default"}
+                          disabled={teachersQuery.isLoading || teachersQuery.isError}
+                          onClick={() => {
+                            const next = selected
+                              ? field.value.filter((id: number) => id !== tchr.id)
+                              : [...field.value, tchr.id]
+                            field.onChange(next)
+                          }}
+                          clickable
+                          sx={{ fontSize: "0.9rem", height: 36, px: 1 }}
+                        />
+                      )
+                    })}
+                  </Stack>
+                </Box>
               )}
             />
           </DialogContent>
@@ -607,26 +608,34 @@ const TeacherMyClasses = () => {
               name="classIds" control={addStudentControl}
               rules={{ validate: value => (value && value.length > 0) || t(TranslationKey.FORM_RULES_REQUIRED).toString() }}
               render={({ field }) => (
-                <FormControl fullWidth margin="dense" error={!!addStudentErrors.classIds}>
-                  <InputLabel id="add-student-classes-label">{t(TranslationKey.TEACHER_MY_CLASSES_CLASSES)}</InputLabel>
-                  <Select multiple labelId="add-student-classes-label" value={field.value}
-                    onChange={e => field.onChange(Array.isArray(e.target.value) ? e.target.value.map(Number) : [])}
-                    input={<OutlinedInput label={t(TranslationKey.TEACHER_MY_CLASSES_CLASSES)} />}
-                    renderValue={selected =>
-                      (classesQuery.data ?? []).filter(c => (selected as number[]).includes(c.classId)).map(c => c.className).join(", ")
-                    }
-                  >
-                    {(classesQuery.data ?? []).map(cls => (
-                      <MenuItem key={cls.classId} value={cls.classId}>
-                        <Checkbox checked={field.value.indexOf(cls.classId) > -1} />
-                        <ListItemText primary={cls.className} />
-                      </MenuItem>
-                    ))}
-                  </Select>
+                <Box mt={1.5}>
+<Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {(classesQuery.data ?? []).map(cls => {
+                      const selected = field.value.includes(cls.classId)
+                      return (
+                        <Chip
+                          key={cls.classId}
+                          label={cls.className}
+                          variant={selected ? "filled" : "outlined"}
+                          color={selected ? "primary" : "default"}
+                          onClick={() => {
+                            const next = selected
+                              ? field.value.filter((id: number) => id !== cls.classId)
+                              : [...field.value, cls.classId]
+                            field.onChange(next)
+                          }}
+                          clickable
+                          sx={{ fontSize: "0.9rem", height: 36, px: 1 }}
+                        />
+                      )
+                    })}
+                  </Stack>
                   {addStudentErrors.classIds && (
-                    <Typography variant="caption" color="error">{addStudentErrors.classIds.message?.toString()}</Typography>
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
+                      {addStudentErrors.classIds.message?.toString()}
+                    </Typography>
                   )}
-                </FormControl>
+                </Box>
               )}
             />
           </DialogContent>

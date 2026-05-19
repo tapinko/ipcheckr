@@ -6,20 +6,14 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Divider,
-  FormControl,
   IconButton,
   InputAdornment,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
   Stack,
   TextField,
   Tooltip,
@@ -164,24 +158,29 @@ const AdminClasses = () => {
     <Controller
       name={name} control={control}
       render={({ field }) => (
-        <FormControl fullWidth margin="dense">
-          <InputLabel>{t(TranslationKey.ADMIN_CLASSES_TEACHER)}</InputLabel>
-          <Select
-            multiple value={field.value}
-            onChange={e => field.onChange(Array.isArray(e.target.value) ? e.target.value.map(Number) : [])}
-            input={<OutlinedInput label={t(TranslationKey.ADMIN_CLASSES_TEACHER)} />}
-            renderValue={selected =>
-              (teachersQuery.data ?? []).filter(tc => (selected as number[]).includes(tc.id)).map(tc => tc.username).join(", ")
-            }
-          >
-            {(teachersQuery.data ?? []).map(tc => (
-              <MenuItem key={tc.id} value={tc.id}>
-                <Checkbox checked={(field.value ?? []).includes(tc.id)} />
-                <ListItemText primary={tc.username} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Box mt={1.5}>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            {(teachersQuery.data ?? []).map(tc => {
+              const selected = (field.value ?? []).includes(tc.id)
+              return (
+                <Chip
+                  key={tc.id}
+                  label={tc.username}
+                  variant={selected ? "filled" : "outlined"}
+                  color={selected ? "primary" : "default"}
+                  onClick={() => {
+                    const next = selected
+                      ? field.value.filter((id: number) => id !== tc.id)
+                      : [...field.value, tc.id]
+                    field.onChange(next)
+                  }}
+                  clickable
+                  sx={{ fontSize: "0.9rem", height: 36, px: 1 }}
+                />
+              )
+            })}
+          </Stack>
+        </Box>
       )}
     />
   )

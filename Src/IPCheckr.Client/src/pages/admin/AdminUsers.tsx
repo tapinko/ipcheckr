@@ -3,17 +3,12 @@ import {
   Autocomplete,
   Box,
   Button,
-  Checkbox,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
+  Stack,
   TextField,
 } from "@mui/material"
 import { useTranslation } from "react-i18next"
@@ -224,24 +219,29 @@ const AdminUsers = () => {
           <Controller
             name="classIds" control={addControl}
             render={({ field }) => (
-              <FormControl fullWidth margin="dense">
-                <InputLabel>{t(TranslationKey.USER_LIST_PANEL_CLASS)}</InputLabel>
-                <Select
-                  multiple value={field.value}
-                  onChange={e => field.onChange(Array.isArray(e.target.value) ? e.target.value.map(Number) : [])}
-                  input={<OutlinedInput label={t(TranslationKey.USER_LIST_PANEL_CLASS)} />}
-                  renderValue={selected =>
-                    (classesQuery.data ?? []).filter(c => (selected as number[]).includes(c.classId)).map(c => c.className).join(", ")
-                  }
-                >
-                  {(classesQuery.data ?? []).map(cls => (
-                    <MenuItem key={cls.classId} value={cls.classId}>
-                      <Checkbox checked={(field.value ?? []).includes(cls.classId)} />
-                      <ListItemText primary={cls.className} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Box mt={1.5}>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  {(classesQuery.data ?? []).map(cls => {
+                    const selected = (field.value ?? []).includes(cls.classId)
+                    return (
+                      <Chip
+                        key={cls.classId}
+                        label={cls.className}
+                        variant={selected ? "filled" : "outlined"}
+                        color={selected ? "primary" : "default"}
+                        onClick={() => {
+                          const next = selected
+                            ? field.value.filter((id: number) => id !== cls.classId)
+                            : [...field.value, cls.classId]
+                          field.onChange(next)
+                        }}
+                        clickable
+                        sx={{ fontSize: "0.9rem", height: 36, px: 1 }}
+                      />
+                    )
+                  })}
+                </Stack>
+              </Box>
             )}
           />
         </DialogContent>

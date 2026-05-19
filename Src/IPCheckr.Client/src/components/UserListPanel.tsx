@@ -8,19 +8,14 @@ import {
   Card,
   CardContent,
   Checkbox,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Divider,
-  FormControl,
   IconButton,
   InputAdornment,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
   Skeleton,
   Stack,
   TextField,
@@ -352,24 +347,29 @@ const UserListPanel = ({
             <Controller
               name="classIds" control={editControl}
               render={({ field }) => (
-                <FormControl fullWidth margin="dense">
-                  <InputLabel>{t(TranslationKey.USER_LIST_PANEL_CLASS)}</InputLabel>
-                  <Select
-                    multiple value={field.value}
-                    onChange={e => field.onChange(Array.isArray(e.target.value) ? e.target.value.map(Number) : [])}
-                    input={<OutlinedInput label={t(TranslationKey.USER_LIST_PANEL_CLASS)} />}
-                    renderValue={selected =>
-                      (classesData ?? []).filter(c => (selected as number[]).includes(c.classId)).map(c => c.className).join(", ")
-                    }
-                  >
-                    {(classesData ?? []).map(cls => (
-                      <MenuItem key={cls.classId} value={cls.classId}>
-                        <Checkbox checked={(field.value ?? []).includes(cls.classId)} />
-                        <ListItemText primary={cls.className} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <Box mt={1.5}>
+<Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {(classesData ?? []).map(cls => {
+                      const selected = (field.value ?? []).includes(cls.classId)
+                      return (
+                        <Chip
+                          key={cls.classId}
+                          label={cls.className}
+                          variant={selected ? "filled" : "outlined"}
+                          color={selected ? "primary" : "default"}
+                          onClick={() => {
+                            const next = selected
+                              ? field.value.filter((id: number) => id !== cls.classId)
+                              : [...field.value, cls.classId]
+                            field.onChange(next)
+                          }}
+                          clickable
+                          sx={{ fontSize: "0.9rem", height: 36, px: 1 }}
+                        />
+                      )
+                    })}
+                  </Stack>
+                </Box>
               )}
             />
           </DialogContent>

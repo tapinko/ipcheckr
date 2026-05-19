@@ -10,6 +10,10 @@ const TeacherAGTemplates = () => {
       onNavigateEdit={id =>
         navigate(getParametrizedUrl(RouteKeys.TEACHER_AG_TEMPLATE_EDIT, { [RouteParams.TEMPLATE_ID]: id.toString() }))
       }
+      onAfterCreate={classId => {
+        const path = Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS]
+        navigate(classId ? `${path}?classId=${classId}` : path)
+      }}
     />
   )
 }

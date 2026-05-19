@@ -13,7 +13,6 @@ import {
   Divider,
   IconButton,
   InputAdornment,
-  MenuItem,
   Stack,
   TextField,
   Tooltip,
@@ -54,10 +53,11 @@ interface QuickCreateForm {
 interface AGTemplatesFeatureProps {
   onNavigateCreate: () => void
   onNavigateEdit: (id: number) => void
+  onAfterCreate: (classId?: number) => void
   teacherFilter?: number | null
 }
 
-const AGTemplatesFeature = ({ onNavigateCreate, onNavigateEdit, teacherFilter }: AGTemplatesFeatureProps) => {
+const AGTemplatesFeature = ({ onNavigateCreate, onNavigateEdit, onAfterCreate, teacherFilter }: AGTemplatesFeatureProps) => {
   const { t, i18n } = useTranslation()
   const { userId } = useAuth()
   const queryUserId = teacherFilter !== undefined ? teacherFilter : userId
@@ -133,8 +133,8 @@ const AGTemplatesFeature = ({ onNavigateCreate, onNavigateEdit, teacherFilter }:
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["agAssignmentGroups"] })
-      setAlert({ severity: "success", message: t(TranslationKey.AG_TEMPLATES_QC_SUCCESS) })
       setQcTemplate(null)
+      onAfterCreate(qcForm.classId !== "" ? (qcForm.classId as number) : undefined)
     },
     onError: error => {
       const details = error.response?.data
@@ -335,14 +335,7 @@ const AGTemplatesFeature = ({ onNavigateCreate, onNavigateEdit, teacherFilter }:
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>
-          <Typography fontWeight={700} noWrap>{t(TranslationKey.AG_TEMPLATES_QC_TITLE)}</Typography>
-          {qcTemplate && (
-            <Typography variant="caption" color="text.secondary" display="block" noWrap>
-              {qcTemplate.name}
-            </Typography>
-          )}
-        </DialogTitle>
+        <DialogTitle>{t(TranslationKey.AG_TEMPLATES_QC_TITLE)}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
@@ -351,17 +344,19 @@ const AGTemplatesFeature = ({ onNavigateCreate, onNavigateEdit, teacherFilter }:
               value={qcForm.agName}
               onChange={e => setQcForm(f => ({ ...f, agName: e.target.value }))}
             />
-            <TextField
-              select
-              label={t(TranslationKey.AG_TEMPLATES_QC_CLASS)}
-              fullWidth
-              value={qcForm.classId}
-              onChange={e => setQcForm(f => ({ ...f, classId: Number(e.target.value) }))}
-            >
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               {(classesQuery.data ?? []).map(c => (
-                <MenuItem key={c.classId} value={c.classId}>{c.className}</MenuItem>
+                <Chip
+                  key={c.classId}
+                  label={c.className}
+                  variant={qcForm.classId === c.classId ? "filled" : "outlined"}
+                  color={qcForm.classId === c.classId ? "primary" : "default"}
+                  onClick={() => setQcForm(f => ({ ...f, classId: c.classId }))}
+                  clickable
+                  sx={{ fontSize: "0.9rem", height: 36, px: 1 }}
+                />
               ))}
-            </TextField>
+            </Stack>
             {classesQuery.data?.length === 0 && (
               <Typography variant="caption" color="error.main">
                 {t(TranslationKey.AG_TEMPLATES_QC_NO_CLASSES)}

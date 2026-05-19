@@ -11,6 +11,10 @@ const AdminAGTemplates = () => {
       onNavigateEdit={id =>
         navigate(getParametrizedUrl(RouteKeys.ADMIN_AG_TEMPLATE_EDIT, { [RouteParams.TEMPLATE_ID]: id.toString() }))
       }
+      onAfterCreate={classId => {
+        const path = Routes[RouteKeys.ADMIN_ASSIGNMENT_GROUPS]
+        navigate(classId ? `${path}?classId=${classId}` : path)
+      }}
     />
   )
 }
