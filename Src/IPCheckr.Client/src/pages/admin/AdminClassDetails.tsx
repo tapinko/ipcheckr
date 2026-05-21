@@ -1,20 +1,31 @@
+import AddIcon from "@mui/icons-material/Add"
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import {
+  Autocomplete,
   Box,
+  Button,
   Card,
   CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
   Stack,
+  TextField,
   Tooltip,
   Typography,
 } from "@mui/material"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { BarChart, LineChart } from "@mui/x-charts"
+import { useState, useEffect } from "react"
 import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
-import { classApi } from "../../utils/apiClients"
-import type { QueryClassDetailsRes } from "../../dtos"
+import { classApi, userApi } from "../../utils/apiClients"
+import type { IsLdapAuthRes, LdapUserDto, QueryClassDetailsRes, UserDto } from "../../dtos"
 import {
   AccessTime,
   Class,
@@ -26,6 +37,15 @@ import {
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import InsightCard from "../../components/InsightCard"
 import InsightGrid from "../../components/InsightGrid"
+import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
+import DeleteDialog from "../../components/DeleteDialog"
+import axiosInstance from "../../utils/axiosInstance"
+import i18n, { Language } from "../../utils/i18n"
+import UserRole from "../../types/UserRole"
+
+const minLdapSearchChars = 2
+
+type AddUserDialogRole = "student" | "teacher"
 
 const AdminClassDetails = () => {
   const { t } = useTranslation()
@@ -33,11 +53,84 @@ const AdminClassDetails = () => {
   const queryClient = useQueryClient()
   const { [RouteParams.CLASS_ID]: classId } = useParams()
 
+  const [addUserDialogRole, setAddUserDialogRole] = useState<AddUserDialogRole | null>(null)
+  const [selectedUser, setSelectedUser] = useState<UserDto | null>(null)
+  const [alert, setAlert] = useState<CustomAlertState | null>(null)
+
   const detailsQuery = useQuery<QueryClassDetailsRes, Error>({
     queryKey: ["teacherClassDetails", classId],
     enabled: !!classId,
     queryFn: () => classApi.classQueryClassDetails(Number(classId)).then(r => r.data),
     placeholderData: prev => prev
+  })
+
+  const ldapAuthQuery = useQuery<IsLdapAuthRes>({
+    queryKey: ["isLdapAuth"],
+    queryFn: () => userApi.userIsLdapAuth().then(r => r.data),
+    staleTime: 5 * 60_000
+  })
+  const isLdapAuth = ldapAuthQuery.data?.isLdapAuth === true
+
+  const allUsersQuery = useQuery<UserDto[], Error>({
+    queryKey: ["allUsersForClassAdd", addUserDialogRole],
+    enabled: !!addUserDialogRole && !isLdapAuth,
+    queryFn: () => {
+      const role = addUserDialogRole === "teacher" ? UserRole.TEACHER : UserRole.STUDENT
+      return userApi.userQueryUsers(null, null, role).then(r => r.data.users ?? [])
+    },
+    staleTime: 30_000
+  })
+
+  const existingIds = new Set(
+    addUserDialogRole === "teacher"
+      ? (detailsQuery.data?.teachers ?? []).map(t => t.teacherId)
+      : (detailsQuery.data?.students ?? []).map(s => s.studentId)
+  )
+  const availableUsers = (allUsersQuery.data ?? []).filter(u => !existingIds.has(u.id))
+
+  const addUserMutation = useMutation({
+    mutationFn: (username: string) => {
+      const endpoint = addUserDialogRole === "teacher"
+        ? "/api/classes/add-teacher"
+        : "/api/classes/add-student"
+      return axiosInstance.post(endpoint, { username, classIds: [Number(classId)] })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teacherClassDetails", classId] })
+      setAlert({ severity: "success", message: t(TranslationKey.ADMIN_CLASS_DETAILS_ADD_SUCCESS) })
+      closeDialog()
+    },
+    onError: (error: any) => {
+      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+      setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASS_DETAILS_ADD_ERROR)}. ${msg ?? ""}` })
+    }
+  })
+
+  const closeDialog = () => {
+    setAddUserDialogRole(null)
+    setSelectedUser(null)
+  }
+
+  const [pendingDelete, setPendingDelete] = useState<{ id: number; username: string; role: "student" | "teacher" } | null>(null)
+
+  const removeMutation = useMutation({
+    mutationFn: ({ id, role }: { id: number; role: "student" | "teacher" }) => {
+      if (role === "student") {
+        const remaining = (detailsQuery.data?.students ?? []).filter(s => s.studentId !== id).map(s => s.studentId)
+        return classApi.classEditClass({ id: Number(classId), students: remaining })
+      } else {
+        const remaining = (detailsQuery.data?.teachers ?? []).filter(t => t.teacherId !== id).map(t => t.teacherId)
+        return classApi.classEditClass({ id: Number(classId), teachers: remaining })
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teacherClassDetails", classId] })
+      setAlert({ severity: "success", message: t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_SUCCESS) })
+    },
+    onError: (error: any) => {
+      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+      setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_ERROR)}. ${msg ?? ""}` })
+    }
   })
 
   if (detailsQuery.isLoading && !detailsQuery.data) {
@@ -57,8 +150,18 @@ const AdminClassDetails = () => {
   const avgStudents = detailsQuery.data?.averageSuccessRateInStudents ?? []
   const avgGroups = detailsQuery.data?.averageSuccessRateInAssignmentGroups ?? []
 
+  const addButtonSx = {
+    border: (theme: any) => `1px solid ${theme.palette.success.main}`,
+    width: 20,
+    height: 20,
+    color: (theme: any) => theme.palette.success.dark,
+    "& .MuiSvgIcon-root": { fontSize: 14 },
+    mb: "1px"
+  }
+
   return (
     <>
+      {alert && <CustomAlert {...alert} onClose={() => setAlert(null)} />}
       <Stack spacing={2}>
         <Card variant="outlined" sx={{ borderColor: "divider", backgroundColor: "background.paper" }}>
           <CardContent>
@@ -111,7 +214,7 @@ const AdminClassDetails = () => {
               <Box>
                 <InsightCard
                   title={t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_SUCCESS_RATE)}
-                  value={detailsQuery.data && detailsQuery.data.totalSubmits > 0 ? `${detailsQuery.data.averageSuccessRate.toFixed(2)}%` : (detailsQuery.data ? t(TranslationKey.TEACHER_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED) : "0.00%")}
+                  value={detailsQuery.data && detailsQuery.data.totalSubmits > 0 ? `${detailsQuery.data.averageSuccessRate.toFixed(2)}%` : (detailsQuery.data ? t(TranslationKey.ADMIN_CLASS_DETAILS_CARD_UNSUBMITTED) : "0.00%")}
                   icon={<Percent />}
                   tone="success"
                   dense
@@ -138,9 +241,16 @@ const AdminClassDetails = () => {
           <Box sx={{ flex: 1, width: "100%" }}>
             <Card variant="outlined">
               <CardContent>
-                <Typography variant="overline" color="text.secondary">
-                  {t(TranslationKey.ADMIN_CLASS_DETAILS_STUDENTS)}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography variant="overline" color="text.secondary">
+                    {t(TranslationKey.ADMIN_CLASS_DETAILS_STUDENTS)}
+                  </Typography>
+                  <Tooltip title={t(TranslationKey.ADMIN_CLASS_DETAILS_ADD_STUDENT_TOOLTIP)}>
+                    <IconButton size="small" onClick={() => setAddUserDialogRole("student")} sx={addButtonSx}>
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
 
                 {detailsQuery.data?.students?.length ? (
                   <Stack spacing={1} sx={{ mt: 1 }}>
@@ -166,6 +276,12 @@ const AdminClassDetails = () => {
                         }
                       >
                         <Typography variant="body2" className="admin-student-link">{s.username}</Typography>
+                        <IconButton
+                          size="small"
+                          onClick={e => { e.stopPropagation(); setPendingDelete({ id: s.studentId, username: s.username, role: "student" }) }}
+                        >
+                          <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
                       </Stack>
                     ))}
                   </Stack>
@@ -181,9 +297,16 @@ const AdminClassDetails = () => {
           <Box sx={{ flex: 1, width: "100%" }}>
             <Card variant="outlined">
               <CardContent>
-                <Typography variant="overline" color="text.secondary">
-                  {t(TranslationKey.ADMIN_CLASS_DETAILS_TEACHERS)}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography variant="overline" color="text.secondary">
+                    {t(TranslationKey.ADMIN_CLASS_DETAILS_TEACHERS)}
+                  </Typography>
+                  <Tooltip title={t(TranslationKey.ADMIN_CLASS_DETAILS_ADD_TEACHER_TOOLTIP)}>
+                    <IconButton size="small" onClick={() => setAddUserDialogRole("teacher")} sx={addButtonSx}>
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
 
                 {detailsQuery.data?.teachers?.length ? (
                   <Stack spacing={1} sx={{ mt: 1 }}>
@@ -209,12 +332,18 @@ const AdminClassDetails = () => {
                         }
                       >
                         <Typography variant="body2" className="admin-teacher-link">{te.username}</Typography>
+                        <IconButton
+                          size="small"
+                          onClick={e => { e.stopPropagation(); setPendingDelete({ id: te.teacherId, username: te.username, role: "teacher" }) }}
+                        >
+                          <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
                       </Stack>
                     ))}
                   </Stack>
                 ) : (
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    {t(TranslationKey.ADMIN_CLASS_DETAILS_NO_STUDENTS)}
+                    {t(TranslationKey.ADMIN_CLASS_DETAILS_NO_TEACHERS)}
                   </Typography>
                 )}
               </CardContent>
@@ -305,7 +434,115 @@ const AdminClassDetails = () => {
           </Box>
         </Stack>
       </Stack>
+
+      <Dialog open={!!addUserDialogRole} onClose={closeDialog} fullWidth maxWidth="sm">
+        <DialogTitle>
+          {addUserDialogRole === "teacher"
+            ? t(TranslationKey.ADMIN_CLASS_DETAILS_ADD_TEACHER)
+            : t(TranslationKey.ADMIN_CLASS_DETAILS_ADD_STUDENT)}
+        </DialogTitle>
+        <DialogContent>
+          {isLdapAuth ? (
+            <LdapUserSearch
+              onSelect={setSelectedUser}
+              noOptionsText={t(TranslationKey.ADMIN_CLASS_DETAILS_NO_USERS_AVAILABLE)}
+              loadingText={t(TranslationKey.ADMIN_CLASS_DETAILS_LOADING)}
+              placeholder={t(TranslationKey.ADMIN_CLASS_DETAILS_LDAP_USERNAME_PLACEHOLDER, { value: minLdapSearchChars })}
+              label={t(TranslationKey.ADMIN_CLASS_DETAILS_USERNAME)}
+            />
+          ) : (
+            <Autocomplete
+              options={availableUsers}
+              getOptionLabel={o => o.username}
+              loading={allUsersQuery.isLoading}
+              noOptionsText={t(TranslationKey.ADMIN_CLASS_DETAILS_NO_USERS_AVAILABLE)}
+              value={selectedUser}
+              onChange={(_, v) => setSelectedUser(v)}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  margin="dense"
+                  fullWidth
+                  label={t(TranslationKey.ADMIN_CLASS_DETAILS_USERNAME)}
+                />
+              )}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog}>{t(TranslationKey.ADMIN_CLASS_DETAILS_CANCEL)}</Button>
+          <Button
+            variant="contained"
+            color="success"
+            disabled={!selectedUser || addUserMutation.isPending}
+            onClick={() => selectedUser && addUserMutation.mutate(selectedUser.username)}
+          >
+            {t(TranslationKey.ADMIN_CLASS_DETAILS_CONFIRM_ADD)}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <DeleteDialog
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => pendingDelete && removeMutation.mutate({ id: pendingDelete.id, role: pendingDelete.role })}
+        title={pendingDelete?.role === "teacher"
+          ? t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_TEACHER_TITLE)
+          : t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_STUDENT_TITLE)}
+        question={pendingDelete?.role === "teacher"
+          ? t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_TEACHER_QUESTION)
+          : t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_STUDENT_QUESTION)}
+        label={pendingDelete?.username}
+      />
     </>
+  )
+}
+
+type LdapUserSearchProps = {
+  onSelect: (user: UserDto | null) => void
+  noOptionsText: string
+  loadingText: string
+  placeholder: string
+  label: string
+}
+
+const LdapUserSearch = ({ onSelect, noOptionsText, loadingText, placeholder, label }: LdapUserSearchProps) => {
+  const [options, setOptions] = useState<LdapUserDto[]>([])
+  const [input, setInput] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const q = input.trim()
+    if (!q || q.length < minLdapSearchChars) { setOptions([]); return }
+    let cancelled = false
+    setLoading(true)
+    const timer = setTimeout(() => {
+      userApi.userLdapSearchUsers(q).then(r => r.data.users)
+        .then(users => { if (!cancelled) setOptions(users) })
+        .finally(() => { if (!cancelled) setLoading(false) })
+    }, 250)
+    return () => { cancelled = true; clearTimeout(timer) }
+  }, [input])
+
+  return (
+    <Autocomplete
+      loading={loading}
+      options={options}
+      getOptionLabel={o => o.username}
+      noOptionsText={noOptionsText}
+      loadingText={loadingText}
+      onInputChange={(_, v) => setInput(v)}
+      onChange={(_, v) => onSelect(v ? ({ id: 0, username: (v as LdapUserDto).username } as UserDto) : null)}
+      renderInput={params => (
+        <TextField
+          {...params}
+          margin="dense"
+          fullWidth
+          label={label}
+          placeholder={placeholder}
+        />
+      )}
+    />
   )
 }
 
