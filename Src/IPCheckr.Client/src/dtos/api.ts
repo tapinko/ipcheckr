@@ -2645,6 +2645,48 @@ export interface QueryAdminDashboardRes {
      * @type {number}
      * @memberof QueryAdminDashboardRes
      */
+    'lastSubmitGroupId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'lastSubmitId'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAdminDashboardRes
+     */
+    'lastSubmitType'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAdminDashboardRes
+     */
+    'mostSuccessfulClass'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'mostSuccessfulClassId'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryAdminDashboardRes
+     */
+    'mostSuccessfulStudent'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
+    'mostSuccessfulStudentId'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryAdminDashboardRes
+     */
     'totalSubmits': number;
 }
 /**
@@ -3398,6 +3440,12 @@ export interface QueryStudentDashboardRes {
     'lastSubmitGroupId'?: number | null;
     /**
      * 
+     * @type {string}
+     * @memberof QueryStudentDashboardRes
+     */
+    'lastSubmitType'?: string | null;
+    /**
+     * 
      * @type {number}
      * @memberof QueryStudentDashboardRes
      */
@@ -3784,13 +3832,31 @@ export interface QueryTeacherDashboardRes {
      * @type {string}
      * @memberof QueryTeacherDashboardRes
      */
+    'lastSubmitType'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof QueryTeacherDashboardRes
+     */
     'mostSuccessfulClass'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'mostSuccessfulClassId'?: number | null;
     /**
      * 
      * @type {string}
      * @memberof QueryTeacherDashboardRes
      */
     'mostSuccessfulStudent'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QueryTeacherDashboardRes
+     */
+    'mostSuccessfulStudentId'?: number | null;
     /**
      * 
      * @type {number}

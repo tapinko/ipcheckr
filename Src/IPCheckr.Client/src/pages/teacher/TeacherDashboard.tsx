@@ -14,8 +14,8 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "../../contexts/AuthContext"
-import { assignmentGroupApi, classApi, dashboardApi, userApi } from "../../utils/apiClients"
-import { AssignmentGroupType, type QueryTeacherDashboardRes } from "../../dtos"
+import { dashboardApi } from "../../utils/apiClients"
+import { type QueryTeacherDashboardRes } from "../../dtos"
 import ErrorLoading from "../../components/ErrorLoading"
 import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import { TranslationKey } from "../../utils/i18n"
@@ -23,9 +23,7 @@ import { AccessTime, Class, EmojiEvents, Groups, Quiz, School, TaskAlt } from "@
 import { BarChart } from "@mui/x-charts"
 import { useNavigate } from "react-router-dom"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
-import { fromAssignmentTypeParam, toAssignmentTypeParam } from "../../utils/assignmentType"
 import InsightCard from "../../components/InsightCard"
-import UserRole from "../../types/UserRole"
 
 const TeacherDashboard = () => {
   const { t } = useTranslation()
@@ -46,10 +44,10 @@ const TeacherDashboard = () => {
   const hasLastSubmitTarget =
     !!dashboardQuery.data?.lastSubmitGroupId &&
     !!dashboardQuery.data?.lastSubmitId &&
-    !!dashboardQuery.data?.lastSubmitUsername
+    !!dashboardQuery.data?.lastSubmitType
 
-  const hasMostSuccessfulClassTarget = !!dashboardQuery.data?.mostSuccessfulClass
-  const hasMostSuccessfulStudentTarget = !!dashboardQuery.data?.mostSuccessfulStudent
+  const hasMostSuccessfulClassTarget = !!dashboardQuery.data?.mostSuccessfulClassId
+  const hasMostSuccessfulStudentTarget = !!dashboardQuery.data?.mostSuccessfulStudentId
 
   const handleMyClassesNavigate = () => {
     navigate(getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES, {}))
@@ -60,64 +58,37 @@ const TeacherDashboard = () => {
     else if (barChartLength > 10) setBarChartLength(10)
   }, [barChartLength])
 
-  const handleLastSubmitNavigate = async () => {
-    if (!dashboardQuery.data?.lastSubmitGroupId || !dashboardQuery.data?.lastSubmitId) return
-
-    let resolvedType = fromAssignmentTypeParam((dashboardQuery.data as any)?.lastSubmitType as string | undefined)
-
-    if (!resolvedType) {
-      try {
-        await assignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroupDetails(dashboardQuery.data.lastSubmitGroupId)
-        resolvedType = AssignmentGroupType.Subnet
-      } catch {
-        try {
-          await assignmentGroupApi.assignmentGroupQueryIdNetAssignmentGroupDetails(dashboardQuery.data.lastSubmitGroupId)
-          resolvedType = AssignmentGroupType.Idnet
-        } catch {
-          return
-        }
-      }
-    }
+  const handleLastSubmitNavigate = () => {
+    const { lastSubmitGroupId, lastSubmitId, lastSubmitType } = dashboardQuery.data ?? {}
+    if (!lastSubmitGroupId || !lastSubmitId || !lastSubmitType) return
 
     navigate(
       getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT, {
-        [RouteParams.ASSIGNMENT_GROUP_ID]: dashboardQuery.data.lastSubmitGroupId.toString(),
-        [RouteParams.ASSIGNMENT_ID]: dashboardQuery.data.lastSubmitId.toString(),
-        [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(resolvedType)
+        [RouteParams.ASSIGNMENT_GROUP_ID]: lastSubmitGroupId.toString(),
+        [RouteParams.ASSIGNMENT_ID]: lastSubmitId.toString(),
+        [RouteParams.ASSIGNMENT_GROUP_TYPE]: lastSubmitType
       })
     )
   }
 
-  const handleMostSuccessfulClassNavigate = async () => {
-    const className = dashboardQuery.data?.mostSuccessfulClass
-    if (!className || !userId) return
-
-    const classesRes = await classApi.classQueryClasses(null, className, userId)
-    const classes = classesRes.data.classes ?? []
-    const exactMatch = classes.find(c => c.className.toLowerCase() === className.toLowerCase())
-    const targetClass = exactMatch ?? classes[0]
-    if (!targetClass?.classId) return
+  const handleMostSuccessfulClassNavigate = () => {
+    const classId = dashboardQuery.data?.mostSuccessfulClassId
+    if (!classId) return
 
     navigate(
       getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_CLASS_DETAILS, {
-        [RouteParams.CLASS_ID]: targetClass.classId.toString()
+        [RouteParams.CLASS_ID]: classId.toString()
       })
     )
   }
 
-  const handleMostSuccessfulStudentNavigate = async () => {
-    const studentUsername = dashboardQuery.data?.mostSuccessfulStudent
-    if (!studentUsername) return
-
-    const usersRes = await userApi.userQueryUsers(null, studentUsername, UserRole.STUDENT, null, null, null)
-    const users = usersRes.data.users ?? []
-    const exactMatch = users.find(u => u.username.toLowerCase() === studentUsername.toLowerCase())
-    const targetStudent = exactMatch ?? users[0]
-    if (!targetStudent?.id) return
+  const handleMostSuccessfulStudentNavigate = () => {
+    const studentId = dashboardQuery.data?.mostSuccessfulStudentId
+    if (!studentId) return
 
     navigate(
       getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS, {
-        [RouteParams.STUDENT_ID]: targetStudent.id.toString()
+        [RouteParams.STUDENT_ID]: studentId.toString()
       })
     )
   }
@@ -185,9 +156,7 @@ const TeacherDashboard = () => {
 
           <Stack spacing={1.25}>
             <Box
-              onClick={() => {
-                void handleLastSubmitNavigate()
-              }}
+              onClick={handleLastSubmitNavigate}
               sx={{
                 cursor: hasLastSubmitTarget ? "pointer" : "default",
                 "&:hover .last-submit-link-value":
@@ -261,9 +230,7 @@ const TeacherDashboard = () => {
             >
               <Box
                 component="span"
-                onClick={() => {
-                  void handleMostSuccessfulClassNavigate()
-                }}
+                onClick={handleMostSuccessfulClassNavigate}
                 sx={{
                   display: "block",
                   cursor: hasMostSuccessfulClassTarget ? "pointer" : "default",
@@ -293,9 +260,7 @@ const TeacherDashboard = () => {
             >
               <Box
                 component="span"
-                onClick={() => {
-                  void handleMostSuccessfulStudentNavigate()
-                }}
+                onClick={handleMostSuccessfulStudentNavigate}
                 sx={{
                   display: "block",
                   cursor: hasMostSuccessfulStudentTarget ? "pointer" : "default",

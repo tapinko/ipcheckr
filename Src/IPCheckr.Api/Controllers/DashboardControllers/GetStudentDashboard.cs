@@ -76,20 +76,20 @@ namespace IPCheckr.Api.Controllers
             var subnetAnswerKeyByAssignment = subnetAnswerKeys.ToDictionary(k => k.Assignment.Id, k => k);
             var idnetAnswerKeyByAssignment = idnetAnswerKeys.ToDictionary(k => k.Assignment.Id, k => k);
 
-            var combinedSubmits = new List<(DateTime submittedAt, int id, int assignmentId, int groupId, double percentage)>();
+            var combinedSubmits = new List<(DateTime submittedAt, int id, int assignmentId, int groupId, double percentage, string type)>();
 
             foreach (var submit in subnetSubmits)
             {
                 subnetAnswerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key);
                 double pct = AssignmentEvaluationUtils.CalculateSubnetSuccessRate(key, submit);
-                combinedSubmits.Add((submit.SubmittedAt, submit.Id, submit.Assignment.Id, submit.Assignment.AssignmentGroup.Id, pct));
+                combinedSubmits.Add((submit.SubmittedAt, submit.Id, submit.Assignment.Id, submit.Assignment.AssignmentGroup.Id, pct, "subnet"));
             }
 
             foreach (var submit in idnetSubmits)
             {
                 idnetAnswerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key);
                 double pct = AssignmentEvaluationUtils.CalculateIdNetSuccessRate(key, submit, submit.Assignment.AssignmentGroup.TestWildcard, submit.Assignment.AssignmentGroup.TestFirstLastBr);
-                combinedSubmits.Add((submit.SubmittedAt, submit.Id, submit.Assignment.Id, submit.Assignment.AssignmentGroup.Id, pct));
+                combinedSubmits.Add((submit.SubmittedAt, submit.Id, submit.Assignment.Id, submit.Assignment.AssignmentGroup.Id, pct, "idnet"));
             }
 
             var successRate = combinedSubmits
@@ -110,6 +110,7 @@ namespace IPCheckr.Api.Controllers
             var lastSubmitAt = combinedSubmits.Count > 0 ? lastSubmit.submittedAt : (DateTime?)null;
             var lastSubmitId = combinedSubmits.Count > 0 ? lastSubmit.assignmentId : (int?)null;
             var lastSubmitGroupId = combinedSubmits.Count > 0 ? lastSubmit.groupId : (int?)null;
+            var lastSubmitType = combinedSubmits.Count > 0 ? lastSubmit.type : null;
 
             var classesStr = string.Join(", ", classes.Select(c => c.Name).OrderBy(n => n));
             var teachersStr = string.Join(", ",
@@ -131,6 +132,7 @@ namespace IPCheckr.Api.Controllers
                 LastSubmitAt = lastSubmitAt,
                 LastSubmitId = lastSubmitId,
                 LastSubmitGroupId = lastSubmitGroupId,
+                LastSubmitType = lastSubmitType,
                 TotalSubmits = combinedSubmits.Count,
                 SuccessRate = successRate
             };

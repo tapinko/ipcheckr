@@ -11,13 +11,13 @@ import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { AccessTime, Class, Groups, School, TaskAlt, Quiz } from "@mui/icons-material"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { assignmentApi, dashboardApi } from "../../utils/apiClients"
-import { AssignmentGroupType, type QueryStudentDashboardRes } from "../../dtos"
+import { dashboardApi } from "../../utils/apiClients"
+import { type QueryStudentDashboardRes } from "../../dtos"
 import { useAuth } from "../../contexts/AuthContext"
 import { LineChart } from "@mui/x-charts"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { useNavigate } from "react-router-dom"
-import { fromAssignmentTypeParam, toAssignmentTypeParam } from "../../utils/assignmentType"
+
 import InsightCard from "../../components/InsightCard"
 
 const StudentDashboard = () => {
@@ -33,31 +33,18 @@ const StudentDashboard = () => {
     placeholderData: prev => prev,
   })
 
-  const hasLastSubmitTarget = !!dashboardQuery.data?.lastSubmitId
+  const hasLastSubmitTarget =
+    !!dashboardQuery.data?.lastSubmitId &&
+    !!dashboardQuery.data?.lastSubmitType
 
-  const handleLastSubmitNavigate = async () => {
-    if (!dashboardQuery.data?.lastSubmitId) return
-
-    let resolvedType = fromAssignmentTypeParam((dashboardQuery.data as any)?.lastSubmitType as string | undefined)
-
-    if (!resolvedType) {
-      try {
-        await assignmentApi.assignmentQuerySubnetAssignmentSubmitDetailsFull(dashboardQuery.data.lastSubmitId)
-        resolvedType = AssignmentGroupType.Subnet
-      } catch {
-        try {
-          await assignmentApi.assignmentQueryIdNetAssignmentSubmitDetailsFull(dashboardQuery.data.lastSubmitId)
-          resolvedType = AssignmentGroupType.Idnet
-        } catch {
-          return
-        }
-      }
-    }
+  const handleLastSubmitNavigate = () => {
+    const { lastSubmitId, lastSubmitType } = dashboardQuery.data ?? {}
+    if (!lastSubmitId || !lastSubmitType) return
 
     navigate(
       getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_DETAILS, {
-        [RouteParams.ASSIGNMENT_ID]: dashboardQuery.data.lastSubmitId.toString(),
-        [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(resolvedType)
+        [RouteParams.ASSIGNMENT_ID]: lastSubmitId.toString(),
+        [RouteParams.ASSIGNMENT_GROUP_TYPE]: lastSubmitType
       })
     )
   }
@@ -147,9 +134,7 @@ const StudentDashboard = () => {
               dense
             />
             <Box
-              onClick={() => {
-                void handleLastSubmitNavigate()
-              }}
+              onClick={handleLastSubmitNavigate}
               sx={{
                 cursor: hasLastSubmitTarget ? "pointer" : "default",
                 "&:hover .last-submit-link-value":

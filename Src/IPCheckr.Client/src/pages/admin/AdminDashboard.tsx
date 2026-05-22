@@ -8,17 +8,18 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Paper
+  Paper,
+  Tooltip
 } from "@mui/material"
 import { TranslationKey } from "../../utils/i18n"
 import { useTranslation } from "react-i18next"
 import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
-import { AccessTime, Class, Groups, Quiz, School, TaskAlt } from "@mui/icons-material"
+import { AccessTime, Class, EmojiEvents, Groups, Quiz, School, TaskAlt } from "@mui/icons-material"
 import { PlayArrow, Stop, Refresh } from "@mui/icons-material"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { dashboardApi, userApi } from "../../utils/apiClients"
-import type { QueryAdminDashboardRes } from "../../dtos"
+import { dashboardApi } from "../../utils/apiClients"
+import { type QueryAdminDashboardRes } from "../../dtos"
 import { useEffect, useMemo, useRef, useState } from "react"
 import getApiBase from "../../utils/getApiBase"
 import InsightCard from "../../components/InsightCard"
@@ -54,8 +55,6 @@ const AdminDashboard = () => {
   const [isConnecting, setIsConnecting] = useState(false)
   const [logs, setLogs] = useState<StreamLogEntry[]>([])
   const [autoScroll, setAutoScroll] = useState(true)
-
-  const hasLastSubmitTarget = !!dashboardQuery.data?.lastSubmitUsername
 
   const controllerRef = useRef<AbortController | null>(null)
   const bufferRef = useRef<string>("")
@@ -226,19 +225,45 @@ const AdminDashboard = () => {
     connect(true)
   }
 
-  const handleLastSubmitNavigate = async () => {
-    const username = dashboardQuery.data?.lastSubmitUsername
-    if (!username) return
+  const hasLastSubmitTarget =
+    !!dashboardQuery.data?.lastSubmitGroupId &&
+    !!dashboardQuery.data?.lastSubmitId &&
+    !!dashboardQuery.data?.lastSubmitType
 
-    const usersRes = await userApi.userQueryUsers(null, username, null, null, null, null)
-    const users = usersRes.data.users ?? []
-    const exactMatch = users.find(u => u.username.toLowerCase() === username.toLowerCase())
-    const targetUser = exactMatch ?? users[0]
-    if (!targetUser?.id) return
+  const hasMostSuccessfulClassTarget = !!dashboardQuery.data?.mostSuccessfulClassId
+  const hasMostSuccessfulStudentTarget = !!dashboardQuery.data?.mostSuccessfulStudentId
+
+  const handleLastSubmitNavigate = () => {
+    const { lastSubmitGroupId, lastSubmitId, lastSubmitType } = dashboardQuery.data ?? {}
+    if (!lastSubmitGroupId || !lastSubmitId || !lastSubmitType) return
+
+    navigate(
+      getParametrizedUrl(RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS_SUBMIT, {
+        [RouteParams.ASSIGNMENT_GROUP_ID]: lastSubmitGroupId.toString(),
+        [RouteParams.ASSIGNMENT_ID]: lastSubmitId.toString(),
+        [RouteParams.ASSIGNMENT_GROUP_TYPE]: lastSubmitType
+      })
+    )
+  }
+
+  const handleMostSuccessfulClassNavigate = () => {
+    const classId = dashboardQuery.data?.mostSuccessfulClassId
+    if (!classId) return
+
+    navigate(
+      getParametrizedUrl(RouteKeys.ADMIN_CLASS_DETAILS, {
+        [RouteParams.CLASS_ID]: classId.toString()
+      })
+    )
+  }
+
+  const handleMostSuccessfulStudentNavigate = () => {
+    const studentId = dashboardQuery.data?.mostSuccessfulStudentId
+    if (!studentId) return
 
     navigate(
       getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
-        [RouteParams.USER_ID]: targetUser.id.toString()
+        [RouteParams.USER_ID]: studentId.toString()
       })
     )
   }
@@ -277,6 +302,12 @@ const AdminDashboard = () => {
         >
           <Stack spacing={1.25}>
             <InsightCard
+              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
+              value={dashboardQuery.data?.totalAssignmentGroups ?? "-"}
+              icon={<Quiz />}
+              dense
+            />
+            <InsightCard
               title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_UPCOMING)}
               value={dashboardQuery.data?.totalUpcoming ?? "-"}
               icon={<AccessTime />}
@@ -299,12 +330,24 @@ const AdminDashboard = () => {
           </Stack>
 
           <Stack spacing={1.25}>
-            <InsightCard
-              title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_ASSIGNMENT_GROUPS)}
-              value={dashboardQuery.data?.totalAssignmentGroups ?? "-"}
-              icon={<Quiz />}
-              dense
-            />
+            <Box
+              onClick={handleLastSubmitNavigate}
+              sx={{
+                cursor: hasLastSubmitTarget ? "pointer" : "default",
+                "&:hover .last-submit-link-value": hasLastSubmitTarget ? { textDecoration: "underline" } : undefined
+              }}
+            >
+              <InsightCard
+                title={t(TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT)}
+                value={
+                  <Box component="span" className="last-submit-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                    {dashboardQuery.data?.lastSubmitUsername ?? "-"}
+                  </Box>
+                }
+                icon={<AccessTime />}
+                dense
+              />
+            </Box>
             <Box
               onClick={() => navigate(Routes[RouteKeys.ADMIN_CLASSES])}
               sx={{
@@ -348,6 +391,52 @@ const AdminDashboard = () => {
           </Stack>
 
           <Stack spacing={1.25}>
+            <Tooltip title={t(TranslationKey.ADMIN_DASHBOARD_MOST_SUCCESSFUL_CLASS_TOOLTIP)}>
+              <Box
+                component="span"
+                onClick={handleMostSuccessfulClassNavigate}
+                sx={{
+                  display: "block",
+                  cursor: hasMostSuccessfulClassTarget ? "pointer" : "default",
+                  "&:hover .most-successful-class-link-value": hasMostSuccessfulClassTarget ? { textDecoration: "underline" } : undefined
+                }}
+              >
+                <InsightCard
+                  title={t(TranslationKey.ADMIN_DASHBOARD_MOST_SUCCESSFUL_CLASS)}
+                  value={
+                    <Box component="span" className="most-successful-class-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                      {dashboardQuery.data?.mostSuccessfulClass ?? "-"}
+                    </Box>
+                  }
+                  icon={<Class />}
+                  tone="success"
+                  dense
+                />
+              </Box>
+            </Tooltip>
+            <Tooltip title={t(TranslationKey.ADMIN_DASHBOARD_MOST_SUCCESSFUL_STUDENT_TOOLTIP)}>
+              <Box
+                component="span"
+                onClick={handleMostSuccessfulStudentNavigate}
+                sx={{
+                  display: "block",
+                  cursor: hasMostSuccessfulStudentTarget ? "pointer" : "default",
+                  "&:hover .most-successful-student-link-value": hasMostSuccessfulStudentTarget ? { textDecoration: "underline" } : undefined
+                }}
+              >
+                <InsightCard
+                  title={t(TranslationKey.ADMIN_DASHBOARD_MOST_SUCCESSFUL_STUDENT)}
+                  value={
+                    <Box component="span" className="most-successful-student-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
+                      {dashboardQuery.data?.mostSuccessfulStudent ?? "-"}
+                    </Box>
+                  }
+                  icon={<EmojiEvents />}
+                  tone="success"
+                  dense
+                />
+              </Box>
+            </Tooltip>
             <InsightCard
               title={t(TranslationKey.ADMIN_DASHBOARD_TOTAL_SUBMITS)}
               value={dashboardQuery.data?.totalSubmits ?? "-"}
@@ -355,31 +444,6 @@ const AdminDashboard = () => {
               tone="info"
               dense
             />
-            <Box
-              onClick={() => {
-                void handleLastSubmitNavigate()
-              }}
-              sx={{
-                cursor: hasLastSubmitTarget ? "pointer" : "default",
-                "&:hover .last-submit-link-value":
-                  hasLastSubmitTarget
-                    ? {
-                        textDecoration: "underline"
-                      }
-                    : undefined
-              }}
-            >
-              <InsightCard
-                title={t(TranslationKey.ADMIN_DASHBOARD_LAST_SUBMIT)}
-                value={
-                  <Box component="span" className="last-submit-link-value" sx={{ fontWeight: "inherit", fontSize: "inherit" }}>
-                    {dashboardQuery.data?.lastSubmitUsername ?? "-"}
-                  </Box>
-                }
-                icon={<AccessTime />}
-                dense
-              />
-            </Box>
           </Stack>
         </Box>
 

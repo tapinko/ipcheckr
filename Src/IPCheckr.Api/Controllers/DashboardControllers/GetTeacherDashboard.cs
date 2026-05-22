@@ -59,14 +59,14 @@ namespace IPCheckr.Api.Controllers
             var subnetAnswerKeyByAssignment = subnetAnswerKeys.ToDictionary(k => k.Assignment.Id, k => k);
             var idnetAnswerKeyByAssignment = idnetAnswerKeys.ToDictionary(k => k.Assignment.Id, k => k);
 
-            var combinedSubmits = new List<(int studentId, string studentUsername, int classId, string className, DateTime submittedAt, int id, int assignmentId, int groupId, double percentage)>();
+            var combinedSubmits = new List<(int studentId, string studentUsername, int classId, string className, DateTime submittedAt, int id, int assignmentId, int groupId, double percentage, string type)>();
 
             foreach (var submit in subnetSubmits)
             {
                 subnetAnswerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key);
                 double pct = AssignmentEvaluationUtils.CalculateSubnetSuccessRate(key, submit);
                 var ag = submit.Assignment.AssignmentGroup;
-                combinedSubmits.Add((submit.Assignment.Student.Id, submit.Assignment.Student.Username, ag.Class.Id, ag.Class.Name, submit.SubmittedAt, submit.Id, submit.Assignment.Id, ag.Id, pct));
+                combinedSubmits.Add((submit.Assignment.Student.Id, submit.Assignment.Student.Username, ag.Class.Id, ag.Class.Name, submit.SubmittedAt, submit.Id, submit.Assignment.Id, ag.Id, pct, "subnet"));
             }
 
             foreach (var submit in idnetSubmits)
@@ -74,7 +74,7 @@ namespace IPCheckr.Api.Controllers
                 idnetAnswerKeyByAssignment.TryGetValue(submit.Assignment.Id, out var key);
                 double pct = AssignmentEvaluationUtils.CalculateIdNetSuccessRate(key, submit, submit.Assignment.AssignmentGroup.TestWildcard, submit.Assignment.AssignmentGroup.TestFirstLastBr);
                 var ag = submit.Assignment.AssignmentGroup;
-                combinedSubmits.Add((submit.Assignment.Student.Id, submit.Assignment.Student.Username, ag.Class.Id, ag.Class.Name, submit.SubmittedAt, submit.Id, submit.Assignment.Id, ag.Id, pct));
+                combinedSubmits.Add((submit.Assignment.Student.Id, submit.Assignment.Student.Username, ag.Class.Id, ag.Class.Name, submit.SubmittedAt, submit.Id, submit.Assignment.Id, ag.Id, pct, "idnet"));
             }
 
             var studentAverages = combinedSubmits
@@ -97,6 +97,18 @@ namespace IPCheckr.Api.Controllers
                 .OrderByDescending(x => x.Percentage)
                 .ToList();
 
+            var topStudentGroup = combinedSubmits
+                .GroupBy(s => new { s.studentId, s.studentUsername })
+                .Select(g => new { g.Key.studentId, g.Key.studentUsername, avg = g.Average(x => x.percentage) })
+                .OrderByDescending(x => x.avg)
+                .FirstOrDefault();
+
+            var topClassGroup = combinedSubmits
+                .GroupBy(s => new { s.classId, s.className })
+                .Select(g => new { g.Key.classId, g.Key.className, avg = g.Average(x => x.percentage) })
+                .OrderByDescending(x => x.avg)
+                .FirstOrDefault();
+
             var lastSubmit = combinedSubmits
                 .OrderByDescending(s => s.submittedAt)
                 .ThenByDescending(s => s.id)
@@ -106,6 +118,7 @@ namespace IPCheckr.Api.Controllers
 
             int? lastSubmitId = combinedSubmits.Count > 0 ? lastSubmit.assignmentId : (int?)null;
             int? lastSubmitGroupId = combinedSubmits.Count > 0 ? lastSubmit.groupId : (int?)null;
+            string? lastSubmitType = combinedSubmits.Count > 0 ? lastSubmit.type : null;
 
             var institution = await _db.AppSettings.FirstOrDefaultAsync(a => a.Name == "InstitutionName");
             var institutionName = institution?.Value;
@@ -132,10 +145,10 @@ namespace IPCheckr.Api.Controllers
                 .Distinct()
                 .Count();
 
-            var mostSuccessfulStudent = studentAverages.FirstOrDefault()?.Username;
-            if (!string.IsNullOrEmpty(mostSuccessfulStudent))
-                mostSuccessfulStudent = UsernameUtils.ToDisplay(mostSuccessfulStudent);
-            var mostSuccessfulClass = classAverages.FirstOrDefault()?.ClassName;
+            var mostSuccessfulStudent = topStudentGroup != null ? UsernameUtils.ToDisplay(topStudentGroup.studentUsername) : null;
+            int? mostSuccessfulStudentId = topStudentGroup?.studentId;
+            var mostSuccessfulClass = topClassGroup?.className;
+            int? mostSuccessfulClassId = topClassGroup?.classId;
 
             int take = req.BarChartLength > 0 ? req.BarChartLength : int.MaxValue;
             var studentBars = studentAverages.Take(take).ToArray();
@@ -152,8 +165,11 @@ namespace IPCheckr.Api.Controllers
                 LastSubmitAt = lastSubmitAt,
                 LastSubmitGroupId = lastSubmitGroupId,
                 LastSubmitId = lastSubmitId,
+                LastSubmitType = lastSubmitType,
                 MostSuccessfulClass = mostSuccessfulClass,
+                MostSuccessfulClassId = mostSuccessfulClassId,
                 MostSuccessfulStudent = mostSuccessfulStudent,
+                MostSuccessfulStudentId = mostSuccessfulStudentId,
                 TotalClasses = totalClasses,
                 TotalStudents = totalStudents,
                 TotalSubmits = totalSubmits,

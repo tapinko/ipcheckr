@@ -20,9 +20,15 @@ namespace IPCheckr.Api.DTOs.Dashboard
 
         public int? LastSubmitId { get; set; }
 
+        public string? LastSubmitType { get; set; }
+
         public string? MostSuccessfulClass { get; set; }
 
+        public int? MostSuccessfulClassId { get; set; }
+
         public string? MostSuccessfulStudent { get; set; }
+
+        public int? MostSuccessfulStudentId { get; set; }
 
         [Required]
         public int TotalClasses { get; set; }
