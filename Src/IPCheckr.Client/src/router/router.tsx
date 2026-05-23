@@ -13,6 +13,7 @@ import AdminEditAssignmentGroup from "../pages/admin/AdminEditAssignmentGroup"
 import AdminAssignmentGroupDetails from "../pages/admin/AdminAssignmentGroupDetails"
 import AdminAssignmentGroupDetailsSubmit from "../pages/admin/AdminAssignmentGroupDetailsSubmit"
 import AdminArchiveAssignmentGroups from "../pages/admin/AdminArchiveAssignmentGroups"
+import AdminArchiveAssignmentGroupDetails from "../pages/admin/AdminArchiveAssignmentGroupDetails"
 import AdminAGTemplates from "../pages/admin/AdminAGTemplates"
 import AdminCreateAGTemplate from "../pages/admin/AdminCreateAGTemplate"
 import AdminEditAGTemplate from "../pages/admin/AdminEditAGTemplate"
@@ -28,6 +29,7 @@ import TeacherEditAssignmentGroup from "../pages/teacher/TeacherEditAssignmentGr
 import TeacherAssignmentGroupDetails from "../pages/teacher/TeacherAssignmentGroupDetails"
 import TeacherAssignmentGroupDetailsSubmit from "../pages/teacher/TeacherAssignmentGroupDetailsSubmit"
 import TeacherArchiveAssignmentGroups from "../pages/teacher/TeacherArchiveAssignmentGroups"
+import TeacherArchiveAssignmentGroupDetails from "../pages/teacher/TeacherArchiveAssignmentGroupDetails"
 import TeacherAGTemplates from "../pages/teacher/TeacherAGTemplates"
 import TeacherCreateAGTemplate from "../pages/teacher/TeacherCreateAGTemplate"
 import TeacherEditAGTemplate from "../pages/teacher/TeacherEditAGTemplate"
@@ -72,6 +74,8 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS]: <AdminAssignmentGroupDetails />,
   [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <AdminAssignmentGroupDetailsSubmit />,
   [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE]: <AdminArchiveAssignmentGroups />,
+  [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS]: <AdminArchiveAssignmentGroupDetails />,
+  [RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT]: <AdminAssignmentGroupDetailsSubmit />,
   [RouteKeys.ADMIN_AG_TEMPLATES]: <AdminAGTemplates />,
   [RouteKeys.ADMIN_AG_TEMPLATE_CREATE]: <AdminCreateAGTemplate />,
   [RouteKeys.ADMIN_AG_TEMPLATE_EDIT]: <AdminEditAGTemplate />,
@@ -87,6 +91,8 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS]: <TeacherAssignmentGroupDetails />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT]: <TeacherAssignmentGroupDetailsSubmit />,
   [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE]: <TeacherArchiveAssignmentGroups />,
+  [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS]: <TeacherArchiveAssignmentGroupDetails />,
+  [RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT]: <TeacherAssignmentGroupDetailsSubmit />,
   [RouteKeys.TEACHER_AG_TEMPLATES]: <TeacherAGTemplates />,
   [RouteKeys.TEACHER_AG_TEMPLATE_CREATE]: <TeacherCreateAGTemplate />,
   [RouteKeys.TEACHER_AG_TEMPLATE_EDIT]: <TeacherEditAGTemplate />,
@@ -100,6 +106,7 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.STUDENT_ASSIGNMENT_DETAILS]: <StudentAssignmentDetails />,
   [RouteKeys.STUDENT_GNS3]: <StudentGns3 />,
   [RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE]: <StudentArchiveAssignmentGroups />,
+  [RouteKeys.STUDENT_ARCHIVE_ASSIGNMENT_DETAILS]: <StudentAssignmentDetails />,
 }
 
 const useAuthRouter = () => {
@@ -151,6 +158,8 @@ const useAuthRouter = () => {
           RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS,
           RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
           RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE,
+          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS,
+          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT,
           RouteKeys.ADMIN_AG_TEMPLATES,
           RouteKeys.ADMIN_AG_TEMPLATE_CREATE,
           RouteKeys.ADMIN_AG_TEMPLATE_EDIT,
@@ -176,6 +185,8 @@ const useAuthRouter = () => {
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
           RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE,
+          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS,
+          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT,
           RouteKeys.TEACHER_AG_TEMPLATES,
           RouteKeys.TEACHER_AG_TEMPLATE_CREATE,
           RouteKeys.TEACHER_AG_TEMPLATE_EDIT,
@@ -196,6 +207,7 @@ const useAuthRouter = () => {
           RouteKeys.STUDENT_DASHBOARD,
           RouteKeys.STUDENT_ASSIGNMENTS,
           RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE,
+          RouteKeys.STUDENT_ARCHIVE_ASSIGNMENT_DETAILS,
           RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION,
           RouteKeys.STUDENT_ASSIGNMENT_DETAILS,
           RouteKeys.STUDENT_GNS3,

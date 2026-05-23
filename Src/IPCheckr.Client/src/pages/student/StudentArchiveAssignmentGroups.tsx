@@ -29,7 +29,7 @@ const StudentArchiveAssignmentGroups = () => {
       : (idnetQuery.data ?? [])
     const assignment = list.find(a => a.assignmentGroupId === agId)
     if (!assignment) return
-    navigate(getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_DETAILS, {
+    navigate(getParametrizedUrl(RouteKeys.STUDENT_ARCHIVE_ASSIGNMENT_DETAILS, {
       [RouteParams.ASSIGNMENT_ID]: assignment.assignmentId.toString(),
       [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(type)
     }))

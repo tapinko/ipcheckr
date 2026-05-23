@@ -91,6 +91,18 @@ const routes: BreadcrumbsRoute[] = [
       </Typography>
   },
   {
+    path: Routes[RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS],
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS)} {match.params.ASSIGNMENT_GROUP_ID}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT],
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT)} {match.params.ASSIGNMENT_ID}
+      </Typography>
+  },
+  {
     path: Routes[RouteKeys.ADMIN_AG_TEMPLATES],
     breadcrumb: () => <Typography variant="body2" component="span">
         {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_AG_TEMPLATES)}
@@ -164,6 +176,18 @@ const routes: BreadcrumbsRoute[] = [
       </Typography>
   },
   {
+    path: Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS],
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS)} {match.params.ASSIGNMENT_GROUP_ID}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT],
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT)} {match.params.ASSIGNMENT_ID}
+      </Typography>
+  },
+  {
     path: Routes[RouteKeys.TEACHER_AG_TEMPLATES],
     breadcrumb: () => <Typography variant="body2" component="span">
         {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_AG_TEMPLATES)}
@@ -204,6 +228,12 @@ const routes: BreadcrumbsRoute[] = [
     path: Routes[RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE],
     breadcrumb: () => <Typography variant="body2" component="span">
         {i18n.t(TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENTS_ARCHIVE)}
+      </Typography>
+  },
+  {
+    path: Routes[RouteKeys.STUDENT_ARCHIVE_ASSIGNMENT_DETAILS],
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_STUDENT_ASSIGNMENT_DETAILS)} {match.params.ASSIGNMENT_ID}
       </Typography>
   },
   {
