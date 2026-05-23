@@ -459,6 +459,7 @@ const AdminUserDetails = () => {
                       valueFormatter: (v: number) => `${v.toFixed(2)}%`,
                     },
                   ]}
+                  margin={{ left: 60, right: 80, top: 20, bottom: 40 }}
                 />
               ) : (
                 <Typography variant="body2" color="text.secondary">

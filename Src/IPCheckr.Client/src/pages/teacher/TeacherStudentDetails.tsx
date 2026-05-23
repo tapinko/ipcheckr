@@ -285,6 +285,7 @@ const TeacherStudentDetails = () => {
                         valueFormatter: (v: number) => `${v}%`,
                       },
                     ]}
+                    margin={{ left: 60, right: 80, top: 20, bottom: 40 }}
                   />
                 ) : (
                   <Typography variant="body2" color="text.secondary">
