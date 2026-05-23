@@ -177,8 +177,8 @@ const AGCreateAssignmentGroupFeature = ({ onAfterCreate, teacherFilter }: AGCrea
         classId: data.classId!,
         students: data.students.length ? data.students : null,
         type: data.type,
-        startDate: data.startDate,
-        deadline: data.deadline,
+        startDate: new Date(data.startDate).toISOString(),
+        deadline: new Date(data.deadline).toISOString(),
         numberOfRecords: data.numberOfRecords,
         ipCat: data.ipCat
       }

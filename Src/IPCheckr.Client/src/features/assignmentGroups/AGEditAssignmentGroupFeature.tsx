@@ -128,8 +128,8 @@ const AGEditAssignmentGroupFeature = ({ onAfterSave }: AGEditAssignmentGroupFeat
       name: detail.name,
       description: detail.description ?? "",
       students: detail.assignments?.map(a => a.studentId) ?? [],
-      startDate: detail.startDate,
-      deadline: detail.deadline
+      startDate: toLocalDateTimeString(new Date(detail.startDate)),
+      deadline: toLocalDateTimeString(new Date(detail.deadline))
     })
   }, [detailQuery.data, reset])
 
@@ -149,8 +149,8 @@ const AGEditAssignmentGroupFeature = ({ onAfterSave }: AGEditAssignmentGroupFeat
         name: data.name,
         description: data.description,
         students: data.students.length ? data.students : null,
-        startDate: data.startDate,
-        deadline: data.deadline
+        startDate: new Date(data.startDate).toISOString(),
+        deadline: new Date(data.deadline).toISOString()
       }
 
       if (assignmentType === AssignmentGroupType.Subnet)

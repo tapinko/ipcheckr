@@ -111,8 +111,8 @@ const AGTemplatesFeature = ({ onNavigateCreate, onNavigateEdit, onAfterCreate, t
         classId: qcForm.classId as number,
         students: null,
         type: qcTemplate.type!,
-        startDate: qcForm.startDate,
-        deadline: qcForm.deadline,
+        startDate: new Date(qcForm.startDate).toISOString(),
+        deadline: new Date(qcForm.deadline).toISOString(),
         numberOfRecords: qcTemplate.numberOfRecords!,
         ipCat: qcTemplate.ipCat!
       }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using IPCheckr.Api.Models;
 
 namespace IPCheckr.Api
@@ -30,6 +31,32 @@ namespace IPCheckr.Api
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Ensure all DateTime values read from the DB are tagged as UTC so the JSON
+            // serializer emits the "Z" suffix and browsers can convert to local time correctly.
+            var utcConverter = new ValueConverter<DateTime, DateTime>(
+                v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            var utcNullableConverter = new ValueConverter<DateTime?, DateTime?>(
+                v => v.HasValue
+                    ? (v.Value.Kind == DateTimeKind.Utc ? v : v.Value.ToUniversalTime())
+                    : v,
+                v => v.HasValue
+                    ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                    : v);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime))
+                        property.SetValueConverter(utcConverter);
+                    else if (property.ClrType == typeof(DateTime?))
+                        property.SetValueConverter(utcNullableConverter);
+                }
+            }
+
 
             modelBuilder.Entity<Class>()
                 .HasMany(c => c.Teachers)

@@ -166,8 +166,8 @@ const computeMoveDates = (
   }
 
   return {
-    startDate: toLocalDateTimeString(nextStart),
-    deadline: toLocalDateTimeString(nextDeadline)
+    startDate: nextStart.toISOString(),
+    deadline: nextDeadline.toISOString()
   }
 }
 
