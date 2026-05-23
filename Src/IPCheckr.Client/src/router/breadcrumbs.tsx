@@ -116,8 +116,8 @@ const routes: BreadcrumbsRoute[] = [
   },
   {
     path: Routes[RouteKeys.ADMIN_AG_TEMPLATE_EDIT],
-    breadcrumb: () => <Typography variant="body2" component="span">
-        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_AG_TEMPLATE_EDIT)}
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_ADMIN_AG_TEMPLATE_EDIT)} {match.params.TEMPLATE_ID}
       </Typography>
   },
 
@@ -201,8 +201,8 @@ const routes: BreadcrumbsRoute[] = [
   },
   {
     path: Routes[RouteKeys.TEACHER_AG_TEMPLATE_EDIT],
-    breadcrumb: () => <Typography variant="body2" component="span">
-        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_AG_TEMPLATE_EDIT)}
+    breadcrumb: ({match}) => <Typography variant="body2" component="span">
+        {i18n.t(TranslationKey.BREADCRUMBS_TEACHER_AG_TEMPLATE_EDIT)} {match.params.TEMPLATE_ID}
       </Typography>
   },
   {
