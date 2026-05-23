@@ -282,7 +282,7 @@ const CustomBreadcrumbsRoot = () => {
   return (
     <>
       {breadcrumbs.length > 0 && (
-        <Box component={Paper} elevation={3} p={2}>
+        <Box component={Paper} elevation={1} p={2} sx={{ borderRadius: 0, boxShadow: "0 6px 12px -2px rgba(0,0,0,0.35)" }}>
           <CustomBreadcrumbs breadcrumbs={breadcrumbs} />
         </Box>
       )}
