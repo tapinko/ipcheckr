@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useBlocker, useLocation, useNavigate, useParams } from "react-router-dom"
 import { assignmentSubmitApi } from "../../utils/apiClients"
 import type {
   ApiProblemDetails,
@@ -199,6 +199,7 @@ const StudentAssignmentSubmission = () => {
       queryClient.invalidateQueries({
         queryKey: ["studentAssignments"]
       })
+      submitSucceededRef.current = true
       navigate(
         getParametrizedUrl(RouteKeys.STUDENT_ASSIGNMENT_DETAILS, {
           [RouteParams.ASSIGNMENT_ID]: assignmentId!,
@@ -255,6 +256,7 @@ const StudentAssignmentSubmission = () => {
   const attemptData = attemptQuery.data ?? null
   const [optimisticLocked, setOptimisticLocked] = useState(false)
   const lockInFlightRef = useRef(false)
+  const submitSucceededRef = useRef(false)
   const attemptLocked = attemptData?.status === "LOCKED" || optimisticLocked
   const attemptSubmitted = attemptData?.status === "SUBMITTED"
   const assignmentAttemptId = attemptData?.assignmentAttemptId ?? null
@@ -448,32 +450,68 @@ const StudentAssignmentSubmission = () => {
     })
   }, [assignmentAttemptId, assignmentAttemptLockToken, attemptData, attemptLocked, attemptSubmitted, assignmentType, rowSignature, enqueueSaveDraft])
 
+  // Extract lock payload builder so it can be used both by the lock effect and the navigation blocker.
+  const createLockPayload = useCallback((rows: AssignmentFormRow[]): SaveAssignmentSubmissionAttemptDraftReq =>
+    assignmentType === AssignmentGroupTypeValues.Idnet
+      ? {
+          assignmentAttemptId: assignmentAttemptId!,
+          lockToken: assignmentAttemptLockToken!,
+          idNetData: rows.map(row => ({
+            idNet: row.idNet,
+            wildcard: row.wildcard,
+            firstUsable: row.firstUsable,
+            lastUsable: row.lastUsable,
+            broadcast: row.broadcast
+          }))
+        }
+      : {
+          assignmentAttemptId: assignmentAttemptId!,
+          lockToken: assignmentAttemptLockToken!,
+          subnetData: rows.map(row => ({
+            network: row.network,
+            firstUsable: row.firstUsable,
+            lastUsable: row.lastUsable,
+            broadcast: row.broadcast
+          }))
+        },
+  [assignmentType, assignmentAttemptId, assignmentAttemptLockToken])
+
+  // Intercept ALL React Router navigations (back/forward/breadcrumbs/links) while the attempt is
+  // active. We do NOT block if the student successfully submitted (submitSucceededRef guards that).
+  const blockingRef = useRef(false)
+  const blocker = useBlocker(
+    useCallback(() => {
+      if (submitSucceededRef.current) return false
+      return !attemptLocked && !attemptSubmitted && !!assignmentAttemptId && !!assignmentAttemptLockToken
+    }, [attemptLocked, attemptSubmitted, assignmentAttemptId, assignmentAttemptLockToken])
+  )
+
+  useEffect(() => {
+    if (blocker.state !== "blocked") return
+    if (blockingRef.current) return
+    blockingRef.current = true
+
+    // If already locked/submitted or another lock is in flight, just proceed.
+    if (lockInFlightRef.current || attemptLocked || attemptSubmitted || !assignmentAttemptId || !assignmentAttemptLockToken) {
+      blockingRef.current = false
+      blocker.proceed()
+      return
+    }
+
+    lockInFlightRef.current = true
+    setOptimisticLocked(true)
+    const rows = getValues("rows") ?? []
+    lockAttemptMutation.mutateAsync(createLockPayload(rows))
+      .catch(() => {})
+      .finally(() => {
+        lockInFlightRef.current = false
+        blockingRef.current = false
+        blocker.proceed()
+      })
+  }, [blocker.state])
+
   useEffect(() => {
     if (!assignmentAttemptId || !assignmentAttemptLockToken || !attemptData || attemptLocked || attemptSubmitted) return
-
-    const createLockPayload = (rows: AssignmentFormRow[]): SaveAssignmentSubmissionAttemptDraftReq =>
-      assignmentType === AssignmentGroupTypeValues.Idnet
-        ? {
-            assignmentAttemptId,
-            lockToken: assignmentAttemptLockToken,
-            idNetData: rows.map(row => ({
-              idNet: row.idNet,
-              wildcard: row.wildcard,
-              firstUsable: row.firstUsable,
-              lastUsable: row.lastUsable,
-              broadcast: row.broadcast
-            }))
-          }
-        : {
-            assignmentAttemptId,
-            lockToken: assignmentAttemptLockToken,
-            subnetData: rows.map(row => ({
-              network: row.network,
-              firstUsable: row.firstUsable,
-              lastUsable: row.lastUsable,
-              broadcast: row.broadcast
-            }))
-          }
 
     const lockNow = (preferKeepalive = false) => {
       if (lockInFlightRef.current || attemptSubmitted || attemptLocked) return
@@ -528,7 +566,7 @@ const StudentAssignmentSubmission = () => {
       window.removeEventListener("pagehide", handlePageHide)
       window.removeEventListener("beforeunload", handleBeforeUnload)
     }
-  }, [assignmentAttemptId, assignmentAttemptLockToken, attemptData, attemptLocked, attemptSubmitted, assignmentType, getValues, lockAttemptMutation])
+  }, [assignmentAttemptId, assignmentAttemptLockToken, attemptData, attemptLocked, attemptSubmitted, assignmentType, getValues, lockAttemptMutation, createLockPayload])
 
   useEffect(() => {
     if (!assignmentType || !assignmentIdNum) return

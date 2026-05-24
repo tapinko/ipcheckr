@@ -1,38 +1,53 @@
-import { BrowserRouter, useRoutes } from "react-router-dom"
-import useAuthRouter from "./router/router"
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom"
+import routeConfig from "./router/router"
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material"
-import { ThemeContext } from "./contexts/ThemeContext"
-import { useContext } from "react"
-import { NestedThemeProvider } from "./contexts/ThemeContext"
+import { ThemeContext, NestedThemeProvider } from "./contexts/ThemeContext"
+import { useContext, useEffect } from "react"
 import { AuthProvider } from "./contexts/AuthContext"
+import { useAuth } from "./contexts/AuthContext"
 import ReactQueryProvider from "./contexts/ReactQueryProvider"
 
-const AppRoutes = () => {
-  const routes = useAuthRouter()
-  return useRoutes(routes)
+/**
+ * Calls refreshAuth once on mount so the auth state is initialised
+ * before any route renders. Must be rendered inside AuthProvider.
+ */
+const AuthInitializer = () => {
+  const { refreshAuth } = useAuth()
+  useEffect(() => {
+    refreshAuth()
+  }, [refreshAuth])
+  return <Outlet />
 }
 
-const App = () => {
+/**
+ * Root layout rendered by the data router. Provides MUI theme and auth
+ * context to every route in the tree.
+ */
+const RouterRoot = () => {
   const { mode } = useContext(ThemeContext)
   const theme = createTheme({ palette: { mode } })
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppRoutes />
+      <AuthProvider>
+        <AuthInitializer />
+      </AuthProvider>
     </ThemeProvider>
   )
 }
+
+const router = createBrowserRouter([
+  {
+    element: <RouterRoot />,
+    children: routeConfig,
+  },
+])
 
 const RootApp = () => {
   return (
     <NestedThemeProvider>
       <ReactQueryProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
-        </BrowserRouter>
+        <RouterProvider router={router} />
       </ReactQueryProvider>
     </NestedThemeProvider>
   )

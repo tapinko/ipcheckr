@@ -44,22 +44,21 @@ import StudentAssignmentDetails from "../pages/student/StudentAssignmentDetails"
 import StudentGns3 from "../pages/student/StudentGns3"
 import StudentArchiveAssignmentGroups from "../pages/student/StudentArchiveAssignmentGroups"
 
-import Unauthorized401 from "../pages/errors/Unauthorized401"
 import NotFound404 from "../pages/errors/NotFound404"
 import Login from "../pages/Login"
-import LoadingPage from "../components/LoadingPage"
 
-import { useEffect, type JSX } from "react"
-import { Routes, RouteKeys } from "./routes"
 import { Navigate } from "react-router-dom"
+import type { RouteObject } from "react-router-dom"
+import { Routes, RouteKeys } from "./routes"
 import UserRole from "../types/UserRole"
-import { useAuth } from "../contexts/AuthContext"
+import ProtectedRoute from "../components/ProtectedRoute"
+import PublicRoute from "../components/PublicRoute"
+import type { JSX } from "react"
 
 const childPath = (full: string, parent: string) =>
   full.startsWith(parent) ? full.slice(parent.length).replace(/^\//, "") : full
 
 const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
-  [RouteKeys.ADMIN]: <Navigate to={Routes[RouteKeys.ADMIN_DASHBOARD]} />,
   [RouteKeys.ADMIN_DASHBOARD]: <AdminDashboard />,
   [RouteKeys.ADMIN_USERS]: <AdminUsers />,
   [RouteKeys.ADMIN_USER_DETAILS]: <AdminUserDetails />,
@@ -80,7 +79,6 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.ADMIN_AG_TEMPLATE_CREATE]: <AdminCreateAGTemplate />,
   [RouteKeys.ADMIN_AG_TEMPLATE_EDIT]: <AdminEditAGTemplate />,
 
-  [RouteKeys.TEACHER]: <Navigate to={Routes[RouteKeys.TEACHER_DASHBOARD]} />,
   [RouteKeys.TEACHER_DASHBOARD]: <TeacherDashboard />,
   [RouteKeys.TEACHER_MY_CLASSES]: <TeacherMyClasses />,
   [RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS]: <TeacherStudentDetails />,
@@ -99,7 +97,6 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.TEACHER_GNS3]: <TeacherGns3 />,
   [RouteKeys.TEACHER_GNS3_ALL_SESSIONS]: <TeacherGns3AllSessions />,
 
-  [RouteKeys.STUDENT]: <Navigate to={Routes[RouteKeys.STUDENT_DASHBOARD]} />,
   [RouteKeys.STUDENT_DASHBOARD]: <StudentDashboard />,
   [RouteKeys.STUDENT_ASSIGNMENTS]: <StudentAssignments />,
   [RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION]: <StudentAssignmentSubmission />,
@@ -109,124 +106,114 @@ const routeElements: Partial<Record<RouteKeys, JSX.Element>> = {
   [RouteKeys.STUDENT_ARCHIVE_ASSIGNMENT_DETAILS]: <StudentAssignmentDetails />,
 }
 
-const useAuthRouter = () => {
-  const { isAuthenticated, userRole, loading, refreshAuth } = useAuth()
+const routeConfig: RouteObject[] = [
+  {
+    path: Routes[RouteKeys.LOGIN],
+    element: (
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: Routes[RouteKeys.ADMIN],
+    element: (
+      <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      ...[
+        RouteKeys.ADMIN_DASHBOARD,
+        RouteKeys.ADMIN_USERS,
+        RouteKeys.ADMIN_USER_DETAILS,
+        RouteKeys.ADMIN_CLASSES,
+        RouteKeys.ADMIN_CLASS_DETAILS,
+        RouteKeys.ADMIN_GNS3,
+        RouteKeys.ADMIN_GNS3_ALL_SESSIONS,
+        RouteKeys.ADMIN_SETTINGS,
+        RouteKeys.ADMIN_ASSIGNMENT_GROUPS,
+        RouteKeys.ADMIN_ASSIGNMENT_GROUPS_CREATE,
+        RouteKeys.ADMIN_ASSIGNMENT_GROUPS_EDIT,
+        RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS,
+        RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
+        RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE,
+        RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS,
+        RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT,
+        RouteKeys.ADMIN_AG_TEMPLATES,
+        RouteKeys.ADMIN_AG_TEMPLATE_CREATE,
+        RouteKeys.ADMIN_AG_TEMPLATE_EDIT,
+      ].map(key => ({
+        path: childPath(Routes[key], Routes[RouteKeys.ADMIN]),
+        element: routeElements[key]!,
+      })),
+      { path: "*", element: <NotFound404 /> },
+    ],
+  },
+  {
+    path: Routes[RouteKeys.TEACHER],
+    element: (
+      <ProtectedRoute allowedRoles={[UserRole.TEACHER]}>
+        <TeacherLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      ...[
+        RouteKeys.TEACHER_DASHBOARD,
+        RouteKeys.TEACHER_MY_CLASSES,
+        RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS,
+        RouteKeys.TEACHER_MY_CLASSES_CLASS_DETAILS,
+        RouteKeys.TEACHER_ASSIGNMENT_GROUPS,
+        RouteKeys.TEACHER_ASSIGNMENT_GROUPS_CREATE,
+        RouteKeys.TEACHER_ASSIGNMENT_GROUPS_EDIT,
+        RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
+        RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
+        RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE,
+        RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS,
+        RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT,
+        RouteKeys.TEACHER_AG_TEMPLATES,
+        RouteKeys.TEACHER_AG_TEMPLATE_CREATE,
+        RouteKeys.TEACHER_AG_TEMPLATE_EDIT,
+        RouteKeys.TEACHER_GNS3,
+        RouteKeys.TEACHER_GNS3_ALL_SESSIONS,
+      ].map(key => ({
+        path: childPath(Routes[key], Routes[RouteKeys.TEACHER]),
+        element: routeElements[key]!,
+      })),
+      { path: "*", element: <NotFound404 /> },
+    ],
+  },
+  {
+    path: Routes[RouteKeys.STUDENT],
+    element: (
+      <ProtectedRoute allowedRoles={[UserRole.STUDENT]}>
+        <StudentLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      ...[
+        RouteKeys.STUDENT_DASHBOARD,
+        RouteKeys.STUDENT_ASSIGNMENTS,
+        RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE,
+        RouteKeys.STUDENT_ARCHIVE_ASSIGNMENT_DETAILS,
+        RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION,
+        RouteKeys.STUDENT_ASSIGNMENT_DETAILS,
+        RouteKeys.STUDENT_GNS3,
+      ].map(key => ({
+        path: childPath(Routes[key], Routes[RouteKeys.STUDENT]),
+        element: routeElements[key]!,
+      })),
+      { path: "*", element: <NotFound404 /> },
+    ],
+  },
+  {
+    path: "*",
+    element: <NotFound404 />,
+  },
+  {
+    path: "/",
+    element: <Navigate to={Routes[RouteKeys.LOGIN]} replace />,
+  },
+]
 
-  useEffect(() => {
-    refreshAuth()
-  }, [refreshAuth])
-
-  const requiresNoAuth = (Component: JSX.Element) => {
-    if (loading) return <LoadingPage />
-    if (isAuthenticated) {
-      if (userRole === UserRole.ADMIN) return <Navigate to={Routes[RouteKeys.ADMIN_DASHBOARD]} replace />
-      if (userRole === UserRole.TEACHER) return <Navigate to={Routes[RouteKeys.TEACHER_DASHBOARD]} replace />
-      if (userRole === UserRole.STUDENT) return <Navigate to={Routes[RouteKeys.STUDENT_DASHBOARD]} replace />
-      return <Navigate to="/" replace />
-    }
-    return Component
-  }
-
-  const requiresAuth = (Component: JSX.Element, allowedRoles?: UserRole[]) => {
-    if (loading) return <LoadingPage />
-    if (!isAuthenticated) return <Navigate to={Routes[RouteKeys.LOGIN]} replace />
-    if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) return <Unauthorized401 />
-    return Component
-  }
-
-  return [
-    {
-      path: Routes[RouteKeys.LOGIN],
-      element: requiresNoAuth(<Login />),
-    },
-    {
-      path: Routes[RouteKeys.ADMIN],
-      element: requiresAuth(<AdminLayout />, [UserRole.ADMIN]),
-      children: [
-        ...[
-          RouteKeys.ADMIN_DASHBOARD,
-          RouteKeys.ADMIN_USERS,
-          RouteKeys.ADMIN_USER_DETAILS,
-          RouteKeys.ADMIN_CLASSES,
-          RouteKeys.ADMIN_CLASS_DETAILS,
-          RouteKeys.ADMIN_GNS3,
-          RouteKeys.ADMIN_GNS3_ALL_SESSIONS,
-          RouteKeys.ADMIN_SETTINGS,
-          RouteKeys.ADMIN_ASSIGNMENT_GROUPS,
-          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_CREATE,
-          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_EDIT,
-          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS,
-          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
-          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE,
-          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS,
-          RouteKeys.ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT,
-          RouteKeys.ADMIN_AG_TEMPLATES,
-          RouteKeys.ADMIN_AG_TEMPLATE_CREATE,
-          RouteKeys.ADMIN_AG_TEMPLATE_EDIT,
-        ].map(key => ({
-          path: childPath(Routes[key], Routes[RouteKeys.ADMIN]),
-          element: routeElements[key]!,
-        })),
-        { path: "*", element: <NotFound404 /> },
-      ],
-    },
-    {
-      path: Routes[RouteKeys.TEACHER],
-      element: requiresAuth(<TeacherLayout />, [UserRole.TEACHER]),
-      children: [
-        ...[
-          RouteKeys.TEACHER_DASHBOARD,
-          RouteKeys.TEACHER_MY_CLASSES,
-          RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS,
-          RouteKeys.TEACHER_MY_CLASSES_CLASS_DETAILS,
-          RouteKeys.TEACHER_ASSIGNMENT_GROUPS,
-          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_CREATE,
-          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_EDIT,
-          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS,
-          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_DETAILS_SUBMIT,
-          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE,
-          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS,
-          RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT,
-          RouteKeys.TEACHER_AG_TEMPLATES,
-          RouteKeys.TEACHER_AG_TEMPLATE_CREATE,
-          RouteKeys.TEACHER_AG_TEMPLATE_EDIT,
-          RouteKeys.TEACHER_GNS3,
-          RouteKeys.TEACHER_GNS3_ALL_SESSIONS,
-        ].map(key => ({
-          path: childPath(Routes[key], Routes[RouteKeys.TEACHER]),
-          element: routeElements[key]!,
-        })),
-        { path: "*", element: <NotFound404 /> },
-      ],
-    },
-    {
-      path: Routes[RouteKeys.STUDENT],
-      element: requiresAuth(<StudentLayout />, [UserRole.STUDENT]),
-      children: [
-        ...[
-          RouteKeys.STUDENT_DASHBOARD,
-          RouteKeys.STUDENT_ASSIGNMENTS,
-          RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE,
-          RouteKeys.STUDENT_ARCHIVE_ASSIGNMENT_DETAILS,
-          RouteKeys.STUDENT_ASSIGNMENT_SUBMISSION,
-          RouteKeys.STUDENT_ASSIGNMENT_DETAILS,
-          RouteKeys.STUDENT_GNS3,
-        ].map(key => ({
-          path: childPath(Routes[key], Routes[RouteKeys.STUDENT]),
-          element: routeElements[key]!,
-        })),
-        { path: "*", element: <NotFound404 /> },
-      ],
-    },
-    {
-      path: "*",
-      element: <NotFound404 />
-    },
-    {
-      path: "/",
-      element: <Navigate to={Routes[RouteKeys.LOGIN]} replace />
-    }
-  ]
-}
-
-export default useAuthRouter
+export default routeConfig
