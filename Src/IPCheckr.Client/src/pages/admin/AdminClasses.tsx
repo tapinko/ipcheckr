@@ -317,7 +317,7 @@ const AdminClasses = () => {
           <DialogContent>
             <Controller
               name="className" control={createControl}
-              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort(), ...FormRules.patternLettersNumbersSpaces() }}
+              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort() }}
               render={({ field }) => (
                 <TextField
                   {...field} margin="dense" fullWidth label={t(TranslationKey.ADMIN_CLASSES_NAME)}
@@ -346,7 +346,7 @@ const AdminClasses = () => {
           <DialogContent>
             <Controller
               name="className" control={editControl}
-              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort(), ...FormRules.patternLettersNumbersSpaces() }}
+              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort() }}
               render={({ field }) => (
                 <TextField
                   {...field} margin="dense" fullWidth label={t(TranslationKey.ADMIN_CLASSES_NAME)}

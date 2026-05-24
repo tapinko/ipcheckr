@@ -435,7 +435,7 @@ const TeacherMyClasses = () => {
           <DialogContent>
             <Controller
               name="className" control={createControl}
-              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort(), ...FormRules.patternLettersNumbersSpecial() }}
+              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort() }}
               render={({ field }) => (
                 <TextField {...field} label={t(TranslationKey.TEACHER_MY_CLASSES_CLASS_NAME)}
                   fullWidth margin="dense"
@@ -460,7 +460,7 @@ const TeacherMyClasses = () => {
           <DialogContent>
             <Controller
               name="className" control={editClassControl}
-              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort(), ...FormRules.patternLettersNumbersSpecial() }}
+              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort() }}
               render={({ field }) => (
                 <TextField {...field} label={t(TranslationKey.TEACHER_MY_CLASSES_CLASS_NAME)}
                   fullWidth margin="dense"
