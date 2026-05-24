@@ -17,7 +17,6 @@ import {
   Stack,
   TextField,
   Tooltip,
-  Typography
 } from "@mui/material"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { AxiosError, type AxiosResponse } from "axios"
@@ -270,7 +269,6 @@ const TeacherMyClasses = () => {
   const addStudentDisabled =
     !addStudentValues.username ||
     (!isLdapAuth && !isExistingStudentSelected && !addStudentValues.password) ||
-    (addStudentValues.classIds?.length ?? 0) === 0 ||
     addStudentMutation.isPending
 
   const isLoading = !userId || classesQuery.isLoading
@@ -410,7 +408,7 @@ const TeacherMyClasses = () => {
               search={studentSearch}
               onSearchChange={setStudentSearch}
               addTooltip={t(TranslationKey.TEACHER_MY_CLASSES_ADD_STUDENT)}
-              onAddClick={() => { resetAddStudent(getAddStudentDefaults()); setAddStudentDialogVis(true) }}
+              onAddClick={() => { resetAddStudent({ ...getAddStudentDefaults(), classIds: selectedClassId ? [selectedClassId] : [] }); setAddStudentDialogVis(true) }}
               isLdapAuth={isLdapAuth}
               classesData={classesQuery.data}
               onEditSave={handleStudentEditSave}
@@ -602,40 +600,6 @@ const TeacherMyClasses = () => {
                   error={!!addStudentErrors.password}
                   helperText={isLdapAuth || isExistingStudentSelected ? "" : (addStudentErrors.password ? t(addStudentErrors.password.message as string) : "")}
                 />
-              )}
-            />
-            <Controller
-              name="classIds" control={addStudentControl}
-              rules={{ validate: value => (value && value.length > 0) || t(TranslationKey.FORM_RULES_REQUIRED).toString() }}
-              render={({ field }) => (
-                <Box mt={1.5}>
-<Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    {(classesQuery.data ?? []).map(cls => {
-                      const selected = field.value.includes(cls.classId)
-                      return (
-                        <Chip
-                          key={cls.classId}
-                          label={cls.className}
-                          variant={selected ? "filled" : "outlined"}
-                          color={selected ? "primary" : "default"}
-                          onClick={() => {
-                            const next = selected
-                              ? field.value.filter((id: number) => id !== cls.classId)
-                              : [...field.value, cls.classId]
-                            field.onChange(next)
-                          }}
-                          clickable
-                          sx={{ fontSize: "0.9rem", height: 36, px: 1 }}
-                        />
-                      )
-                    })}
-                  </Stack>
-                  {addStudentErrors.classIds && (
-                    <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
-                      {addStudentErrors.classIds.message?.toString()}
-                    </Typography>
-                  )}
-                </Box>
               )}
             />
           </DialogContent>

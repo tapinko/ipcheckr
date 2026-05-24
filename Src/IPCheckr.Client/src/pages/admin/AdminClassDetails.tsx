@@ -1,5 +1,6 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import {
   Autocomplete,
   Box,
@@ -21,6 +22,8 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { BarChart, LineChart } from "@mui/x-charts"
 import { useState, useEffect } from "react"
+import { Controller, useForm } from "react-hook-form"
+import FormRules from "../../utils/FormRules"
 import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
@@ -34,7 +37,7 @@ import {
   Quiz,
   TaskAlt,
 } from "@mui/icons-material"
-import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
+import { getParametrizedUrl, RouteKeys, RouteParams, Routes } from "../../router/routes"
 import InsightCard from "../../components/InsightCard"
 import InsightGrid from "../../components/InsightGrid"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
@@ -56,6 +59,13 @@ const AdminClassDetails = () => {
   const [addUserDialogRole, setAddUserDialogRole] = useState<AddUserDialogRole | null>(null)
   const [selectedUser, setSelectedUser] = useState<UserDto | null>(null)
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+
+  type EditFormValues = { className: string }
+  const { control: editControl, handleSubmit: handleEditSubmit, reset: resetEdit, watch: watchEdit, formState: { errors: editErrors } } =
+    useForm<EditFormValues>({ defaultValues: { className: "" }, mode: "onBlur" })
+  const editClassName = watchEdit("className")
 
   const detailsQuery = useQuery<QueryClassDetailsRes, Error>({
     queryKey: ["teacherClassDetails", classId],
@@ -133,6 +143,32 @@ const AdminClassDetails = () => {
     }
   })
 
+  const editClassMutation = useMutation({
+    mutationFn: (className: string) =>
+      classApi.classEditClass({ id: Number(classId), classname: className }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teacherClassDetails", classId] })
+      setAlert({ severity: "success", message: t(TranslationKey.ADMIN_CLASS_DETAILS_EDIT_SUCCESS) })
+      setEditDialogOpen(false)
+    },
+    onError: (error: any) => {
+      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+      setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASS_DETAILS_EDIT_ERROR)}. ${msg ?? ""}` })
+    }
+  })
+
+  const deleteClassMutation = useMutation({
+    mutationFn: () => classApi.classDeleteClasses({ classIds: [Number(classId)] }),
+    onSuccess: () => {
+      navigate(Routes[RouteKeys.ADMIN_CLASSES])
+    },
+    onError: (error: any) => {
+      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+      setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASS_DETAILS_DELETE_ERROR)}. ${msg ?? ""}` })
+      setDeleteDialogOpen(false)
+    }
+  })
+
   if (detailsQuery.isLoading && !detailsQuery.data) {
     return <InsightGridSkeleton count={8} columnsMax={3} />
   }
@@ -167,9 +203,22 @@ const AdminClassDetails = () => {
           <CardContent>
             <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
               <Class fontSize="small" color="action" />
-              <Typography variant="h6" fontWeight={800}>
+              <Typography variant="h6" fontWeight={800} sx={{ flex: 1 }}>
                 {detailsQuery.data?.className ?? "-"}
               </Typography>
+              <Tooltip title={t(TranslationKey.ADMIN_CLASS_DETAILS_EDIT_TOOLTIP)}>
+                <IconButton
+                  size="small"
+                  onClick={() => { resetEdit({ className: detailsQuery.data?.className ?? "" }); setEditDialogOpen(true) }}
+                >
+                  <EditOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t(TranslationKey.ADMIN_CLASS_DETAILS_DELETE_TOOLTIP)}>
+                <IconButton size="small" onClick={() => setDeleteDialogOpen(true)}>
+                  <DeleteOutlineIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </Stack>
           </CardContent>
         </Card>
@@ -493,6 +542,44 @@ const AdminClassDetails = () => {
           ? t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_TEACHER_QUESTION)
           : t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_STUDENT_QUESTION)}
         label={pendingDelete?.username}
+      />
+
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth maxWidth="sm">
+        <form onSubmit={handleEditSubmit(data => editClassMutation.mutate(data.className))}>
+          <DialogTitle>{t(TranslationKey.ADMIN_CLASS_DETAILS_EDIT_CLASS)}</DialogTitle>
+          <DialogContent>
+            <Controller
+              name="className"
+              control={editControl}
+              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.maxLengthShort() }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="dense"
+                  fullWidth
+                  label={t(TranslationKey.ADMIN_CLASS_DETAILS_CLASS_NAME)}
+                  error={!!editErrors.className}
+                  helperText={editErrors.className ? t(editErrors.className.message as string) : ""}
+                />
+              )}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setEditDialogOpen(false)}>{t(TranslationKey.ADMIN_CLASS_DETAILS_CANCEL)}</Button>
+            <Button type="submit" variant="contained" color="success" disabled={!editClassName || editClassMutation.isPending}>
+              {t(TranslationKey.ADMIN_CLASS_DETAILS_SAVE)}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={() => deleteClassMutation.mutate()}
+        title={t(TranslationKey.ADMIN_CLASS_DETAILS_DELETE_TITLE)}
+        question={t(TranslationKey.ADMIN_CLASS_DETAILS_DELETE_QUESTION)}
+        label={detailsQuery.data?.className}
       />
     </>
   )
