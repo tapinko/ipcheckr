@@ -1,4 +1,4 @@
-import { UserApi, ClassApi, AuthApi, AssignmentGroupApi, AssignmentApi, AssignmentSubmitApi, AppSettingsApi, DashboardApi, Gns3Api, AGTemplateApi } from "../dtos/api"
+import { UserApi, ClassApi, AuthApi, AssignmentGroupApi, AssignmentApi, AssignmentSubmitApi, AppSettingsApi, DashboardApi, Gns3Api, AGTemplateApi, AppConfigApi } from "../dtos/api"
 import { Configuration } from "../dtos/configuration"
 import axiosInstance from "./axiosInstance"
 import getApiBase from "./getApiBase"
@@ -15,3 +15,4 @@ export const appSettingsApi = new AppSettingsApi(configuration, undefined, axios
 export const dashboardApi = new DashboardApi(configuration, undefined, axiosInstance)
 export const gns3Api = new Gns3Api(configuration, undefined, axiosInstance)
 export const agTemplateApi = new AGTemplateApi(configuration, undefined, axiosInstance)
+export const appConfigApi = new AppConfigApi(configuration, undefined, axiosInstance)

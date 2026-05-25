@@ -6,6 +6,7 @@ import { useContext, useEffect } from "react"
 import { AuthProvider } from "./contexts/AuthContext"
 import { useAuth } from "./contexts/AuthContext"
 import ReactQueryProvider from "./contexts/ReactQueryProvider"
+import { AppConfigProvider } from "./contexts/AppConfigContext"
 
 /**
  * Calls refreshAuth once on mount so the auth state is initialised
@@ -47,7 +48,9 @@ const RootApp = () => {
   return (
     <NestedThemeProvider>
       <ReactQueryProvider>
-        <RouterProvider router={router} />
+        <AppConfigProvider>
+          <RouterProvider router={router} />
+        </AppConfigProvider>
       </ReactQueryProvider>
     </NestedThemeProvider>
   )

@@ -3062,9 +3062,6 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.AG_TEMPLATE_ERROR]: "Chyba pri ukladaní šablóny.",
 }
 
-const serverLang = window.__IPCHECKR_DEFAULT_LANGUAGE__ ?? undefined
-const initialLang = serverLang ?? Language.EN;
-
 i18n.use(initReactI18next).init({
   resources: {
     [Language.EN]: {
@@ -3078,7 +3075,7 @@ i18n.use(initReactI18next).init({
       },
     },
   },
-  lng: initialLang,
+  lng: Language.EN,
   fallbackLng: Language.EN,
   interpolation: { escapeValue: false },
 })

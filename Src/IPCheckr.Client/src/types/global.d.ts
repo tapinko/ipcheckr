@@ -1,6 +1,6 @@
 declare global {
   interface Window {
-    __IPCHECKR_DEFAULT_LANGUAGE__?: string
+    __RUNTIME_CONFIG__?: { API_BASE_URL?: string }
   }
 }
 export {}

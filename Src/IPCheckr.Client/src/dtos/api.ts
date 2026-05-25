@@ -398,6 +398,33 @@ export type ApiProblemDetailsAllOfPayload = UserConflictInfoDto;
 /**
  * 
  * @export
+ * @interface AppConfigDto
+ */
+export interface AppConfigDto {
+    /**
+     * 
+     * @type {Language}
+     * @memberof AppConfigDto
+     */
+    'defaultLanguage': Language;
+    /**
+     * 
+     * @type {AuthType}
+     * @memberof AppConfigDto
+     */
+    'authType': AuthType;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppConfigDto
+     */
+    'institutionName'?: string | null;
+}
+
+
+/**
+ * 
+ * @export
  * @interface AppSettingDto
  */
 export interface AppSettingDto {
@@ -838,6 +865,20 @@ export interface AuthReq {
      */
     'password': string;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const AuthType = {
+    Local: 'LOCAL',
+    Ldap: 'LDAP'
+} as const;
+
+export type AuthType = typeof AuthType[keyof typeof AuthType];
+
+
 /**
  * 
  * @export
@@ -2439,6 +2480,20 @@ export interface IsLdapAuthRes {
      */
     'isLdapAuth'?: boolean;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const Language = {
+    En: 'EN',
+    Sk: 'SK'
+} as const;
+
+export type Language = typeof Language[keyof typeof Language];
+
+
 /**
  * 
  * @export
@@ -5223,6 +5278,106 @@ export class AGTemplateApi extends BaseAPI {
      */
     public aGTemplateQueryAGTemplates(options?: RawAxiosRequestConfig) {
         return AGTemplateApiFp(this.configuration).aGTemplateQueryAGTemplates(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * AppConfigApi - axios parameter creator
+ * @export
+ */
+export const AppConfigApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        appConfigGetAppConfig: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/app-config`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AppConfigApi - functional programming interface
+ * @export
+ */
+export const AppConfigApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AppConfigApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async appConfigGetAppConfig(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppConfigDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.appConfigGetAppConfig(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AppConfigApi.appConfigGetAppConfig']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * AppConfigApi - factory interface
+ * @export
+ */
+export const AppConfigApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AppConfigApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        appConfigGetAppConfig(options?: RawAxiosRequestConfig): AxiosPromise<AppConfigDto> {
+            return localVarFp.appConfigGetAppConfig(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AppConfigApi - object-oriented interface
+ * @export
+ * @class AppConfigApi
+ * @extends {BaseAPI}
+ */
+export class AppConfigApi extends BaseAPI {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppConfigApi
+     */
+    public appConfigGetAppConfig(options?: RawAxiosRequestConfig) {
+        return AppConfigApiFp(this.configuration).appConfigGetAppConfig(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

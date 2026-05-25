@@ -117,31 +117,7 @@ namespace IPCheckr.Api
             app.MapHub<AttemptEventsHub>("/hubs/attempt-events");
             app.MapFallbackToFile("index.html");
 
-            // creating admin user, setting the language and institution name empty string
             await app.SeedDatabaseAsync();
-
-            // suply the client with the default language from the server settings
-            app.MapGet("/lang.js", async (HttpContext context) =>
-            {
-                using var scope = app.Services.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
-
-                var rawLang = await db.AppSettings
-                    .Where(s => s.Name == "DefaultLanguage" || s.Name == "Language")
-                    .Select(s => s.Value)
-                    .FirstOrDefaultAsync();
-
-                var normalized = (rawLang ?? string.Empty).Trim().ToUpperInvariant();
-                var clientLang = normalized == Common.Constants.Languages.Sk
-                    ? Common.Constants.Languages.Sk
-                    : Common.Constants.Languages.En;
-
-                var js = $"window.__IPCHECKR_DEFAULT_LANGUAGE__ = '{clientLang}';";
-
-                context.Response.ContentType = "application/javascript; charset=utf-8";
-                context.Response.Headers["Cache-Control"] = "no-store, must-revalidate";
-                await context.Response.WriteAsync(js);
-            });
 
             app.Run();
         }
