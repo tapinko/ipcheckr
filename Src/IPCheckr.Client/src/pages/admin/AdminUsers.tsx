@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Autocomplete,
   Box,
@@ -14,8 +14,10 @@ import {
 import { useTranslation } from "react-i18next"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
-import type { AddUserRes, ApiProblemDetails, AppSettingDto, ClassDto, LdapUserDto } from "../../dtos"
-import { appSettingsApi, classApi, userApi } from "../../utils/apiClients"
+import { AuthType } from "../../dtos"
+import type { AddUserRes, ApiProblemDetails, ClassDto, LdapUserDto } from "../../dtos"
+import { classApi, userApi } from "../../utils/apiClients"
+import { useAppConfig } from "../../contexts/AppConfigContext"
 import i18n, { Language, TranslationKey } from "../../utils/i18n"
 import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
 import FormRules from "../../utils/FormRules"
@@ -45,17 +47,8 @@ const AdminUsers = () => {
   const [addDialogRole, setAddDialogRole] = useState<RoleKey | null>(null)
   const [alert, setAlert] = useState<CustomAlertState | null>(null)
 
-  const settingsQuery = useQuery({
-    queryKey: ["appsettings"],
-    queryFn: () => appSettingsApi.appSettingsQueryAppSettings(),
-    staleTime: 5 * 60_000
-  })
-
-  const isLdapAuth = useMemo(() => {
-    const list: AppSettingDto[] = settingsQuery.data?.data?.appSettings ?? []
-    return (list.find(s => (s.name ?? "").toLowerCase() === "authtype")?.value ?? "").toUpperCase() === "LDAP"
-  }, [settingsQuery.data])
-
+  const { config } = useAppConfig()
+  const isLdapAuth = config?.authType === AuthType.Ldap
 
   const classesQuery = useQuery<ClassDto[]>({
     queryKey: ["classes"],
@@ -201,21 +194,20 @@ const AdminUsers = () => {
               )}
             />
           )}
-          <Controller
-            name="password" control={addControl}
-            rules={isLdapAuth ? {} : {
-              ...FormRules.required(), ...FormRules.minLengthLong(),
-              ...FormRules.maxLengthLong(), ...FormRules.patternLettersNumbersSpecial()
-            }}
-            render={({ field }) => (
-              <TextField
-                {...field} disabled={isLdapAuth} margin="dense" type="password" fullWidth
-                label={t(TranslationKey.USER_LIST_PANEL_PASSWORD)}
-                error={!!addErrors.password}
-                helperText={isLdapAuth ? "" : (addErrors.password ? t(addErrors.password.message as string) : "")}
-              />
-            )}
-          />
+          {!isLdapAuth && (
+            <Controller
+              name="password" control={addControl}
+              rules={{ ...FormRules.required(), ...FormRules.minLengthLong(), ...FormRules.maxLengthLong(), ...FormRules.patternLettersNumbersSpecial() }}
+              render={({ field }) => (
+                <TextField
+                  {...field} margin="dense" type="password" fullWidth
+                  label={t(TranslationKey.USER_LIST_PANEL_PASSWORD)}
+                  error={!!addErrors.password}
+                  helperText={addErrors.password ? t(addErrors.password.message as string) : ""}
+                />
+              )}
+            />
+          )}
           <Controller
             name="classIds" control={addControl}
             render={({ field }) => (

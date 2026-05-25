@@ -27,7 +27,8 @@ import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
 import { classApi, userApi } from "../../utils/apiClients"
-import { AssignmentGroupType, type AddUserRes, type IsLdapAuthRes, type LdapUserDto, type QueryClassDetailsRes, type UserDto } from "../../dtos"
+import { AuthType, AssignmentGroupType, type AddUserRes, type LdapUserDto, type QueryClassDetailsRes, type UserDto } from "../../dtos"
+import { useAppConfig } from "../../contexts/AppConfigContext"
 import {
   AccessTime,
   Class,
@@ -89,12 +90,8 @@ const TeacherClassDetails = () => {
     placeholderData: prev => prev
   })
 
-  const ldapAuthQuery = useQuery<IsLdapAuthRes>({
-    queryKey: ["isLdapAuth"],
-    queryFn: () => userApi.userIsLdapAuth().then(r => r.data),
-    staleTime: 5 * 60_000
-  })
-  const isLdapAuth = ldapAuthQuery.data?.isLdapAuth === true
+  const { config } = useAppConfig()
+  const isLdapAuth = config?.authType === AuthType.Ldap
 
   const allStudentsQuery = useQuery<UserDto[], Error>({
     queryKey: ["allStudentsForClassAdd"],
@@ -529,17 +526,19 @@ const TeacherClassDetails = () => {
                 )}
               />
             )}
-            <Controller
-              name="password" control={addControl}
-              render={({ field }) => (
-                <TextField {...field} disabled={isLdapAuth || isExistingStudentSelected}
-                  margin="dense" type="password" fullWidth
-                  label={t(TranslationKey.TEACHER_CLASS_DETAILS_PASSWORD)}
-                  error={!!addErrors.password}
-                  helperText={isLdapAuth || isExistingStudentSelected ? "" : (addErrors.password ? t(addErrors.password.message as string) : "")}
-                />
-              )}
-            />
+            {!isLdapAuth && (
+              <Controller
+                name="password" control={addControl}
+                render={({ field }) => (
+                  <TextField {...field} disabled={isExistingStudentSelected}
+                    margin="dense" type="password" fullWidth
+                    label={t(TranslationKey.TEACHER_CLASS_DETAILS_PASSWORD)}
+                    error={!!addErrors.password}
+                    helperText={isExistingStudentSelected ? "" : (addErrors.password ? t(addErrors.password.message as string) : "")}
+                  />
+                )}
+              />
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={closeAddDialog}>{t(TranslationKey.TEACHER_CLASS_DETAILS_CANCEL)}</Button>

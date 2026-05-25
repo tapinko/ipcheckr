@@ -322,7 +322,7 @@ const UserListPanel = ({
           <DialogContent>
             <Controller
               name="username" control={editControl}
-              rules={{ ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.patternLettersNumbersDots() }}
+              rules={isLdapAuth ? { ...FormRules.required() } : { ...FormRules.required(), ...FormRules.minLengthShort(), ...FormRules.patternLettersNumbersDots() }}
               render={({ field }) => (
                 <TextField
                   {...field} disabled={isLdapAuth} margin="dense" fullWidth
@@ -332,18 +332,20 @@ const UserListPanel = ({
                 />
               )}
             />
-            <Controller
-              name="password" control={editControl}
-              rules={{ ...FormRules.minLengthLong(), ...FormRules.maxLengthLong(), ...FormRules.patternLettersNumbersSpecial() }}
-              render={({ field }) => (
-                <TextField
-                  {...field} disabled={isLdapAuth} margin="dense" type="password" fullWidth
-                  label={t(TranslationKey.USER_LIST_PANEL_PASSWORD)}
-                  error={!!editErrors.password}
-                  helperText={isLdapAuth ? "" : (editErrors.password ? t(editErrors.password.message as string) : "")}
-                />
-              )}
-            />
+            {!isLdapAuth && (
+              <Controller
+                name="password" control={editControl}
+                rules={{ ...FormRules.minLengthLong(), ...FormRules.maxLengthLong(), ...FormRules.patternLettersNumbersSpecial() }}
+                render={({ field }) => (
+                  <TextField
+                    {...field} margin="dense" type="password" fullWidth
+                    label={t(TranslationKey.USER_LIST_PANEL_PASSWORD)}
+                    error={!!editErrors.password}
+                    helperText={editErrors.password ? t(editErrors.password.message as string) : ""}
+                  />
+                )}
+              />
+            )}
             <Controller
               name="classIds" control={editControl}
               render={({ field }) => (

@@ -28,7 +28,9 @@ import InsightGridSkeleton from "../../components/InsightGridSkeleton"
 import ErrorLoading from "../../components/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
 import { classApi, userApi } from "../../utils/apiClients"
-import type { IsLdapAuthRes, LdapUserDto, QueryClassDetailsRes, UserDto } from "../../dtos"
+import { AuthType } from "../../dtos"
+import type { LdapUserDto, QueryClassDetailsRes, UserDto } from "../../dtos"
+import { useAppConfig } from "../../contexts/AppConfigContext"
 import {
   AccessTime,
   Class,
@@ -74,12 +76,8 @@ const AdminClassDetails = () => {
     placeholderData: prev => prev
   })
 
-  const ldapAuthQuery = useQuery<IsLdapAuthRes>({
-    queryKey: ["isLdapAuth"],
-    queryFn: () => userApi.userIsLdapAuth().then(r => r.data),
-    staleTime: 5 * 60_000
-  })
-  const isLdapAuth = ldapAuthQuery.data?.isLdapAuth === true
+  const { config } = useAppConfig()
+  const isLdapAuth = config?.authType === AuthType.Ldap
 
   const allUsersQuery = useQuery<UserDto[], Error>({
     queryKey: ["allUsersForClassAdd", addUserDialogRole],

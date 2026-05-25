@@ -30,7 +30,9 @@ import ErrorLoading from "../../components/ErrorLoading"
 import MyClassesSkeleton from "../../components/MyClassesSkeleton"
 import UserListPanel, { type UserRow } from "../../components/UserListPanel"
 import { useAuth } from "../../contexts/AuthContext"
-import type { AddUserRes, ApiProblemDetails, ClassDto, IsLdapAuthRes, LdapUserDto, UserDto } from "../../dtos"
+import { AuthType } from "../../dtos"
+import type { AddUserRes, ApiProblemDetails, ClassDto, LdapUserDto, UserDto } from "../../dtos"
+import { useAppConfig } from "../../contexts/AppConfigContext"
 import { classApi, userApi } from "../../utils/apiClients"
 import axiosInstance from "../../utils/axiosInstance"
 import FormRules from "../../utils/FormRules"
@@ -116,12 +118,8 @@ const TeacherMyClasses = () => {
     queryFn: () => userApi.userQueryUsers(null, null, UserRole.TEACHER).then(r => r.data.users)
   })
 
-  const ldapAuthQuery = useQuery<IsLdapAuthRes>({
-    queryKey: ["isLdapAuth"],
-    queryFn: () => userApi.userIsLdapAuth().then(r => r.data),
-    staleTime: 5 * 60_000
-  })
-  const isLdapAuth = ldapAuthQuery.data?.isLdapAuth === true
+  const { config } = useAppConfig()
+  const isLdapAuth = config?.authType === AuthType.Ldap
 
   const allStudentsQuery = useQuery<UserDto[], Error>({
     queryKey: ["allStudentsForClassAssign"],
@@ -591,17 +589,19 @@ const TeacherMyClasses = () => {
                 )}
               />
             )}
-            <Controller
-              name="password" control={addStudentControl}
-              render={({ field }) => (
-                <TextField {...field} disabled={isLdapAuth || isExistingStudentSelected}
-                  margin="dense" type="password" fullWidth
-                  label={t(TranslationKey.TEACHER_MY_CLASSES_PASSWORD)}
-                  error={!!addStudentErrors.password}
-                  helperText={isLdapAuth || isExistingStudentSelected ? "" : (addStudentErrors.password ? t(addStudentErrors.password.message as string) : "")}
-                />
-              )}
-            />
+            {!isLdapAuth && (
+              <Controller
+                name="password" control={addStudentControl}
+                render={({ field }) => (
+                  <TextField {...field} disabled={isExistingStudentSelected}
+                    margin="dense" type="password" fullWidth
+                    label={t(TranslationKey.TEACHER_MY_CLASSES_PASSWORD)}
+                    error={!!addStudentErrors.password}
+                    helperText={isExistingStudentSelected ? "" : (addStudentErrors.password ? t(addStudentErrors.password.message as string) : "")}
+                  />
+                )}
+              />
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={closeAddStudentDialog}>{t(TranslationKey.TEACHER_MY_CLASSES_CANCEL)}</Button>
