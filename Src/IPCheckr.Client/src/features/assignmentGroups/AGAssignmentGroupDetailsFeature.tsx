@@ -16,12 +16,14 @@ import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficult
 import { getHostSortLabel } from "../../utils/getHostSortLabel"
 import {
   AccessTime,
+  Archive,
   Category,
   Class,
   Percent,
   PlaylistAddCheck,
   Quiz,
-  TaskAlt
+  TaskAlt,
+  Unarchive
 } from "@mui/icons-material"
 import {
   Box,
@@ -29,6 +31,11 @@ import {
   Card,
   CardContent,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   LinearProgress,
   Stack,
@@ -38,6 +45,9 @@ import { useParams } from "react-router-dom"
 import { RouteParams } from "../../router/routes"
 import { assignmentGroupApi } from "../../utils/apiClients"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import type { ArchiveAGReq } from "../../dtos"
+import UserRole from "../../types/UserRole"
+import { useAuth } from "../../contexts/AuthContext"
 import ErrorLoading from "../../components/ErrorLoading"
 import AGDetailsSkeleton from "../../components/ag/AGDetailsSkeleton"
 import InsightCard from "../../components/InsightCard"
@@ -148,13 +158,18 @@ const AssignmentGroupSubmitDetailsCard = ({
 interface AGAssignmentGroupDetailsFeatureProps {
   onNavigateSubmitDetails: (assignmentGroupId: string, assignmentId: number, type: AssignmentGroupType) => void
   onNavigateClassDetails: (classId: number) => void
+  onArchived?: (assignmentGroupId: number, type: AssignmentGroupType) => void
+  onUnarchived?: (assignmentGroupId: number, type: AssignmentGroupType) => void
 }
 
 const AGAssignmentGroupDetailsFeature = ({
   onNavigateSubmitDetails,
-  onNavigateClassDetails
+  onNavigateClassDetails,
+  onArchived,
+  onUnarchived
 }: AGAssignmentGroupDetailsFeatureProps) => {
   const { t } = useTranslation()
+  const { userRole } = useAuth()
   const {
     [RouteParams.ASSIGNMENT_GROUP_ID]: assignmentGroupId,
     [RouteParams.ASSIGNMENT_GROUP_TYPE]: assignmentTypeParam
@@ -165,6 +180,7 @@ const AGAssignmentGroupDetailsFeature = ({
   const [sortField, setSortField] = useState<"name" | "%">("name")
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
   const [reopenedAssignmentIds, setReopenedAssignmentIds] = useState<Set<number>>(new Set())
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false)
 
   const subnetQuery = useQuery<QuerySubnetAGDetailRes, Error>({
     queryKey: ["assignmentGroupDetails", "subnet", assignmentGroupId],
@@ -217,6 +233,22 @@ const AGAssignmentGroupDetailsFeature = ({
     if (assignmentType === AssignmentGroupType.Idnet) return idnetQuery.isError
     return subnetQuery.isError && idnetQuery.isError
   })()
+
+  const archiveMutation = useMutation({
+    mutationFn: (payload: ArchiveAGReq) =>
+      assignmentGroupApi.assignmentGroupArchiveAssignmentGroup(payload).then(r => r.data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["assignmentGroupDetails", "subnet", assignmentGroupId] })
+      queryClient.invalidateQueries({ queryKey: ["assignmentGroupDetails", "idnet", assignmentGroupId] })
+      queryClient.invalidateQueries({ queryKey: ["assignmentGroups"] })
+      queryClient.invalidateQueries({ queryKey: ["archiveAssignmentGroups"] })
+      setArchiveConfirmOpen(false)
+      if (data?.type) {
+        if (variables.isArchived) onArchived?.(variables.assignmentGroupId, data.type)
+        else onUnarchived?.(variables.assignmentGroupId, data.type)
+      }
+    }
+  })
 
   const reopenAttemptMutation = useMutation({
     mutationFn: (payload: ReopenStudentAssignmentAttemptReq) =>
@@ -343,17 +375,33 @@ const AGAssignmentGroupDetailsFeature = ({
                     />
                   </Stack>
 
-                  <Chip
-                    label={statusMap[data.status]?.label ?? data.status}
-                    color={
-                      data.status === AssignmentGroupStatus.Upcoming
-                        ? "primary"
-                        : data.status === AssignmentGroupStatus.InProgress
-                          ? "warning"
-                          : "default"
-                    }
-                    size="small"
-                  />
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Chip
+                      label={statusMap[data.status]?.label ?? data.status}
+                      color={
+                        data.status === AssignmentGroupStatus.Upcoming
+                          ? "primary"
+                          : data.status === AssignmentGroupStatus.InProgress
+                            ? "warning"
+                            : "default"
+                      }
+                      size="small"
+                    />
+                    {(!data.isArchived || userRole === UserRole.ADMIN) && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color={data.isArchived ? "primary" : "inherit"}
+                        startIcon={data.isArchived ? <Unarchive fontSize="small" /> : <Archive fontSize="small" />}
+                        disabled={archiveMutation.isPending}
+                        onClick={() => setArchiveConfirmOpen(true)}
+                      >
+                        {data.isArchived
+                          ? t(TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_UNARCHIVE)
+                          : t(TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_ARCHIVE)}
+                      </Button>
+                    )}
+                  </Stack>
                 </Stack>
 
                 <Stack direction="row" flexWrap="wrap" gap={0.5} alignItems="center">
@@ -538,6 +586,35 @@ const AGAssignmentGroupDetailsFeature = ({
           })}
         </Box>
       </Stack>
+
+      <Dialog open={archiveConfirmOpen} onClose={() => setArchiveConfirmOpen(false)}>
+        <DialogTitle>
+          {data?.isArchived
+            ? t(TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_UNARCHIVE_CONFIRM)
+            : t(TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_ARCHIVE_CONFIRM)}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>{data?.name}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setArchiveConfirmOpen(false)} disabled={archiveMutation.isPending}>
+            {t(TranslationKey.DELETE_DIALOG_CANCEL)}
+          </Button>
+          <Button
+            variant="contained"
+            color={data?.isArchived ? "primary" : "warning"}
+            disabled={archiveMutation.isPending}
+            onClick={() => {
+              if (!data || !assignmentGroupId) return
+              archiveMutation.mutate({ assignmentGroupId: Number(assignmentGroupId), isArchived: !data.isArchived, type: data.type })
+            }}
+          >
+            {data?.isArchived
+              ? t(TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_UNARCHIVE)
+              : t(TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_ARCHIVE)}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

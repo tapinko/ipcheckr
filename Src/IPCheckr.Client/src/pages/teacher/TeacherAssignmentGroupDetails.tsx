@@ -15,6 +15,10 @@ const TeacherAssignmentGroupDetails = () => {
       onNavigateClassDetails={classId => navigate(getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_CLASS_DETAILS, {
         [RouteParams.CLASS_ID]: classId.toString()
       }))}
+      onArchived={(agId, type) => navigate(getParametrizedUrl(RouteKeys.TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS, {
+        [RouteParams.ASSIGNMENT_GROUP_ID]: agId.toString(),
+        [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(type)
+      }))}
     />
   )
 }

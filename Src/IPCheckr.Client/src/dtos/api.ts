@@ -450,6 +450,33 @@ export interface AppSettingDto {
 /**
  * 
  * @export
+ * @interface ArchiveAGReq
+ */
+export interface ArchiveAGReq {
+    /**
+     * 
+     * @type {number}
+     * @memberof ArchiveAGReq
+     */
+    'assignmentGroupId': number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ArchiveAGReq
+     */
+    'isArchived': boolean;
+    /**
+     * 
+     * @type {AssignmentGroupType}
+     * @memberof ArchiveAGReq
+     */
+    'type': AssignmentGroupType;
+}
+
+
+/**
+ * 
+ * @export
  * @interface AssignmentDto
  */
 export interface AssignmentDto {
@@ -5889,6 +5916,44 @@ export const AssignmentGroupApiAxiosParamCreator = function (configuration?: Con
     return {
         /**
          * 
+         * @param {ArchiveAGReq} archiveAGReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupArchiveAssignmentGroup: async (archiveAGReq: ArchiveAGReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'archiveAGReq' is not null or undefined
+            assertParamExists('assignmentGroupArchiveAssignmentGroup', 'archiveAGReq', archiveAGReq)
+            const localVarPath = `/api/assignment-group/archive-assignment-group`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(archiveAGReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {CreateIDNetAGReq} createIDNetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -6306,6 +6371,18 @@ export const AssignmentGroupApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {ArchiveAGReq} archiveAGReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assignmentGroupArchiveAssignmentGroup(archiveAGReq: ArchiveAGReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assignmentGroupArchiveAssignmentGroup(archiveAGReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AssignmentGroupApi.assignmentGroupArchiveAssignmentGroup']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {CreateIDNetAGReq} createIDNetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -6442,6 +6519,15 @@ export const AssignmentGroupApiFactory = function (configuration?: Configuration
     return {
         /**
          * 
+         * @param {ArchiveAGReq} archiveAGReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assignmentGroupArchiveAssignmentGroup(archiveAGReq: ArchiveAGReq, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.assignmentGroupArchiveAssignmentGroup(archiveAGReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {CreateIDNetAGReq} createIDNetAGReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -6546,6 +6632,17 @@ export const AssignmentGroupApiFactory = function (configuration?: Configuration
  * @extends {BaseAPI}
  */
 export class AssignmentGroupApi extends BaseAPI {
+    /**
+     * 
+     * @param {ArchiveAGReq} archiveAGReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssignmentGroupApi
+     */
+    public assignmentGroupArchiveAssignmentGroup(archiveAGReq: ArchiveAGReq, options?: RawAxiosRequestConfig) {
+        return AssignmentGroupApiFp(this.configuration).assignmentGroupArchiveAssignmentGroup(archiveAGReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {CreateIDNetAGReq} createIDNetAGReq 

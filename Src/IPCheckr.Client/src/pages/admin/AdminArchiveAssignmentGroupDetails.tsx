@@ -15,6 +15,10 @@ const AdminArchiveAssignmentGroupDetails = () => {
       onNavigateClassDetails={classId => navigate(getParametrizedUrl(RouteKeys.ADMIN_CLASS_DETAILS, {
         [RouteParams.CLASS_ID]: classId.toString()
       }))}
+      onUnarchived={(agId, type) => navigate(getParametrizedUrl(RouteKeys.ADMIN_ASSIGNMENT_GROUPS_DETAILS, {
+        [RouteParams.ASSIGNMENT_GROUP_ID]: agId.toString(),
+        [RouteParams.ASSIGNMENT_GROUP_TYPE]: toAssignmentTypeParam(type)
+      }))}
     />
   )
 }

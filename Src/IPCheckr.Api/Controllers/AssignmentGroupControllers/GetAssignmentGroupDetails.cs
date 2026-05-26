@@ -117,6 +117,7 @@ namespace IPCheckr.Api.Controllers
                 IpCat = subnetGroup.AssignmentIpCat,
                 Difficulty = subnetGroup.Difficulty,
                 HostSortStrategy = subnetGroup.HostSortStrategy,
+                IsArchived = subnetGroup.IsArchived,
                 Assignments = assignmentDetails.ToArray()
             };
 
@@ -233,6 +234,7 @@ namespace IPCheckr.Api.Controllers
                 Difficulty = null,
                 TestWildcard = idnetGroup.TestWildcard,
                 TestFirstLastBr = idnetGroup.TestFirstLastBr,
+                IsArchived = idnetGroup.IsArchived,
                 Assignments = assignmentDetails.ToArray()
             };
 
