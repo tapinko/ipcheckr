@@ -28,11 +28,6 @@ export enum TranslationKey {
   LOLGIN_LOADING = "LOLGIN_LOADING",
   LOGIN_INVALID_DEMO_CREDENTIALS = "LOGIN_INVALID_DEMO_CREDENTIALS",
 
-  // ActionPanel
-  ACTION_PANEL_EDIT = "ACTION_PANEL_EDIT",
-  ACTION_PANEL_DETAILS = "ACTION_PANEL_DETAILS",
-  ACTION_PANEL_DELETE = "ACTION_PANEL_DELETE",
-
   // DataGridWithSearch
   DATA_GRID_SEARCH = "DATA_GRID_SEARCH",
   DATA_GRID_DESC = "DATA_GRID_DESC",
@@ -1050,11 +1045,6 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.LOLGIN_LOADING]: "Loading",
   [TranslationKey.LOGIN_INVALID_DEMO_CREDENTIALS]: "Invalid demo credentials. Use teacher/cisco or student/cisco.",
 
-  // ActionPanel
-  [TranslationKey.ACTION_PANEL_EDIT]: "Edit",
-  [TranslationKey.ACTION_PANEL_DETAILS]: "Details",
-  [TranslationKey.ACTION_PANEL_DELETE]: "Delete",
-
   // DataGridWithSearch
   [TranslationKey.DATA_GRID_SEARCH]: "Search",
   [TranslationKey.DATA_GRID_DESC]: "Desc",
@@ -2068,11 +2058,6 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.LOGIN_SUBMIT]: "Prihlásiť sa",
   [TranslationKey.LOLGIN_LOADING]: "Načítavam",
   [TranslationKey.LOGIN_INVALID_DEMO_CREDENTIALS]: "Neplatné demo prihlasovacie údaje. Použite ucitel/cisco alebo ziak/cisco.",
-
-  // ActionPanel
-  [TranslationKey.ACTION_PANEL_EDIT]: "Upraviť",
-  [TranslationKey.ACTION_PANEL_DETAILS]: "Detaily",
-  [TranslationKey.ACTION_PANEL_DELETE]: "Odstrániť",
 
   // DataGridWithSearch
   [TranslationKey.DATA_GRID_SEARCH]: "Hľadať",
