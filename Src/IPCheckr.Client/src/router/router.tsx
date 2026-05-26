@@ -1,51 +1,55 @@
-import AdminLayout from "../layouts/AdminLayout"
-import AdminDashboard from "../pages/admin/AdminDashboard"
-import AdminUsers from "../pages/admin/AdminUsers"
-import AdminUserDetails from "../pages/admin/AdminUserDetails"
-import AdminClasses from "../pages/admin/AdminClasses"
-import AdminClassDetails from "../pages/admin/AdminClassDetails"
-import AdminGns3 from "../pages/admin/AdminGns3"
-import AdminGns3AllSessions from "../pages/admin/AdminGnsAllSessions"
-import AdminSettings from "../pages/admin/AdminSettings"
-import AdminAssignmentGroups from "../pages/admin/AdminAssignmentGroups"
-import AdminCreateAssignmentGroup from "../pages/admin/AdminCreateAssignmentGroup"
-import AdminEditAssignmentGroup from "../pages/admin/AdminEditAssignmentGroup"
-import AdminAssignmentGroupDetails from "../pages/admin/AdminAssignmentGroupDetails"
-import AdminAssignmentGroupDetailsSubmit from "../pages/admin/AdminAssignmentGroupDetailsSubmit"
-import AdminArchiveAssignmentGroups from "../pages/admin/AdminArchiveAssignmentGroups"
-import AdminArchiveAssignmentGroupDetails from "../pages/admin/AdminArchiveAssignmentGroupDetails"
-import AdminAGTemplates from "../pages/admin/AdminAGTemplates"
-import AdminCreateAGTemplate from "../pages/admin/AdminCreateAGTemplate"
-import AdminEditAGTemplate from "../pages/admin/AdminEditAGTemplate"
+import { lazy } from "react"
 
-import TeacherLayout from "../layouts/TeacherLayout"
-import TeacherDashboard from "../pages/teacher/TeacherDashboard"
-import TeacherMyClasses from "../pages/teacher/TeacherMyClasses"
-import TeacherStudentDetails from "../pages/teacher/TeacherStudentDetails"
-import TeacherClassDetails from "../pages/teacher/TeacherClassDetails"
-import TeacherAssignmentGroups from "../pages/teacher/TeacherAssignmentGroups"
-import TeacherCreateAssignmentGroup from "../pages/teacher/TeacherCreateAssignmentGroup"
-import TeacherEditAssignmentGroup from "../pages/teacher/TeacherEditAssignmentGroup"
-import TeacherAssignmentGroupDetails from "../pages/teacher/TeacherAssignmentGroupDetails"
-import TeacherAssignmentGroupDetailsSubmit from "../pages/teacher/TeacherAssignmentGroupDetailsSubmit"
-import TeacherArchiveAssignmentGroups from "../pages/teacher/TeacherArchiveAssignmentGroups"
-import TeacherArchiveAssignmentGroupDetails from "../pages/teacher/TeacherArchiveAssignmentGroupDetails"
-import TeacherAGTemplates from "../pages/teacher/TeacherAGTemplates"
-import TeacherCreateAGTemplate from "../pages/teacher/TeacherCreateAGTemplate"
-import TeacherEditAGTemplate from "../pages/teacher/TeacherEditAGTemplate"
-import TeacherGns3 from "../pages/teacher/TeacherGns3"
-import TeacherGns3AllSessions from "../pages/teacher/TeacherGns3AllSessions"
-
-import StudentLayout from "../layouts/StudentLayout"
-import StudentDashboard from "../pages/student/StudentDashboard"
-import StudentAssignments from "../pages/student/StudentAssignments"
-import StudentAssignmentSubmission from "../pages/student/StudentAssignmentSubmission"
-import StudentAssignmentDetails from "../pages/student/StudentAssignmentDetails"
-import StudentGns3 from "../pages/student/StudentGns3"
-import StudentArchiveAssignmentGroups from "../pages/student/StudentArchiveAssignmentGroups"
-
-import NotFound404 from "../pages/errors/NotFound404"
+// Eager — needed immediately (Login is the first screen, errors are tiny)
 import Login from "../pages/Login"
+import NotFound404 from "../pages/errors/NotFound404"
+
+// Lazy — loaded only when the matching role section is first accessed
+const AdminLayout = lazy(() => import("../layouts/AdminLayout"))
+const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard"))
+const AdminUsers = lazy(() => import("../pages/admin/AdminUsers"))
+const AdminUserDetails = lazy(() => import("../pages/admin/AdminUserDetails"))
+const AdminClasses = lazy(() => import("../pages/admin/AdminClasses"))
+const AdminClassDetails = lazy(() => import("../pages/admin/AdminClassDetails"))
+const AdminGns3 = lazy(() => import("../pages/admin/AdminGns3"))
+const AdminGns3AllSessions = lazy(() => import("../pages/admin/AdminGnsAllSessions"))
+const AdminSettings = lazy(() => import("../pages/admin/AdminSettings"))
+const AdminAssignmentGroups = lazy(() => import("../pages/admin/AdminAssignmentGroups"))
+const AdminCreateAssignmentGroup = lazy(() => import("../pages/admin/AdminCreateAssignmentGroup"))
+const AdminEditAssignmentGroup = lazy(() => import("../pages/admin/AdminEditAssignmentGroup"))
+const AdminAssignmentGroupDetails = lazy(() => import("../pages/admin/AdminAssignmentGroupDetails"))
+const AdminAssignmentGroupDetailsSubmit = lazy(() => import("../pages/admin/AdminAssignmentGroupDetailsSubmit"))
+const AdminArchiveAssignmentGroups = lazy(() => import("../pages/admin/AdminArchiveAssignmentGroups"))
+const AdminArchiveAssignmentGroupDetails = lazy(() => import("../pages/admin/AdminArchiveAssignmentGroupDetails"))
+const AdminAGTemplates = lazy(() => import("../pages/admin/AdminAGTemplates"))
+const AdminCreateAGTemplate = lazy(() => import("../pages/admin/AdminCreateAGTemplate"))
+const AdminEditAGTemplate = lazy(() => import("../pages/admin/AdminEditAGTemplate"))
+
+const TeacherLayout = lazy(() => import("../layouts/TeacherLayout"))
+const TeacherDashboard = lazy(() => import("../pages/teacher/TeacherDashboard"))
+const TeacherMyClasses = lazy(() => import("../pages/teacher/TeacherMyClasses"))
+const TeacherStudentDetails = lazy(() => import("../pages/teacher/TeacherStudentDetails"))
+const TeacherClassDetails = lazy(() => import("../pages/teacher/TeacherClassDetails"))
+const TeacherAssignmentGroups = lazy(() => import("../pages/teacher/TeacherAssignmentGroups"))
+const TeacherCreateAssignmentGroup = lazy(() => import("../pages/teacher/TeacherCreateAssignmentGroup"))
+const TeacherEditAssignmentGroup = lazy(() => import("../pages/teacher/TeacherEditAssignmentGroup"))
+const TeacherAssignmentGroupDetails = lazy(() => import("../pages/teacher/TeacherAssignmentGroupDetails"))
+const TeacherAssignmentGroupDetailsSubmit = lazy(() => import("../pages/teacher/TeacherAssignmentGroupDetailsSubmit"))
+const TeacherArchiveAssignmentGroups = lazy(() => import("../pages/teacher/TeacherArchiveAssignmentGroups"))
+const TeacherArchiveAssignmentGroupDetails = lazy(() => import("../pages/teacher/TeacherArchiveAssignmentGroupDetails"))
+const TeacherAGTemplates = lazy(() => import("../pages/teacher/TeacherAGTemplates"))
+const TeacherCreateAGTemplate = lazy(() => import("../pages/teacher/TeacherCreateAGTemplate"))
+const TeacherEditAGTemplate = lazy(() => import("../pages/teacher/TeacherEditAGTemplate"))
+const TeacherGns3 = lazy(() => import("../pages/teacher/TeacherGns3"))
+const TeacherGns3AllSessions = lazy(() => import("../pages/teacher/TeacherGns3AllSessions"))
+
+const StudentLayout = lazy(() => import("../layouts/StudentLayout"))
+const StudentDashboard = lazy(() => import("../pages/student/StudentDashboard"))
+const StudentAssignments = lazy(() => import("../pages/student/StudentAssignments"))
+const StudentAssignmentSubmission = lazy(() => import("../pages/student/StudentAssignmentSubmission"))
+const StudentAssignmentDetails = lazy(() => import("../pages/student/StudentAssignmentDetails"))
+const StudentGns3 = lazy(() => import("../pages/student/StudentGns3"))
+const StudentArchiveAssignmentGroups = lazy(() => import("../pages/student/StudentArchiveAssignmentGroups"))
 
 import { Navigate } from "react-router-dom"
 import type { RouteObject } from "react-router-dom"
@@ -215,5 +219,57 @@ const routeConfig: RouteObject[] = [
     element: <Navigate to={Routes[RouteKeys.LOGIN]} replace />,
   },
 ]
+
+export const prefetchAdminBundle = () => {
+  import("../layouts/AdminLayout")
+  import("../pages/admin/AdminDashboard")
+  import("../pages/admin/AdminUsers")
+  import("../pages/admin/AdminUserDetails")
+  import("../pages/admin/AdminClasses")
+  import("../pages/admin/AdminClassDetails")
+  import("../pages/admin/AdminSettings")
+  import("../pages/admin/AdminAssignmentGroups")
+  import("../pages/admin/AdminCreateAssignmentGroup")
+  import("../pages/admin/AdminEditAssignmentGroup")
+  import("../pages/admin/AdminAssignmentGroupDetails")
+  import("../pages/admin/AdminAssignmentGroupDetailsSubmit")
+  import("../pages/admin/AdminArchiveAssignmentGroups")
+  import("../pages/admin/AdminArchiveAssignmentGroupDetails")
+  import("../pages/admin/AdminAGTemplates")
+  import("../pages/admin/AdminCreateAGTemplate")
+  import("../pages/admin/AdminEditAGTemplate")
+  import("../pages/admin/AdminGns3")
+  import("../pages/admin/AdminGnsAllSessions")
+}
+
+export const prefetchTeacherBundle = () => {
+  import("../layouts/TeacherLayout")
+  import("../pages/teacher/TeacherDashboard")
+  import("../pages/teacher/TeacherMyClasses")
+  import("../pages/teacher/TeacherStudentDetails")
+  import("../pages/teacher/TeacherClassDetails")
+  import("../pages/teacher/TeacherAssignmentGroups")
+  import("../pages/teacher/TeacherCreateAssignmentGroup")
+  import("../pages/teacher/TeacherEditAssignmentGroup")
+  import("../pages/teacher/TeacherAssignmentGroupDetails")
+  import("../pages/teacher/TeacherAssignmentGroupDetailsSubmit")
+  import("../pages/teacher/TeacherArchiveAssignmentGroups")
+  import("../pages/teacher/TeacherArchiveAssignmentGroupDetails")
+  import("../pages/teacher/TeacherAGTemplates")
+  import("../pages/teacher/TeacherCreateAGTemplate")
+  import("../pages/teacher/TeacherEditAGTemplate")
+  import("../pages/teacher/TeacherGns3")
+  import("../pages/teacher/TeacherGns3AllSessions")
+}
+
+export const prefetchStudentBundle = () => {
+  import("../layouts/StudentLayout")
+  import("../pages/student/StudentDashboard")
+  import("../pages/student/StudentAssignments")
+  import("../pages/student/StudentAssignmentSubmission")
+  import("../pages/student/StudentAssignmentDetails")
+  import("../pages/student/StudentGns3")
+  import("../pages/student/StudentArchiveAssignmentGroups")
+}
 
 export default routeConfig

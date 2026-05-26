@@ -2,22 +2,23 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom"
 import routeConfig from "./router/router"
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material"
 import { ThemeContext, NestedThemeProvider } from "./contexts/ThemeContext"
-import { useContext, useEffect } from "react"
+import { useContext, useEffect, Suspense } from "react"
 import { AuthProvider } from "./contexts/AuthContext"
 import { useAuth } from "./contexts/AuthContext"
 import ReactQueryProvider from "./contexts/ReactQueryProvider"
 import { AppConfigProvider } from "./contexts/AppConfigContext"
+import LoadingPage from "./components/LoadingPage"
 
-/**
- * Calls refreshAuth once on mount so the auth state is initialised
- * before any route renders. Must be rendered inside AuthProvider.
- */
 const AuthInitializer = () => {
   const { refreshAuth } = useAuth()
   useEffect(() => {
     refreshAuth()
   }, [refreshAuth])
-  return <Outlet />
+  return (
+    <Suspense fallback={<LoadingPage />}>
+      <Outlet />
+    </Suspense>
+  )
 }
 
 /**

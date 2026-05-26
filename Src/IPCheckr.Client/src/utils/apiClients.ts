@@ -3,16 +3,16 @@ import { Configuration } from "../dtos/configuration"
 import axiosInstance from "./axiosInstance"
 import getApiBase from "./getApiBase"
 
-const configuration = new Configuration({ basePath: getApiBase() })
+const configuration = /*#__PURE__*/ new Configuration({ basePath: getApiBase() })
 
-export const userApi = new UserApi(configuration, undefined, axiosInstance)
-export const classApi = new ClassApi(configuration, undefined, axiosInstance)
-export const authApi = new AuthApi(configuration, undefined, axiosInstance)
-export const assignmentGroupApi = new AssignmentGroupApi(configuration, undefined, axiosInstance)
-export const assignmentApi = new AssignmentApi(configuration, undefined, axiosInstance)
-export const assignmentSubmitApi = new AssignmentSubmitApi(configuration, undefined, axiosInstance)
-export const appSettingsApi = new AppSettingsApi(configuration, undefined, axiosInstance)
-export const dashboardApi = new DashboardApi(configuration, undefined, axiosInstance)
-export const gns3Api = new Gns3Api(configuration, undefined, axiosInstance)
-export const agTemplateApi = new AGTemplateApi(configuration, undefined, axiosInstance)
-export const appConfigApi = new AppConfigApi(configuration, undefined, axiosInstance)
+export const userApi = /*#__PURE__*/ new UserApi(configuration, undefined, axiosInstance)
+export const classApi = /*#__PURE__*/ new ClassApi(configuration, undefined, axiosInstance)
+export const authApi = /*#__PURE__*/ new AuthApi(configuration, undefined, axiosInstance)
+export const assignmentGroupApi = /*#__PURE__*/ new AssignmentGroupApi(configuration, undefined, axiosInstance)
+export const assignmentApi = /*#__PURE__*/ new AssignmentApi(configuration, undefined, axiosInstance)
+export const assignmentSubmitApi = /*#__PURE__*/ new AssignmentSubmitApi(configuration, undefined, axiosInstance)
+export const appSettingsApi = /*#__PURE__*/ new AppSettingsApi(configuration, undefined, axiosInstance)
+export const dashboardApi = /*#__PURE__*/ new DashboardApi(configuration, undefined, axiosInstance)
+export const gns3Api = /*#__PURE__*/ new Gns3Api(configuration, undefined, axiosInstance)
+export const agTemplateApi = /*#__PURE__*/ new AGTemplateApi(configuration, undefined, axiosInstance)
+export const appConfigApi = /*#__PURE__*/ new AppConfigApi(configuration, undefined, axiosInstance)

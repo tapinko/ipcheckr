@@ -2573,6 +2573,19 @@ export interface LoginRes {
 /**
  * 
  * @export
+ * @interface PrefetchRoleRes
+ */
+export interface PrefetchRoleRes {
+    /**
+     * 
+     * @type {string}
+     * @memberof PrefetchRoleRes
+     */
+    'role'?: string | null;
+}
+/**
+ * 
+ * @export
  * @interface ProblemDetails
  */
 export interface ProblemDetails {
@@ -7372,6 +7385,43 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
+         * @param {string} [username] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authPrefetchRole: async (username?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/auth/prefetch-role`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (username !== undefined) {
+                localVarQueryParameter['username'] = username;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {ValidateTokenReq} validateTokenReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7432,6 +7482,18 @@ export const AuthApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string} [username] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async authPrefetchRole(username?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrefetchRoleRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authPrefetchRole(username, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.authPrefetchRole']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {ValidateTokenReq} validateTokenReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7463,6 +7525,15 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * 
+         * @param {string} [username] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authPrefetchRole(username?: string, options?: RawAxiosRequestConfig): AxiosPromise<PrefetchRoleRes> {
+            return localVarFp.authPrefetchRole(username, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {ValidateTokenReq} validateTokenReq 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7489,6 +7560,17 @@ export class AuthApi extends BaseAPI {
      */
     public authLogin(loginReq: LoginReq, options?: RawAxiosRequestConfig) {
         return AuthApiFp(this.configuration).authLogin(loginReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} [username] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public authPrefetchRole(username?: string, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authPrefetchRole(username, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

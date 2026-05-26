@@ -16,6 +16,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.HttpOverrides;
 using IPCheckr.Api.Services.Realtime;
 using IPCheckr.Api.Hubs;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace IPCheckr.Api
 {
@@ -49,6 +51,19 @@ namespace IPCheckr.Api
                 });
             builder.Services.AddCustomAuthorization();
             builder.Services.AddMemoryCache();
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.AddPolicy("prefetch-role", context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 10,
+                            Window = TimeSpan.FromMinutes(1),
+                        }
+                    ));
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            });
             builder.Services.AddHostedService<Gns3SessionCleanupService>();
             builder.Services.AddSignalR();
             builder.Services.AddSingleton<IAttemptEventsPublisher, AttemptEventsPublisher>();
@@ -109,6 +124,7 @@ namespace IPCheckr.Api
                 app.UseSwaggerUi();
             }
 
+            app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseOpenApi();

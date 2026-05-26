@@ -13,6 +13,8 @@ import bg_w_cr_text from "../assets/bg_w_cr_text.svg"
 import { GitHub } from "@mui/icons-material"
 import { isDemoMode } from "../config/demoMode"
 import { demoLogin } from "../demo/auth"
+import { useRef } from "react"
+import { prefetchAdminBundle, prefetchTeacherBundle, prefetchStudentBundle } from "../router/router"
 
 type LoginFormValues = {
   username: string
@@ -23,6 +25,22 @@ const Login = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { refreshAuth } = useAuth()
+
+  const prefetchFired = useRef(false)
+
+  const handleUsernamePrefetch = async (username: string) => {
+    if (prefetchFired.current || !username.trim() || isDemoMode) return
+    prefetchFired.current = true
+    try {
+      const res = await authApi.authPrefetchRole(username.trim())
+      const role = res.data.role
+      if (role === UserRole.ADMIN) prefetchAdminBundle()
+      else if (role === UserRole.TEACHER) prefetchTeacherBundle()
+      else if (role === UserRole.STUDENT) prefetchStudentBundle()
+    } catch {
+      // prefetch failure never affects login
+    }
+  }
 
   const {
     control,
@@ -162,6 +180,10 @@ const Login = () => {
                       errors.username ? t(errors.username.message as string) : ""
                     }
                     onChange={(e) => field.onChange(e.target.value.trim())}
+                    onBlur={(e) => {
+                      field.onBlur()
+                      handleUsernamePrefetch(e.target.value)
+                    }}
                   />
                 )}
               />
