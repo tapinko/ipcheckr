@@ -53,6 +53,7 @@ import InsightCard from "../../components/ui/InsightCard"
 import InsightGrid from "../../components/ui/InsightGrid"
 import { fromAssignmentTypeParam } from "../../utils/assignmentType"
 import { createAttemptEventsConnection } from "../../utils/attemptEventsHub"
+import { isDemoMode } from "../../config/demoMode"
 
 interface IAssignmentGroupSubmitDetailsCard {
   assignmentId: number
@@ -395,7 +396,7 @@ const AGAssignmentGroupDetailsFeature = ({
                         variant="outlined"
                         color={data.isArchived ? "primary" : "inherit"}
                         startIcon={data.isArchived ? <Unarchive fontSize="small" /> : <Archive fontSize="small" />}
-                        disabled={archiveMutation.isPending}
+                        disabled={archiveMutation.isPending || isDemoMode}
                         onClick={() => setArchiveConfirmOpen(true)}
                       >
                         {data.isArchived

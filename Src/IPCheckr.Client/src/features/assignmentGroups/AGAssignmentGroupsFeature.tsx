@@ -47,6 +47,7 @@ import { getStatusMap } from "../../utils/getStatusMap"
 import { resolveEffectiveStatus } from "./agStatus"
 import type { AGClassFilterValue } from "./components/AGHeader"
 import AGHeader from "./components/AGHeader"
+import { isDemoMode } from "../../config/demoMode"
 
 export interface IAG {
   id: number
@@ -761,6 +762,7 @@ const AGAssignmentGroupsFeature = ({
           onCreateClick={() => onNavigateCreate(classFilterNormalized ?? undefined)}
           onTemplatesClick={() => onNavigateTemplates()}
           onArchiveClick={() => onNavigateArchive()}
+          archiveDisabled={isDemoMode}
           createDisabled={!classesQuery.data?.length}
         />
       </Box>

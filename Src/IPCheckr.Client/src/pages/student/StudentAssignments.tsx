@@ -41,6 +41,7 @@ import { getStatusMap } from "../../utils/getStatusMap"
 import AGHeader from "../../features/assignmentGroups/components/AGHeader"
 import type { AGClassFilterValue } from "../../features/assignmentGroups/components/AGHeader"
 import { toAssignmentTypeParam } from "../../utils/assignmentType"
+import { isDemoMode } from "../../config/demoMode"
 
 type StudentAssignment = (IDNetAssignmentDto | SubnetAssignmentDto) & {
 	assignmentId: number
@@ -481,6 +482,7 @@ const StudentAssignments = () => {
 					difficultyValues={difficultyFilter}
 					onToggleDifficulty={v => setDifficultyFilter(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
 					onArchiveClick={() => navigate(Routes[RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE])}
+					archiveDisabled={isDemoMode}
 					hideTemplates
 				/>
 

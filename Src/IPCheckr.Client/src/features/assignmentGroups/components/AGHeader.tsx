@@ -54,6 +54,7 @@ interface AGHeaderProps {
   onArchiveClick?: () => void
   createDisabled?: boolean
   templatesDisabled?: boolean
+  archiveDisabled?: boolean
   hideArchive?: boolean
   hideTemplates?: boolean
   hideClassFilter?: boolean
@@ -87,6 +88,7 @@ const AGHeader = ({
   onArchiveClick,
   createDisabled,
   templatesDisabled,
+  archiveDisabled,
   hideArchive,
   hideTemplates,
   hideClassFilter
@@ -133,7 +135,7 @@ const AGHeader = ({
                   <span>
                     <IconButton
                       onClick={onArchiveClick}
-                      disabled={!onArchiveClick}
+                      disabled={!onArchiveClick || archiveDisabled}
                       aria-label="Archive"
                       sx={{
                         border: theme => `1px solid ${theme.palette.warning.main}`,
