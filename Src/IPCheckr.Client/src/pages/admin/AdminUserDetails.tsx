@@ -17,7 +17,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { LineChart, RadarChart } from "@mui/x-charts"
+import { LazyLineChart, LazyRadarChart } from "../../components/charts/LazyCharts"
 import { AccessTime, MoreTime, Percent, Person, Quiz, TaskAlt } from "@mui/icons-material"
 import InsightGridSkeleton from "../../components/skeletons/InsightGridSkeleton"
 import ErrorLoading from "../../components/ui/ErrorLoading"
@@ -399,7 +399,7 @@ const AdminUserDetails = () => {
               </Typography>
 
               {hasAnyAverage ? (
-                <RadarChart
+                <LazyRadarChart
                   shape="circular"
                   divisions={4}
                   height={320}
@@ -436,7 +436,7 @@ const AdminUserDetails = () => {
                 {t(TranslationKey.ADMIN_USER_DETAILS_AVERAGE_SUCCESS_RATE)}
               </Typography>
               {(detailsQuery.data?.successRate?.length ?? 0) > 0 ? (
-                <LineChart
+                <LazyLineChart
                   height={320}
                   xAxis={[
                     {

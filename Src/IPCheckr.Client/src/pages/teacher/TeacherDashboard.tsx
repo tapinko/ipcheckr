@@ -20,7 +20,7 @@ import ErrorLoading from "../../components/ui/ErrorLoading"
 import InsightGridSkeleton from "../../components/skeletons/InsightGridSkeleton"
 import { TranslationKey } from "../../utils/i18n"
 import { AccessTime, Class, EmojiEvents, Groups, Quiz, School, TaskAlt } from "@mui/icons-material"
-import { BarChart } from "@mui/x-charts"
+import { LazyBarChart } from "../../components/charts/LazyCharts"
 import { useNavigate } from "react-router-dom"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import InsightCard from "../../components/ui/InsightCard"
@@ -320,7 +320,7 @@ const TeacherDashboard = () => {
                   {t(TranslationKey.TEACHER_DASHBOARD_AVERAGE_IN_STUDENTS)}
                 </Typography>
                 {(dashboardQuery.data?.averagePercentageInStudents?.length ?? 0) > 0 ? (
-                  <BarChart
+                  <LazyBarChart
                     height={300}
                     xAxis={[
                       {
@@ -362,7 +362,7 @@ const TeacherDashboard = () => {
                   {t(TranslationKey.TEACHER_DASHBOARD_AVERAGE_IN_CLASSES)}
                 </Typography>
                 {(dashboardQuery.data?.averagePercentageInClasses?.length ?? 0) > 0 ? (
-                  <BarChart
+                  <LazyBarChart
                     height={300}
                     xAxis={[
                       {

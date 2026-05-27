@@ -14,7 +14,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { dashboardApi } from "../../utils/apiClients"
 import { type QueryStudentDashboardRes } from "../../dtos"
 import { useAuth } from "../../contexts/AuthContext"
-import { LineChart } from "@mui/x-charts"
+import { LazyLineChart } from "../../components/charts/LazyCharts"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { useNavigate } from "react-router-dom"
 
@@ -168,7 +168,7 @@ const StudentDashboard = () => {
                 {t(TranslationKey.STUDENT_DASHBOARD_SUCCESS_RATE)}
               </Typography>
               {(dashboardQuery.data?.successRate?.length ?? 0) > 0 ? (
-                <LineChart
+                <LazyLineChart
                   height={300}
                   xAxis={[
                     {

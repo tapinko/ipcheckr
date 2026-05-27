@@ -20,7 +20,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { BarChart, LineChart } from "@mui/x-charts"
+import { LazyBarChart, LazyLineChart } from "../../components/charts/LazyCharts"
 import { useState, useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import FormRules from "../../utils/FormRules"
@@ -413,7 +413,7 @@ const AdminClassDetails = () => {
                   {t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_STUDENTS)}
                 </Typography>
                 {(avgStudents.length ?? 0) > 0 ? (
-                  <BarChart
+                  <LazyBarChart
                     height={300}
                     xAxis={[
                       {
@@ -453,7 +453,7 @@ const AdminClassDetails = () => {
                   {t(TranslationKey.ADMIN_CLASS_DETAILS_AVERAGE_IN_ASSIGNMENT_GROUPS)}
                 </Typography>
                 {(avgGroups.length ?? 0) > 0 ? (
-                  <LineChart
+                  <LazyLineChart
                     height={300}
                     xAxis={[
                       {
