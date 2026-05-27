@@ -1,3 +1,5 @@
+import UserRole from "../types/UserRole"
+
 export enum RouteParams {
   ASSIGNMENT_GROUP_ID = "ASSIGNMENT_GROUP_ID",
   ASSIGNMENT_GROUP_TYPE = "ASSIGNMENT_TYPE",
@@ -117,6 +119,12 @@ const TEACHER_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT = `${TEACHER_ASSIGNMENT_G
 
 const ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS = `${ADMIN_ASSIGNMENT_GROUPS_ARCHIVE}/:${RouteParams.ASSIGNMENT_GROUP_TYPE}/details/:${RouteParams.ASSIGNMENT_GROUP_ID}`
 const ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS_SUBMIT = `${ADMIN_ASSIGNMENT_GROUPS_ARCHIVE_DETAILS}/:${RouteParams.ASSIGNMENT_ID}`
+
+export const RolePrefixes: Record<UserRole, string> = {
+  [UserRole.ADMIN]: ADMIN,
+  [UserRole.TEACHER]: TEACHER,
+  [UserRole.STUDENT]: STUDENT,
+}
 
 /**
  * Generates a URL with parameters replaced with a provided values.

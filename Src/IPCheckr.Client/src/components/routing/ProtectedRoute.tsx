@@ -2,18 +2,12 @@ import { Navigate, Outlet, useLocation } from "react-router-dom"
 import { useAuth } from "../../contexts/AuthContext"
 import UserRole from "../../types/UserRole"
 import LoadingPage from "../layout/LoadingPage"
-import { Routes, RouteKeys } from "../../router/routes"
+import { Routes, RouteKeys, RolePrefixes } from "../../router/routes"
 import type { ReactNode } from "react"
 
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[]
   children?: ReactNode
-}
-
-const rolePrefix: Record<UserRole, string> = {
-  [UserRole.ADMIN]: "/admin",
-  [UserRole.TEACHER]: "/teacher",
-  [UserRole.STUDENT]: "/student",
 }
 
 // Mapping of first path segment to target route keys for each role
@@ -67,14 +61,14 @@ const resolveRoleRedirect = (pathname: string, targetRole: UserRole): string => 
 
   let sourceRole: UserRole | null = null
   for (const role of [UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT] as UserRole[]) {
-    if (pathname.startsWith(rolePrefix[role])) {
+    if (pathname.startsWith(RolePrefixes[role])) {
       sourceRole = role
       break
     }
   }
   if (!sourceRole || sourceRole === targetRole) return fallback
 
-  const sub = pathname.slice(rolePrefix[sourceRole].length) // e.g. "/dashboard", "/assignment-groups/..."
+  const sub = pathname.slice(RolePrefixes[sourceRole].length) // e.g. "/dashboard", "/assignment-groups/..."
   const section = sub.split("/")[1] // first segment: "dashboard", "assignment-groups", etc.
 
   const mapping = sectionTargets[section]
@@ -89,7 +83,10 @@ const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
   const location = useLocation()
 
   if (loading) return <LoadingPage />
-  if (!isAuthenticated) return <Navigate to={Routes[RouteKeys.LOGIN]} replace />
+  if (!isAuthenticated) {
+    const redirectParam = encodeURIComponent(location.pathname + location.search)
+    return <Navigate to={`${Routes[RouteKeys.LOGIN]}?redirect=${redirectParam}`} replace />
+  }
   if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
     const target = userRole ? resolveRoleRedirect(location.pathname, userRole) : Routes[RouteKeys.LOGIN]
     return <Navigate to={target} replace />

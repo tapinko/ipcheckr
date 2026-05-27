@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<number | null>(null)
   const [username, setUsername] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const clearAuthState = useCallback((redirectToLogin = false) => {
+  const clearAuthState = useCallback((redirectToLogin = false, includeReturnUrl = false) => {
     sessionStorage.removeItem("token")
     sessionStorage.removeItem("role")
     setIsAuthenticated(false)
@@ -42,7 +42,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUsername(null)
 
     if (redirectToLogin && window.location.pathname !== Routes[RouteKeys.LOGIN]) {
-      navigate(Routes[RouteKeys.LOGIN], { replace: true })
+      const loginPath = Routes[RouteKeys.LOGIN]
+      if (includeReturnUrl) {
+        const currentPath = window.location.pathname + window.location.search
+        navigate(`${loginPath}?redirect=${encodeURIComponent(currentPath)}`, { replace: true })
+      } else {
+        navigate(loginPath, { replace: true })
+      }
     }
   }, [navigate])
 
@@ -74,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Locally check token expiry before making an API call
     const expiryMs = getTokenExpiryMs(token)
     if (expiryMs !== null && expiryMs <= Date.now()) {
-      clearAuthState(true)
+      clearAuthState(true, true)
       setLoading(false)
       return
     }
@@ -89,11 +95,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUsername(res.username)
           setUserId(res.userId)
           if (!res.isValid) {
-            clearAuthState(true)
+            clearAuthState(true, true)
           }
         })
         .catch(() => {
-          clearAuthState(true)
+          clearAuthState(true, true)
         })
         .finally(() => setLoading(false))
       return
@@ -102,7 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     authApi.authValidateToken({ token })
       .then(res => {
         if (!res.data.isValid) {
-          clearAuthState(true)
+          clearAuthState(true, true)
           return
         }
 
@@ -112,7 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUserId(res.data.userId || null)
       })
       .catch(() => {
-        clearAuthState(true)
+        clearAuthState(true, true)
       })
       .finally(() => setLoading(false))
   }, [clearAuthState])
@@ -126,24 +132,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const token = sessionStorage.getItem("token") || ""
     if (!token) {
-      clearAuthState(true)
+      clearAuthState(true, true)
       return
     }
 
     const expiryMs = getTokenExpiryMs(token)
     if (!expiryMs) {
-      clearAuthState(true)
+      clearAuthState(true, true)
       return
     }
 
     const delay = expiryMs - Date.now()
     if (delay <= 0) {
-      clearAuthState(true)
+      clearAuthState(true, true)
       return
     }
 
     const timerId = window.setTimeout(() => {
-      clearAuthState(true)
+      clearAuthState(true, true)
     }, delay)
 
     return () => {

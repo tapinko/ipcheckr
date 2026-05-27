@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { authApi } from "../utils/apiClients"
 import type { AxiosError } from "axios"
 import type { ApiProblemDetails } from "../dtos"
 import i18n, { Language } from "../utils/i18n"
 import { Box, Button, Divider, Paper, Stack, TextField, Typography } from "@mui/material"
-import { RouteKeys, Routes } from "../router/routes"
+import { RouteKeys, Routes, RolePrefixes } from "../router/routes"
 import UserRole from "../types/UserRole"
 import { useAuth } from "../contexts/AuthContext"
 import { TranslationKey } from "../utils/i18n"
@@ -27,6 +27,7 @@ type LoginFormValues = {
 const Login = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { refreshAuth } = useAuth()
 
   const prefetchFired = useRef(false)
@@ -77,6 +78,20 @@ const Login = () => {
       sessionStorage.setItem("token", res.token || "")
       sessionStorage.setItem("role", role || "")
       refreshAuth()
+
+      const rolePrefix = RolePrefixes[role as UserRole]
+      const redirect = searchParams.get("redirect")
+      const isValidRedirect =
+        redirect &&
+        redirect.startsWith("/") &&
+        !redirect.startsWith("//") &&
+        rolePrefix &&
+        redirect.startsWith(rolePrefix)
+
+      if (isValidRedirect) {
+        navigate(redirect, { replace: true })
+        return
+      }
 
       if (role === UserRole.ADMIN) {
         navigate(Routes[RouteKeys.ADMIN_DASHBOARD], { replace: true })
