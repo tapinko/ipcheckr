@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material"
 import { useTranslation } from "react-i18next"
-import { TranslationKey } from "../utils/i18n"
+import { TranslationKey } from "../../../utils/i18n"
 
 type ClassCardProps = {
   classId: number

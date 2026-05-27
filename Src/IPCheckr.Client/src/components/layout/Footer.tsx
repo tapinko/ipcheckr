@@ -1,6 +1,6 @@
 import { AppBar, IconButton, Toolbar, Tooltip, Typography } from "@mui/material"
-import { isDemoMode } from "../config/demoMode"
-import { resetDemoState } from "../demo/db"
+import { isDemoMode } from "../../config/demoMode"
+import { resetDemoState } from "../../demo/db"
 import { Refresh } from "@mui/icons-material"
 
 const Footer = () => {

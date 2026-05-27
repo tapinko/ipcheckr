@@ -1,5 +1,5 @@
 import { Stack, TextField, Typography } from "@mui/material"
-import { TranslationKey } from "../utils/i18n"
+import { TranslationKey } from "../../../utils/i18n"
 import { useTranslation } from "react-i18next"
 
 type DetailTone = "success" | "error" | "info" | "neutral"

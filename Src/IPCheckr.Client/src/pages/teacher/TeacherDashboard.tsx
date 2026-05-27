@@ -16,14 +16,14 @@ import { useTranslation } from "react-i18next"
 import { useAuth } from "../../contexts/AuthContext"
 import { dashboardApi } from "../../utils/apiClients"
 import { type QueryTeacherDashboardRes } from "../../dtos"
-import ErrorLoading from "../../components/ErrorLoading"
-import InsightGridSkeleton from "../../components/InsightGridSkeleton"
+import ErrorLoading from "../../components/ui/ErrorLoading"
+import InsightGridSkeleton from "../../components/skeletons/InsightGridSkeleton"
 import { TranslationKey } from "../../utils/i18n"
 import { AccessTime, Class, EmojiEvents, Groups, Quiz, School, TaskAlt } from "@mui/icons-material"
 import { BarChart } from "@mui/x-charts"
 import { useNavigate } from "react-router-dom"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
-import InsightCard from "../../components/InsightCard"
+import InsightCard from "../../components/ui/InsightCard"
 
 const TeacherDashboard = () => {
   const { t } = useTranslation()

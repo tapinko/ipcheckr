@@ -1,7 +1,7 @@
 import { Box, Button, Checkbox, InputAdornment, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField } from "@mui/material"
 import SearchIcon from "@mui/icons-material/Search"
 import { useTranslation } from "react-i18next"
-import { TranslationKey } from "../utils/i18n"
+import { TranslationKey } from "../../utils/i18n"
 import type { FC, ReactNode } from "react"
 
 interface IDataGridWithSearchProps {

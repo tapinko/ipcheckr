@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import UserRole from "../types/UserRole"
-import LoadingPage from "./LoadingPage"
-import Unauthorized401 from "../pages/errors/Unauthorized401"
-import { Routes, RouteKeys } from "../router/routes"
+import { useAuth } from "../../contexts/AuthContext"
+import UserRole from "../../types/UserRole"
+import LoadingPage from "../layout/LoadingPage"
+import Unauthorized401 from "../../pages/errors/Unauthorized401"
+import { Routes, RouteKeys } from "../../router/routes"
 import type { ReactNode } from "react"
 
 interface ProtectedRouteProps {

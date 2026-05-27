@@ -9,7 +9,7 @@ import {
   Checkbox,
 } from "@mui/material"
 import { useTranslation } from "react-i18next"
-import { TranslationKey } from "../utils/i18n"
+import { TranslationKey } from "../../utils/i18n"
 
 interface IDeleteDialogProps {
   open: boolean

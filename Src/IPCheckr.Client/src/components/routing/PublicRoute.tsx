@@ -1,8 +1,8 @@
 import { Navigate, Outlet } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import UserRole from "../types/UserRole"
-import LoadingPage from "./LoadingPage"
-import { Routes, RouteKeys } from "../router/routes"
+import { useAuth } from "../../contexts/AuthContext"
+import UserRole from "../../types/UserRole"
+import LoadingPage from "../layout/LoadingPage"
+import { Routes, RouteKeys } from "../../router/routes"
 import type { ReactNode } from "react"
 
 interface PublicRouteProps {

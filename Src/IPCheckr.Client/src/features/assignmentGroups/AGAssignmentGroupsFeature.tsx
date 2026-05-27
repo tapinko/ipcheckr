@@ -35,18 +35,18 @@ import {
   type QueryAssignmentGroupsRes,
 } from "../../dtos"
 import { useAuth } from "../../contexts/AuthContext"
-import AGListSkeleton from "../../components/ag/AGListSkeleton"
-import ErrorLoading from "../../components/ErrorLoading"
+import AGListSkeleton from "./components/skeletons/AGListSkeleton"
+import ErrorLoading from "../../components/ui/ErrorLoading"
 import { Language, TranslationKey } from "../../utils/i18n"
 import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficultyLabel"
 import { getHostSortLabel } from "../../utils/getHostSortLabel"
-import DeleteDialog from "../../components/DeleteDialog"
+import DeleteDialog from "../../components/ui/DeleteDialog"
 import type { AxiosError, AxiosResponse } from "axios"
-import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
+import { CustomAlert, type CustomAlertState } from "../../components/ui/CustomAlert"
 import { getStatusMap } from "../../utils/getStatusMap"
 import { resolveEffectiveStatus } from "./agStatus"
-import type { AGClassFilterValue } from "../../components/AGHeader"
-import AGHeader from "../../components/AGHeader"
+import type { AGClassFilterValue } from "./components/AGHeader"
+import AGHeader from "./components/AGHeader"
 
 export interface IAG {
   id: number

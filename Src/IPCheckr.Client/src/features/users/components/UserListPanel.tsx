@@ -26,12 +26,12 @@ import { AxiosError, type AxiosResponse } from "axios"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
-import { CustomAlert, type CustomAlertState } from "./CustomAlert"
-import DeleteDialog from "./DeleteDialog"
-import ErrorLoading from "./ErrorLoading"
-import type { ApiProblemDetails, ClassDto, UserDto } from "../dtos"
-import FormRules from "../utils/FormRules"
-import i18n, { Language, TranslationKey } from "../utils/i18n"
+import { CustomAlert, type CustomAlertState } from "../../../components/ui/CustomAlert"
+import DeleteDialog from "../../../components/ui/DeleteDialog"
+import ErrorLoading from "../../../components/ui/ErrorLoading"
+import type { ApiProblemDetails, ClassDto, UserDto } from "../../../dtos"
+import FormRules from "../../../utils/FormRules"
+import i18n, { Language, TranslationKey } from "../../../utils/i18n"
 
 export type UserRow = UserDto & { classNamesDisplay: string }
 

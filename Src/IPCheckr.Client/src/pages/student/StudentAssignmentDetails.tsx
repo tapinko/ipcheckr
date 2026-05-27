@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
+import { CustomAlert, type CustomAlertState } from "../../components/ui/CustomAlert"
 import AGAssignmentGroupDetailsSubmitFeature from "../../features/assignmentGroups/AGAssignmentGroupDetailsSubmitFeature"
 
 const StudentAssignmentDetails = () => {

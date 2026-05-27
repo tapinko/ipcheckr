@@ -23,9 +23,9 @@ import {
   AssignmentGroupIpCat,
   AssignmentGroupType,
   type ClassDto
-} from "../dtos"
-import { getIpCatLabel } from "../utils/getIpCatLabel"
-import { TranslationKey } from "../utils/i18n"
+} from "../../../dtos"
+import { getIpCatLabel } from "../../../utils/getIpCatLabel"
+import { TranslationKey } from "../../../utils/i18n"
 import type { TFunction } from "i18next"
 import { useState } from "react"
 

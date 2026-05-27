@@ -7,7 +7,7 @@ import { AuthProvider } from "./contexts/AuthContext"
 import { useAuth } from "./contexts/AuthContext"
 import ReactQueryProvider from "./contexts/ReactQueryProvider"
 import { AppConfigProvider } from "./contexts/AppConfigContext"
-import LoadingPage from "./components/LoadingPage"
+import LoadingPage from "./components/layout/LoadingPage"
 
 const AuthInitializer = () => {
   const { refreshAuth } = useAuth()

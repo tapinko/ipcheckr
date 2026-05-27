@@ -7,8 +7,8 @@ import {
 } from "@mui/material"
 import { TranslationKey } from "../../utils/i18n"
 import { useTranslation } from "react-i18next"
-import InsightGridSkeleton from "../../components/InsightGridSkeleton"
-import ErrorLoading from "../../components/ErrorLoading"
+import InsightGridSkeleton from "../../components/skeletons/InsightGridSkeleton"
+import ErrorLoading from "../../components/ui/ErrorLoading"
 import { AccessTime, Class, Groups, School, TaskAlt, Quiz } from "@mui/icons-material"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { dashboardApi } from "../../utils/apiClients"
@@ -18,7 +18,7 @@ import { LineChart } from "@mui/x-charts"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { useNavigate } from "react-router-dom"
 
-import InsightCard from "../../components/InsightCard"
+import InsightCard from "../../components/ui/InsightCard"
 
 const StudentDashboard = () => {
   const { t } = useTranslation()

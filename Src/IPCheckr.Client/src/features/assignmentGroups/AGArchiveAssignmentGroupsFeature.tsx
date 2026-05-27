@@ -24,13 +24,13 @@ import {
   type QueryAssignmentGroupsRes,
 } from "../../dtos"
 import { useAuth } from "../../contexts/AuthContext"
-import AGArchiveSkeleton from "../../components/ag/AGArchiveSkeleton"
-import ErrorLoading from "../../components/ErrorLoading"
+import AGArchiveSkeleton from "./components/skeletons/AGArchiveSkeleton"
+import ErrorLoading from "../../components/ui/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
 import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficultyLabel"
 import { getHostSortLabel } from "../../utils/getHostSortLabel"
-import AGHeader from "../../components/AGHeader"
-import type { AGClassFilterValue } from "../../components/AGHeader"
+import AGHeader from "./components/AGHeader"
+import type { AGClassFilterValue } from "./components/AGHeader"
 import type { IAG } from "./AGAssignmentGroupsFeature"
 
 const formatDateTimeByLanguage = (value: string, language: string) =>

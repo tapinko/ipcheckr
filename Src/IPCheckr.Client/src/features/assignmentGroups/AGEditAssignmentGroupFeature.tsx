@@ -23,11 +23,11 @@ import type { AxiosError, AxiosResponse } from "axios"
 import { assignmentGroupApi, userApi } from "../../utils/apiClients"
 import { useAuth } from "../../contexts/AuthContext"
 import UserRole from "../../types/UserRole"
-import ErrorLoading from "../../components/ErrorLoading"
-import AGFormSkeleton from "../../components/ag/AGFormSkeleton"
+import ErrorLoading from "../../components/ui/ErrorLoading"
+import AGFormSkeleton from "./components/skeletons/AGFormSkeleton"
 import { Language, TranslationKey } from "../../utils/i18n"
 import FormRules from "../../utils/FormRules"
-import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
+import { CustomAlert, type CustomAlertState } from "../../components/ui/CustomAlert"
 import {
   AssignmentGroupDifficulty,
   AssignmentGroupHostSortStrategy,

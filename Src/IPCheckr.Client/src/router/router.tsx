@@ -55,8 +55,8 @@ import { Navigate } from "react-router-dom"
 import type { RouteObject } from "react-router-dom"
 import { Routes, RouteKeys } from "./routes"
 import UserRole from "../types/UserRole"
-import ProtectedRoute from "../components/ProtectedRoute"
-import PublicRoute from "../components/PublicRoute"
+import ProtectedRoute from "../components/routing/ProtectedRoute"
+import PublicRoute from "../components/routing/PublicRoute"
 import type { JSX } from "react"
 
 const childPath = (full: string, parent: string) =>

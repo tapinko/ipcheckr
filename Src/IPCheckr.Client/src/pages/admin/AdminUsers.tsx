@@ -19,12 +19,12 @@ import type { AddUserRes, ApiProblemDetails, ClassDto, LdapUserDto } from "../..
 import { classApi, userApi } from "../../utils/apiClients"
 import { useAppConfig } from "../../contexts/AppConfigContext"
 import i18n, { Language, TranslationKey } from "../../utils/i18n"
-import { CustomAlert, type CustomAlertState } from "../../components/CustomAlert"
+import { CustomAlert, type CustomAlertState } from "../../components/ui/CustomAlert"
 import FormRules from "../../utils/FormRules"
 import { Controller, useForm } from "react-hook-form"
 import { AxiosError, type AxiosResponse } from "axios"
 import UserRole from "../../types/UserRole"
-import UserListPanel, { type UserRow, type EditFormValues } from "../../components/UserListPanel"
+import UserListPanel, { type UserRow, type EditFormValues } from "../../features/users/components/UserListPanel"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 
 type AddFormValues = {
