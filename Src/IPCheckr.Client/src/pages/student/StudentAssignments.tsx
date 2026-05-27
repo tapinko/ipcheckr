@@ -13,7 +13,7 @@ import {
 import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficultyLabel"
 import { getHostSortLabel } from "../../utils/getHostSortLabel"
 import { resolveComputedStatus, resolveEffectiveStatus } from "../../features/assignmentGroups/agStatus"
-import { assignmentApi } from "../../utils/apiClients"
+import { assignmentApi, assignmentGroupApi, assignmentSubmitApi } from "../../utils/apiClients"
 import {
 	Box,
 	Button,
@@ -94,6 +94,43 @@ const StudentAssignments = () => {
 	const { userId } = useAuth()
 	const queryClient = useQueryClient()
 	const statusMap = getStatusMap(t)
+
+	const handleCardHover = (assignment: StudentAssignment) => {
+		if (!assignment.assignmentId) return
+		const computedStatus = resolveComputedStatus(assignment.startDate, assignment.deadline, assignment.successRate)
+		const isEnded = computedStatus === AssignmentGroupStatus.Ended
+		const typeKey = assignment.type === AssignmentGroupType.Subnet ? "subnet" : "idnet"
+		const id = assignment.assignmentId
+		if (isEnded) {
+			if (assignment.type === AssignmentGroupType.Subnet) {
+				queryClient.prefetchQuery({
+					queryKey: ["agSubmitDetails", typeKey, String(id)],
+					queryFn: () => assignmentApi.assignmentQuerySubnetAssignmentSubmitDetailsFull(id).then(r => r.data),
+					staleTime: 60_000
+				})
+			} else {
+				queryClient.prefetchQuery({
+					queryKey: ["agSubmitDetails", typeKey, String(id)],
+					queryFn: () => assignmentApi.assignmentQueryIdNetAssignmentSubmitDetailsFull(id).then(r => r.data),
+					staleTime: 60_000
+				})
+			}
+		} else {
+			if (assignment.type === AssignmentGroupType.Subnet) {
+				queryClient.prefetchQuery({
+					queryKey: ["assignmentSubmissionData", typeKey, id],
+					queryFn: () => assignmentSubmitApi.assignmentSubmitQuerySubnetAssignmentDataForSubmit(id).then(r => r.data),
+					staleTime: 60_000
+				})
+			} else {
+				queryClient.prefetchQuery({
+					queryKey: ["assignmentSubmissionData", typeKey, id],
+					queryFn: () => assignmentSubmitApi.assignmentSubmitQueryIdNetAssignmentDataForSubmit(id).then(r => r.data),
+					staleTime: 60_000
+				})
+			}
+		}
+	}
 
 	const [nowMs, setNowMs] = useState(() => Date.now())
 
@@ -289,6 +326,7 @@ const StudentAssignments = () => {
 					}
 					: undefined
 			}}
+			onMouseEnter={() => handleCardHover(assignment)}
 			onClick={() => {
 				if (!assignment.assignmentId || !canViewDetails) return
 				handleDetailsNavigate(assignment)
@@ -482,6 +520,11 @@ const StudentAssignments = () => {
 					difficultyValues={difficultyFilter}
 					onToggleDifficulty={v => setDifficultyFilter(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
 					onArchiveClick={() => navigate(Routes[RouteKeys.STUDENT_ASSIGNMENTS_ARCHIVE])}
+					onArchiveHover={() => queryClient.prefetchQuery({
+						queryKey: ["archiveAssignmentGroups", null, null, "", null],
+						queryFn: () => assignmentGroupApi.assignmentGroupQueryAssignmentGroups(null, null, null, null, null, null, true).then(r => r.data),
+						staleTime: 60_000
+					})}
 					archiveDisabled={isDemoMode}
 					hideTemplates
 				/>

@@ -280,6 +280,11 @@ const AdminUsers = () => {
         addTooltip={t(TranslationKey.USER_LIST_PANEL_ADD_TEACHER)}
         onAddClick={() => setAddDialogRole("teacher")}
         onRowClick={user => navigate(getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, { [RouteParams.USER_ID]: user.id.toString() }))}
+      onRowHover={user => {
+        const id = user.id.toString()
+        queryClient.prefetchQuery({ queryKey: ["adminUserRole", id], queryFn: () => userApi.userQueryUsers(user.id).then(r => r.data), staleTime: 60_000 })
+        queryClient.prefetchQuery({ queryKey: ["adminUserDetails", id], queryFn: () => userApi.userQueryUserDetails(user.id).then(r => r.data), staleTime: 60_000 })
+      }}
       />
 
       <UserListPanel
@@ -295,6 +300,11 @@ const AdminUsers = () => {
         addTooltip={t(TranslationKey.USER_LIST_PANEL_ADD_STUDENT)}
         onAddClick={() => setAddDialogRole("student")}
         onRowClick={user => navigate(getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, { [RouteParams.USER_ID]: user.id.toString() }))}
+        onRowHover={user => {
+          const id = user.id.toString()
+          queryClient.prefetchQuery({ queryKey: ["adminUserRole", id], queryFn: () => userApi.userQueryUsers(user.id).then(r => r.data), staleTime: 60_000 })
+          queryClient.prefetchQuery({ queryKey: ["adminUserDetails", id], queryFn: () => userApi.userQueryUserDetails(user.id).then(r => r.data), staleTime: 60_000 })
+        }}
       />
     </Box>
   )

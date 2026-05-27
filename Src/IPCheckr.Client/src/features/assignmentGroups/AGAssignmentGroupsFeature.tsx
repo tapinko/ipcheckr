@@ -280,6 +280,7 @@ interface AGStatusColumnProps {
   onDrop: (e: React.DragEvent) => void
   onCardDragStart: (ag: IAG, e: React.DragEvent) => void
   onCardDragEnd: () => void
+  onCardHover: (ag: IAG) => void
   onCardClick: (ag: IAG) => void
   onCardEdit: (ag: IAG) => void
   onCardDelete: (ag: IAG) => void
@@ -301,6 +302,7 @@ const AGStatusColumn = ({
   onDrop,
   onCardDragStart,
   onCardDragEnd,
+  onCardHover,
   onCardClick,
   onCardEdit,
   onCardDelete,
@@ -378,6 +380,7 @@ const AGStatusColumn = ({
                   e.dataTransfer.effectAllowed = "move"
                 }}
                 onDragEnd={onCardDragEnd}
+                onMouseEnter={() => onCardHover(ag)}
                 onClick={() => onCardClick(ag)}
               >
                 <CardHeader
@@ -508,6 +511,22 @@ const AGAssignmentGroupsFeature = ({
   const queryUserId = teacherFilter !== undefined ? teacherFilter : userId
   const queryClient = useQueryClient()
   const statusMap = getStatusMap(t)
+
+  const handleArchiveHover = () => {
+    queryClient.prefetchQuery({
+      queryKey: ["archiveAssignmentGroups", queryUserId, null, "", null],
+      queryFn: () => assignmentGroupApi.assignmentGroupQueryAssignmentGroups(null, null, queryUserId, null, null, null, true).then(r => r.data),
+      staleTime: 60_000
+    })
+  }
+
+  const handleCardHover = (ag: IAG) => {
+    const typeKey = ag.type === AssignmentGroupType.Subnet ? "subnet" : "idnet"
+    const queryFn = ag.type === AssignmentGroupType.Subnet
+      ? () => assignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroupDetails(ag.id).then(r => r.data)
+      : () => assignmentGroupApi.assignmentGroupQueryIdNetAssignmentGroupDetails(ag.id).then(r => r.data)
+    queryClient.prefetchQuery({ queryKey: ["assignmentGroupDetails", typeKey, String(ag.id)], queryFn, staleTime: 60_000 })
+  }
 
   const [search, setSearch] = useState("")
   const [classFilter, setClassFilter] = useState<ClassFilterValue>(null)
@@ -762,6 +781,7 @@ const AGAssignmentGroupsFeature = ({
           onCreateClick={() => onNavigateCreate(classFilterNormalized ?? undefined)}
           onTemplatesClick={() => onNavigateTemplates()}
           onArchiveClick={() => onNavigateArchive()}
+          onArchiveHover={handleArchiveHover}
           archiveDisabled={isDemoMode}
           createDisabled={!classesQuery.data?.length}
         />
@@ -810,6 +830,7 @@ const AGAssignmentGroupsFeature = ({
                   setDraggedAG(null)
                   setDragOverStatus(null)
                 }}
+                onCardHover={handleCardHover}
                 onCardClick={ag => onNavigateDetails(ag.id, ag.type)}
                 onCardEdit={ag => onNavigateEdit(ag.id, ag.type)}
                 onCardDelete={ag => {

@@ -11,7 +11,8 @@ namespace IPCheckr.Api.Config
                 options.AddPolicy("AllowVite", policy =>
                     policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "https://pltg.tapusik.sk")
                           .AllowAnyMethod()
-                          .AllowAnyHeader());
+                          .AllowAnyHeader()
+                          .AllowCredentials());
             });
 
             return services;

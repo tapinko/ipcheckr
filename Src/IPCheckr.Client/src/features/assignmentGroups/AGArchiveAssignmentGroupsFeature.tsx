@@ -60,9 +60,10 @@ const normalizeAssignmentGroup = (ag: AssignmentGroupDto): IAG => ({
 interface AGArchiveCardProps {
   ag: IAG
   onCardClick: (ag: IAG) => void
+  onCardHover: (ag: IAG) => void
 }
 
-const AGArchiveCard = ({ ag, onCardClick }: AGArchiveCardProps) => {
+const AGArchiveCard = ({ ag, onCardClick, onCardHover }: AGArchiveCardProps) => {
   const { t, i18n } = useTranslation()
 
   return (
@@ -81,6 +82,7 @@ const AGArchiveCard = ({ ag, onCardClick }: AGArchiveCardProps) => {
           "&:hover": { opacity: 0.9 },
           "&:hover .ag-title-text": { textDecoration: "underline" }
         }}
+        onMouseEnter={() => onCardHover(ag)}
         onClick={() => onCardClick(ag)}
       >
         <CardHeader
@@ -165,6 +167,7 @@ interface AGArchiveAssignmentGroupsFeatureProps {
   onNavigateDetails: (id: number, type: AssignmentGroupType) => void
   teacherFilter?: number | null
   hideClassFilter?: boolean
+  onCardHover?: (id: number, type: AssignmentGroupType) => void
 }
 
 const ITEMS_PER_PAGE = 12
@@ -172,12 +175,21 @@ const ITEMS_PER_PAGE = 12
 const AGArchiveAssignmentGroupsFeature = ({
   onNavigateDetails,
   teacherFilter,
-  hideClassFilter
+  hideClassFilter,
+  onCardHover
 }: AGArchiveAssignmentGroupsFeatureProps) => {
   const { t } = useTranslation()
   const { userId } = useAuth()
   const queryUserId = teacherFilter !== undefined ? teacherFilter : userId
   const queryClient = useQueryClient()
+
+  const handleCardHover = (ag: IAG) => {
+    const typeKey = ag.type === AssignmentGroupType.Subnet ? "subnet" : "idnet"
+    const queryFn = ag.type === AssignmentGroupType.Subnet
+      ? () => assignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroupDetails(ag.id).then(r => r.data)
+      : () => assignmentGroupApi.assignmentGroupQueryIdNetAssignmentGroupDetails(ag.id).then(r => r.data)
+    queryClient.prefetchQuery({ queryKey: ["assignmentGroupDetails", typeKey, String(ag.id)], queryFn, staleTime: 60_000 })
+  }
 
   const [search, setSearch] = useState("")
   const [classFilter, setClassFilter] = useState<AGClassFilterValue>(null)
@@ -321,6 +333,7 @@ const AGArchiveAssignmentGroupsFeature = ({
                 <AGArchiveCard
                   key={`${ag.type}-${ag.id}`}
                   ag={ag}
+                  onCardHover={ag => onCardHover ? onCardHover(ag.id, ag.type) : handleCardHover(ag)}
                   onCardClick={ag => onNavigateDetails(ag.id, ag.type)}
                 />
               ))}

@@ -72,6 +72,7 @@ type UserListPanelProps = {
 
   noDataMessage?: string
   onRowClick?: (user: UserRow) => void
+  onRowHover?: (user: UserRow) => void
 }
 
 const UserListPanel = ({
@@ -98,6 +99,7 @@ const UserListPanel = ({
   deleteErrorMessage,
   noDataMessage,
   onRowClick,
+  onRowHover,
 }: UserListPanelProps) => {
   const { t } = useTranslation()
 
@@ -280,6 +282,7 @@ const UserListPanel = ({
                   <Box
                     key={user.id}
                     onClick={() => onRowClick?.(user)}
+                    onMouseEnter={() => onRowHover?.(user)}
                     sx={{
                       display: "flex",
                       alignItems: "center",

@@ -313,6 +313,11 @@ const AdminClassDetails = () => {
                           cursor: "pointer",
                           "&:hover .admin-student-link": { textDecoration: "underline" }
                         }}
+                        onMouseEnter={() => {
+                          const id = s.studentId.toString()
+                          queryClient.prefetchQuery({ queryKey: ["adminUserRole", id], queryFn: () => userApi.userQueryUsers(s.studentId).then(r => r.data), staleTime: 60_000 })
+                          queryClient.prefetchQuery({ queryKey: ["adminUserDetails", id], queryFn: () => userApi.userQueryUserDetails(s.studentId).then(r => r.data), staleTime: 60_000 })
+                        }}
                         onClick={() =>
                           navigate(
                             getParametrizedUrl(RouteKeys.ADMIN_USER_DETAILS, {
@@ -371,6 +376,11 @@ const AdminClassDetails = () => {
                           p: 1,
                           cursor: "pointer",
                           "&:hover .admin-teacher-link": { textDecoration: "underline" }
+                        }}
+                        onMouseEnter={() => {
+                          const id = te.teacherId.toString()
+                          queryClient.prefetchQuery({ queryKey: ["adminUserRole", id], queryFn: () => userApi.userQueryUsers(te.teacherId).then(r => r.data), staleTime: 60_000 })
+                          queryClient.prefetchQuery({ queryKey: ["adminUserDetails", id], queryFn: () => userApi.userQueryUserDetails(te.teacherId).then(r => r.data), staleTime: 60_000 })
                         }}
                         onClick={() =>
                           navigate(

@@ -316,6 +316,11 @@ const TeacherMyClasses = () => {
                       key={classId}
                       variant={selectedClassId === classId ? "contained" : "outlined"}
                       onClick={() => setSelectedClassId(classId)}
+                      onMouseEnter={() => queryClient.prefetchQuery({
+                        queryKey: ["teacherClassDetails", String(classId)],
+                        queryFn: () => classApi.classQueryClassDetails(classId).then(r => r.data),
+                        staleTime: 60_000
+                      })}
                       size="small"
                       sx={{ borderRadius: 1, textTransform: "none", px: 2.5, py: 1, fontWeight: 600, minHeight: 40 }}
                     >
@@ -422,6 +427,11 @@ const TeacherMyClasses = () => {
               deleteErrorMessage={t(TranslationKey.TEACHER_MY_CLASSES_DELETE_STUDENTS_ERROR)}
               noDataMessage={t(TranslationKey.TEACHER_MY_CLASSES_NO_DATA)}
               onRowClick={student => navigate(getParametrizedUrl(RouteKeys.TEACHER_MY_CLASSES_STUDENT_DETAILS, { [RouteParams.STUDENT_ID]: student.id.toString() }))}
+              onRowHover={student => queryClient.prefetchQuery({
+                queryKey: ["teacherStudentDetails", String(student.id)],
+                queryFn: () => userApi.userQueryUserDetails(student.id).then(r => r.data),
+                staleTime: 60_000
+              })}
             />
           )}
         </>

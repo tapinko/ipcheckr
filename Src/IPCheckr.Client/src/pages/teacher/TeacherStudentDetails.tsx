@@ -21,7 +21,7 @@ import InsightGridSkeleton from "../../components/skeletons/InsightGridSkeleton"
 import ErrorLoading from "../../components/ui/ErrorLoading"
 import { TranslationKey } from "../../utils/i18n"
 import { AssignmentGroupType, type QueryUserDetailsRes } from "../../dtos"
-import { assignmentGroupApi, userApi } from "../../utils/apiClients"
+import { assignmentApi, assignmentGroupApi, userApi } from "../../utils/apiClients"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 import { fromAssignmentTypeParam, toAssignmentTypeParam } from "../../utils/assignmentType"
 import InsightCard from "../../components/ui/InsightCard"
@@ -130,6 +130,19 @@ const TeacherStudentDetails = () => {
               dense
             />,
             <Box
+              onMouseEnter={() => {
+                if (!hasLastSubmitTarget) return
+                const groupId = detailsQuery.data!.lastSubmitGroupId!
+                const assignmentId = detailsQuery.data!.lastSubmitAssignmentId!
+                const resolvedType = fromAssignmentTypeParam((detailsQuery.data as any)?.lastSubmitType as string | undefined)
+                if (resolvedType === AssignmentGroupType.Subnet || !resolvedType) {
+                  queryClient.prefetchQuery({ queryKey: ["agSubmitDetails", "subnet", String(assignmentId)], queryFn: () => assignmentApi.assignmentQuerySubnetAssignmentSubmitDetailsFull(assignmentId).then(r => r.data), staleTime: 60_000 })
+                }
+                if (resolvedType === AssignmentGroupType.Idnet || !resolvedType) {
+                  queryClient.prefetchQuery({ queryKey: ["agSubmitDetails", "idnet", String(assignmentId)], queryFn: () => assignmentApi.assignmentQueryIdNetAssignmentSubmitDetailsFull(assignmentId).then(r => r.data), staleTime: 60_000 })
+                }
+                queryClient.prefetchQuery({ queryKey: ["assignmentGroupDetails", "subnet", String(groupId)], queryFn: () => assignmentGroupApi.assignmentGroupQuerySubnetAssignmentGroupDetails(groupId).then(r => r.data), staleTime: 60_000 })
+              }}
               onClick={() => {
                 void handleLastSubmitNavigate()
               }}

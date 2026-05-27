@@ -24,8 +24,8 @@ import { useAuth } from "../../contexts/AuthContext"
 import { RouteKeys, Routes } from "../../router/routes"
 import UserRole from "../../types/UserRole"
 import bg_w_cr_text from "../../assets/bg_w_cr_text.svg"
-import { appSettingsApi } from "../../utils/apiClients"
-import { useQuery } from "@tanstack/react-query"
+import { appSettingsApi, assignmentApi, assignmentGroupApi, classApi, dashboardApi, userApi } from "../../utils/apiClients"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { isDemoMode } from "../../config/demoMode"
 
 interface NavItem {
@@ -81,7 +81,8 @@ const Navbar = ({ role }: NavbarProps) => {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { mode, setMode } = useContext(ThemeContext)
-  const { refreshAuth, username } = useAuth()
+  const { refreshAuth, username, userId } = useAuth()
+  const queryClient = useQueryClient()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"))
   const [navMenuAnchor, setNavMenuAnchor] = useState<null | HTMLElement>(null)
@@ -183,6 +184,48 @@ const Navbar = ({ role }: NavbarProps) => {
     [closeMobileMenu, navigate]
   )
 
+  const handleNavHover = useCallback(
+    (routeKey: RouteKeys) => {
+      const staleTime = 60_000
+      switch (routeKey) {
+        case RouteKeys.ADMIN_DASHBOARD:
+          queryClient.prefetchQuery({ queryKey: ["adminDashboard"], queryFn: () => dashboardApi.dashboardQueryAdminDashboard().then(r => r.data), staleTime })
+          break
+        case RouteKeys.ADMIN_USERS: {
+          const toRows = (users: any[]) => (users ?? []).map((u: any) => ({ ...u, classNamesDisplay: (u.classNames ?? []).join(", ") }))
+          queryClient.prefetchQuery({ queryKey: ["users", UserRole.TEACHER, ""], queryFn: () => userApi.userQueryUsers(null, null, UserRole.TEACHER, null, null, null).then(r => toRows(r.data.users)), staleTime })
+          queryClient.prefetchQuery({ queryKey: ["users", UserRole.STUDENT, ""], queryFn: () => userApi.userQueryUsers(null, null, UserRole.STUDENT, null, null, null).then(r => toRows(r.data.users)), staleTime })
+          break
+        }
+        case RouteKeys.ADMIN_CLASSES:
+          queryClient.prefetchQuery({ queryKey: ["classes", "", null], queryFn: () => classApi.classQueryClasses(null, null, null).then(r => r.data.classes), staleTime })
+          break
+        case RouteKeys.ADMIN_ASSIGNMENT_GROUPS:
+          queryClient.prefetchQuery({ queryKey: ["agAssignmentGroups", null, null, "", null], queryFn: () => assignmentGroupApi.assignmentGroupQueryAssignmentGroups(null, null, null, null, null, null, false).then(r => r.data), staleTime })
+          break
+        case RouteKeys.TEACHER_DASHBOARD:
+          if (userId) queryClient.prefetchQuery({ queryKey: ["teacherDashboard", userId, 5], queryFn: () => dashboardApi.dashboardQueryTeacherDashboard(5).then(r => r.data), staleTime })
+          break
+        case RouteKeys.TEACHER_MY_CLASSES:
+          if (userId) queryClient.prefetchQuery({ queryKey: ["teacherClasses", userId], queryFn: () => classApi.classQueryClasses(null, null, userId).then(r => r.data.classes), staleTime })
+          break
+        case RouteKeys.TEACHER_ASSIGNMENT_GROUPS:
+          if (userId) queryClient.prefetchQuery({ queryKey: ["agAssignmentGroups", userId, null, "", null], queryFn: () => assignmentGroupApi.assignmentGroupQueryAssignmentGroups(null, null, userId, null, null, null, false).then(r => r.data), staleTime })
+          break
+        case RouteKeys.STUDENT_DASHBOARD:
+          if (userId) queryClient.prefetchQuery({ queryKey: ["studentDashboard", userId], queryFn: () => dashboardApi.dashboardQueryStudentDashboard().then(r => r.data), staleTime })
+          break
+        case RouteKeys.STUDENT_ASSIGNMENTS:
+          if (userId) {
+            queryClient.prefetchQuery({ queryKey: ["studentAssignments", "subnet", userId], queryFn: () => assignmentApi.assignmentQuerySubnetAssignments(userId).then(r => r.data.assignments ?? []), staleTime })
+            queryClient.prefetchQuery({ queryKey: ["studentAssignments", "idnet", userId], queryFn: () => assignmentApi.assignmentQueryIdNetAssignments(userId).then(r => r.data.assignments ?? []), staleTime })
+          }
+          break
+      }
+    },
+    [queryClient, userId]
+  )
+
   const navButtons = useMemo(
     () =>
       navItems.map(item => (
@@ -191,11 +234,12 @@ const Navbar = ({ role }: NavbarProps) => {
           color="inherit"
           disabled={isItemDisabled(item.routeKey)}
           onClick={() => handleNavigate(item.routeKey)}
+          onMouseEnter={() => handleNavHover(item.routeKey)}
         >
           {t(item.labelKey)}
         </Button>
       )),
-    [handleNavigate, isItemDisabled, navItems, t]
+    [handleNavigate, handleNavHover, isItemDisabled, navItems, t]
   )
 
   if (!cfg) return null

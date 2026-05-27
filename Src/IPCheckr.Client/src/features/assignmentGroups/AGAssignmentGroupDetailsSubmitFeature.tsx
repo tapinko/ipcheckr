@@ -233,6 +233,13 @@ const AGAssignmentGroupDetailsSubmitFeature = ({ onNavigateStudentDetails, refet
                     direction="row"
                     alignItems="center"
                     spacing={1}
+                    onMouseEnter={() => {
+                      if (!studentId) return
+                      const id = String(studentId)
+                      queryClient.prefetchQuery({ queryKey: ["adminUserDetails", id], queryFn: () => userApi.userQueryUserDetails(studentId).then(r => r.data), staleTime: 60_000 })
+                      queryClient.prefetchQuery({ queryKey: ["adminUserRole", id], queryFn: () => userApi.userQueryUsers(studentId).then(r => r.data), staleTime: 60_000 })
+                      queryClient.prefetchQuery({ queryKey: ["teacherStudentDetails", id], queryFn: () => userApi.userQueryUserDetails(studentId).then(r => r.data), staleTime: 60_000 })
+                    }}
                     onClick={() => {
                       if (!studentId) return
                       onNavigateStudentDetails(studentId)

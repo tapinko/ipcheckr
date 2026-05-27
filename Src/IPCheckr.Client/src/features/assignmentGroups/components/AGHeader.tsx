@@ -52,6 +52,7 @@ interface AGHeaderProps {
   onCreateClick?: () => void
   onTemplatesClick?: () => void
   onArchiveClick?: () => void
+  onArchiveHover?: () => void
   createDisabled?: boolean
   templatesDisabled?: boolean
   archiveDisabled?: boolean
@@ -86,6 +87,7 @@ const AGHeader = ({
   onCreateClick,
   onTemplatesClick,
   onArchiveClick,
+  onArchiveHover,
   createDisabled,
   templatesDisabled,
   archiveDisabled,
@@ -132,7 +134,7 @@ const AGHeader = ({
             <Stack direction="row" spacing={1.25} justifyContent={{ xs: "flex-start", lg: "flex-end" }}>
               {!hideArchive && (
                 <Tooltip title={t(TranslationKey.AG_HEADER_ARCHIVE_TOOLTIP)}>
-                  <span>
+                  <span onMouseEnter={onArchiveHover}>
                     <IconButton
                       onClick={onArchiveClick}
                       disabled={!onArchiveClick || archiveDisabled}

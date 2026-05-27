@@ -42,7 +42,7 @@ import {
 } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { RouteParams } from "../../router/routes"
-import { assignmentGroupApi } from "../../utils/apiClients"
+import { assignmentApi, assignmentGroupApi } from "../../utils/apiClients"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { ArchiveAGReq } from "../../dtos"
 import UserRole from "../../types/UserRole"
@@ -65,6 +65,7 @@ interface IAssignmentGroupSubmitDetailsCard {
   onReopen?: () => void
   reopenPending?: boolean
   onNavigateSubmitDetails: (assignmentId: number, type: AssignmentGroupType) => void
+  onMouseEnter?: () => void
 }
 
 const AssignmentGroupSubmitDetailsCard = ({
@@ -76,7 +77,8 @@ const AssignmentGroupSubmitDetailsCard = ({
   assignmentType,
   onReopen,
   reopenPending,
-  onNavigateSubmitDetails
+  onNavigateSubmitDetails,
+  onMouseEnter
 }: IAssignmentGroupSubmitDetailsCard) => {
   const { t } = useTranslation()
   const canReopenAttempt = assignmentAttemptStatus === AssignmentSubmissionAttemptStatus.Locked && !!onReopen
@@ -105,6 +107,7 @@ const AssignmentGroupSubmitDetailsCard = ({
           textDecoration: "underline"
         }
       }}
+      onMouseEnter={onMouseEnter}
       onClick={() => {
         if (!assignmentType) return
         onNavigateSubmitDetails(assignmentId, assignmentType)
@@ -285,7 +288,10 @@ const AGAssignmentGroupDetailsFeature = ({
     const connect = async () => {
       try {
         await connection.start()
-        if (cancelled) return
+        if (cancelled) {
+          void connection.stop()
+          return
+        }
         await connection.invoke("SubscribeAssignmentGroup", channelType, Number(assignmentGroupId))
       } catch {
       }
@@ -296,10 +302,31 @@ const AGAssignmentGroupDetailsFeature = ({
     return () => {
       cancelled = true
       connection.off("AttemptChanged", handleAttemptChanged)
-      void connection.invoke("UnsubscribeAssignmentGroup", channelType, Number(assignmentGroupId)).catch(() => {})
-      void connection.stop()
+      if (connection.state === "Connected") {
+        void connection.invoke("UnsubscribeAssignmentGroup", channelType, Number(assignmentGroupId)).catch(() => {})
+      }
+      void connection.stop().catch(() => {})
     }
   }, [assignmentGroupId, assignmentType, data?.type, queryClient])
+
+  const handleCardHover = (assignmentId: number) => {
+    const type = assignmentType ?? data?.type
+    if (!type) return
+    const typeKey = type === AssignmentGroupType.Subnet ? "subnet" : "idnet"
+    if (type === AssignmentGroupType.Subnet) {
+      queryClient.prefetchQuery({
+        queryKey: ["agSubmitDetails", typeKey, String(assignmentId)],
+        queryFn: () => assignmentApi.assignmentQuerySubnetAssignmentSubmitDetailsFull(assignmentId).then(r => r.data),
+        staleTime: 60_000
+      })
+    } else {
+      queryClient.prefetchQuery({
+        queryKey: ["agSubmitDetails", typeKey, String(assignmentId)],
+        queryFn: () => assignmentApi.assignmentQueryIdNetAssignmentSubmitDetailsFull(assignmentId).then(r => r.data),
+        staleTime: 60_000
+      })
+    }
+  }
 
   const isIdNetDetail = (detail: QueryIDNetAGDetailRes | QuerySubnetAGDetailRes | null): detail is QueryIDNetAGDetailRes =>
     detail?.type === AssignmentGroupType.Idnet
@@ -575,6 +602,7 @@ const AGAssignmentGroupDetailsFeature = ({
                 assignmentAttemptStatus={a.assignmentAttemptStatus}
                 assignmentType={data?.type}
                 reopenPending={reopenAttemptMutation.isPending}
+                onMouseEnter={() => handleCardHover(a.assignmentId)}
                 onReopen={canReopen
                   ? () => {
                       if (!data?.type) return
