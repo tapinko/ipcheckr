@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { authApi } from "../utils/apiClients"
+import type { AxiosError } from "axios"
+import type { ApiProblemDetails } from "../dtos"
+import i18n, { Language } from "../utils/i18n"
 import { Box, Button, Divider, Paper, Stack, TextField, Typography } from "@mui/material"
 import { RouteKeys, Routes } from "../router/routes"
 import UserRole from "../types/UserRole"
@@ -57,7 +60,7 @@ const Login = () => {
     error
   } = useMutation<
     { token?: string; role?: string },
-    Error,
+    AxiosError<ApiProblemDetails>,
     LoginFormValues
   >({
     mutationFn: async ({ username, password }) => {
@@ -87,7 +90,9 @@ const Login = () => {
 
   const serverErrorMessage = (() => {
     if (!error) return null
-    return error.message
+    const data = error.response?.data
+    const localized = i18n.language === Language.SK ? data?.messageSk : data?.messageEn
+    return localized ?? t(TranslationKey.LOGIN_ERROR)
   })()
 
   const onSubmit = (values: LoginFormValues) => {

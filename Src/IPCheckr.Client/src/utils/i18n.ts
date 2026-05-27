@@ -30,6 +30,7 @@ export enum TranslationKey {
   LOGIN_SUBMIT = "LOGIN_SUBMIT",
   LOLGIN_LOADING = "LOLGIN_LOADING",
   LOGIN_INVALID_DEMO_CREDENTIALS = "LOGIN_INVALID_DEMO_CREDENTIALS",
+  LOGIN_ERROR = "LOGIN_ERROR",
 
   // DataGridWithSearch
   DATA_GRID_SEARCH = "DATA_GRID_SEARCH",
@@ -887,6 +888,7 @@ export enum TranslationKey {
   AG_ASSIGNMENT_GROUPS_MOVE_NEW_DEADLINE = "AG_ASSIGNMENT_GROUPS_MOVE_NEW_DEADLINE",
   AG_ASSIGNMENT_GROUPS_CANCEL = "AG_ASSIGNMENT_GROUPS_CANCEL",
   AG_ASSIGNMENT_GROUPS_MOVE_CONFIRM = "AG_ASSIGNMENT_GROUPS_MOVE_CONFIRM",
+  AG_ASSIGNMENT_GROUPS_LOAD_ERROR = "AG_ASSIGNMENT_GROUPS_LOAD_ERROR",
 
   // AGCreateAssignmentGroupFeature
   AG_CREATE_ASSIGNMENT_GROUP_NAME = "AG_CREATE_ASSIGNMENT_GROUP_NAME",
@@ -949,6 +951,8 @@ export enum TranslationKey {
   AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_ABC = "AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_ABC",
   AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_ALL = "AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_ALL",
   AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_LOCAL = "AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_LOCAL",
+  AG_CREATE_ASSIGNMENT_GROUP_ERROR = "AG_CREATE_ASSIGNMENT_GROUP_ERROR",
+  AG_EDIT_ASSIGNMENT_GROUP_ERROR = "AG_EDIT_ASSIGNMENT_GROUP_ERROR",
 
   // AGAssignmentGroupDetailsFeature
   AG_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED = "AG_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED",
@@ -1050,6 +1054,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.LOGIN_SUBMIT]: "Login",
   [TranslationKey.LOLGIN_LOADING]: "Loading",
   [TranslationKey.LOGIN_INVALID_DEMO_CREDENTIALS]: "Invalid demo credentials. Use teacher/cisco or student/cisco.",
+  [TranslationKey.LOGIN_ERROR]: "Invalid credentials.",
 
   // DataGridWithSearch
   [TranslationKey.DATA_GRID_SEARCH]: "Search",
@@ -1769,6 +1774,7 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.AG_ASSIGNMENT_GROUPS_MOVE_NEW_DEADLINE]: "New deadline",
   [TranslationKey.AG_ASSIGNMENT_GROUPS_CANCEL]: "Cancel",
   [TranslationKey.AG_ASSIGNMENT_GROUPS_MOVE_CONFIRM]: "Confirm move",
+  [TranslationKey.AG_ASSIGNMENT_GROUPS_LOAD_ERROR]: "Error loading data.",
 
   // AGCreateAssignmentGroupFeature
   [TranslationKey.AG_CREATE_ASSIGNMENT_GROUP_NAME]: "Name",
@@ -1831,6 +1837,8 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_ABC]: "ABC",
   [TranslationKey.AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_ALL]: "All",
   [TranslationKey.AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_LOCAL]: "Private",
+  [TranslationKey.AG_CREATE_ASSIGNMENT_GROUP_ERROR]: "Error creating assignment group.",
+  [TranslationKey.AG_EDIT_ASSIGNMENT_GROUP_ERROR]: "Error saving assignment group.",
 
   // AGAssignmentGroupDetailsFeature
   [TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED]: "Not written",
@@ -2067,6 +2075,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.LOGIN_SUBMIT]: "Prihlásiť sa",
   [TranslationKey.LOLGIN_LOADING]: "Načítavam",
   [TranslationKey.LOGIN_INVALID_DEMO_CREDENTIALS]: "Neplatné demo prihlasovacie údaje. Použite ucitel/cisco alebo ziak/cisco.",
+  [TranslationKey.LOGIN_ERROR]: "Neplatné prihlasovacie údaje.",
 
   // DataGridWithSearch
   [TranslationKey.DATA_GRID_SEARCH]: "Hľadať",
@@ -2787,6 +2796,7 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.AG_ASSIGNMENT_GROUPS_MOVE_NEW_DEADLINE]: "Nové ukončenie",
   [TranslationKey.AG_ASSIGNMENT_GROUPS_CANCEL]: "Zrušiť",
   [TranslationKey.AG_ASSIGNMENT_GROUPS_MOVE_CONFIRM]: "Potvrdiť presun",
+  [TranslationKey.AG_ASSIGNMENT_GROUPS_LOAD_ERROR]: "Chyba pri načítavaní dát.",
 
   // AGCreateAssignmentGroupFeature
   [TranslationKey.AG_CREATE_ASSIGNMENT_GROUP_NAME]: "Názov",
@@ -2849,6 +2859,8 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_ABC]: "ABC",
   [TranslationKey.AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_ALL]: "Všetky",
   [TranslationKey.AG_EDIT_ASSIGNMENT_GROUP_IP_CAT_LOCAL]: "Privátne",
+  [TranslationKey.AG_CREATE_ASSIGNMENT_GROUP_ERROR]: "Chyba pri vytváraní skupiny zadaní.",
+  [TranslationKey.AG_EDIT_ASSIGNMENT_GROUP_ERROR]: "Chyba pri ukladaní skupiny zadaní.",
 
   // AGAssignmentGroupDetailsFeature
   [TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_CARD_UNSUBMITTED]: "Nepísal",

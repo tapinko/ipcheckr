@@ -642,7 +642,7 @@ const AGAssignmentGroupsFeature = ({
   const hasError = classesQuery.isError || agsQuery.isError
 
   useEffect(() => {
-    if (hasError) setAlert({ severity: "error", message: "Error loading data" })
+    if (hasError) setAlert({ severity: "error", message: t(TranslationKey.AG_ASSIGNMENT_GROUPS_LOAD_ERROR) })
   }, [hasError])
 
   const retry = () => {

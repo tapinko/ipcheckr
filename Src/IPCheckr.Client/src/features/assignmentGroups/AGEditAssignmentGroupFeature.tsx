@@ -168,7 +168,7 @@ const AGEditAssignmentGroupFeature = ({ onAfterSave }: AGEditAssignmentGroupFeat
       const localMessage = i18n.language === Language.EN ? details?.messageEn : details?.messageSk
       setAlert({
         severity: "error",
-        message: localMessage ?? details?.detail ?? error.message
+        message: localMessage ?? t(TranslationKey.AG_EDIT_ASSIGNMENT_GROUP_ERROR)
       })
     }
   })
