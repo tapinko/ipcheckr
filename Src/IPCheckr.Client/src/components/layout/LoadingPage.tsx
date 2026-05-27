@@ -9,7 +9,8 @@ import AGTemplatesSkeleton from "../../features/assignmentGroups/components/skel
 import AGDetailsSkeleton from "../../features/assignmentGroups/components/skeletons/AGDetailsSkeleton"
 import AGFormSkeleton from "../../features/assignmentGroups/components/skeletons/AGFormSkeleton"
 import InsightGridSkeleton from "../skeletons/InsightGridSkeleton"
-import TableSkeleton from "../skeletons/TableSkeleton"
+import AdminSettingsSkeleton from "../skeletons/AdminSettingsSkeleton"
+import GenericPageSkeleton from "../skeletons/GenericPageSkeleton"
 import SubmissionSkeleton from "../skeletons/SubmissionSkeleton"
 import AdminUsersSkeleton from "../skeletons/AdminUsersSkeleton"
 import AdminClassesSkeleton from "../skeletons/AdminClassesSkeleton"
@@ -58,8 +59,10 @@ const resolvePageSkeleton = (path: string): JSX.Element => {
     return <InsightGridSkeleton count={6} columnsMax={3} />
   }
 
-  // Fallback old skeleton
-  return <TableSkeleton />
+  // Settings
+  if (/\/settings/.test(path)) return <AdminSettingsSkeleton />
+
+  return <GenericPageSkeleton />
 }
 
 const LoadingPage = () => {
