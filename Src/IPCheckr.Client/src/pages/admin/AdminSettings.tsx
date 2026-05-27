@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import {
-  Box, Button, ButtonGroup, Card, CardContent, Checkbox, Divider,
+  Alert, Box, Button, ButtonGroup, Card, CardContent, Checkbox, Divider,
   FormControl, FormControlLabel, InputLabel, MenuItem,
-  Paper, Radio, RadioGroup, Select, Stack, Tab, Tabs, TextField, Tooltip, Typography,
+  Paper, Radio, RadioGroup, Select, Snackbar, Stack, Tab, Tabs, TextField, Tooltip, Typography,
 } from "@mui/material"
 import {
   Language as LanguageIcon, Lock, PlayArrow, Refresh, Stop,
@@ -482,6 +482,15 @@ const AdminSettings = () => {
   return (
     <Box display="flex" flexDirection="column" gap={3}>
       {alert && <CustomAlert severity={alert.severity} message={alert.message} onClose={() => setAlert(null)} />}
+      <Snackbar
+        open={hasChanges}
+        autoHideDuration={null}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert severity="warning" variant="filled" sx={{ alignItems: "center", boxShadow: 3 }}>
+          {t(TranslationKey.ADMIN_SETTINGS_UNSAVED_CHANGES)}
+        </Alert>
+      </Snackbar>
 
       <Card variant="outlined" sx={{ borderRadius: 1 }}>
         <Stack direction="row" alignItems="center">
