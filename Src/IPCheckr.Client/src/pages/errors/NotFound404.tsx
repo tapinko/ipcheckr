@@ -1,15 +1,5 @@
-import { Typography } from "@mui/material"
-import { useTranslation } from "react-i18next"
-import { TranslationKey } from "../../utils/i18n"
+import ErrorPage from "./ErrorPage"
 
-const NotFound404 = () => {
-  const { t } = useTranslation()
-
-  return (
-    <Typography variant="h4">
-      {t(TranslationKey.PAGE_NOT_FOUND)}
-    </Typography>
-  )
-}
+const NotFound404 = () => <ErrorPage code={404} />
 
 export default NotFound404

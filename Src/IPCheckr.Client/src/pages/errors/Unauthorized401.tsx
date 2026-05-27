@@ -1,15 +1,5 @@
-import { Typography } from "@mui/material"
-import { TranslationKey } from "../../utils/i18n"
-import { useTranslation } from "react-i18next"
+import ErrorPage from "./ErrorPage"
 
-const Unauthorized401 = () => {
-  const { t } = useTranslation()
-
-  return (
-    <Typography variant="h4" sx={{ display: "flex", justifyContent: "center" }}>
-      {t(TranslationKey.UNAUTHORIZED)}
-    </Typography>
-  )
-}
+const Unauthorized401 = () => <ErrorPage code={401} />
 
 export default Unauthorized401

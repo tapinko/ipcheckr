@@ -14,11 +14,14 @@ export enum Language {
  * This enum defines all the keys used for translations in the application.
  */
 export enum TranslationKey {
-  // 404
-  PAGE_NOT_FOUND = "PAGE_NOT_FOUND",
-
-  // 401
-  UNAUTHORIZED = "UNAUTHORIZED",
+  // ErrorPage
+  ERROR_PAGE_BACK_TO_DASHBOARD = "ERROR_PAGE_BACK_TO_DASHBOARD",
+  ERROR_PAGE_404_TITLE = "ERROR_PAGE_404_TITLE",
+  ERROR_PAGE_404_DESCRIPTION = "ERROR_PAGE_404_DESCRIPTION",
+  ERROR_PAGE_401_TITLE = "ERROR_PAGE_401_TITLE",
+  ERROR_PAGE_401_DESCRIPTION = "ERROR_PAGE_401_DESCRIPTION",
+  ERROR_PAGE_403_TITLE = "ERROR_PAGE_403_TITLE",
+  ERROR_PAGE_403_DESCRIPTION = "ERROR_PAGE_403_DESCRIPTION",
 
   // Login page
   LOGIN_USERNAME = "LOGIN_USERNAME",
@@ -1031,11 +1034,14 @@ export enum TranslationKey {
 }
 
 const _EN: Record<TranslationKey, string> = {
-  // 404
-  [TranslationKey.PAGE_NOT_FOUND]: "Page not found",
-
-  // 401
-  [TranslationKey.UNAUTHORIZED]: "Unauthorized",
+  // ErrorPage
+  [TranslationKey.ERROR_PAGE_BACK_TO_DASHBOARD]: "Back to dashboard",
+  [TranslationKey.ERROR_PAGE_404_TITLE]: "Page not found",
+  [TranslationKey.ERROR_PAGE_404_DESCRIPTION]: "The page you are looking for does not exist or has been moved.",
+  [TranslationKey.ERROR_PAGE_401_TITLE]: "Unauthorized",
+  [TranslationKey.ERROR_PAGE_401_DESCRIPTION]: "You must be logged in to access this page.",
+  [TranslationKey.ERROR_PAGE_403_TITLE]: "Access denied",
+  [TranslationKey.ERROR_PAGE_403_DESCRIPTION]: "You do not have permission to access this page.",
 
   // Login
   [TranslationKey.LOGIN_USERNAME]: "Username",
@@ -2045,11 +2051,14 @@ const _EN: Record<TranslationKey, string> = {
 }
 
 const _SK: Record<TranslationKey, string> = {
-  // 404
-  [TranslationKey.PAGE_NOT_FOUND]: "Stránka sa nenašla",
-
-  // 401
-  [TranslationKey.UNAUTHORIZED]: "Neoprávnený prístup",
+  // ErrorPage
+  [TranslationKey.ERROR_PAGE_BACK_TO_DASHBOARD]: "Späť na hlavný panel",
+  [TranslationKey.ERROR_PAGE_404_TITLE]: "Stránka sa nenašla",
+  [TranslationKey.ERROR_PAGE_404_DESCRIPTION]: "Stránka, ktorú hľadáte, neexistuje alebo bola presunutá.",
+  [TranslationKey.ERROR_PAGE_401_TITLE]: "Neoprávnený prístup",
+  [TranslationKey.ERROR_PAGE_401_DESCRIPTION]: "Pre prístup na túto stránku musíte byť prihlásený.",
+  [TranslationKey.ERROR_PAGE_403_TITLE]: "Prístup zamietnutý",
+  [TranslationKey.ERROR_PAGE_403_DESCRIPTION]: "Nemáte oprávnenie na prístup k tejto stránke.",
 
   // Login
   [TranslationKey.LOGIN_USERNAME]: "Používateľské meno",

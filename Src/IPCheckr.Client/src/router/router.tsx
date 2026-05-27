@@ -1,11 +1,13 @@
 import { lazy } from "react"
 
-// Eager — needed immediately (Login is the first screen, errors are tiny)
+// Eager — needed immediately
 import Login from "../pages/Login"
 import NotFound404 from "../pages/errors/NotFound404"
+import Unauthorized401 from "../pages/errors/Unauthorized401"
+import Forbidden403 from "../pages/errors/Forbidden403"
+import StandaloneLayout from "../components/layout/StandaloneLayout"
 
 // Lazy — loaded only when the matching role section is first accessed
-const AdminLayout = lazy(() => import("../layouts/AdminLayout"))
 const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard"))
 const AdminUsers = lazy(() => import("../pages/admin/AdminUsers"))
 const AdminUserDetails = lazy(() => import("../pages/admin/AdminUserDetails"))
@@ -25,7 +27,6 @@ const AdminAGTemplates = lazy(() => import("../pages/admin/AdminAGTemplates"))
 const AdminCreateAGTemplate = lazy(() => import("../pages/admin/AdminCreateAGTemplate"))
 const AdminEditAGTemplate = lazy(() => import("../pages/admin/AdminEditAGTemplate"))
 
-const TeacherLayout = lazy(() => import("../layouts/TeacherLayout"))
 const TeacherDashboard = lazy(() => import("../pages/teacher/TeacherDashboard"))
 const TeacherMyClasses = lazy(() => import("../pages/teacher/TeacherMyClasses"))
 const TeacherStudentDetails = lazy(() => import("../pages/teacher/TeacherStudentDetails"))
@@ -43,7 +44,6 @@ const TeacherEditAGTemplate = lazy(() => import("../pages/teacher/TeacherEditAGT
 const TeacherGns3 = lazy(() => import("../pages/teacher/TeacherGns3"))
 const TeacherGns3AllSessions = lazy(() => import("../pages/teacher/TeacherGns3AllSessions"))
 
-const StudentLayout = lazy(() => import("../layouts/StudentLayout"))
 const StudentDashboard = lazy(() => import("../pages/student/StudentDashboard"))
 const StudentAssignments = lazy(() => import("../pages/student/StudentAssignments"))
 const StudentAssignmentSubmission = lazy(() => import("../pages/student/StudentAssignmentSubmission"))
@@ -123,7 +123,7 @@ const routeConfig: RouteObject[] = [
     path: Routes[RouteKeys.ADMIN],
     element: (
       <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
-        <AdminLayout />
+        <StandaloneLayout />
       </ProtectedRoute>
     ),
     children: [
@@ -158,7 +158,7 @@ const routeConfig: RouteObject[] = [
     path: Routes[RouteKeys.TEACHER],
     element: (
       <ProtectedRoute allowedRoles={[UserRole.TEACHER]}>
-        <TeacherLayout />
+        <StandaloneLayout />
       </ProtectedRoute>
     ),
     children: [
@@ -191,7 +191,7 @@ const routeConfig: RouteObject[] = [
     path: Routes[RouteKeys.STUDENT],
     element: (
       <ProtectedRoute allowedRoles={[UserRole.STUDENT]}>
-        <StudentLayout />
+        <StandaloneLayout />
       </ProtectedRoute>
     ),
     children: [
@@ -211,8 +211,15 @@ const routeConfig: RouteObject[] = [
     ],
   },
   {
+    element: <StandaloneLayout />,
+    children: [
+      { path: Routes[RouteKeys.UNAUTHORIZED], element: <Unauthorized401 /> },
+      { path: Routes[RouteKeys.FORBIDDEN], element: <Forbidden403 /> },
+    ],
+  },
+  {
     path: "*",
-    element: <NotFound404 />,
+    element: <Navigate to={Routes[RouteKeys.LOGIN]} replace />,
   },
   {
     path: "/",
@@ -221,7 +228,6 @@ const routeConfig: RouteObject[] = [
 ]
 
 export const prefetchAdminBundle = () => {
-  import("../layouts/AdminLayout")
   import("../pages/admin/AdminDashboard")
   import("../pages/admin/AdminUsers")
   import("../pages/admin/AdminUserDetails")
@@ -243,7 +249,6 @@ export const prefetchAdminBundle = () => {
 }
 
 export const prefetchTeacherBundle = () => {
-  import("../layouts/TeacherLayout")
   import("../pages/teacher/TeacherDashboard")
   import("../pages/teacher/TeacherMyClasses")
   import("../pages/teacher/TeacherStudentDetails")
@@ -263,7 +268,6 @@ export const prefetchTeacherBundle = () => {
 }
 
 export const prefetchStudentBundle = () => {
-  import("../layouts/StudentLayout")
   import("../pages/student/StudentDashboard")
   import("../pages/student/StudentAssignments")
   import("../pages/student/StudentAssignmentSubmission")

@@ -10,6 +10,8 @@ export enum RouteParams {
 
 export enum RouteKeys {
   LOGIN,
+  UNAUTHORIZED,
+  FORBIDDEN,
 
   ADMIN,
   ADMIN_DASHBOARD,
@@ -62,6 +64,8 @@ export enum RouteKeys {
 }
 
 const LOGIN = "/login"
+const UNAUTHORIZED = "/unauthorized"
+const FORBIDDEN = "/forbidden"
 
 const ADMIN = "/admin"
 const ADMIN_DASHBOARD = `${ADMIN}/dashboard`
@@ -127,6 +131,8 @@ export const getParametrizedUrl = (route: RouteKeys, params: { [key in RoutePara
 
 export const Routes: Record<RouteKeys, string> = {
   [RouteKeys.LOGIN]: LOGIN,
+  [RouteKeys.UNAUTHORIZED]: UNAUTHORIZED,
+  [RouteKeys.FORBIDDEN]: FORBIDDEN,
 
   [RouteKeys.ADMIN]: ADMIN,
   [RouteKeys.ADMIN_DASHBOARD]: ADMIN_DASHBOARD,

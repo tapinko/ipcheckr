@@ -1,14 +1,16 @@
 import { Outlet } from "react-router-dom"
-import Navbar from "../components/layout/Navbar"
-import Footer from "../components/layout/Footer"
 import { Box, Container } from "@mui/material"
-import UserRole from "../types/UserRole"
-import CustomBreadcrumbs from "../router/breadcrumbs"
+import { useAuth } from "../../contexts/AuthContext"
+import Navbar from "./Navbar"
+import Footer from "./Footer"
+import CustomBreadcrumbs from "../../router/breadcrumbs"
 
-const StudentLayout = () => {
+const StandaloneLayout = () => {
+  const { userRole } = useAuth()
+
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <Navbar role={UserRole.STUDENT} />
+      {userRole && <Navbar role={userRole} />}
       <CustomBreadcrumbs />
       <Container component="main" sx={{ my: 10, flexGrow: 1 }}>
         <Outlet />
@@ -18,4 +20,4 @@ const StudentLayout = () => {
   )
 }
 
-export default StudentLayout
+export default StandaloneLayout
