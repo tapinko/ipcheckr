@@ -14,6 +14,8 @@ import {
 import { useTranslation } from "react-i18next"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
+import PeopleIcon from "@mui/icons-material/People"
+import SchoolIcon from "@mui/icons-material/School"
 import { AuthType } from "../../dtos"
 import type { AddUserRes, ApiProblemDetails, ClassDto, LdapUserDto } from "../../dtos"
 import { classApi, userApi } from "../../utils/apiClients"
@@ -267,6 +269,7 @@ const AdminUsers = () => {
 
       <UserListPanel
         {...sharedPanelProps}
+        icon={<PeopleIcon fontSize="small" />}
         title={t(TranslationKey.USER_LIST_PANEL_TEACHERS)}
         users={teachersQuery.data ?? []}
         isLoading={teachersQuery.isLoading}
@@ -281,6 +284,7 @@ const AdminUsers = () => {
 
       <UserListPanel
         {...sharedPanelProps}
+        icon={<SchoolIcon fontSize="small" />}
         title={t(TranslationKey.USER_LIST_PANEL_STUDENTS)}
         users={studentsQuery.data ?? []}
         isLoading={studentsQuery.isLoading}

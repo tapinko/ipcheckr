@@ -16,6 +16,7 @@ import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficult
 import { getHostSortLabel } from "../../utils/getHostSortLabel"
 import {
   AccessTime,
+  AccountCircle,
   Archive,
   Category,
   Class,
@@ -113,9 +114,12 @@ const AssignmentGroupSubmitDetailsCard = ({
       <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Stack direction="row" alignItems="flex-start" spacing={1} justifyContent="space-between" flexWrap="wrap">
           <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
-            <Typography variant="subtitle1" fontWeight={700} className="submit-student-name" sx={{ wordBreak: "break-word" }}>
-              {studentUsername}
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={0.75}>
+              <AccountCircle fontSize="small" sx={{ color: "text.disabled", flexShrink: 0 }} />
+              <Typography variant="subtitle1" fontWeight={700} className="submit-student-name" sx={{ wordBreak: "break-word" }}>
+                {studentUsername}
+              </Typography>
+            </Stack>
             <Typography variant="caption" color="text.secondary" sx={{ wordBreak: "break-word" }}>
               {submittedLabel}
             </Typography>

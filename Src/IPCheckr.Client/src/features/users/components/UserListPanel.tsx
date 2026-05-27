@@ -2,6 +2,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import AddIcon from "@mui/icons-material/Add"
 import SearchIcon from "@mui/icons-material/Search"
+import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import {
   Box,
   Button,
@@ -43,6 +44,7 @@ export type EditFormValues = {
 
 type UserListPanelProps = {
   title?: string
+  icon?: React.ReactNode
 
   users: UserRow[]
   isLoading?: boolean
@@ -74,6 +76,7 @@ type UserListPanelProps = {
 
 const UserListPanel = ({
   title,
+  icon,
   users,
   isLoading,
   isError,
@@ -198,9 +201,12 @@ const UserListPanel = ({
             <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }}>
                 {title && (
-                  <Typography variant="subtitle1" fontWeight={600} sx={{ flexShrink: 0, minWidth: 90 }}>
-                    {title}
-                  </Typography>
+                  <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexShrink: 0 }}>
+                    {icon && <Box sx={{ color: "text.secondary", display: "flex" }}>{icon}</Box>}
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      {title}
+                    </Typography>
+                  </Stack>
                 )}
                 <TextField
                   fullWidth
@@ -292,7 +298,8 @@ const UserListPanel = ({
                       onChange={() => toggleSelect(user.id)}
                       onClick={e => e.stopPropagation()}
                     />
-                    <Typography className="user-name" sx={{ flex: 1, fontWeight: 500, ml: 0.5 }}>
+                    <AccountCircleIcon fontSize="small" sx={{ color: "text.disabled", flexShrink: 0 }} />
+                    <Typography className="user-name" sx={{ flex: 1, fontWeight: 500, ml: 0.75 }}>
                       {user.username}
                     </Typography>
                     {user.classNamesDisplay && (

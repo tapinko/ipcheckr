@@ -33,6 +33,7 @@ import type { LdapUserDto, QueryClassDetailsRes, UserDto } from "../../dtos"
 import { useAppConfig } from "../../contexts/AppConfigContext"
 import {
   AccessTime,
+  AccountCircle,
   Class,
   Groups,
   Percent,
@@ -322,7 +323,10 @@ const AdminClassDetails = () => {
                           )
                         }
                       >
-                        <Typography variant="body2" className="admin-student-link">{s.username}</Typography>
+                        <Stack direction="row" alignItems="center" spacing={0.75}>
+                          <AccountCircle fontSize="small" sx={{ color: "text.disabled", flexShrink: 0 }} />
+                          <Typography variant="body2" className="admin-student-link">{s.username}</Typography>
+                        </Stack>
                         <IconButton
                           size="small"
                           onClick={e => { e.stopPropagation(); setPendingDelete({ id: s.studentId, username: s.username, role: "student" }) }}
@@ -378,7 +382,10 @@ const AdminClassDetails = () => {
                           )
                         }
                       >
-                        <Typography variant="body2" className="admin-teacher-link">{te.username}</Typography>
+                        <Stack direction="row" alignItems="center" spacing={0.75}>
+                          <AccountCircle fontSize="small" sx={{ color: "text.disabled", flexShrink: 0 }} />
+                          <Typography variant="body2" className="admin-teacher-link">{te.username}</Typography>
+                        </Stack>
                         <IconButton
                           size="small"
                           onClick={e => { e.stopPropagation(); setPendingDelete({ id: te.teacherId, username: te.username, role: "teacher" }) }}

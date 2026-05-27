@@ -2,6 +2,7 @@ import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
+import SchoolIcon from "@mui/icons-material/School"
 import {
   Autocomplete,
   Box,
@@ -399,6 +400,7 @@ const TeacherMyClasses = () => {
           {selectedClassId && (
             <UserListPanel
               key={selectedClassId}
+              icon={<SchoolIcon fontSize="small" />}
               users={studentRows}
               isLoading={studentsQuery.isLoading}
               isError={studentsQuery.isError}

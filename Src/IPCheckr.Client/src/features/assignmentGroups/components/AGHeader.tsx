@@ -2,6 +2,7 @@ import AddIcon from "@mui/icons-material/Add"
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined"
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined"
 import SearchIcon from "@mui/icons-material/Search"
+import { AccountTree, Language, Speed } from "@mui/icons-material"
 import {
   Box,
   Button,
@@ -273,9 +274,12 @@ const AGHeader = ({
         <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
           <Card variant="outlined" sx={{ flex: 1, borderRadius: 1 }}>
             <CardContent>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                {t(TranslationKey.AG_HEADER_TYPE)}
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1 }}>
+                <AccountTree fontSize="small" sx={{ color: "text.secondary" }} />
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t(TranslationKey.AG_HEADER_TYPE)}
+                </Typography>
+              </Stack>
               <FormGroup>
                 <FormControlLabel
                   control={<Checkbox checked={selectedTypeValues.includes(AssignmentGroupType.Subnet)} onChange={() => onToggleType?.(AssignmentGroupType.Subnet)} />}
@@ -291,9 +295,12 @@ const AGHeader = ({
 
           <Card variant="outlined" sx={{ flex: 1, borderRadius: 1 }}>
             <CardContent>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                {t(TranslationKey.AG_HEADER_IP_CATEGORY)}
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1 }}>
+                <Language fontSize="small" sx={{ color: "text.secondary" }} />
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t(TranslationKey.AG_HEADER_IP_CATEGORY)}
+                </Typography>
+              </Stack>
               <FormGroup>
                 {Object.values(AssignmentGroupIpCat).map(cat => (
                   <FormControlLabel
@@ -308,9 +315,12 @@ const AGHeader = ({
 
           <Card variant="outlined" sx={{ flex: 1, borderRadius: 1 }}>
             <CardContent>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                {t(TranslationKey.AG_HEADER_DIFFICULTY)}
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1 }}>
+                <Speed fontSize="small" sx={{ color: "text.secondary" }} />
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t(TranslationKey.AG_HEADER_DIFFICULTY)}
+                </Typography>
+              </Stack>
               <FormGroup>
                 {Object.values(AssignmentGroupDifficulty).map(difficulty => (
                   <FormControlLabel

@@ -1,5 +1,6 @@
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import { Groups, Person } from "@mui/icons-material"
 import {
   Box,
   Card,
@@ -83,19 +84,23 @@ const ClassCard = ({
 
 
       <Box sx={{ px: 2, py: 1.5, flex: 1 }}>
-        <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.75 }}>
+        <Stack direction="row" alignItems="center" spacing={0.75}>
+          <Groups fontSize="small" sx={{ color: "text.secondary" }} />
           <Typography variant="h5" fontWeight={700} lineHeight={1}>
             {studentCount}
           </Typography>
           <Typography variant="caption" color="text.secondary">
             {t(TranslationKey.ADMIN_CLASSES_STUDENTS)}
           </Typography>
-        </Box>
-        <Typography variant="body2" sx={{ mt: 1.5 }}>
-          {teacherUsernames.length > 0
-            ? teacherUsernames.join(", ")
-            : t(TranslationKey.ADMIN_CLASSES_NO_TEACHERS)}
-        </Typography>
+        </Stack>
+        <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 1.5 }}>
+          <Person fontSize="small" sx={{ color: "text.disabled", flexShrink: 0 }} />
+          <Typography variant="body2" noWrap>
+            {teacherUsernames.length > 0
+              ? teacherUsernames.join(", ")
+              : t(TranslationKey.ADMIN_CLASSES_NO_TEACHERS)}
+          </Typography>
+        </Stack>
       </Box>
     </Card>
   )
