@@ -1,6 +1,7 @@
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
-import { Groups, Person } from "@mui/icons-material"
+import Groups from "@mui/icons-material/Groups"
+import Person from "@mui/icons-material/Person"
 import {
   Box,
   Card,

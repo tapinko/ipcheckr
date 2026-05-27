@@ -12,7 +12,12 @@ import {
   Stack,
   Typography
 } from "@mui/material"
-import { AccessTime, Category, Percent, Person, Quiz, TaskAlt } from "@mui/icons-material"
+import AccessTime from "@mui/icons-material/AccessTime"
+import Category from "@mui/icons-material/Category"
+import Percent from "@mui/icons-material/Percent"
+import Person from "@mui/icons-material/Person"
+import Quiz from "@mui/icons-material/Quiz"
+import TaskAlt from "@mui/icons-material/TaskAlt"
 import { RouteParams } from "../../router/routes"
 import { assignmentApi, userApi } from "../../utils/apiClients"
 import { AssignmentGroupType, type QueryIDNetAssignmentSubmitDetailsFullRes, type QuerySubnetAssignmentSubmitDetailsFullRes } from "../../dtos"

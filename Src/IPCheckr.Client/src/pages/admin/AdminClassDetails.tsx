@@ -31,15 +31,13 @@ import { classApi, userApi } from "../../utils/apiClients"
 import { AuthType } from "../../dtos"
 import type { LdapUserDto, QueryClassDetailsRes, UserDto } from "../../dtos"
 import { useAppConfig } from "../../contexts/AppConfigContext"
-import {
-  AccessTime,
-  AccountCircle,
-  Class,
-  Groups,
-  Percent,
-  Quiz,
-  TaskAlt,
-} from "@mui/icons-material"
+import AccessTime from "@mui/icons-material/AccessTime"
+import AccountCircle from "@mui/icons-material/AccountCircle"
+import Class from "@mui/icons-material/Class"
+import Groups from "@mui/icons-material/Groups"
+import Percent from "@mui/icons-material/Percent"
+import Quiz from "@mui/icons-material/Quiz"
+import TaskAlt from "@mui/icons-material/TaskAlt"
 import { getParametrizedUrl, RouteKeys, RouteParams, Routes } from "../../router/routes"
 import InsightCard from "../../components/ui/InsightCard"
 import InsightGrid from "../../components/ui/InsightGrid"

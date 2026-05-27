@@ -29,14 +29,12 @@ import { TranslationKey } from "../../utils/i18n"
 import { classApi, userApi } from "../../utils/apiClients"
 import { AuthType, AssignmentGroupType, type AddUserRes, type LdapUserDto, type QueryClassDetailsRes, type UserDto } from "../../dtos"
 import { useAppConfig } from "../../contexts/AppConfigContext"
-import {
-  AccessTime,
-  Class,
-  Groups,
-  Percent,
-  Quiz,
-  TaskAlt,
-} from "@mui/icons-material"
+import AccessTime from "@mui/icons-material/AccessTime"
+import Class from "@mui/icons-material/Class"
+import Groups from "@mui/icons-material/Groups"
+import Percent from "@mui/icons-material/Percent"
+import Quiz from "@mui/icons-material/Quiz"
+import TaskAlt from "@mui/icons-material/TaskAlt"
 import { getParametrizedUrl, RouteKeys, RouteParams, Routes } from "../../router/routes"
 import InsightCard from "../../components/ui/InsightCard"
 import InsightGrid from "../../components/ui/InsightGrid"

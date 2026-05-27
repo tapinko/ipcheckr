@@ -2,7 +2,9 @@ import AddIcon from "@mui/icons-material/Add"
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined"
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined"
 import SearchIcon from "@mui/icons-material/Search"
-import { AccountTree, Language, Speed } from "@mui/icons-material"
+import AccountTree from "@mui/icons-material/AccountTree"
+import Language from "@mui/icons-material/Language"
+import Speed from "@mui/icons-material/Speed"
 import {
   Box,
   Button,

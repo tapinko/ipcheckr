@@ -14,18 +14,16 @@ import { getStatusMap } from "../../utils/getStatusMap"
 import { getIpCatLabel } from "../../utils/getIpCatLabel"
 import { getDifficultyColor, getDifficultyLabel } from "../../utils/getDifficultyLabel"
 import { getHostSortLabel } from "../../utils/getHostSortLabel"
-import {
-  AccessTime,
-  AccountCircle,
-  Archive,
-  Category,
-  Class,
-  Percent,
-  PlaylistAddCheck,
-  Quiz,
-  TaskAlt,
-  Unarchive
-} from "@mui/icons-material"
+import AccessTime from "@mui/icons-material/AccessTime"
+import AccountCircle from "@mui/icons-material/AccountCircle"
+import Archive from "@mui/icons-material/Archive"
+import Category from "@mui/icons-material/Category"
+import Class from "@mui/icons-material/Class"
+import Percent from "@mui/icons-material/Percent"
+import PlaylistAddCheck from "@mui/icons-material/PlaylistAddCheck"
+import Quiz from "@mui/icons-material/Quiz"
+import TaskAlt from "@mui/icons-material/TaskAlt"
+import Unarchive from "@mui/icons-material/Unarchive"
 import {
   Box,
   Button,

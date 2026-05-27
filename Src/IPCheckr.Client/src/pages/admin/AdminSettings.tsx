@@ -5,10 +5,13 @@ import {
   FormControl, FormControlLabel, InputLabel, MenuItem,
   Paper, Radio, RadioGroup, Select, Snackbar, Stack, Tab, Tabs, TextField, Tooltip, Typography,
 } from "@mui/material"
-import {
-  Language as LanguageIcon, Lock, PlayArrow, Refresh, Stop,
-  Tune, ViewList,
-} from "@mui/icons-material"
+import LanguageIcon from "@mui/icons-material/Language"
+import Lock from "@mui/icons-material/Lock"
+import PlayArrow from "@mui/icons-material/PlayArrow"
+import Refresh from "@mui/icons-material/Refresh"
+import Stop from "@mui/icons-material/Stop"
+import Tune from "@mui/icons-material/Tune"
+import ViewList from "@mui/icons-material/ViewList"
 import { useTranslation } from "react-i18next"
 import type { AppSettingDto, EditAppSettinReq, ApiProblemDetails } from "../../dtos"
 import { appSettingsApi } from "../../utils/apiClients"
@@ -19,7 +22,8 @@ import { CustomAlert, type CustomAlertState } from "../../components/ui/CustomAl
 import i18n, { Language, TranslationKey } from "../../utils/i18n"
 import type { AxiosError, AxiosResponse } from "axios"
 import AuthType from "../../types/AuthType"
-import { RadioButtonChecked, RadioButtonUnchecked } from "@mui/icons-material"
+import RadioButtonChecked from "@mui/icons-material/RadioButtonChecked"
+import RadioButtonUnchecked from "@mui/icons-material/RadioButtonUnchecked"
 import getApiBase from "../../utils/getApiBase"
 
 type LogLevel = "Trace" | "Debug" | "Information" | "Warning" | "Error" | "Critical"

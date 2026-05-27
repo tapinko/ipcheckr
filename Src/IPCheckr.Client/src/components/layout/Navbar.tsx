@@ -10,7 +10,9 @@ import {
   Typography,
   useMediaQuery
 } from "@mui/material"
-import { Brightness4, Brightness7, Menu as MenuIcon } from "@mui/icons-material"
+import Brightness4 from "@mui/icons-material/Brightness4"
+import Brightness7 from "@mui/icons-material/Brightness7"
+import MenuIcon from "@mui/icons-material/Menu"
 import { useContext, useCallback, useMemo, useState, useEffect } from "react"
 import type { MouseEvent } from "react"
 import { useTheme } from "@mui/material/styles"
