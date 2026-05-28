@@ -18,15 +18,6 @@ export default defineConfig({
           if (id.includes("@mui/icons-material")) return "vendor-mui-icons"
           if (id.includes("@mui/") || id.includes("@emotion/")) return "vendor-mui"
           if (id.includes("@microsoft/signalr")) return "vendor-signalr"
-          if (
-            id.includes("/react/") ||
-            id.includes("/react-dom/") ||
-            id.includes("react-router") ||
-            id.includes("react-hook-form") ||
-            id.includes("react-i18next") ||
-            id.includes("scheduler")
-          )
-            return "vendor-react"
           return "vendor"
         },
       },

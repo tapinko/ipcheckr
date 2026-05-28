@@ -17,7 +17,7 @@ import GitHub from "@mui/icons-material/GitHub"
 import { isDemoMode } from "../config/demoMode"
 import { demoLogin } from "../demo/auth"
 import { useRef } from "react"
-import { prefetchAdminBundle, prefetchTeacherBundle, prefetchStudentBundle } from "../router/router"
+import { prefetchAdminBundle, prefetchTeacherBundle, prefetchStudentBundle } from "../router/prefetch"
 
 type LoginFormValues = {
   username: string
