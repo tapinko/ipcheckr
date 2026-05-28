@@ -1,4 +1,5 @@
 using IPCheckr.Api.Config;
+using IPCheckr.Api.Services.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -13,11 +14,13 @@ namespace IPCheckr.Api.Services.Config
     {
         private readonly ApiDbContext _db;
         private readonly IOptions<LdapSettings> _options;
+        private readonly ILdapPasswordProtector _passwordProtector;
 
-        public LdapSettingsProvider(ApiDbContext db, IOptions<LdapSettings> options)
+        public LdapSettingsProvider(ApiDbContext db, IOptions<LdapSettings> options, ILdapPasswordProtector passwordProtector)
         {
             _db = db;
             _options = options;
+            _passwordProtector = passwordProtector;
         }
 
         public async Task<LdapSettings> GetCurrentAsync(CancellationToken ct = default)
@@ -67,7 +70,9 @@ namespace IPCheckr.Api.Services.Config
                     case "Ldap_TeacherGroupDn": s.TeacherGroupDn = string.IsNullOrWhiteSpace(val) ? null : val; break;
                     case "Ldap_ConnectTimeoutSeconds": s.ConnectTimeoutSeconds = ParseInt(val, s.ConnectTimeoutSeconds); break;
                     case "Ldap_BindDn": s.BindDn = string.IsNullOrWhiteSpace(val) ? null : val; break;
-                    case "Ldap_BindPassword": s.BindPassword = string.IsNullOrWhiteSpace(val) ? null : val; break;
+                    case "Ldap_BindPassword":
+                        s.BindPassword = string.IsNullOrWhiteSpace(val) ? null : _passwordProtector.TryUnprotect(val);
+                        break;
                 }
             }
 

@@ -18,6 +18,8 @@ using IPCheckr.Api.Services.Realtime;
 using IPCheckr.Api.Hubs;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
+using IPCheckr.Api.Services.Security;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace IPCheckr.Api
 {
@@ -39,6 +41,13 @@ namespace IPCheckr.Api
             }
 
             // service registrations
+            var dpKeysPath = config["DataProtection:KeysPath"]
+                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ipcheckr", "dp-keys");
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(dpKeysPath))
+                .SetApplicationName("IPCheckr");
+            builder.Services.AddScoped<ILdapPasswordProtector, LdapPasswordProtector>();
+
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddDatabase(builder.Configuration);
             builder.Services.AddJwtAuthentication(config, env);

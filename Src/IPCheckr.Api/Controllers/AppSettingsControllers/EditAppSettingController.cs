@@ -31,7 +31,11 @@ namespace IPCheckr.Api.Controllers
             }
 
             appSetting.Name = req.Name;
-            appSetting.Value = req.Value;
+
+            if (req.Name == "Ldap_BindPassword" && !string.IsNullOrEmpty(req.Value))
+                appSetting.Value = _passwordProtector.Protect(req.Value);
+            else
+                appSetting.Value = req.Value;
 
             await _db.SaveChangesAsync();
 

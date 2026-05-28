@@ -35,7 +35,9 @@ namespace IPCheckr.Api.Controllers
             {
                 Id = setting.Id,
                 Name = setting.Name,
-                Value = setting.Value
+                Value = setting.Name == "Ldap_BindPassword"
+                    ? (string.IsNullOrEmpty(setting.Value) ? "" : "***")
+                    : setting.Value
             }).ToArray();
 
             var response = new QueryAppSettingRes
