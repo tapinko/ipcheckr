@@ -5,7 +5,8 @@ import packageJson from "./package.json"
 // https://vite.dev/config/
 export default defineConfig({
   define: {
-    __APP_VERSION__: JSON.stringify(packageJson.version)
+    __APP_VERSION__: JSON.stringify(packageJson.version),
+    __GIT_REPO_URL__: JSON.stringify("https://github.com/tapinko/ipcheckr"),
   },
   plugins: [react()],
   logLevel: "info",

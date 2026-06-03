@@ -19,9 +19,11 @@ RUN dotnet publish IPCheckr.Api.csproj -c Release -o /app/publish -p:UseAppHost=
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
+ARG APP_VERSION=dev
 ENV ASPNETCORE_URLS=https://0.0.0.0:8081 \
     ASPNETCORE_ENVIRONMENT=Production \
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
+    APP_VERSION=$APP_VERSION
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates openssl ldap-utils tzdata \

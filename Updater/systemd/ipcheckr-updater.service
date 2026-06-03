@@ -1,0 +1,24 @@
+[Unit]
+Description=IPCheckr Updater service
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/ipcheckr/updater/updater.env
+ExecStart=/usr/local/bin/ipcheckr-updater
+User=root
+Group=root
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ProtectControlGroups=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+LockPersonality=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

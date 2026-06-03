@@ -19,6 +19,7 @@ using IPCheckr.Api.Hubs;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using IPCheckr.Api.Services.Security;
+using IPCheckr.Api.Services.Updater;
 using Microsoft.AspNetCore.DataProtection;
 
 namespace IPCheckr.Api
@@ -80,6 +81,14 @@ namespace IPCheckr.Api
             builder.Services.AddSingleton<ILogStreamBroker, LogStreamBroker>();
             builder.Logging.Services.AddSingleton<ILoggerProvider, BroadcastLoggerProvider>();
 
+            builder.Services.Configure<UpdaterOptions>(config.GetSection("Updater"));
+            builder.Services.AddScoped<IUpdaterService, UpdaterService>();
+            builder.Services.AddHttpClient("github", c =>
+            {
+                c.DefaultRequestHeaders.Add("User-Agent", "IPCheckr-Server");
+                c.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+            });
+
             builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.Events ??= new JwtBearerEvents();
@@ -88,6 +97,11 @@ namespace IPCheckr.Api
                 {
                     var path = context.HttpContext.Request.Path;
                     if (path.StartsWithSegments("/api/dashboard/stream-logs"))
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        if (!string.IsNullOrEmpty(accessToken)) context.Token = accessToken!;
+                    }
+                    else if (path.StartsWithSegments("/api/updater/stream"))
                     {
                         var accessToken = context.Request.Query["access_token"];
                         if (!string.IsNullOrEmpty(accessToken)) context.Token = accessToken!;

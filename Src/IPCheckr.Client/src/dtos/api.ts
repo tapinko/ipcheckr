@@ -4870,6 +4870,74 @@ export type SubnetAssignmentDtoAllOfHostSortStrategy = AssignmentGroupHostSortSt
 /**
  * 
  * @export
+ * @interface UpdaterVersionInfoDto
+ */
+export interface UpdaterVersionInfoDto {
+    /**
+     * 
+     * @type {UpdaterVersionInfoDtoCurrent}
+     * @memberof UpdaterVersionInfoDto
+     */
+    'current'?: UpdaterVersionInfoDtoCurrent | null;
+    /**
+     * 
+     * @type {UpdaterVersionInfoDtoCurrent}
+     * @memberof UpdaterVersionInfoDto
+     */
+    'latest'?: UpdaterVersionInfoDtoCurrent | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdaterVersionInfoDto
+     */
+    'updateAvailable'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdaterVersionInfoDto
+     */
+    'updaterEnabled'?: boolean;
+}
+/**
+ * @type UpdaterVersionInfoDtoCurrent
+ * @export
+ */
+export type UpdaterVersionInfoDtoCurrent = VersionEntry;
+
+/**
+ * 
+ * @export
+ * @interface UpdaterVersionInfoRes
+ */
+export interface UpdaterVersionInfoRes {
+    /**
+     * 
+     * @type {UpdaterVersionInfoDtoCurrent}
+     * @memberof UpdaterVersionInfoRes
+     */
+    'current'?: UpdaterVersionInfoDtoCurrent | null;
+    /**
+     * 
+     * @type {UpdaterVersionInfoDtoCurrent}
+     * @memberof UpdaterVersionInfoRes
+     */
+    'latest'?: UpdaterVersionInfoDtoCurrent | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdaterVersionInfoRes
+     */
+    'updateAvailable'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdaterVersionInfoRes
+     */
+    'updaterEnabled'?: boolean;
+}
+/**
+ * 
+ * @export
  * @interface UserConflictInfoDto
  */
 export interface UserConflictInfoDto {
@@ -5004,6 +5072,25 @@ export interface ValidateTokenRes {
      * @memberof ValidateTokenRes
      */
     'username': string;
+}
+/**
+ * 
+ * @export
+ * @interface VersionEntry
+ */
+export interface VersionEntry {
+    /**
+     * 
+     * @type {string}
+     * @memberof VersionEntry
+     */
+    'version'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof VersionEntry
+     */
+    'branch'?: string | null;
 }
 
 /**
@@ -9067,6 +9154,167 @@ export class Gns3Api extends BaseAPI {
      */
     public gns3StopSession(stopSessionReq: StopSessionReq, options?: RawAxiosRequestConfig) {
         return Gns3ApiFp(this.configuration).gns3StopSession(stopSessionReq, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * UpdaterApi - axios parameter creator
+ * @export
+ */
+export const UpdaterApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updaterGetVersionInfo: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/updater/version-info`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updaterStreamUpdate: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/updater/stream`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication JWT required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * UpdaterApi - functional programming interface
+ * @export
+ */
+export const UpdaterApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = UpdaterApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updaterGetVersionInfo(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UpdaterVersionInfoRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updaterGetVersionInfo(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UpdaterApi.updaterGetVersionInfo']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updaterStreamUpdate(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updaterStreamUpdate(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UpdaterApi.updaterStreamUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * UpdaterApi - factory interface
+ * @export
+ */
+export const UpdaterApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = UpdaterApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updaterGetVersionInfo(options?: RawAxiosRequestConfig): AxiosPromise<UpdaterVersionInfoRes> {
+            return localVarFp.updaterGetVersionInfo(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updaterStreamUpdate(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.updaterStreamUpdate(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * UpdaterApi - object-oriented interface
+ * @export
+ * @class UpdaterApi
+ * @extends {BaseAPI}
+ */
+export class UpdaterApi extends BaseAPI {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UpdaterApi
+     */
+    public updaterGetVersionInfo(options?: RawAxiosRequestConfig) {
+        return UpdaterApiFp(this.configuration).updaterGetVersionInfo(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UpdaterApi
+     */
+    public updaterStreamUpdate(options?: RawAxiosRequestConfig) {
+        return UpdaterApiFp(this.configuration).updaterStreamUpdate(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

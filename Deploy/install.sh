@@ -192,6 +192,15 @@ install_docker() {
     log_success "Docker installed successfully"
 }
 
+run_updater_setup() {
+    log_info "Setting up IPCheckr Updater service..."
+    local updater_init_tmp="/tmp/updater-init.sh"
+    download_from_github "Updater/scripts/updater-init.sh" "$updater_init_tmp"
+    chmod +x "$updater_init_tmp"
+    bash "$updater_init_tmp" "$GITHUB_BRANCH" "$DEPLOY_DIR"
+    log_success "Updater setup completed"
+}
+
 run_gns3_setup() {
     log_info "Setting up GNS3 Launcher..."
     local gns3_init_tmp="/tmp/gns3-init.sh"
@@ -853,8 +862,10 @@ main() {
         log_info "GNS3 installation skipped by user choice"
     fi
 
+    run_updater_setup
+
     start_docker_compose
-    
+
     show_summary
     
     log_success "Installation completed successfully!"

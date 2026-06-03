@@ -10,11 +10,12 @@ import Lock from "@mui/icons-material/Lock"
 import PlayArrow from "@mui/icons-material/PlayArrow"
 import Refresh from "@mui/icons-material/Refresh"
 import Stop from "@mui/icons-material/Stop"
+import SystemUpdateAlt from "@mui/icons-material/SystemUpdateAlt"
 import Tune from "@mui/icons-material/Tune"
 import ViewList from "@mui/icons-material/ViewList"
 import { useTranslation } from "react-i18next"
-import type { AppSettingDto, EditAppSettinReq, ApiProblemDetails } from "../../dtos"
-import { appSettingsApi } from "../../utils/apiClients"
+import type { AppSettingDto, EditAppSettinReq, ApiProblemDetails, UpdaterVersionInfoRes, VersionEntry } from "../../dtos"
+import { appSettingsApi, updaterApi } from "../../utils/apiClients"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import AdminSettingsSkeleton from "../../components/skeletons/AdminSettingsSkeleton"
 import ErrorLoading from "../../components/ui/ErrorLoading"
@@ -25,6 +26,7 @@ import AuthType from "../../types/AuthType"
 import RadioButtonChecked from "@mui/icons-material/RadioButtonChecked"
 import RadioButtonUnchecked from "@mui/icons-material/RadioButtonUnchecked"
 import getApiBase from "../../utils/getApiBase"
+import Chip from "@mui/material/Chip"
 
 type LogLevel = "Trace" | "Debug" | "Information" | "Warning" | "Error" | "Critical"
 type StreamLogEntry = {
@@ -141,6 +143,12 @@ const AdminSettings = () => {
   const bufferRef = useRef<string>("")
   const logContainerRef = useRef<HTMLDivElement | null>(null)
 
+  type UpdateState = "idle" | "running" | "restarting" | "done" | "error"
+  const [updateState, setUpdateState] = useState<UpdateState>("idle")
+  const [updateLines, setUpdateLines] = useState<string[]>([])
+  const updateControllerRef = useRef<AbortController | null>(null)
+  const updateContainerRef = useRef<HTMLDivElement | null>(null)
+
   const filtersDirty = useMemo(() => {
     if (!activeFilters) return true
     return (
@@ -159,6 +167,72 @@ const AdminSettings = () => {
   useEffect(() => {
     return () => { controllerRef.current?.abort() }
   }, [])
+
+  useEffect(() => {
+    return () => { updateControllerRef.current?.abort() }
+  }, [])
+
+  useEffect(() => {
+    if (updateContainerRef.current) {
+      updateContainerRef.current.scrollTop = updateContainerRef.current.scrollHeight
+    }
+  }, [updateLines])
+
+  const startUpdate = async () => {
+    if (!window.confirm(t(TranslationKey.ADMIN_SETTINGS_UPDATE_CONFIRM))) return
+
+    updateControllerRef.current?.abort()
+    setUpdateLines([])
+    setUpdateState("running")
+
+    const token = sessionStorage.getItem("token")
+    const auth = token ? (token.startsWith("Bearer ") ? token : `Bearer ${token}`) : undefined
+    const ctrl = new AbortController()
+    updateControllerRef.current = ctrl
+
+    try {
+      const resp = await fetch(`${getApiBase()}/api/updater/stream`, {
+        method: "GET",
+        headers: { ...(auth ? { Authorization: auth } : {}), Accept: "text/event-stream" },
+        signal: ctrl.signal,
+      })
+
+      if (!resp.ok || !resp.body) {
+        setUpdateState("error")
+        setUpdateLines([`ERR HTTP ${resp.status} ${resp.statusText}`])
+        return
+      }
+
+      const reader = resp.body.getReader()
+      const decoder = new TextDecoder("utf-8")
+      let buf = ""
+
+      while (true) {
+        const { value, done } = await reader.read()
+        if (done) break
+        buf += decoder.decode(value, { stream: true })
+        const parts = buf.split("\n\n")
+        buf = parts.pop() ?? ""
+        for (const block of parts) {
+          for (const line of block.split("\n")) {
+            if (!line.startsWith("data:")) continue
+            const msg = line.slice(5).trimStart()
+            if (!msg) continue
+            setUpdateLines(prev => [...prev, msg])
+            if (msg.startsWith("OK ")) setUpdateState("done")
+            else if (msg.startsWith("ERR ")) setUpdateState("error")
+          }
+        }
+      }
+
+      // connection dropped without OK/ERR — container was killed (self-update restart)
+      setUpdateState(prev => prev === "running" ? "restarting" : prev)
+    } catch (e: any) {
+      if (e?.name === "AbortError") return
+      // connection reset = container restarted
+      setUpdateState(prev => prev === "running" ? "restarting" : prev)
+    }
+  }
 
   const getAuthHeader = (): string | undefined => {
     const raw = sessionStorage.getItem("token")
@@ -277,6 +351,13 @@ const AdminSettings = () => {
   const settingsQuery = useQuery({
     queryKey: ["appsettings"],
     queryFn: () => appSettingsApi.appSettingsQueryAppSettings(),
+  })
+
+  const versionQuery = useQuery<UpdaterVersionInfoRes>({
+    queryKey: ["updater-version-info"],
+    queryFn: () => updaterApi.updaterGetVersionInfo().then(r => r.data),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 
   const languageSetting = useMemo(() => {
@@ -540,46 +621,166 @@ const AdminSettings = () => {
       </Card>
 
       {activeTab === "general" && (
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-            gap: 2,
-            alignItems: "start",
-          }}
-        >
-          <SectionCard icon={<LanguageIcon />} title={t(TranslationKey.ADMIN_SETTINGS_TAB_GENERAL)}>
-            <SettingField label={t(TranslationKey.ADMIN_SETTINGS_LANGUAGE)}>
-              <ButtonGroup size="small">
-                <Button
-                  variant={language === Language.EN ? "contained" : "outlined"}
-                  onClick={() => setLanguage(Language.EN)}
-                  sx={{ px: 3, py: 1 }}
-                >
-                  {t(TranslationKey.ADMIN_SETTINGS_EN)}
-                </Button>
-                <Button
-                  variant={language === Language.SK ? "contained" : "outlined"}
-                  onClick={() => setLanguage(Language.SK)}
-                  sx={{ px: 3, py: 1 }}
-                >
-                  {t(TranslationKey.ADMIN_SETTINGS_SK)}
-                </Button>
-              </ButtonGroup>
-            </SettingField>
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2, alignItems: "start" }}>
+          <Stack spacing={2}>
+            <SectionCard icon={<LanguageIcon />} title={t(TranslationKey.ADMIN_SETTINGS_TAB_GENERAL)}>
+              <SettingField label={t(TranslationKey.ADMIN_SETTINGS_LANGUAGE)}>
+                <ButtonGroup size="small">
+                  <Button
+                    variant={language === Language.EN ? "contained" : "outlined"}
+                    onClick={() => setLanguage(Language.EN)}
+                    sx={{ px: 3, py: 1 }}
+                  >
+                    {t(TranslationKey.ADMIN_SETTINGS_EN)}
+                  </Button>
+                  <Button
+                    variant={language === Language.SK ? "contained" : "outlined"}
+                    onClick={() => setLanguage(Language.SK)}
+                    sx={{ px: 3, py: 1 }}
+                  >
+                    {t(TranslationKey.ADMIN_SETTINGS_SK)}
+                  </Button>
+                </ButtonGroup>
+              </SettingField>
+              <SettingField
+                label={t(TranslationKey.ADMIN_SETTINGS_INSTITUTION_NAME)}
+                tooltip={t(TranslationKey.ADMIN_SETTINGS_INSTITUTION_NAME_TOOLTIP)}
+              >
+                <TextField
+                  value={institutionName}
+                  onChange={(e) => setInstitutionName(e.target.value)}
+                  fullWidth
+                  size="small"
+                />
+              </SettingField>
+            </SectionCard>
 
-            <SettingField
-              label={t(TranslationKey.ADMIN_SETTINGS_INSTITUTION_NAME)}
-              tooltip={t(TranslationKey.ADMIN_SETTINGS_INSTITUTION_NAME_TOOLTIP)}
-            >
-              <TextField
-                value={institutionName}
-                onChange={(e) => setInstitutionName(e.target.value)}
-                fullWidth
-                size="small"
-              />
-            </SettingField>
-          </SectionCard>
+            <SectionCard icon={<SystemUpdateAlt fontSize="small" />} title={t(TranslationKey.ADMIN_SETTINGS_UPDATE)}>
+              <Box sx={{ mb: 2 }}>
+                {versionQuery.isLoading && (
+                  <Typography variant="body2" color="text.secondary">
+                    {t(TranslationKey.ADMIN_SETTINGS_UPDATE_VERSION_LOADING)}
+                  </Typography>
+                )}
+                {versionQuery.isError && (
+                  <Typography variant="body2" color="error">
+                    {t(TranslationKey.ADMIN_SETTINGS_UPDATE_VERSION_ERROR)}
+                  </Typography>
+                )}
+                {versionQuery.data && (() => {
+                  const isReal = (v: string | null | undefined) => !!v && v.startsWith("v")
+                  const releaseHref = (v: string | null | undefined) => isReal(v) ? `${__GIT_REPO_URL__}/releases/tag/${v}` : undefined
+                  const branchHref  = (b: string | null | undefined) => b ? `${__GIT_REPO_URL__}/tree/${b}` : undefined
+
+                  const VersionChip = ({ entry }: { entry: VersionEntry | null | undefined }) => {
+                    const href = branchHref(entry?.branch)
+                    return entry?.branch ? (
+                      <Chip
+                        {...(href ? { component: "a", href, target: "_blank", rel: "noopener noreferrer", clickable: true } : {})}
+                        label={entry.branch}
+                        size="small"
+                        variant="outlined"
+                        icon={<span style={{ fontSize: "0.7rem", paddingLeft: 4 }}>⎇</span>}
+                      />
+                    ) : null
+                  }
+
+                  const VersionText = ({ entry }: { entry: VersionEntry | null | undefined }) => {
+                    const v = entry?.version ?? null
+                    const href = releaseHref(v)
+                    return href ? (
+                      <Typography
+                        variant="body2"
+                        fontFamily="monospace"
+                        component="a"
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ color: "inherit", textDecorationColor: "currentColor" }}
+                      >
+                        {v}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body2" fontFamily="monospace">{v ?? "—"}</Typography>
+                    )
+                  }
+
+                  return (
+                    <Stack spacing={0.75}>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography variant="body2" color="text.secondary" sx={{ minWidth: 140 }}>
+                          {t(TranslationKey.ADMIN_SETTINGS_UPDATE_CURRENT_VERSION)}
+                        </Typography>
+                        <VersionText entry={versionQuery.data.current} />
+                        <VersionChip entry={versionQuery.data.current} />
+                      </Stack>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography variant="body2" color="text.secondary" sx={{ minWidth: 140 }}>
+                          {t(TranslationKey.ADMIN_SETTINGS_UPDATE_LATEST_VERSION)}
+                        </Typography>
+                        <VersionText entry={versionQuery.data.latest} />
+                        <VersionChip entry={versionQuery.data.latest} />
+                        {versionQuery.data.updateAvailable ? (
+                          <Chip label={t(TranslationKey.ADMIN_SETTINGS_UPDATE_AVAILABLE)} size="small" color="warning" />
+                        ) : versionQuery.data.latest?.version ? (
+                          <Chip label={t(TranslationKey.ADMIN_SETTINGS_UPDATE_UP_TO_DATE)} size="small" color="success" />
+                        ) : null}
+                      </Stack>
+                    </Stack>
+                  )
+                })()}
+              </Box>
+              <Stack direction="row" spacing={1} alignItems="center" mb={updateLines.length > 0 || updateState !== "idle" ? 2 : 0}>
+                <Button
+                  variant="contained"
+                  color="warning"
+                  startIcon={<SystemUpdateAlt />}
+                  onClick={startUpdate}
+                  disabled={updateState === "running" || !versionQuery.data?.updaterEnabled}
+                >
+                  {t(TranslationKey.ADMIN_SETTINGS_UPDATE_BUTTON)}
+                </Button>
+                {!versionQuery.data?.updaterEnabled && versionQuery.data !== undefined && (
+                  <Typography variant="body2" color="text.secondary">
+                    {t(TranslationKey.ADMIN_SETTINGS_UPDATE_DISABLED)}
+                  </Typography>
+                )}
+                {updateLines.length > 0 && (
+                  <Button size="small" onClick={() => { setUpdateLines([]); setUpdateState("idle") }}>
+                    {t(TranslationKey.ADMIN_SETTINGS_UPDATE_CLEAR)}
+                  </Button>
+                )}
+              </Stack>
+              {updateState === "restarting" && (
+                <Alert severity="info" sx={{ mb: 1 }}>{t(TranslationKey.ADMIN_SETTINGS_UPDATE_RESTARTING)}</Alert>
+              )}
+              {updateState === "done" && (
+                <Alert severity="success" sx={{ mb: 1 }}>{t(TranslationKey.ADMIN_SETTINGS_UPDATE_DONE)}</Alert>
+              )}
+              {updateState === "error" && (
+                <Alert severity="error" sx={{ mb: 1 }}>{t(TranslationKey.ADMIN_SETTINGS_UPDATE_ERROR)}</Alert>
+              )}
+              {updateLines.length > 0 && (
+                <Paper variant="outlined" sx={{ p: 1, maxHeight: 280, overflow: "auto" }} ref={updateContainerRef}>
+                  <Stack spacing={0}>
+                    {updateLines.map((line, idx) => (
+                      <Box
+                        key={idx}
+                        sx={{
+                          fontFamily: "monospace",
+                          fontSize: "0.75rem",
+                          whiteSpace: "pre-wrap",
+                          color: line.startsWith("ERR") ? "error.main" : line.startsWith("OK") ? "success.main" : "text.primary",
+                        }}
+                      >
+                        {line}
+                      </Box>
+                    ))}
+                  </Stack>
+                </Paper>
+              )}
+            </SectionCard>
+          </Stack>
 
           <SectionCard icon={<Tune fontSize="small" />} title={t(TranslationKey.ADMIN_SETTINGS_GNS3)}>
             <FormControlLabel
@@ -593,7 +794,6 @@ const AdminSettings = () => {
               }
               label={t(TranslationKey.ADMIN_SETTINGS_GNS3_ENABLE)}
             />
-
             {gns3Enabled && (
               <>
                 <SettingField label={t(TranslationKey.ADMIN_SETTINGS_GNS3_DEFAULT_DURATION_MIN)}>
@@ -606,7 +806,6 @@ const AdminSettings = () => {
                     inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                   />
                 </SettingField>
-
                 <SettingField label={t(TranslationKey.ADMIN_SETTINGS_GNS3_EXTENSION_MIN)}>
                   <TextField
                     value={gns3ExtensionMinutes}
