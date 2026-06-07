@@ -91,7 +91,7 @@ public class UpdaterService : IUpdaterService
 
         using (client!)
         using (var stream = client.GetStream())
-        using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true) { AutoFlush = true })
+        using (var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), leaveOpen: true) { AutoFlush = true })
         using (var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: false, leaveOpen: true))
         {
             await writer.WriteLineAsync("update");
@@ -147,6 +147,7 @@ public class UpdaterService : IUpdaterService
 
         using var doc = await JsonDocument.ParseAsync(await resp.Content.ReadAsStreamAsync(ct), cancellationToken: ct);
         var tag = doc.RootElement.GetProperty("tag_name").GetString();
+        if (tag == null) return null;
 
         _cache.Set(CacheKey, tag, CacheTtl);
         return tag;

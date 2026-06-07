@@ -20,6 +20,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import AdminSettingsSkeleton from "../../components/skeletons/AdminSettingsSkeleton"
 import ErrorLoading from "../../components/ui/ErrorLoading"
 import { CustomAlert, type CustomAlertState } from "../../components/ui/CustomAlert"
+import CustomDialog from "../../components/ui/CustomDialog"
 import i18n, { Language, TranslationKey } from "../../utils/i18n"
 import type { AxiosError, AxiosResponse } from "axios"
 import AuthType from "../../types/AuthType"
@@ -146,6 +147,7 @@ const AdminSettings = () => {
   type UpdateState = "idle" | "running" | "restarting" | "done" | "error"
   const [updateState, setUpdateState] = useState<UpdateState>("idle")
   const [updateLines, setUpdateLines] = useState<string[]>([])
+  const [updateDialogOpen, setUpdateDialogOpen] = useState(false)
   const updateControllerRef = useRef<AbortController | null>(null)
   const updateContainerRef = useRef<HTMLDivElement | null>(null)
 
@@ -178,9 +180,13 @@ const AdminSettings = () => {
     }
   }, [updateLines])
 
-  const startUpdate = async () => {
-    if (!window.confirm(t(TranslationKey.ADMIN_SETTINGS_UPDATE_CONFIRM))) return
+  useEffect(() => {
+    if (updateState === "restarting") setAlert({ severity: "info", message: t(TranslationKey.ADMIN_SETTINGS_UPDATE_RESTARTING) })
+    else if (updateState === "done") setAlert({ severity: "success", message: t(TranslationKey.ADMIN_SETTINGS_UPDATE_DONE) })
+    else if (updateState === "error") setAlert({ severity: "error", message: t(TranslationKey.ADMIN_SETTINGS_UPDATE_ERROR) })
+  }, [updateState])
 
+  const startUpdate = async () => {
     updateControllerRef.current?.abort()
     setUpdateLines([])
     setUpdateState("running")
@@ -577,6 +583,16 @@ const AdminSettings = () => {
         </Alert>
       </Snackbar>
 
+      <CustomDialog
+        open={updateDialogOpen}
+        onClose={() => setUpdateDialogOpen(false)}
+        onConfirm={startUpdate}
+        title={t(TranslationKey.ADMIN_SETTINGS_UPDATE)}
+        question={t(TranslationKey.ADMIN_SETTINGS_UPDATE_CONFIRM)}
+        color="warning"
+        confirmLabel={t(TranslationKey.ADMIN_SETTINGS_UPDATE_BUTTON)}
+      />
+
       <Card variant="outlined" sx={{ borderRadius: 1 }}>
         <Stack direction="row" alignItems="center">
           <Tabs
@@ -735,7 +751,7 @@ const AdminSettings = () => {
                   variant="contained"
                   color="warning"
                   startIcon={<SystemUpdateAlt />}
-                  onClick={startUpdate}
+                  onClick={() => setUpdateDialogOpen(true)}
                   disabled={updateState === "running" || !versionQuery.data?.updaterEnabled}
                 >
                   {t(TranslationKey.ADMIN_SETTINGS_UPDATE_BUTTON)}
@@ -751,15 +767,6 @@ const AdminSettings = () => {
                   </Button>
                 )}
               </Stack>
-              {updateState === "restarting" && (
-                <Alert severity="info" sx={{ mb: 1 }}>{t(TranslationKey.ADMIN_SETTINGS_UPDATE_RESTARTING)}</Alert>
-              )}
-              {updateState === "done" && (
-                <Alert severity="success" sx={{ mb: 1 }}>{t(TranslationKey.ADMIN_SETTINGS_UPDATE_DONE)}</Alert>
-              )}
-              {updateState === "error" && (
-                <Alert severity="error" sx={{ mb: 1 }}>{t(TranslationKey.ADMIN_SETTINGS_UPDATE_ERROR)}</Alert>
-              )}
               {updateLines.length > 0 && (
                 <Paper variant="outlined" sx={{ p: 1, maxHeight: 280, overflow: "auto" }} ref={updateContainerRef}>
                   <Stack spacing={0}>

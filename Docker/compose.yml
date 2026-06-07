@@ -23,6 +23,7 @@ services:
       - Gns3__LauncherAllowNameMismatch=${GNS3_LAUNCHER_ALLOW_NAME_MISMATCH}
       - Gns3__LauncherTimeoutSeconds=${GNS3_LAUNCHER_TIMEOUT}
       - Gns3__LauncherRetries=${GNS3_LAUNCHER_RETRIES}
+      - Updater__Enabled=${UPDATER_ENABLED:-false}
     ports:
       - "${WEB_PORT}:8081"
     volumes:
