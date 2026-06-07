@@ -31,5 +31,6 @@ jobs:
           context: .
           file: Docker/Dockerfile
           push: true
+          provenance: false
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ipcheckr:${{ github.event.inputs.tag }}
           build-args: APP_VERSION=${{ github.event.inputs.tag }}
