@@ -20,7 +20,7 @@ export const getIdnetDataForSubmitHandler: DemoEndpointHandler = async ({ config
 
   if (tokenUserId !== null && tokenUserId !== variant.studentUserId) return demoResponse(config, { messageEn: "Forbidden" }, 403)
 
-  const hasSubmit = state.submissions.some((s: any) => s.assignmentId === assignmentId)
+  const hasSubmit = state.submissions.some((s: { assignmentId: number }) => s.assignmentId === assignmentId)
   const isAvailable = resolveStatus(group.startDate, group.deadline, group.completedAt ?? null) === AssignmentGroupStatus.InProgress && !hasSubmit
 
   return demoResponse(config, {
@@ -31,7 +31,7 @@ export const getIdnetDataForSubmitHandler: DemoEndpointHandler = async ({ config
     cidr: variant.rows[0]?.idNet ?? "-",
     testWildcard: group.testWildcard,
     testFirstLastBr: group.testFirstLastBr,
-    addresses: variant.addresses ?? variant.rows.map((row: any) => row.address ?? ""),
+    addresses: variant.addresses ?? variant.rows.map((row: { address?: string }) => row.address ?? ""),
     isAvailableForSubmission: isAvailable,
   })
 }

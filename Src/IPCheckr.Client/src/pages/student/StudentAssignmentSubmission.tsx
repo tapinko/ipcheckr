@@ -74,7 +74,7 @@ const StudentAssignmentSubmission = () => {
   const draftHydratedRef = useRef(false)
   const autoSubmitTriggeredRef = useRef(false)
   const [assignmentType, setAssignmentType] = useState<AssignmentGroupType | null>(
-    () => fromAssignmentTypeParam(assignmentTypeParam) ?? (location.state as any)?.assignmentType ?? null
+    () => fromAssignmentTypeParam(assignmentTypeParam) ?? (location.state as { assignmentType?: AssignmentGroupType } | null)?.assignmentType ?? null
   )
 
   const newRow = (): AssignmentFormRow => ({
@@ -300,8 +300,6 @@ const StudentAssignmentSubmission = () => {
     }
 
     if (assignmentType === AssignmentGroupTypeValues.Idnet) {
-      const idNetNetwork = (idNetData as any)?.cidr
-      if (typeof idNetNetwork === "string" && idNetNetwork.trim()) return idNetNetwork
       return idNetData?.addresses?.[0] ?? "-"
     }
 
@@ -386,6 +384,7 @@ const StudentAssignmentSubmission = () => {
 
     try {
       await saveDraftMutation.mutateAsync(payload)
+    // eslint-disable-next-line no-empty
     } catch {
     } finally {
       saveInFlightRef.current = false
@@ -586,6 +585,7 @@ const StudentAssignmentSubmission = () => {
         await connection.start()
         if (cancelled) return
         await connection.invoke("SubscribeAssignment", assignmentType, assignmentIdNum)
+      // eslint-disable-next-line no-empty
       } catch {
       }
     }

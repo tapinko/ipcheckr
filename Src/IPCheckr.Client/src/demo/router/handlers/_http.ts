@@ -26,6 +26,7 @@ export const demoResponse = (config: AxiosRequestConfig, data: unknown, status =
   status,
   statusText: status === 200 ? "OK" : "Bad Request",
   headers: {},
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   config: config as any,
 })
 
@@ -36,7 +37,8 @@ export const resolveUser = (role: string | null) => {
 }
 
 export const extractUserIdFromToken = (config: AxiosRequestConfig): number | null => {
-  const authHeaderRaw = (config.headers as any)?.Authorization ?? (config.headers as any)?.authorization
+  const headers = config.headers as Record<string, unknown> | undefined
+  const authHeaderRaw = headers?.Authorization ?? headers?.authorization
   const authHeader = typeof authHeaderRaw === "string" ? authHeaderRaw : null
   if (!authHeader?.startsWith("Bearer ")) return null
 
@@ -46,7 +48,7 @@ export const extractUserIdFromToken = (config: AxiosRequestConfig): number | nul
   const tokenPart = token.slice("demo.".length)
   try {
     const decoded = window.atob(tokenPart)
-    const payload = JSON.parse(decoded) as any
+    const payload = JSON.parse(decoded) as Record<string, unknown>
     return typeof payload.userId === "number" ? payload.userId : null
   } catch {
     return null

@@ -275,7 +275,7 @@ class FormRules {
    * @memberof FormRules
    */
   static patternLettersNumbersSpecial(): object {
-    const pattern = /^[a-zA-Z0-9!@#$%^&*()_+={}\[\]:"'<>,.?\/\\|-]+$/
+    const pattern = /^[a-zA-Z0-9!@#$%^&*()_+={}[\]:"'<>,.?/\\|-]+$/
     const message = TranslationKey.FORM_RULES_PATTERN_LETTERS_NUMBERS_SPECIAL
     return {
       pattern: { value: pattern, message: message },
@@ -297,7 +297,7 @@ class FormRules {
    * @memberof FormRules
    */
   static patternLettersNumbersSpecialSpaces(): object {
-    const pattern = /^[a-zA-Z0-9!@#$%^&*()_+={}\[\]:"'<>,.?\/\\|-]+\s*$/
+    const pattern = /^[a-zA-Z0-9!@#$%^&*()_+={}[\]:"'<>,.?/\\|-]+\s*$/
     const message = TranslationKey.FORM_RULES_PATTERN_LETTERS_NUMBERS_SPECIAL_SPACES
     return {
       pattern: { value: pattern, message: message },

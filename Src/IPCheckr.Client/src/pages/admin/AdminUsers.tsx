@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import {
-  Autocomplete,
   Box,
   Button,
   Chip,
@@ -17,7 +16,7 @@ import { useNavigate } from "react-router-dom"
 import PeopleIcon from "@mui/icons-material/People"
 import SchoolIcon from "@mui/icons-material/School"
 import { AuthType } from "../../dtos"
-import type { AddUserRes, ApiProblemDetails, ClassDto, LdapUserDto } from "../../dtos"
+import type { AddUserRes, ApiProblemDetails, ClassDto, UserDto } from "../../dtos"
 import { classApi, userApi } from "../../utils/apiClients"
 import { useAppConfig } from "../../contexts/AppConfigContext"
 import i18n, { Language, TranslationKey } from "../../utils/i18n"
@@ -27,6 +26,7 @@ import { Controller, useForm } from "react-hook-form"
 import { AxiosError, type AxiosResponse } from "axios"
 import UserRole from "../../types/UserRole"
 import UserListPanel, { type UserRow, type EditFormValues } from "../../features/users/components/UserListPanel"
+import LdapAutocompleteField from "../../features/users/components/LdapAutocompleteField"
 import { getParametrizedUrl, RouteKeys, RouteParams } from "../../router/routes"
 
 type AddFormValues = {
@@ -58,8 +58,8 @@ const AdminUsers = () => {
     staleTime: 5 * 60_000
   })
 
-  const toRows = (data: unknown[] | undefined): UserRow[] =>
-    (data ?? []).map((u: any) => ({ ...u, classNamesDisplay: (u.classNames ?? []).join(", ") }))
+  const toRows = (data: UserDto[] | undefined): UserRow[] =>
+    (data ?? []).map(u => ({ ...u, classNamesDisplay: (u.classNames ?? []).join(", ") }))
 
   const teachersQuery = useQuery({
     queryKey: ["users", UserRole.TEACHER, teacherSearch],
@@ -146,41 +146,17 @@ const AdminUsers = () => {
             <Controller
               name="username" control={addControl}
               rules={{ ...FormRules.required() }}
-              render={({ field }) => {
-                const [options, setOptions] = useState<LdapUserDto[]>([])
-                const [input, setInput] = useState("")
-                const [loading, setLoading] = useState(false)
-                useEffect(() => {
-                  const q = input.trim()
-                  if (!q || q.length < minLdapSearchChars) { setOptions([]); return }
-                  let cancelled = false
-                  setLoading(true)
-                  const timer = setTimeout(() => {
-                    userApi.userLdapSearchUsers(q)
-                      .then(r => { if (!cancelled) setOptions(r.data.users ?? []) })
-                      .finally(() => { if (!cancelled) setLoading(false) })
-                  }, 250)
-                  return () => { cancelled = true; clearTimeout(timer) }
-                }, [input])
-                return (
-                  <Autocomplete
-                    loading={loading} options={options} getOptionLabel={o => o.username}
-                    noOptionsText={t(TranslationKey.USER_LIST_PANEL_NO_DATA)}
-                    loadingText={t(TranslationKey.USER_LIST_PANEL_LOADING)}
-                    onInputChange={(_, v) => setInput(v)}
-                    onChange={(_, v) => field.onChange(v ? (v as LdapUserDto).username : "")}
-                    renderInput={params => (
-                      <TextField
-                        {...params} margin="dense" fullWidth
-                        label={t(TranslationKey.USER_LIST_PANEL_USERNAME)}
-                        placeholder={t(TranslationKey.USER_LIST_PANEL_LDAP_PLACEHOLDER, { value: minLdapSearchChars })}
-                        error={!!addErrors.username}
-                        helperText={addErrors.username ? t(addErrors.username.message as string) : ""}
-                      />
-                    )}
-                  />
-                )
-              }}
+              render={({ field }) => (
+                <LdapAutocompleteField
+                  field={field}
+                  error={addErrors.username}
+                  label={t(TranslationKey.USER_LIST_PANEL_USERNAME)}
+                  placeholder={t(TranslationKey.USER_LIST_PANEL_LDAP_PLACEHOLDER, { value: minLdapSearchChars })}
+                  noOptionsText={t(TranslationKey.USER_LIST_PANEL_NO_DATA)}
+                  loadingText={t(TranslationKey.USER_LIST_PANEL_LOADING)}
+                  minSearchChars={minLdapSearchChars}
+                />
+              )}
             />
           ) : (
             <Controller

@@ -20,6 +20,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import type { Theme } from "@mui/material/styles"
 import { LazyBarChart, LazyLineChart } from "../../components/charts/LazyCharts"
 import { useState, useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
@@ -107,8 +108,9 @@ const AdminClassDetails = () => {
       setAlert({ severity: "success", message: t(TranslationKey.ADMIN_CLASS_DETAILS_ADD_SUCCESS) })
       closeDialog()
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASS_DETAILS_ADD_ERROR)}. ${msg ?? ""}` })
     }
   })
@@ -134,8 +136,9 @@ const AdminClassDetails = () => {
       queryClient.invalidateQueries({ queryKey: ["teacherClassDetails", classId] })
       setAlert({ severity: "success", message: t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_SUCCESS) })
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASS_DETAILS_REMOVE_ERROR)}. ${msg ?? ""}` })
     }
   })
@@ -148,8 +151,9 @@ const AdminClassDetails = () => {
       setAlert({ severity: "success", message: t(TranslationKey.ADMIN_CLASS_DETAILS_EDIT_SUCCESS) })
       setEditDialogOpen(false)
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASS_DETAILS_EDIT_ERROR)}. ${msg ?? ""}` })
     }
   })
@@ -159,8 +163,9 @@ const AdminClassDetails = () => {
     onSuccess: () => {
       navigate(Routes[RouteKeys.ADMIN_CLASSES])
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_CLASS_DETAILS_DELETE_ERROR)}. ${msg ?? ""}` })
       setDeleteDialogOpen(false)
     }
@@ -184,10 +189,10 @@ const AdminClassDetails = () => {
   const avgGroups = detailsQuery.data?.averageSuccessRateInAssignmentGroups ?? []
 
   const addButtonSx = {
-    border: (theme: any) => `1px solid ${theme.palette.success.main}`,
+    border: (theme: Theme) =>`1px solid ${theme.palette.success.main}`,
     width: 20,
     height: 20,
-    color: (theme: any) => theme.palette.success.dark,
+    color: (theme: Theme) => theme.palette.success.dark,
     "& .MuiSvgIcon-root": { fontSize: 14 },
     mb: "1px"
   }
@@ -307,7 +312,7 @@ const AdminClassDetails = () => {
                         alignItems="center"
                         justifyContent="space-between"
                         sx={{
-                          border: theme => `1px solid ${theme.palette.divider}`,
+                          border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
                           borderRadius: 1,
                           p: 1,
                           cursor: "pointer",
@@ -371,7 +376,7 @@ const AdminClassDetails = () => {
                         alignItems="center"
                         justifyContent="space-between"
                         sx={{
-                          border: theme => `1px solid ${theme.palette.divider}`,
+                          border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
                           borderRadius: 1,
                           p: 1,
                           cursor: "pointer",

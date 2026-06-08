@@ -1,6 +1,7 @@
 import { createContext, useState } from "react"
 import type { ReactNode, Dispatch, SetStateAction, FC } from "react"
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const ThemeContext = createContext<{
   mode: "dark" | "light"
   setMode: Dispatch<SetStateAction<"dark" | "light">>

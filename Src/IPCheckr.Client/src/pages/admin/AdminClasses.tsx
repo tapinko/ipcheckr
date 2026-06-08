@@ -22,7 +22,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { AxiosError, AxiosResponse } from "axios"
 import { useState } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { Controller, useForm, type Control } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import ClassCard from "../../features/classes/components/ClassCard"
@@ -154,7 +154,8 @@ const AdminClasses = () => {
   const classes = classesQuery.data ?? []
   const deletingNames = classes.filter(c => deletingIds.includes(c.classId)).map(c => c.className).join(", ")
 
-  const teacherSelect = (control: any, _errors: any, name: "teacherIds") => (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const teacherSelect = (control: Control<any>, _errors: unknown, name: "teacherIds") => (
     <Controller
       name={name} control={control}
       render={({ field }) => (

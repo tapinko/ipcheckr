@@ -38,6 +38,7 @@ type AGTypeSpecificSettingsLabels = {
 }
 
 type Props = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<any>
   selectedType: AssignmentGroupType
   numberOfRecordsError?: FieldError
@@ -58,6 +59,7 @@ const NumberStepper = ({
   max
 }: {
   name: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<any>
   label: string
   helperText: string

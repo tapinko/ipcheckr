@@ -49,7 +49,8 @@ type StudentAssignment = (IDNetAssignmentDto | SubnetAssignmentDto) & {
 }
 
 const resolveAssignmentId = (a: unknown): number => {
-	const raw = (a as any)?.assignmentId ?? (a as any)?.id
+	const obj = a as { assignmentId?: unknown; id?: unknown } | null
+	const raw = obj?.assignmentId ?? obj?.id
 	return typeof raw === "number" && raw > 0 ? raw : 0
 }
 
@@ -192,7 +193,7 @@ const StudentAssignments = () => {
 		return assignments
 			.filter(a => typeFilter.includes(a.type))
 			.filter(a => a.ipCat == null || ipCatFilter.includes(a.ipCat))
-			.filter(a => (a as any).difficulty == null || difficultyFilter.includes((a as any).difficulty))
+			.filter(a => (a as SubnetAssignmentDto).difficulty == null || difficultyFilter.includes((a as SubnetAssignmentDto).difficulty!))
 			.filter(a => (selectedClassName ? a.className === selectedClassName : true))
 			.filter(a =>
 				term
@@ -354,29 +355,29 @@ const StudentAssignments = () => {
 								sx={{ borderStyle: "dashed" }}
 							/>
 						)}
-						{(assignment as any).difficulty && (
+						{(assignment as SubnetAssignmentDto).difficulty && (
 							<Chip
-								label={getDifficultyLabel((assignment as any).difficulty, t)}
-								color={getDifficultyColor((assignment as any).difficulty)}
+								label={getDifficultyLabel((assignment as SubnetAssignmentDto).difficulty!, t)}
+								color={getDifficultyColor((assignment as SubnetAssignmentDto).difficulty!)}
 								size="small"
 								variant="outlined"
 							/>
 						)}
-						{(assignment as any).hostSortStrategy && (
+						{(assignment as SubnetAssignmentDto).hostSortStrategy && (
 							<Chip
-								label={getHostSortLabel((assignment as any).hostSortStrategy, t)}
+								label={getHostSortLabel((assignment as SubnetAssignmentDto).hostSortStrategy!, t)}
 								size="small"
 								variant="outlined"
 							/>
 						)}
-						{(assignment as any).testWildcard && (
+						{(assignment as IDNetAssignmentDto).testWildcard && (
 							<Chip
 								label={t(TranslationKey.STUDENT_ASSIGNMENTS_CHIP_WILDCARD)}
 								size="small"
 								variant="outlined"
 							/>
 						)}
-						{(assignment as any).testFirstLastBr && (
+						{(assignment as IDNetAssignmentDto).testFirstLastBr && (
 							<Chip
 								label={t(TranslationKey.STUDENT_ASSIGNMENTS_CHIP_FIRST_LAST_BR)}
 								size="small"

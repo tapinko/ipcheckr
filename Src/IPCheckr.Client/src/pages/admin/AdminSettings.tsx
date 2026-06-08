@@ -233,8 +233,8 @@ const AdminSettings = () => {
 
       // connection dropped without OK/ERR — container was killed (self-update restart)
       setUpdateState(prev => prev === "running" ? "restarting" : prev)
-    } catch (e: any) {
-      if (e?.name === "AbortError") return
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name === "AbortError") return
       // connection reset = container restarted
       setUpdateState(prev => prev === "running" ? "restarting" : prev)
     }
@@ -323,11 +323,11 @@ const AdminSettings = () => {
         if (done) break
         if (value) parseAndDispatch(decoder.decode(value, { stream: true }))
       }
-    } catch (e: any) {
-      if (e?.name !== "AbortError") {
+    } catch (e: unknown) {
+      if (!(e instanceof Error) || e.name !== "AbortError") {
         setLogs(prev => [...prev, {
           timestampUtc: new Date().toISOString(), category: "Stream", level: "Error",
-          eventId: 0, message: `Stream exception: ${e?.message || String(e)}`
+          eventId: 0, message: `Stream exception: ${e instanceof Error ? e.message : String(e)}`
         }])
       }
     } finally {

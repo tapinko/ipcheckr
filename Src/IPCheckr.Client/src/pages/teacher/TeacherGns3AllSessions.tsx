@@ -25,16 +25,12 @@ const TeacherGns3AllSessions = () => {
 
   const handleRoleFilterChange = useCallback((_val: string) => {}, [])
 
-  if (!userId) {
-    return <TableSkeleton />
-  }
-
-  const getApiMessage = (error: unknown) => {
+  const getApiMessage = useCallback((error: unknown) => {
     const apiErr = error as AxiosError<ApiProblemDetails>
     const payload = apiErr?.response?.data
     const localized = i18n.language === Language.SK ? payload?.messageSk : payload?.messageEn
     return localized || payload?.detail || t(TranslationKey.ERROR_MESSAGE)
-  }
+  }, [i18n.language, t])
 
   const settingsQuery = useQuery({
     queryKey: ["appsettings"],
@@ -231,6 +227,10 @@ const TeacherGns3AllSessions = () => {
       ],
     }
   }, [classFilterValue, classesQuery.data, t])
+
+  if (!userId) {
+    return <TableSkeleton />
+  }
 
   return (
     <>

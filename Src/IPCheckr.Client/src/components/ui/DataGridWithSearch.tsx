@@ -22,12 +22,12 @@ interface IDataGridWithSearchProps {
   descending?: boolean
   setDescending?: (val: boolean) => void
   columns: { label: string; key: string; width?: string | number; hideOnMobile?: boolean }[],
-  rows?: Record<string, any>[]
+  rows?: Record<string, unknown>[]
   selectableRows?: boolean
   selectedRows?: number[]
   setSelectedRows?: (rows: number[]) => void
   expandedRowId?: number | null
-  renderExpandedRow?: (row: any) => ReactNode
+  renderExpandedRow?: (row: Record<string, unknown>) => ReactNode
 }
 
 const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
@@ -47,9 +47,9 @@ const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
 }) => {
   const { t } = useTranslation()
 
-  const handleRowSelect = (row: any) => {
+  const handleRowSelect = (row: Record<string, unknown>) => {
     if (!selectableRows || !setSelectedRows) return
-    const id = row.id
+    const id = row.id as number
     if (selectedRows.includes(id)) {
       setSelectedRows(selectedRows.filter(i => i !== id))
     } else {
@@ -176,16 +176,16 @@ const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
             rows.flatMap((row, idx) => {
               const baseRow = (
                 <TableRow
-                  key={row.id ?? idx}
+                  key={(row.id as string | number | null | undefined) ?? idx}
                   hover={selectableRows}
-                  selected={selectableRows && selectedRows.includes(row.id)}
+                  selected={selectableRows && selectedRows.includes(row.id as number)}
                   onClick={selectableRows ? () => handleRowSelect(row) : undefined}
                   style={selectableRows ? { cursor: "pointer" } : undefined}
                 >
                   {selectableRows && (
                     <TableCell padding="checkbox" sx={{ width: 44, minWidth: 44, maxWidth: 48, p: 0.5 }}>
                       <Checkbox
-                        checked={selectedRows.includes(row.id)}
+                        checked={selectedRows.includes(row.id as number)}
                         onChange={() => handleRowSelect(row)}
                         onClick={e => e.stopPropagation()}
                         color="primary"
@@ -201,7 +201,7 @@ const DataGridWithSearch: FC<IDataGridWithSearchProps> = ({
                           ...(col.hideOnMobile ? { display: { xs: "none", md: "table-cell" } } : {})
                         }}
                     >
-                      {row[col.key]}
+                      {row[col.key] as ReactNode}
                     </TableCell>
                   ))}
                 </TableRow>

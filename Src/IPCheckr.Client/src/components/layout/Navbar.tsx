@@ -27,6 +27,7 @@ import bg_w_cr_text from "../../assets/bg_w_cr_text.svg"
 import { appSettingsApi, assignmentApi, assignmentGroupApi, classApi, dashboardApi, userApi } from "../../utils/apiClients"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { isDemoMode } from "../../config/demoMode"
+import type { UserDto } from "../../dtos"
 
 interface NavItem {
   labelKey: TranslationKey
@@ -192,7 +193,7 @@ const Navbar = ({ role }: NavbarProps) => {
           queryClient.prefetchQuery({ queryKey: ["adminDashboard"], queryFn: () => dashboardApi.dashboardQueryAdminDashboard().then(r => r.data), staleTime })
           break
         case RouteKeys.ADMIN_USERS: {
-          const toRows = (users: any[]) => (users ?? []).map((u: any) => ({ ...u, classNamesDisplay: (u.classNames ?? []).join(", ") }))
+          const toRows = (users: UserDto[]) => (users ?? []).map(u => ({ ...u, classNamesDisplay: (u.classNames ?? []).join(", ") }))
           queryClient.prefetchQuery({ queryKey: ["users", UserRole.TEACHER, ""], queryFn: () => userApi.userQueryUsers(null, null, UserRole.TEACHER, null, null, null).then(r => toRows(r.data.users)), staleTime })
           queryClient.prefetchQuery({ queryKey: ["users", UserRole.STUDENT, ""], queryFn: () => userApi.userQueryUsers(null, null, UserRole.STUDENT, null, null, null).then(r => toRows(r.data.users)), staleTime })
           break

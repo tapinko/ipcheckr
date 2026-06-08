@@ -40,4 +40,5 @@ export const AppConfigProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppConfig = () => useContext(AppConfigContext)

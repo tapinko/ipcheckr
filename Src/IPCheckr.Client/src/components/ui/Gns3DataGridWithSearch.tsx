@@ -332,7 +332,7 @@ const Gns3DataGridWithSearch = ({
     })
   }, [displayUsers, expandedUserId, isUsersFetching, nowTs, sessionsByUser, startPendingUserId, statusMap, stopPendingUserId, onStartSession, onStopSession])
 
-  const renderExpandedRow = (_row: any) => {
+  const renderExpandedRow = (_row: Record<string, unknown>) => {
     const colByKey = Object.fromEntries(columns.map(c => [c.key, c]))
 
     if (historyQuery.isLoading) return <LinearProgress />

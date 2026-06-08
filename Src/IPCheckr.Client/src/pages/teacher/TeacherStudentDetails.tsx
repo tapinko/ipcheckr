@@ -69,7 +69,7 @@ const TeacherStudentDetails = () => {
   const handleLastSubmitNavigate = async () => {
     if (!detailsQuery.data?.lastSubmitGroupId || !detailsQuery.data?.lastSubmitAssignmentId) return
 
-    let resolvedType = fromAssignmentTypeParam((detailsQuery.data as any)?.lastSubmitType as string | undefined)
+    let resolvedType = fromAssignmentTypeParam((detailsQuery.data as { lastSubmitType?: string | null } | undefined)?.lastSubmitType as string | undefined)
 
     if (!resolvedType) {
       try {
@@ -134,7 +134,7 @@ const TeacherStudentDetails = () => {
                 if (!hasLastSubmitTarget) return
                 const groupId = detailsQuery.data!.lastSubmitGroupId!
                 const assignmentId = detailsQuery.data!.lastSubmitAssignmentId!
-                const resolvedType = fromAssignmentTypeParam((detailsQuery.data as any)?.lastSubmitType as string | undefined)
+                const resolvedType = fromAssignmentTypeParam((detailsQuery.data as { lastSubmitType?: string | null } | undefined)?.lastSubmitType as string | undefined)
                 if (resolvedType === AssignmentGroupType.Subnet || !resolvedType) {
                   queryClient.prefetchQuery({ queryKey: ["agSubmitDetails", "subnet", String(assignmentId)], queryFn: () => assignmentApi.assignmentQuerySubnetAssignmentSubmitDetailsFull(assignmentId).then(r => r.data), staleTime: 60_000 })
                 }

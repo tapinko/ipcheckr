@@ -30,9 +30,10 @@ import DeleteDialog from "../../components/ui/DeleteDialog"
 import ErrorLoading from "../../components/ui/ErrorLoading"
 import MyClassesSkeleton from "../../components/skeletons/MyClassesSkeleton"
 import UserListPanel, { type UserRow } from "../../features/users/components/UserListPanel"
+import LdapAutocompleteField from "../../features/users/components/LdapAutocompleteField"
 import { useAuth } from "../../contexts/AuthContext"
 import { AuthType } from "../../dtos"
-import type { AddUserRes, ApiProblemDetails, ClassDto, LdapUserDto, UserDto } from "../../dtos"
+import type { AddUserRes, ApiProblemDetails, ClassDto, UserDto } from "../../dtos"
 import { useAppConfig } from "../../contexts/AppConfigContext"
 import { classApi, userApi } from "../../utils/apiClients"
 import axiosInstance from "../../utils/axiosInstance"
@@ -158,8 +159,9 @@ const TeacherMyClasses = () => {
       setSelectedClassId(res.classId)
       closeCreateDialog()
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.TEACHER_MY_CLASSES_CREATE_CLASS_ERROR)}. ${msg ?? ""}` })
     }
   })
@@ -543,40 +545,17 @@ const TeacherMyClasses = () => {
               <Controller
                 name="username" control={addStudentControl}
                 rules={{ ...FormRules.required() }}
-                render={({ field }) => {
-                  const [options, setOptions] = useState<LdapUserDto[]>([])
-                  const [input, setInput] = useState("")
-                  const [loading, setLoading] = useState(false)
-                  useEffect(() => {
-                    const q = input.trim()
-                    if (!q || q.length < minLdapSearchChars) { setOptions([]); return }
-                    let cancelled = false
-                    setLoading(true)
-                    const timer = setTimeout(() => {
-                      userApi.userLdapSearchUsers(q).then(r => r.data.users)
-                        .then(users => { if (!cancelled) setOptions(users) })
-                        .finally(() => { if (!cancelled) setLoading(false) })
-                    }, 250)
-                    return () => { cancelled = true; clearTimeout(timer) }
-                  }, [input])
-                  return (
-                    <Autocomplete
-                      loading={loading} options={options} getOptionLabel={o => o.username}
-                      noOptionsText={t(TranslationKey.TEACHER_MY_CLASSES_NO_DATA)}
-                      loadingText={t(TranslationKey.TEACHER_MY_CLASSES_LOADING)}
-                      onInputChange={(_, v) => setInput(v)}
-                      onChange={(_, v) => field.onChange(v ? (v as LdapUserDto).username : "")}
-                      renderInput={params => (
-                        <TextField {...params} margin="dense" fullWidth
-                          label={t(TranslationKey.TEACHER_MY_CLASSES_USERNAME)}
-                          placeholder={t(TranslationKey.TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER, { value: minLdapSearchChars })}
-                          error={!!addStudentErrors.username}
-                          helperText={addStudentErrors.username ? t(addStudentErrors.username.message as string) : ""}
-                        />
-                      )}
-                    />
-                  )
-                }}
+                render={({ field }) => (
+                  <LdapAutocompleteField
+                    field={field}
+                    error={addStudentErrors.username}
+                    label={t(TranslationKey.TEACHER_MY_CLASSES_USERNAME)}
+                    placeholder={t(TranslationKey.TEACHER_MY_CLASSES_LDAP_USERNAME_PLACEHOLDER, { value: minLdapSearchChars })}
+                    noOptionsText={t(TranslationKey.TEACHER_MY_CLASSES_NO_DATA)}
+                    loadingText={t(TranslationKey.TEACHER_MY_CLASSES_LOADING)}
+                    minSearchChars={minLdapSearchChars}
+                  />
+                )}
               />
             ) : (
               <Controller

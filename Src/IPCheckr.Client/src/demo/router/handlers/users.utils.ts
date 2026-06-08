@@ -1,4 +1,5 @@
 import { readDemoState, writeDemoState } from "../../db"
+import UserRole from "../../../types/UserRole"
 import { AssignmentGroupStatus } from "../../../dtos"
 import { resolveStatus } from "./assignmentGroup.utils"
 
@@ -66,7 +67,7 @@ export const addUser = async (
         id: nextId,
         username,
         password: password ?? "cisco",
-        role: role as any,
+        role: role as UserRole,
         classIds: filteredClassIds,
       },
     ],

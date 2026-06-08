@@ -87,8 +87,9 @@ const AdminUserDetails = () => {
       setAlert({ severity: "success", message: t(TranslationKey.ADMIN_USER_DETAILS_ADD_CLASS_SUCCESS) })
       closeAddClassDialog()
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_USER_DETAILS_ADD_CLASS_ERROR)}. ${msg ?? ""}` })
     }
   })
@@ -114,8 +115,9 @@ const AdminUserDetails = () => {
       queryClient.invalidateQueries({ queryKey: ["adminUserDetails", userId] })
       setAlert({ severity: "success", message: t(TranslationKey.ADMIN_USER_DETAILS_REMOVE_FROM_CLASS_SUCCESS) })
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.ADMIN_USER_DETAILS_REMOVE_FROM_CLASS_ERROR)}. ${msg ?? ""}` })
     }
   })

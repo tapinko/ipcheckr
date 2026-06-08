@@ -20,6 +20,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import type { Theme } from "@mui/material/styles"
 import { LazyBarChart, LazyLineChart } from "../../components/charts/LazyCharts"
 import { useState, useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
@@ -114,8 +115,9 @@ const TeacherClassDetails = () => {
       setAlert({ severity: "success", message: t(TranslationKey.TEACHER_CLASS_DETAILS_EDIT_SUCCESS) })
       setEditDialogOpen(false)
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.TEACHER_CLASS_DETAILS_EDIT_ERROR)}. ${msg ?? ""}` })
     }
   })
@@ -125,8 +127,9 @@ const TeacherClassDetails = () => {
     onSuccess: () => {
       navigate(Routes[RouteKeys.TEACHER_MY_CLASSES])
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.TEACHER_CLASS_DETAILS_DELETE_ERROR)}. ${msg ?? ""}` })
       setDeleteDialogOpen(false)
     }
@@ -141,8 +144,9 @@ const TeacherClassDetails = () => {
       queryClient.invalidateQueries({ queryKey: ["teacherClassDetails", classId] })
       setAlert({ severity: "success", message: t(TranslationKey.TEACHER_CLASS_DETAILS_REMOVE_SUCCESS) })
     },
-    onError: (error: any) => {
-      const msg = i18n.language === Language.EN ? error?.response?.data?.messageEn : error?.response?.data?.messageSk
+    onError: (error: unknown) => {
+      const e = error as { response?: { data?: { messageEn?: string; messageSk?: string } } }
+      const msg = i18n.language === Language.EN ? e?.response?.data?.messageEn : e?.response?.data?.messageSk
       setAlert({ severity: "error", message: `${t(TranslationKey.TEACHER_CLASS_DETAILS_REMOVE_ERROR)}. ${msg ?? ""}` })
     }
   })
@@ -227,10 +231,10 @@ const TeacherClassDetails = () => {
   }
 
   const addButtonSx = {
-    border: (theme: any) => `1px solid ${theme.palette.success.main}`,
+    border: (theme: Theme) =>`1px solid ${theme.palette.success.main}`,
     width: 20,
     height: 20,
-    color: (theme: any) => theme.palette.success.dark,
+    color: (theme: Theme) => theme.palette.success.dark,
     "& .MuiSvgIcon-root": { fontSize: 14 },
     mb: "1px"
   }

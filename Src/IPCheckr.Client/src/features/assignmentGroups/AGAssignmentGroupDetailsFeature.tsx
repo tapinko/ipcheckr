@@ -293,6 +293,7 @@ const AGAssignmentGroupDetailsFeature = ({
           return
         }
         await connection.invoke("SubscribeAssignmentGroup", channelType, Number(assignmentGroupId))
+      // eslint-disable-next-line no-empty
       } catch {
       }
     }
