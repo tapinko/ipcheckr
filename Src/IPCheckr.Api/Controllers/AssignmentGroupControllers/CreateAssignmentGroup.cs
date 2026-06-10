@@ -295,7 +295,7 @@ namespace IPCheckr.Api.Controllers
 
                 hosts = ApplyHostSortStrategy(hosts, hostSortStrategy);
 
-                int totalNeeded = hosts.Select(h => h + 2).Sum();
+                int totalNeeded = hosts.Select(h => 1 << (int)Math.Ceiling(Math.Log(h + 2, 2.0))).Sum();
                 int available = 1 << (32 - prefix);
                 if (totalNeeded <= available)
                     return (cidr, hosts);

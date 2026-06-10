@@ -21,7 +21,6 @@ export const getSubnetDataForSubmitHandler: DemoEndpointHandler = async ({ confi
   if (tokenUserId !== null && tokenUserId !== variant.studentUserId) return demoResponse(config, { messageEn: "Forbidden" }, 403)
 
   const hasSubmit = state.submissions.some((s: { assignmentId: number }) => s.assignmentId === assignmentId)
-  const firstNetwork = variant.rows[0]?.network ?? variant.cidr ?? "-"
   const isAvailable = resolveStatus(group.startDate, group.deadline, group.completedAt ?? null) === AssignmentGroupStatus.InProgress && !hasSubmit
 
   return demoResponse(config, {
@@ -30,7 +29,7 @@ export const getSubnetDataForSubmitHandler: DemoEndpointHandler = async ({ confi
     className: group.className,
     deadline: group.deadline,
     hostsPerNetwork: variant.hosts ?? variant.rows.map((row: { hosts?: number }) => row.hosts ?? 0),
-    cidr: firstNetwork,
+    cidr: variant.cidr ?? "-",
     isAvailableForSubmission: isAvailable,
   })
 }

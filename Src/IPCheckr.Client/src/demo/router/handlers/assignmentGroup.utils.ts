@@ -216,7 +216,7 @@ export const tryGenerateSubnetData = (numberOfRecords: number, ipCat: string, ma
     const cidr = `${uintToIp(networkIp)}/${prefix}`
 
     const hosts = Array.from({ length: numberOfRecords }, () => 2 + Math.floor(rand() * 252)).sort((a, b) => b - a)
-    const totalNeeded = hosts.reduce((sum, h) => sum + h + 2, 0)
+    const totalNeeded = hosts.reduce((sum, h) => sum + (1 << Math.ceil(Math.log2(h + 2))), 0)
     const available = 2 ** (32 - prefix)
     if (totalNeeded <= available) return { cidr, hosts }
   }
