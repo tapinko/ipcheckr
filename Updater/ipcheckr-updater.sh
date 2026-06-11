@@ -23,16 +23,27 @@ do_update() {
         return 1
     }
 
+    if [[ ! -f "${ENV_FILE}" ]]; then
+        echo "ERR env-file-not-found: ${ENV_FILE}"
+        return 1
+    fi
+
     echo "INFO Recreating ${COMPOSE_SERVICE}..."
+    docker rm -f "${COMPOSE_SERVICE}" 2>/dev/null || true
+    local compose_out compose_ok=0
+    compose_out=$(docker compose \
+        --project-directory "${DEPLOY_DIR}" \
+        --env-file "${ENV_FILE}" \
+        -f "${COMPOSE_FILE}" \
+        up -d --force-recreate --no-deps "${COMPOSE_SERVICE}" 2>&1) || compose_ok=$?
     while IFS= read -r line; do
         printf 'COMPOSE %s\n' "$line"
-    done < <(
-        docker compose \
-            --project-directory "${DEPLOY_DIR}" \
-            --env-file "${ENV_FILE}" \
-            -f "${COMPOSE_FILE}" \
-            up -d --force-recreate --no-deps "${COMPOSE_SERVICE}" 2>&1
-    )
+    done <<< "$compose_out"
+
+    if [[ $compose_ok -ne 0 ]]; then
+        echo "ERR compose-failed"
+        return 1
+    fi
 
     echo "OK DONE"
 }

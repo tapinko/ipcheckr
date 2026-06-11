@@ -5,8 +5,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DEPLOY_DIR="$SCRIPT_DIR"
+DEPLOY_DIR="${DEPLOY_DIR:-/opt/ipcheckr}"
+mkdir -p "$DEPLOY_DIR"
 
 if [[ $EUID -ne 0 ]]; then
   echo "ERROR: This script must be run as root or with sudo"
