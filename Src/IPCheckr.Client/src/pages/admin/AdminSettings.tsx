@@ -15,7 +15,8 @@ import Tune from "@mui/icons-material/Tune"
 import ViewList from "@mui/icons-material/ViewList"
 import { useTranslation } from "react-i18next"
 import type { AppSettingDto, EditAppSettinReq, ApiProblemDetails, UpdaterVersionInfoRes, VersionEntry } from "../../dtos"
-import { appSettingsApi, updaterApi } from "../../utils/apiClients"
+import { appSettingsApi, updaterApi, userApi } from "../../utils/apiClients"
+import { useAuth } from "../../contexts/AuthContext"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import AdminSettingsSkeleton from "../../components/skeletons/AdminSettingsSkeleton"
 import ErrorLoading from "../../components/ui/ErrorLoading"
@@ -75,6 +76,7 @@ const SectionCard = ({ icon, title, children }: { icon: React.ReactNode; title: 
 const AdminSettings = () => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const { userId } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -143,6 +145,10 @@ const AdminSettings = () => {
   const controllerRef = useRef<AbortController | null>(null)
   const bufferRef = useRef<string>("")
   const logContainerRef = useRef<HTMLDivElement | null>(null)
+
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [changePasswordAlert, setChangePasswordAlert] = useState<CustomAlertState | null>(null)
 
   type UpdateState = "idle" | "running" | "restarting" | "done" | "error"
   const [updateState, setUpdateState] = useState<UpdateState>("idle")
@@ -565,6 +571,29 @@ const AdminSettings = () => {
     }
   }
 
+  const changePasswordMutation = useMutation({
+    mutationFn: (newPassword: string) =>
+      userApi.userEditUser({ id: userId!, password: newPassword }),
+    onSuccess: () => {
+      setChangePasswordAlert({ severity: "success", message: t(TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_SUCCESS) })
+      setNewPassword("")
+      setConfirmPassword("")
+    },
+    onError: (err: AxiosError<ApiProblemDetails>) => {
+      const details = err.response?.data
+      const localMessage = i18n.language === Language.EN ? details?.messageEn : details?.messageSk
+      setChangePasswordAlert({ severity: "error", message: localMessage ?? t(TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_ERROR) })
+    },
+  })
+
+  const handleChangePassword = () => {
+    if (newPassword !== confirmPassword) {
+      setChangePasswordAlert({ severity: "error", message: t(TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_MISMATCH) })
+      return
+    }
+    changePasswordMutation.mutate(newPassword)
+  }
+
   const logStatusText = isConnecting ? "Connecting…" : isConnected ? "Connected" : "Disconnected"
 
   if (settingsQuery.isLoading) return <AdminSettingsSkeleton />
@@ -789,6 +818,7 @@ const AdminSettings = () => {
             </SectionCard>
           </Stack>
 
+          <Stack spacing={2}>
           <SectionCard icon={<Tune fontSize="small" />} title={t(TranslationKey.ADMIN_SETTINGS_GNS3)}>
             <FormControlLabel
               control={
@@ -826,6 +856,50 @@ const AdminSettings = () => {
               </>
             )}
           </SectionCard>
+
+            <SectionCard icon={<Lock fontSize="small" />} title={t(TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD)}>
+              {changePasswordAlert && (
+                <CustomAlert
+                  severity={changePasswordAlert.severity}
+                  message={changePasswordAlert.message}
+                  onClose={() => setChangePasswordAlert(null)}
+                />
+              )}
+              <SettingField label={t(TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_NEW)}>
+                <TextField
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  fullWidth
+                  size="small"
+                  autoComplete="new-password"
+                />
+              </SettingField>
+              <SettingField label={t(TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_CONFIRM)}>
+                <TextField
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  fullWidth
+                  size="small"
+                  autoComplete="new-password"
+                  error={confirmPassword.length > 0 && newPassword !== confirmPassword}
+                  helperText={confirmPassword.length > 0 && newPassword !== confirmPassword
+                    ? t(TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_MISMATCH)
+                    : undefined}
+                />
+              </SettingField>
+              <Box>
+                <Button
+                  variant="contained"
+                  onClick={handleChangePassword}
+                  disabled={!newPassword || changePasswordMutation.isPending}
+                >
+                  {t(TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_SUBMIT)}
+                </Button>
+              </Box>
+            </SectionCard>
+          </Stack>
         </Box>
       )}
 

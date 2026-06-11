@@ -421,6 +421,13 @@ export enum TranslationKey {
   ADMIN_SETTINGS_UPDATE_AVAILABLE = "ADMIN_SETTINGS_UPDATE_AVAILABLE",
   ADMIN_SETTINGS_UPDATE_VERSION_LOADING = "ADMIN_SETTINGS_UPDATE_VERSION_LOADING",
   ADMIN_SETTINGS_UPDATE_VERSION_ERROR = "ADMIN_SETTINGS_UPDATE_VERSION_ERROR",
+  ADMIN_SETTINGS_CHANGE_PASSWORD = "ADMIN_SETTINGS_CHANGE_PASSWORD",
+  ADMIN_SETTINGS_CHANGE_PASSWORD_NEW = "ADMIN_SETTINGS_CHANGE_PASSWORD_NEW",
+  ADMIN_SETTINGS_CHANGE_PASSWORD_CONFIRM = "ADMIN_SETTINGS_CHANGE_PASSWORD_CONFIRM",
+  ADMIN_SETTINGS_CHANGE_PASSWORD_SUBMIT = "ADMIN_SETTINGS_CHANGE_PASSWORD_SUBMIT",
+  ADMIN_SETTINGS_CHANGE_PASSWORD_MISMATCH = "ADMIN_SETTINGS_CHANGE_PASSWORD_MISMATCH",
+  ADMIN_SETTINGS_CHANGE_PASSWORD_SUCCESS = "ADMIN_SETTINGS_CHANGE_PASSWORD_SUCCESS",
+  ADMIN_SETTINGS_CHANGE_PASSWORD_ERROR = "ADMIN_SETTINGS_CHANGE_PASSWORD_ERROR",
   // |                        |
   // ||-----------------------||
 
@@ -1464,6 +1471,13 @@ const _EN: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_UPDATE_AVAILABLE]: "Update available",
   [TranslationKey.ADMIN_SETTINGS_UPDATE_VERSION_LOADING]: "Checking...",
   [TranslationKey.ADMIN_SETTINGS_UPDATE_VERSION_ERROR]: "Could not fetch version info",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD]: "Change Admin Password",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_NEW]: "New password",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_CONFIRM]: "Confirm new password",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_SUBMIT]: "Change password",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_MISMATCH]: "Passwords do not match",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_SUCCESS]: "Password changed successfully",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_ERROR]: "Failed to change password",
   // |                        |
   // ||-----------------------||
 
@@ -2507,6 +2521,13 @@ const _SK: Record<TranslationKey, string> = {
   [TranslationKey.ADMIN_SETTINGS_UPDATE_AVAILABLE]: "K dispozícii je aktualizácia",
   [TranslationKey.ADMIN_SETTINGS_UPDATE_VERSION_LOADING]: "Kontrolujem...",
   [TranslationKey.ADMIN_SETTINGS_UPDATE_VERSION_ERROR]: "Nepodarilo sa načítať informácie o verzii",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD]: "Zmena hesla admina",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_NEW]: "Nové heslo",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_CONFIRM]: "Potvrdenie nového hesla",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_SUBMIT]: "Zmeniť heslo",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_MISMATCH]: "Heslá sa nezhodujú",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_SUCCESS]: "Heslo bolo úspešne zmenené",
+  [TranslationKey.ADMIN_SETTINGS_CHANGE_PASSWORD_ERROR]: "Nepodarilo sa zmeniť heslo",
   // |                        |
   // ||-----------------------||
 

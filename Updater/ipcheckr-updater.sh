@@ -28,6 +28,7 @@ do_update() {
         printf 'COMPOSE %s\n' "$line"
     done < <(
         docker compose \
+            --project-directory "${DEPLOY_DIR}" \
             --env-file "${ENV_FILE}" \
             -f "${COMPOSE_FILE}" \
             up -d --force-recreate --no-deps "${COMPOSE_SERVICE}" 2>&1
