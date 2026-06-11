@@ -3,10 +3,13 @@ name: Build and Push Docker Image
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Docker image tag (e.g. v1.0.0, latest, test)'
+      version:
+        description: 'Version to release (e.g. v0.7.3) — used as image tag and baked into APP_VERSION'
         required: true
-        default: 'latest'
+      push_latest:
+        description: 'Also push as :latest'
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -25,6 +28,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Compute image tags
+        id: tags
+        run: |
+          TAGS="${{ secrets.DOCKERHUB_USERNAME }}/ipcheckr:${{ github.event.inputs.version }}"
+          if [[ "${{ github.event.inputs.push_latest }}" == "true" ]]; then
+            TAGS="${TAGS},${{ secrets.DOCKERHUB_USERNAME }}/ipcheckr:latest"
+          fi
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
@@ -32,5 +44,5 @@ jobs:
           file: Docker/Dockerfile
           push: true
           provenance: false
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ipcheckr:${{ github.event.inputs.tag }}
-          build-args: APP_VERSION=${{ github.event.inputs.tag }}
+          tags: ${{ steps.tags.outputs.tags }}
+          build-args: APP_VERSION=${{ github.event.inputs.version }}

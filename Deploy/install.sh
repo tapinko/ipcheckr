@@ -784,10 +784,17 @@ get_server_ip() {
 
 
 show_summary() {
+    local installed_version
+    installed_version=$(docker inspect "${CONFIG[CONTAINER_IPCHECKR]}" \
+        --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null \
+        | grep '^APP_VERSION=' | cut -d= -f2 | tr -d '[:space:]' || true)
+    installed_version="${installed_version:-unknown}"
+
     local summary_text="Installation Complete!\n\n"
+    summary_text+="Installed version: ${installed_version}\n"
     summary_text+="Web Interface: https://$(get_server_ip):${CONFIG[WEB_PORT]}\n"
     summary_text+="GNS3 Reverse Proxy: https://$(get_server_ip):${CONFIG[NGINX_GNS3_PORT]}\n\n"
-    
+
     show_info "Installation Summary" "$summary_text"
 }
 

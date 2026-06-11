@@ -45,6 +45,14 @@ do_update() {
         return 1
     fi
 
+    local installed_version
+    installed_version=$(docker inspect "${COMPOSE_SERVICE}" \
+        --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null \
+        | grep '^APP_VERSION=' | cut -d= -f2 | tr -d '[:space:]' || true)
+    if [[ -n "$installed_version" ]]; then
+        echo "INFO Installed version: ${installed_version}"
+    fi
+
     echo "OK DONE"
 }
 

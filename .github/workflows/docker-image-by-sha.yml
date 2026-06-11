@@ -7,8 +7,11 @@ on:
         description: 'Specific commit SHA to build from'
         required: true
       tag:
-        description: 'Docker image tag (e.g. v1.0.0, test, latest)'
+        description: 'Docker image tag (e.g. test, v0.7.3-rc1)'
         required: true
+      version:
+        description: 'Version string to bake into APP_VERSION (e.g. v0.7.3) — defaults to tag if omitted'
+        required: false
 
 jobs:
   build:
@@ -29,6 +32,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Resolve APP_VERSION
+        id: version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [[ -z "$VERSION" ]]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          fi
+          echo "value=${VERSION}" >> "$GITHUB_OUTPUT"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
@@ -37,4 +49,4 @@ jobs:
           push: true
           provenance: false
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ipcheckr:${{ github.event.inputs.tag }}
-          build-args: APP_VERSION=${{ github.event.inputs.tag }}
+          build-args: APP_VERSION=${{ steps.version.outputs.value }}
