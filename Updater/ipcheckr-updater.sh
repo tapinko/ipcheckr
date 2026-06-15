@@ -8,6 +8,8 @@ COMPOSE_FILE="${COMPOSE_FILE:-${DEPLOY_DIR}/compose.yml}"
 COMPOSE_SERVICE="${COMPOSE_SERVICE:-ipcheckr}"
 
 do_update() {
+    local tag_override="${1:-}"
+
     if ! command -v docker &>/dev/null; then
         echo "ERR docker-not-found"
         return 1
@@ -26,6 +28,12 @@ do_update() {
     local image
     image=$(grep '^DOCKER_IMAGE=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2- | tr -d '[:space:]' | head -1 || true)
     image="${image:-tapinko/ipcheckr:latest}"
+
+    if [[ -n "$tag_override" ]]; then
+        local base="${image%:*}"
+        image="${base}:${tag_override}"
+        echo "INFO Using tag override: ${image}"
+    fi
 
     # Save the currently running image for rollback
     local old_image
@@ -94,7 +102,7 @@ handle_connection() {
 
         case "$cmd" in
             update)
-                do_update
+                do_update "$rest"
                 ;;
             ping)
                 echo "PONG"

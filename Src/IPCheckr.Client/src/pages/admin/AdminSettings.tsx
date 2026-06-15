@@ -1,21 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import {
-  Alert, Box, Button, ButtonGroup, Card, CardContent, Checkbox, Divider,
-  FormControl, FormControlLabel, InputLabel, MenuItem,
+  Alert, Box, Button, ButtonGroup, Card, CardContent, Checkbox, Collapse, Divider,
+  FormControl, FormControlLabel, IconButton, InputLabel, MenuItem,
   Paper, Radio, RadioGroup, Select, Snackbar, Stack, Tab, Tabs, TextField, Tooltip, Typography,
 } from "@mui/material"
 import LanguageIcon from "@mui/icons-material/Language"
 import Lock from "@mui/icons-material/Lock"
 import PlayArrow from "@mui/icons-material/PlayArrow"
 import Refresh from "@mui/icons-material/Refresh"
+import Settings from "@mui/icons-material/Settings"
 import Stop from "@mui/icons-material/Stop"
 import SystemUpdateAlt from "@mui/icons-material/SystemUpdateAlt"
 import Tune from "@mui/icons-material/Tune"
 import ViewList from "@mui/icons-material/ViewList"
 import { useTranslation } from "react-i18next"
 import type { AppSettingDto, EditAppSettinReq, ApiProblemDetails, UpdaterVersionInfoRes, VersionEntry } from "../../dtos"
-import { appSettingsApi, updaterApi, userApi } from "../../utils/apiClients"
+import { UpdaterApiAxiosParamCreator } from "../../dtos/api"
+import { appSettingsApi, configuration, updaterApi, userApi } from "../../utils/apiClients"
 import { useAuth } from "../../contexts/AuthContext"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import AdminSettingsSkeleton from "../../components/skeletons/AdminSettingsSkeleton"
@@ -154,6 +156,8 @@ const AdminSettings = () => {
   const [updateState, setUpdateState] = useState<UpdateState>("idle")
   const [updateLines, setUpdateLines] = useState<string[]>([])
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false)
+  const [updateAdvancedOpen, setUpdateAdvancedOpen] = useState(false)
+  const [updateTargetTag, setUpdateTargetTag] = useState("")
   const updateControllerRef = useRef<AbortController | null>(null)
   const updateContainerRef = useRef<HTMLDivElement | null>(null)
 
@@ -202,8 +206,13 @@ const AdminSettings = () => {
     const ctrl = new AbortController()
     updateControllerRef.current = ctrl
 
+    const trimmedTag = updateTargetTag.trim()
+    const reqArgs = await UpdaterApiAxiosParamCreator(configuration).updaterStreamUpdate()
+    const streamUrl = new URL(reqArgs.url, configuration.basePath)
+    if (trimmedTag) streamUrl.searchParams.set("tag", trimmedTag)
+
     try {
-      const resp = await fetch(`${getApiBase()}/api/updater/stream`, {
+      const resp = await fetch(streamUrl.toString(), {
         method: "GET",
         headers: { ...(auth ? { Authorization: auth } : {}), Accept: "text/event-stream" },
         signal: ctrl.signal,
@@ -775,26 +784,47 @@ const AdminSettings = () => {
                   )
                 })()}
               </Box>
-              <Stack direction="row" spacing={1} alignItems="center" mb={updateLines.length > 0 || updateState !== "idle" ? 2 : 0}>
-                <Button
-                  variant="contained"
-                  color="warning"
-                  startIcon={<SystemUpdateAlt />}
-                  onClick={() => setUpdateDialogOpen(true)}
-                  disabled={updateState === "running" || !versionQuery.data?.updaterEnabled}
-                >
-                  {t(TranslationKey.ADMIN_SETTINGS_UPDATE_BUTTON)}
-                </Button>
-                {!versionQuery.data?.updaterEnabled && versionQuery.data !== undefined && (
-                  <Typography variant="body2" color="text.secondary">
-                    {t(TranslationKey.ADMIN_SETTINGS_UPDATE_DISABLED)}
-                  </Typography>
-                )}
-                {updateLines.length > 0 && (
-                  <Button size="small" onClick={() => { setUpdateLines([]); setUpdateState("idle") }}>
-                    {t(TranslationKey.ADMIN_SETTINGS_UPDATE_CLEAR)}
+              <Stack spacing={1} mb={updateLines.length > 0 || updateState !== "idle" ? 2 : 0}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    startIcon={<SystemUpdateAlt />}
+                    onClick={() => setUpdateDialogOpen(true)}
+                    disabled={updateState === "running" || !versionQuery.data?.updaterEnabled || (!updateTargetTag.trim() && versionQuery.data?.updateAvailable === false)}
+                  >
+                    {t(TranslationKey.ADMIN_SETTINGS_UPDATE_BUTTON)}
                   </Button>
-                )}
+                  <Tooltip title="Advanced">
+                    <IconButton
+                      size="small"
+                      onClick={() => setUpdateAdvancedOpen(prev => !prev)}
+                      color={updateAdvancedOpen ? "primary" : "default"}
+                    >
+                      <Settings fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  {!versionQuery.data?.updaterEnabled && versionQuery.data !== undefined && (
+                    <Typography variant="body2" color="text.secondary">
+                      {t(TranslationKey.ADMIN_SETTINGS_UPDATE_DISABLED)}
+                    </Typography>
+                  )}
+                  {updateLines.length > 0 && (
+                    <Button size="small" onClick={() => { setUpdateLines([]); setUpdateState("idle") }}>
+                      {t(TranslationKey.ADMIN_SETTINGS_UPDATE_CLEAR)}
+                    </Button>
+                  )}
+                </Stack>
+                <Collapse in={updateAdvancedOpen}>
+                  <TextField
+                    size="small"
+                    label={t(TranslationKey.ADMIN_SETTINGS_UPDATE_TAG)}
+                    value={updateTargetTag}
+                    onChange={e => setUpdateTargetTag(e.target.value)}
+                    placeholder="v1.2.3"
+                    sx={{ width: 220 }}
+                  />
+                </Collapse>
               </Stack>
               {updateLines.length > 0 && (
                 <Paper variant="outlined" sx={{ p: 1, maxHeight: 280, overflow: "auto" }} ref={updateContainerRef}>

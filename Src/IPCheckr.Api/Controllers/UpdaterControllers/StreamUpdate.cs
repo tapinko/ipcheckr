@@ -6,7 +6,7 @@ public partial class UpdaterController : ControllerBase
 {
     [HttpGet("stream")]
     [Produces("text/event-stream")]
-    public async Task StreamUpdate()
+    public async Task StreamUpdate([FromQuery] string? tag)
     {
         Response.StatusCode = StatusCodes.Status200OK;
         Response.Headers["Content-Type"] = "text/event-stream";
@@ -21,7 +21,7 @@ public partial class UpdaterController : ControllerBase
 
         try
         {
-            await foreach (var line in _updater.StreamUpdateAsync(ct))
+            await foreach (var line in _updater.StreamUpdateAsync(tag, ct))
             {
                 await Response.WriteAsync($"data: {line}\n\n", ct);
                 await Response.Body.FlushAsync(ct);

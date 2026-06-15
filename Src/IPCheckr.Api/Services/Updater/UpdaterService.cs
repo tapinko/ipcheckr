@@ -11,7 +11,7 @@ namespace IPCheckr.Api.Services.Updater;
 public interface IUpdaterService
 {
     Task<UpdaterVersionInfoDto> GetVersionInfoAsync(CancellationToken ct);
-    IAsyncEnumerable<string> StreamUpdateAsync(CancellationToken ct);
+    IAsyncEnumerable<string> StreamUpdateAsync(string? tag, CancellationToken ct);
 }
 
 public class UpdaterService : IUpdaterService
@@ -59,7 +59,7 @@ public class UpdaterService : IUpdaterService
         };
     }
 
-    public async IAsyncEnumerable<string> StreamUpdateAsync([EnumeratorCancellation] CancellationToken ct)
+    public async IAsyncEnumerable<string> StreamUpdateAsync(string? tag, [EnumeratorCancellation] CancellationToken ct)
     {
         if (!_options.Enabled)
         {
@@ -94,7 +94,8 @@ public class UpdaterService : IUpdaterService
         using (var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), leaveOpen: true) { AutoFlush = true })
         using (var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: false, leaveOpen: true))
         {
-            await writer.WriteLineAsync("update");
+            var command = string.IsNullOrWhiteSpace(tag) ? "update" : $"update {tag.Trim()}";
+            await writer.WriteLineAsync(command);
 
             while (true)
             {

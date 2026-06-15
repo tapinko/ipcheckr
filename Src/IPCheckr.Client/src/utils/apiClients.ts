@@ -3,7 +3,7 @@ import { Configuration } from "../dtos/configuration"
 import axiosInstance from "./axiosInstance"
 import getApiBase from "./getApiBase"
 
-const configuration = /*#__PURE__*/ new Configuration({ basePath: getApiBase() })
+export const configuration = /*#__PURE__*/ new Configuration({ basePath: getApiBase() })
 
 export const userApi = /*#__PURE__*/ new UserApi(configuration, undefined, axiosInstance)
 export const classApi = /*#__PURE__*/ new ClassApi(configuration, undefined, axiosInstance)

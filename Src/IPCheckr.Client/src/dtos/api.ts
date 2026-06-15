@@ -454,23 +454,35 @@ export interface AppSettingDto {
  */
 export interface ArchiveAGReq {
     /**
-     *
+     * 
      * @type {number}
      * @memberof ArchiveAGReq
      */
     'assignmentGroupId': number;
     /**
-     *
+     * 
      * @type {boolean}
      * @memberof ArchiveAGReq
      */
     'isArchived': boolean;
     /**
-     *
+     * 
      * @type {AssignmentGroupType}
      * @memberof ArchiveAGReq
      */
     'type': AssignmentGroupType;
+    /**
+     * 
+     * @type {string}
+     * @memberof ArchiveAGReq
+     */
+    'newStartDate'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ArchiveAGReq
+     */
+    'newDeadline'?: string | null;
 }
 
 
