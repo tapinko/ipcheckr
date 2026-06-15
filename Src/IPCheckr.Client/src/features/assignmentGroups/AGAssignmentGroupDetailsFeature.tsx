@@ -38,6 +38,7 @@ import {
   Divider,
   LinearProgress,
   Stack,
+  TextField,
   Typography
 } from "@mui/material"
 import { useParams } from "react-router-dom"
@@ -187,6 +188,8 @@ const AGAssignmentGroupDetailsFeature = ({
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
   const [reopenedAssignmentIds, setReopenedAssignmentIds] = useState<Set<number>>(new Set())
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false)
+  const [unarchiveStartDate, setUnarchiveStartDate] = useState("")
+  const [unarchiveDeadline, setUnarchiveDeadline] = useState("")
 
   const subnetQuery = useQuery<QuerySubnetAGDetailRes, Error>({
     queryKey: ["assignmentGroupDetails", "subnet", assignmentGroupId],
@@ -626,7 +629,27 @@ const AGAssignmentGroupDetailsFeature = ({
             : t(TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_ARCHIVE_CONFIRM)}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>{data?.name}</DialogContentText>
+          <DialogContentText sx={{ mb: data?.isArchived ? 2 : 0 }}>{data?.name}</DialogContentText>
+          {data?.isArchived && (
+            <Stack spacing={2} sx={{ mt: 1 }}>
+              <TextField
+                label={t(TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_UNARCHIVE_NEW_START_DATE)}
+                type="datetime-local"
+                fullWidth
+                value={unarchiveStartDate}
+                onChange={e => setUnarchiveStartDate(e.target.value)}
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+              <TextField
+                label={t(TranslationKey.AG_ASSIGNMENT_GROUP_DETAILS_UNARCHIVE_NEW_DEADLINE)}
+                type="datetime-local"
+                fullWidth
+                value={unarchiveDeadline}
+                onChange={e => setUnarchiveDeadline(e.target.value)}
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+            </Stack>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setArchiveConfirmOpen(false)} disabled={archiveMutation.isPending}>
@@ -635,10 +658,18 @@ const AGAssignmentGroupDetailsFeature = ({
           <Button
             variant="contained"
             color={data?.isArchived ? "primary" : "warning"}
-            disabled={archiveMutation.isPending}
+            disabled={archiveMutation.isPending || (!!data?.isArchived && (!unarchiveStartDate || !unarchiveDeadline))}
             onClick={() => {
               if (!data || !assignmentGroupId) return
-              archiveMutation.mutate({ assignmentGroupId: Number(assignmentGroupId), isArchived: !data.isArchived, type: data.type })
+              archiveMutation.mutate({
+                assignmentGroupId: Number(assignmentGroupId),
+                isArchived: !data.isArchived,
+                type: data.type,
+                ...(data.isArchived && {
+                  newStartDate: new Date(unarchiveStartDate).toISOString(),
+                  newDeadline: new Date(unarchiveDeadline).toISOString()
+                })
+              })
             }}
           >
             {data?.isArchived

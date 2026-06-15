@@ -16,5 +16,9 @@ namespace IPCheckr.Api.DTOs.AssignmentGroup
         [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public AssignmentGroupType Type { get; set; }
+
+        public DateTime? NewStartDate { get; set; }
+
+        public DateTime? NewDeadline { get; set; }
     }
 }

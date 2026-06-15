@@ -1,5 +1,6 @@
 using IPCheckr.Api.Common.Constants;
 using IPCheckr.Api.Common.Enums;
+using IPCheckr.Api.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using IPCheckr.Api.DTOs;
 using IPCheckr.Api.DTOs.AssignmentGroup;
@@ -60,6 +61,35 @@ namespace IPCheckr.Api.Controllers
                     });
 
                 group.IsArchived = req.IsArchived;
+                if (!req.IsArchived)
+                {
+                    if (!req.NewStartDate.HasValue || !req.NewDeadline.HasValue)
+                        return BadRequest(new ApiProblemDetails
+                        {
+                            Title = "Bad Request",
+                            Detail = "NewStartDate and NewDeadline are required when unarchiving.",
+                            Status = StatusCodes.Status400BadRequest,
+                            MessageEn = "NewStartDate and NewDeadline are required when unarchiving.",
+                            MessageSk = "Pri odarchivovaní je potrebné zadať nový dátum začiatku a termín."
+                        });
+
+                    var startLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(req.NewStartDate.Value);
+                    var deadlineLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(req.NewDeadline.Value);
+                    if (startLocal > deadlineLocal)
+                        return BadRequest(new ApiProblemDetails
+                        {
+                            Title = "Bad Request",
+                            Detail = "StartDate cannot be after Deadline.",
+                            Status = StatusCodes.Status400BadRequest,
+                            MessageEn = "StartDate cannot be after Deadline.",
+                            MessageSk = "Dátum začiatku nemôže byť po termíne ukončenia."
+                        });
+
+                    group.StartDate = req.NewStartDate.Value;
+                    group.Deadline = req.NewDeadline.Value;
+                    group.CompletedAt = null;
+                    group.Status = AssignmentEvaluationUtils.ResolveStatus(group.StartDate, group.Deadline, group.CompletedAt);
+                }
             }
             else if (req.Type == AssignmentGroupType.IDNET)
             {
@@ -88,6 +118,35 @@ namespace IPCheckr.Api.Controllers
                     });
 
                 group.IsArchived = req.IsArchived;
+                if (!req.IsArchived)
+                {
+                    if (!req.NewStartDate.HasValue || !req.NewDeadline.HasValue)
+                        return BadRequest(new ApiProblemDetails
+                        {
+                            Title = "Bad Request",
+                            Detail = "NewStartDate and NewDeadline are required when unarchiving.",
+                            Status = StatusCodes.Status400BadRequest,
+                            MessageEn = "NewStartDate and NewDeadline are required when unarchiving.",
+                            MessageSk = "Pri odarchivovaní je potrebné zadať nový dátum začiatku a termín."
+                        });
+
+                    var startLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(req.NewStartDate.Value);
+                    var deadlineLocal = AssignmentEvaluationUtils.NormalizeToLocalComparison(req.NewDeadline.Value);
+                    if (startLocal > deadlineLocal)
+                        return BadRequest(new ApiProblemDetails
+                        {
+                            Title = "Bad Request",
+                            Detail = "StartDate cannot be after Deadline.",
+                            Status = StatusCodes.Status400BadRequest,
+                            MessageEn = "StartDate cannot be after Deadline.",
+                            MessageSk = "Dátum začiatku nemôže byť po termíne ukončenia."
+                        });
+
+                    group.StartDate = req.NewStartDate.Value;
+                    group.Deadline = req.NewDeadline.Value;
+                    group.CompletedAt = null;
+                    group.Status = AssignmentEvaluationUtils.ResolveStatus(group.StartDate, group.Deadline, group.CompletedAt);
+                }
             }
             else
             {
