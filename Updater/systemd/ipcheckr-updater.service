@@ -9,6 +9,7 @@ EnvironmentFile=-/etc/ipcheckr/updater/updater.env
 ExecStart=/usr/local/bin/ipcheckr-updater
 User=root
 Group=root
+SyslogIdentifier=ipcheckr-updater
 
 NoNewPrivileges=true
 PrivateTmp=true

@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <branch> <deploy_dir>" >&2
+if [ "$#" -lt 2 ]; then
+    echo "Usage: $0 <branch> <deploy_dir> [updater_port]" >&2
     exit 1
 fi
 
 BRANCH="$1"
 DEPLOY_DIR="$2"
+UPDATER_PORT="${3:-6770}"
 
 BASE_URL="https://raw.githubusercontent.com/tapinko/ipcheckr/${BRANCH}/Updater"
 UPDATER_SCRIPT_URL="${BASE_URL}/ipcheckr-updater.sh"
@@ -40,14 +41,21 @@ if [ ! -f "$ENV_PATH" ]; then
     mkdir -p "$ENV_DIR"
     curl -fsSL -o /tmp/updater.env "$ENV_TEMPLATE_URL"
     sed -i "s|^DEPLOY_DIR=.*|DEPLOY_DIR=${DEPLOY_DIR}|" /tmp/updater.env
+    sed -i "s|^PORT=.*|PORT=${UPDATER_PORT}|" /tmp/updater.env
     install -m 0640 /tmp/updater.env "$ENV_PATH"
     echo "Updater env created at ${ENV_PATH}"
 else
-    # update DEPLOY_DIR if it changed
     sed -i "s|^DEPLOY_DIR=.*|DEPLOY_DIR=${DEPLOY_DIR}|" "$ENV_PATH"
-    echo "Updater env already exists at ${ENV_PATH}; DEPLOY_DIR updated"
+    sed -i "s|^PORT=.*|PORT=${UPDATER_PORT}|" "$ENV_PATH"
+    echo "Updater env already exists at ${ENV_PATH}; DEPLOY_DIR and PORT updated"
 fi
 
 systemctl daemon-reload
-systemctl enable --now ipcheckr-updater.service
-echo "IPCheckr updater service enabled and started"
+systemctl enable ipcheckr-updater.service
+if systemctl is-active --quiet ipcheckr-updater.service; then
+    systemctl restart ipcheckr-updater.service
+    echo "IPCheckr updater service restarted with new binary"
+else
+    systemctl start ipcheckr-updater.service
+    echo "IPCheckr updater service enabled and started"
+fi

@@ -57,6 +57,7 @@ declare -A DEFAULTS=(
     [BRANCH]="master"
     [INSTALL_GNS3]="true"
     [UPDATER_ENABLED]="true"
+    [UPDATER_PORT]="6770"
 )
 
 declare -A CONFIG
@@ -116,7 +117,7 @@ ensure_connector_env() {
     local tmp_env="/tmp/connector.env"
     download_from_github "GNS3/launcher/systemd/connector.env" "$tmp_env"
     sudo install -m 0640 "$tmp_env" "$target"
-    sudo chown root:root "$target" 2>/dev/null || true
+    sudo chown root:root "$target" 2>/dev/null || log_warning "Could not set ownership on ${target} — verify manually"
     log_success "Connector env created at ${target}"
 }
 
@@ -198,7 +199,7 @@ run_updater_setup() {
     local updater_init_tmp="/tmp/updater-init.sh"
     download_from_github "Updater/scripts/updater-init.sh" "$updater_init_tmp"
     chmod +x "$updater_init_tmp"
-    bash "$updater_init_tmp" "$GITHUB_BRANCH" "$DEPLOY_DIR"
+    bash "$updater_init_tmp" "$GITHUB_BRANCH" "$DEPLOY_DIR" "${CONFIG[UPDATER_PORT]}"
     log_success "Updater setup completed"
 }
 
@@ -337,12 +338,9 @@ seed_config_defaults() {
         CONFIG[$key]="${env_value:-${DEFAULTS[$key]}}"
     done
 
-    CONFIG[DB_HOST_ALIAS]="${CONFIG[DB_HOST]}"
 }
 
 save_config_env() {
-    CONFIG[DB_HOST_ALIAS]="${CONFIG[DB_HOST]}"
-
     cat >"$ENV_FILE" <<EOF
 WEB_PORT=${CONFIG[WEB_PORT]}
 TZ=${CONFIG[TZ]}
@@ -370,6 +368,7 @@ GNS3_VERSION=${CONFIG[GNS3_VERSION]}
 GNS3_INSTALL_METHOD=${CONFIG[GNS3_INSTALL_METHOD]}
 NGINX_VERSION=${CONFIG[NGINX_VERSION]}
 UPDATER_ENABLED=${CONFIG[UPDATER_ENABLED]}
+UPDATER_PORT=${CONFIG[UPDATER_PORT]}
 DOCKER_IMAGE=${CONFIG[DOCKER_IMAGE]}
 CONTAINER_IPCHECKR=${CONFIG[CONTAINER_IPCHECKR]}
 CONTAINER_DATABASE=${CONFIG[CONTAINER_DATABASE]}
@@ -382,14 +381,12 @@ EOF
 }
 
 save_runtime_env() {
-    CONFIG[DB_HOST_ALIAS]="${CONFIG[DB_HOST]}"
-
     {
         echo "# Runtime env for docker-compose - includes secrets"
         echo "# $(date)"
         echo "WEB_PORT=${CONFIG[WEB_PORT]}"
         echo "TZ=${CONFIG[TZ]}"
-        echo "DB_HOST=${CONFIG[DB_HOST_ALIAS]}"
+        echo "DB_HOST=${CONFIG[DB_HOST]}"
         echo "DB_PORT=${CONFIG[DB_PORT]}"
         echo "DB_NAME=${CONFIG[DB_NAME]}"
         echo "DB_USER=${CONFIG[DB_USER]}"
@@ -412,11 +409,11 @@ save_runtime_env() {
         echo "GNS3_INSTALL_METHOD=${CONFIG[GNS3_INSTALL_METHOD]}"
         echo "NGINX_GNS3_PORT=${CONFIG[NGINX_GNS3_PORT]}"
         echo "UPDATER_ENABLED=${CONFIG[UPDATER_ENABLED]}"
+        echo "UPDATER_PORT=${CONFIG[UPDATER_PORT]}"
         echo "DOCKER_IMAGE=${CONFIG[DOCKER_IMAGE]}"
         echo "CONTAINER_IPCHECKR=${CONFIG[CONTAINER_IPCHECKR]}"
         echo "CONTAINER_DATABASE=${CONFIG[CONTAINER_DATABASE]}"
         echo "MARIADB_IMAGE=${CONFIG[MARIADB_IMAGE]}"
-        echo "DB_HOST=${CONFIG[DB_HOST_ALIAS]}"
         echo "BRANCH=${GITHUB_BRANCH}"
         echo "INSTALL_GNS3=${CONFIG[INSTALL_GNS3]}"
     } > "$ENV_RUNTIME"

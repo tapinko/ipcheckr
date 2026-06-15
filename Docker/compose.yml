@@ -24,6 +24,7 @@ services:
       - Gns3__LauncherTimeoutSeconds=${GNS3_LAUNCHER_TIMEOUT}
       - Gns3__LauncherRetries=${GNS3_LAUNCHER_RETRIES}
       - Updater__Enabled=${UPDATER_ENABLED:-false}
+      - Updater__Port=${UPDATER_PORT:-6770}
     ports:
       - "${WEB_PORT}:8081"
     volumes:
